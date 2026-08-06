@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 7 exercises — Shor&#x27;s Algorithm, Order Finding and the Hidden Subgroup Problem</title>
+<meta name="description" content="Exercises for chapter 7: Shor&#x27;s Algorithm, Order Finding and the Hidden Subgroup Problem">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = {tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]}, svg:{fontCache:"global"}};</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Quantum Computing</a> · <a href="course.html">Chapter 7</a> · Exercises</div><span class="course-code">Exercise sheet</span></div></header>
+<section class="lesson-hero"><div class="container">
+  <div class="lesson-label">Chapter 7 · exercise sheet</div>
+  <h1>Shor&#x27;s Algorithm, Order Finding and the Hidden Subgroup Problem</h1>
+  <p class="lesson-sub">4 programming exercises ·
+     3 problems with symbolic answers. Every solution is hidden behind a
+     toggle — attempt each one before opening it.</p>
+</div></section>
+<div class="lesson-content">
+<h2>Programming exercises</h2>
+<p>Each exercise is checked automatically against hidden test cases. Only NumPy is required, and the function names in the statement must be used exactly as written.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 7.1</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C7.Q1 — Recovering s/r from a noisy estimate</p><p>Phase estimation returns \(x=y/2^{t}\) with \(|x-s/r|\le1/(2r^{2})\). Legendre's theorem guarantees \(s/r\) is a convergent of the continued-fraction expansion of \(x\).</p></div><p>Write <code>cf_expansion(x, depth)</code> returning the list of partial quotients \([a_0;a_1,\dots]\) (stopping early if the remainder vanishes); <code>convergents(x, depth)</code> returning the list of <code>(p, q)</code> pairs; and <code>best_denominator(x, qmax)</code> returning the largest-\(q\) convergent denominator with \(q\le q_{\max}\). Use integers only in the recurrences \(p_k=a_kp_{k-1}+p_{k-2}\), \(q_k=a_kq_{k-1}+q_{k-2}\).</p><div class="stmt"><pre>cf_expansion(0.3125, 10)   -&gt; [0, 3, 5]        (5/16)
+best_denominator(0.3125, 15) -&gt; 3              (1/3 is the best q&lt;=15)</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>from fractions import Fraction
+
+def cf_expansion(x, depth):
+    # hint: Fraction(x).limit_denominator(10**6) first, then exact integer recurrences
+    ...
+
+def convergents(x, depth):
+    ...
+
+def best_denominator(x, qmax):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>print(cf_expansion(0.3125, 10))
+→ [0, 3, 5]</code></pre><pre><code>print(convergents(0.3125, 10))
+→ [(0, 1), (1, 3), (5, 16)]</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>from fractions import Fraction
+
+def cf_expansion(x, depth):
+    # work in exact rational arithmetic: floating-point recurrences are unstable here
+    x = Fraction(x).limit_denominator(10 ** 6)
+    out = []
+    for _ in range(depth):
+        a = x.numerator // x.denominator
+        out.append(a)
+        x = x - a
+        if x == 0:
+            break
+        x = 1 / x
+    return out
+
+def convergents(x, depth):
+    a = cf_expansion(x, depth)
+    res, pm1, pm2, qm1, qm2 = [], 1, 0, 0, 1
+    for ak in a:
+        pk = ak * pm1 + pm2
+        qk = ak * qm1 + qm2
+        res.append((pk, qk))
+        pm2, pm1 = pm1, pk
+        qm2, qm1 = qm1, qk
+    return res
+
+def best_denominator(x, qmax):
+    best = 1
+    for _, q in convergents(x, 40):
+        if 0 &lt; q &lt;= qmax:
+            best = q
+    return best
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 7.2</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C7.Q2 — From r to a non-trivial divisor</p><p>If \(r=\mathrm{ord}_N(a)\) is even and \(a^{r/2}\not\equiv-1\), then \(\gcd(a^{r/2}\pm1,N)\) are proper factors.</p></div><p>Write <code>order(a, N)</code> (brute force is fine here), <code>factors_from_order(a, r, N)</code> returning a sorted tuple of two non-trivial factors or <code>None</code> when the order is unusable, and <code>shor_classical(N, seed)</code> which loops over random \(a\) drawn with <code>random.Random(seed)</code> until it succeeds, returning the sorted tuple of factors. Use <code>math.gcd</code> and <code>pow(a, e, N)</code>.</p><div class="stmt"><pre>order(7, 15) -&gt; 4
+factors_from_order(7, 4, 15) -&gt; (3, 5)
+shor_classical(15, 0) -&gt; (3, 5)</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>from math import gcd
+import random
+
+def order(a, N):
+    ...
+
+def factors_from_order(a, r, N):
+    ...
+
+def shor_classical(N, seed):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>print(order(7, 15), order(2, 15))
+→ 4 4</code></pre><pre><code>print(factors_from_order(7, 4, 15))
+→ (3, 5)</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>from math import gcd
+import random
+
+def order(a, N):
+    r, x = 1, a % N
+    while x != 1:
+        x = (x * a) % N
+        r += 1
+    return r
+
+def factors_from_order(a, r, N):
+    if r % 2 != 0:
+        return None
+    h = pow(a, r // 2, N)
+    if h == N - 1:
+        return None
+    f = tuple(sorted({gcd(h - 1, N), gcd(h + 1, N)} - {1, N}))
+    if len(f) != 2:
+        cand = [d for d in (gcd(h - 1, N), gcd(h + 1, N)) if 1 &lt; d &lt; N]
+        if not cand:
+            return None
+        d = cand[0]
+        return tuple(sorted((d, N // d)))
+    return f
+
+def shor_classical(N, seed):
+    rng = random.Random(seed)
+    while True:
+        a = rng.randrange(2, N)
+        g = gcd(a, N)
+        if g &gt; 1:
+            return tuple(sorted((g, N // g)))
+        f = factors_from_order(a, order(a, N), N)
+        if f:
+            return f
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 7.3</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C7.Q3 — The quantum subroutine, exactly</p><p>Phase estimation on \(U_a|x\rangle=|ax\bmod N\rangle\) starting from \(|1\rangle\) samples \(s\) uniformly in \(\{0,\dots,r-1\}\) and outputs \(y\) distributed as a Fejér kernel around \(2^{t}s/r\).</p></div><p>Write <code>phase_distribution(r, t)</code> returning the exact distribution over the \(2^{t}\) outcomes \(y\), averaged uniformly over \(s=0,\dots,r-1\); and <code>sample_order(a, N, t, seed, trials)</code> which draws <code>trials</code> outcomes from that distribution, converts each to a candidate denominator by continued fractions, and returns the smallest candidate \(r'\) with \(a^{r'}\equiv1\pmod N\) (or <code>None</code>).</p><div class="stmt"><pre>phase_distribution(4, 4) is supported on y = 0, 4, 8, 12
+sample_order(7, 15, 8, 0, 20) -&gt; 4</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+from fractions import Fraction
+
+def phase_distribution(r, t):
+    ...
+
+def sample_order(a, N, t, seed, trials):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+pr = phase_distribution(4, 4)
+print(np.round(pr, 6).tolist().count(0.25))
+→ 4</code></pre><pre><code>print(sample_order(7, 15, 8, 0, 20))
+→ 4</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+from fractions import Fraction
+
+def phase_distribution(r, t):
+    N = 2 ** t
+    y = np.arange(N)
+    total = np.zeros(N)
+    for s in range(r):
+        d = s / r - y / N
+        amp = np.where(np.abs(np.sin(np.pi * d)) &lt; 1e-14, 1.0,
+                       np.sin(np.pi * N * d) / (N * np.sin(np.pi * d)))
+        total += amp ** 2
+    return total / r
+
+def sample_order(a, N, t, seed, trials):
+    r_true = 1
+    x = a % N
+    while x != 1:
+        x = (x * a) % N
+        r_true += 1
+    pr = phase_distribution(r_true, t)
+    pr = pr / pr.sum()
+    rng = np.random.default_rng(seed)
+    ys = rng.choice(2 ** t, size=trials, p=pr)
+    cands = []
+    for y in ys:
+        q = Fraction(int(y), 2 ** t).limit_denominator(N).denominator
+        if q &gt; 0 and pow(a, q, N) == 1:
+            cands.append(q)
+    return min(cands) if cands else None
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 7.4</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C7.Q4 — Putting it together</p><p>Combine the classical reduction of Q2 with the sampled order finding of Q3. This is the complete algorithm, with the only idealisation being that the eigenphase distribution is computed analytically instead of by state-vector simulation.</p></div><p>Write <code>shor(N, seed, t=None, trials=30)</code> returning a sorted tuple of two non-trivial factors of \(N\). Default \(t=2\lceil\log_2N\rceil+1\). Handle the easy cases first: even \(N\), and \(\gcd(a,N)>1\).</p><div class="stmt"><pre>shor(15, 0) -&gt; (3, 5)
+shor(21, 1) -&gt; (3, 7)
+shor(91, 5) -&gt; (7, 13)</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+from math import gcd, ceil, log2
+from fractions import Fraction
+import random
+
+def shor(N, seed, t=None, trials=30):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>print(shor(15, 0))
+→ (3, 5)</code></pre><pre><code>print(shor(21, 1))
+→ (3, 7)</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+from math import gcd, ceil, log2
+from fractions import Fraction
+import random
+
+def _phase_distribution(r, t):
+    N = 2 ** t
+    y = np.arange(N)
+    total = np.zeros(N)
+    for s in range(r):
+        d = s / r - y / N
+        amp = np.where(np.abs(np.sin(np.pi * d)) &lt; 1e-14, 1.0,
+                       np.sin(np.pi * N * d) / (N * np.sin(np.pi * d)))
+        total += amp ** 2
+    return total / r
+
+def _true_order(a, N):
+    r, x = 1, a % N
+    while x != 1:
+        x = (x * a) % N
+        r += 1
+    return r
+
+def shor(N, seed, t=None, trials=30):
+    if N % 2 == 0:
+        return tuple(sorted((2, N // 2)))
+    if t is None:
+        t = 2 * int(ceil(log2(N))) + 1
+    rng = random.Random(seed)
+    nprng = np.random.default_rng(seed)
+    while True:
+        a = rng.randrange(2, N)
+        g = gcd(a, N)
+        if g &gt; 1:
+            return tuple(sorted((g, N // g)))
+        pr = _phase_distribution(_true_order(a, N), t)
+        pr = pr / pr.sum()
+        for y in nprng.choice(2 ** t, size=trials, p=pr):
+            r = Fraction(int(y), 2 ** t).limit_denominator(N).denominator
+            if r == 0 or pow(a, r, N) != 1 or r % 2:
+                continue
+            h = pow(a, r // 2, N)
+            if h == N - 1:
+                continue
+            for d in (gcd(h - 1, N), gcd(h + 1, N)):
+                if 1 &lt; d &lt; N:
+                    return tuple(sorted((d, N // d)))
+</code></pre></details>
+</div>
+<h2>Problems with symbolic answers</h2>
+<p>Answers here are expressions rather than numbers, and any algebraically equivalent form is accepted. Give fractions and radicals exactly; decimal approximations are not accepted.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 7.1</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C7.S1 — The arithmetic of the reduction</p></div><p>Take \(N=15\) and \(a=7\).</p><p>(a) Give \(r=\mathrm{ord}_{15}(7)\).</p><p>\(r=\) <span>your answer</span> </p><p>(b) Give \(7^{r/2}\bmod 15\).</p><p><span>your answer</span> </p><p>(c) Give the two non-trivial factors \(\gcd(7^{r/2}\pm1,15)\), as an ordered list <code>[smaller, larger]</code>.</p><p><span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) \(7^1=7,\ 7^2=49\equiv4,\ 7^3\equiv28\equiv13,\ 7^4\equiv91\equiv1\pmod{15}\), so \(r=4\).</p><p>(b) \(7^{2}=49\equiv4\pmod{15}\). Crucially \(4\not\equiv-1\equiv14\), so the reduction succeeds.</p><p>(c) \(\gcd(3,15)=3\) and \(\gcd(5,15)=5\), giving \(15=3\cdot5\).</p><p>Had we drawn \(a=14\), we would have \(r=2\) and \(14^{1}\equiv-1\), the failure case — which is why the algorithm retries with a fresh random \(a\). The failure probability is at most \(1/2\) per attempt.</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 7.2</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C7.S2 — Sizing the ancilla register</p></div><p>Order finding must resolve \(s/r\) with \(r<N\), where \(N\) has \(L=\lceil\log_2 N\rceil\) bits.</p><p>(a) Legendre\'s theorem requires \(|x-s/r|\le\varepsilon\). Give the largest \(\varepsilon\) that still determines \(s/r\) uniquely, in terms of <code>r</code>.</p><p>\(\varepsilon=\) <span>your answer</span> </p><p>(b) Give the number of ancilla qubits \(t\) that guarantees this for every \(r<N=2^{L}\), in terms of <code>L</code>.</p><p>\(t=\) <span>your answer</span> </p><p>(c) Evaluate \(t\) for an \(L={@L@}\)-bit modulus.</p><p>\(t=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) \(\varepsilon=\frac{1}{2r^{2}}\): two distinct rationals with denominators below \(r\) differ by at least \(1/r^{2}\), so half that gap identifies the right one.</p><p>(b) Since \(r<2^{L}\), it suffices that \(2^{-t}\le 2^{-(2L+1)}\), i.e. \(t=2L+1\).</p><p>(c) For \(L={@L@}\): \(t=2\cdot{@L@}+1={@ta3@}\).</p><p>For RSA-2048 this is \(t=4097\) ancillas on top of the arithmetic register — before any error-correction overhead. Fault-tolerant estimates instead use windowed arithmetic and semi-classical Fourier readout to bring the logical qubit count down to roughly \(3L\).</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 7.3</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C7.S3 — How often must we retry?</p></div><p>Assume each independent attempt of Shor\'s algorithm succeeds with probability at least \(1/2\).</p><p>(a) Give the probability that at least one of \(k\) independent attempts succeeds, as a function of <code>k</code> (using the worst case \(1/2\)).</p><p>\(p_k=\) <span>your answer</span> </p><p>(b) Give the smallest \(k\) with \(p_k\ge 1-2^{-{@m@}}\).</p><p>\(k=\) <span>your answer</span> </p><p>(c) Phase estimation returns \(s=0\) with probability \(1/r\), which yields no information. For \(r={@r0@}\), give that probability.</p><p><span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) Failures are independent, so \(p_k=1-2^{-k}\).</p><p>(b) \(1-2^{-k}\ge1-2^{-{@m@}}\) iff \(k\ge{@m@}\), so \(k={@m@}\).</p><p>(c) \(1/r=1/{@r0@}\).</p><p>The overall structure is typical of BQP algorithms: a constant success probability per run amplified to \(1-2^{-m}\) with \(O(m)\) repetitions, at negligible cost compared with the exponential classical alternative. Verification is classical and cheap — multiply the factors back — so the algorithm is a Las Vegas procedure.</p></details>
+</div>
+<div class="exo-banner"><div><strong>Back to the theory</strong><span>Every exercise above is worked from a result proved in the chapter</span></div><a href="course.html">Open chapter 7</a></div>
+</div>
+<nav class="lesson-nav"><a class="prev" href="../chapter06-qft-and-phase-estimation/exercises.html"><span class="dir">Previous chapter</span><span class="ttl">6. The Quantum Fourier Transform and Phase Estimation</span></a><a class="next" href="../chapter08-grover-and-amplitude-amplification/exercises.html"><span class="dir">Next chapter</span><span class="ttl">8. Grover Search, Amplitude Amplification and Query Lower Bounds</span></a></nav>
+<footer class="site-footer"><div class="container"><strong>Quantum Computing — Theory and Practice</strong> · ten chapters · forty programming exercises · thirty symbolic problems<span class="footer-meta">Edition 2026</span></div></footer></body></html>

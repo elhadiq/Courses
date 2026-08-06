@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 1 — Foundations of Learning and Linear Regression</title>
+<link href="../assets/style.css" rel="stylesheet">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+
+/* Use the full width the theme allows: the shared stylesheet caps a lesson at
+   880px, which leaves wide figures and tables boxed into the middle of a large
+   screen. --max-w is the theme's own page width, so this stays consistent with
+   the landing page. */
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) {
+  .lesson-content { padding-left: 16px; padding-right: 16px; }
+}
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule);
+               padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center;
+               padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.lesson-nav { max-width: 880px; margin: 0 auto 40px; padding: 0 24px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav .container { display: flex; gap: 18px; flex-wrap: wrap; width: 100%; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600;
+                font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.keypoints h4 { margin-top: 0; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Machine Learning A&ndash;Z</a> &middot; Course</div><span class="course-code">Graph-based machine learning</span></div></header>
+<section class="lesson-hero"><div class="container"><div class="lesson-label">Part I &middot; Section 1</div><h1>Section 1 — Foundations of Learning and Linear Regression</h1><div class="lesson-sub">Empirical risk minimisation, the least-squares estimator, gradient descent, the bias&ndash;variance decomposition and regularisation.</div></div></section>
+<main class="lesson-content">
+<div class="box method"><div class="box-title">Companion annex</div><p>Every algorithm in this section is also set out <strong><a href="algorithms.html">step by step in the annex</a></strong>: what it is given, what it produces, the steps in order, a small example worked by hand, and why it is correct, why it stops and what it costs &mdash; described in words, with no program code.</p></div><h2>1.1 What a learning problem is</h2><p>Supervised learning starts from an unknown joint probability distribution <code>P(x, y)</code> over an input space <strong>X</strong> and an output space <strong>Y</strong>. We never see <code>P</code>; we only observe a finite sample of <em>n</em> pairs drawn independently from it, called the <em>training set</em>.</p><div class="eq">\[D = \{(x_1, y_1), (x_2, y_2), \ldots , (x&#8345;, y&#8345;)\} drawn i.i.d. from P(x, y)\]</div><p>The goal is to choose a function <em>f</em> from a hypothesis class <em>H</em> that makes small errors on <em>future</em> pairs from the same distribution. Error is quantified by a loss function <em>L(y, f(x))</em>, and the quantity we truly care about is the <strong>expected risk</strong> <a class="cite" href="#ref-vapnik1995">[2]</a>:</p><div class="eq">\[R(f) = \mathbf{E}_{(x,y)\sim P} [ L(y, f(x)) ]\]</div><p>Because <code>P</code> is unknown, this expectation cannot be computed. We replace it by its sample average, the <strong>empirical risk</strong>:</p><div class="eq">\[\hat{R}(f) = (1/n) \sum_{i=1..n} L(y_{i}, f(x_{i}))\]</div><div class="box def"><div class="box-title">Definition — Empirical Risk Minimisation (ERM)</div>The ERM principle selects \(\hat{f} = \operatorname{argmin}_{f\in H} \hat{R}(f)\). Vapnik and Chervonenkis <a class="cite" href="#ref-vapnik1991">[1]</a> proved that ERM is <em>consistent</em> &mdash; that R(\(\hat{f}\)) converges to the best achievable risk in <em>H</em> &mdash; if and only if the empirical risk converges uniformly over <em>H</em>, a condition controlled by the VC dimension of the class.</div><div class="box warn"><div class="box-title">No free lunch</div>Wolpert <a class="cite" href="#ref-wolpert1996">[11]</a> showed that, averaged over all possible target functions, every learning algorithm has the same expected off-training-set error. There is no universally best learner: performance always comes from assumptions (the <em>inductive bias</em>) that happen to match the problem.</div><h2>1.2 Linear regression and the least-squares estimator</h2><p>The simplest non-trivial hypothesis class is the set of affine functions. With the squared loss \(L(y, f(x)) = (y - f(x))^2\), ERM becomes the method of least squares, published by Legendre in 1805 <a class="cite" href="#ref-legendre1805">[3]</a> and justified probabilistically by Gauss in 1809 <a class="cite" href="#ref-gauss1809">[4]</a>.</p><div class="eq">\[f_{\theta}(x) = \theta_0 + \theta_1x_1 + \ldots + \theta_{d}x_{d} = \theta^{T}\tilde{x}\]</div><p>Stacking the <em>n</em> augmented inputs as rows of a design matrix <strong>X</strong> (size \(n\times (d+1)\)) and the targets in a vector <strong>y</strong>, the objective is:</p><div class="eq">\[J(\theta ) = \| y - X\theta \|^2_2\]</div><div class="box thm"><div class="box-title">Theorem — Normal equations</div><em>J</em> is convex and differentiable; setting \(\nabla J(\theta ) = -2X^{T}(y - X\theta ) = 0\) gives \(X^{T}X\theta = X^{T}y\). If X has full column rank, \(X^{T}X\) is invertible and the unique minimiser is <strong>\(\hat{\theta} = (X^{T}X)^{-1}X^{T}y\)</strong>. Geometrically, \(X\hat{\theta}\) is the orthogonal projection of y onto the column space of X, so the residual vector is orthogonal to every predictor <a class="cite" href="#ref-esl2009">[10]</a>.</div><p>In one dimension the closed form reduces to the familiar covariance-over-variance ratio, which the interactive figure below recomputes as you drag the points:</p><div class="eq">\[\theta_1 = \sum (x_{i}-\bar{x})(y_{i}-\bar{y}) / \sum (x_{i}-\bar{x})^2 \theta_0 = \bar{y} - \theta_1\bar{x}\]</div><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Drag any of the seven red data points. The fit, the residuals and the sum of squared errors update in real time.</p><div id="jxg1" class="viz-board" style="height:470px;"></div><p class="viz-caption"><strong>Figure.</strong> The blue line is the ordinary least-squares fit. Orange segments are the residuals \(y_{i} - f(x_{i})\); least squares minimises the sum of the <em>squares</em> of their lengths. Note how a single far-away point can swing the line: the squared loss is not robust to outliers.</p></div><h2>1.3 Gradient descent</h2><p>Solving the normal equations costs O(\(nd^2 + d^3\)), which is prohibitive when <em>d</em> is large. Iterative first-order methods scale far better, and they generalise to models with no closed-form solution &mdash; which is essentially every model from Section 2 onwards.</p><div class="eq">\[\theta^{(t+1)} = \theta^{(t)} - \eta \nabla J(\theta^{(t)}) with \nabla J(\theta ) = -(2/n) X^{T}(y - X\theta )\]</div><p>For a convex, <em>L</em>-smooth objective, gradient descent with step size \(\eta \le 1/L\) converges, and the error after <em>t</em> steps decreases as O(1/t). If in addition <em>J</em> is \(\mu -\)strongly convex, convergence is linear at rate (1 \(- \mu /L\)). For least squares, <em>L</em> and \(\mu\) are the largest and smallest eigenvalues of (2/n)\(X^{T}X\), so the <strong>condition number</strong> of the design matrix directly governs the speed.</p><p><strong>Stochastic gradient descent</strong> replaces the full-sample gradient by the gradient of a single example (or a mini-batch). Robbins and Monro <a class="cite" href="#ref-robbins1951">[9]</a> proved convergence under the step-size conditions \(\sum \eta_{t} = \infty\) and \(\sum \eta_{t}^2 \lt \infty\) &mdash; the steps must be large enough to travel anywhere, yet decay fast enough for the noise to average out.</p><pre><code>import numpy as np
+
+def fit_gd(X, y, eta=0.05, n_iter=500):
+    """Batch gradient descent for linear regression. X already has a bias column."""
+    n, d = X.shape
+    theta = np.zeros(d)
+    history = []
+    for _ in range(n_iter):
+        residual = y - X @ theta
+        grad = -(2.0 / n) * (X.T @ residual)
+        theta = theta - eta * grad
+        history.append(float(residual @ residual) / n)
+    return theta, history</code></pre><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Move the learning-rate slider \(\eta\) and the starting point \(\theta_0\). The green path shows the first 12 iterates.</p><div id="jxg2" class="viz-board" style="height:470px;"></div><p class="viz-caption"><strong>Figure.</strong> Gradient descent on a one-dimensional quadratic loss. Small \(\eta\) crawls; \(\eta\) near 2/L oscillates; \(\eta \gt 2/L\) diverges &mdash; the iterates are then multiplied by a factor of modulus greater than one at every step.</p></div><h2>1.4 Overfitting and the bias&ndash;variance decomposition</h2><figure class="viz"><div class="viz-title">Bias&ndash;variance decomposition</div><svg viewBox="0 0 720 340" role="img" style="width:100%;height:auto;display:block;font-family:inherit;"><path d="M 90 30 L 90 300 L 680 300" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><text x="385" y="334" text-anchor="middle" style="fill:var(--color-muted);font-size:13px;font-weight:400;">model complexity &#8594;</text><text x="52" y="165" text-anchor="middle" transform="rotate(-90 52 165)" style="fill:var(--color-muted);font-size:13px;">expected squared error</text><path d="M 90 269.667 L 660 269.667" style="fill:none;stroke:var(--viz-ref);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:6 5;"/><path d="M 90 71.7778 L 94.7899 78.0841 L 99.5798 84.2128 L 104.37 90.1688 L 109.16 95.9571 L 113.95 101.582 L 118.739 107.049 L 123.529 112.362 L 128.319 117.525 L 133.109 122.543 L 137.899 127.419 L 142.689 132.158 L 147.479 136.764 L 152.269 141.24 L 157.059 145.589 L 161.849 149.817 L 166.639 153.925 L 171.429 157.917 L 176.218 161.797 L 181.008 165.568 L 185.798 169.233 L 190.588 172.794 L 195.378 176.255 L 200.168 179.618 L 204.958 182.887 L 209.748 186.064 L 214.538 189.151 L 219.328 192.151 L 224.118 195.067 L 228.908 197.901 L 233.697 200.654 L 238.487 203.331 L 243.277 205.931 L 248.067 208.459 L 252.857 210.915 L 257.647 213.303 L 262.437 215.623 L 267.227 217.877 L 272.017 220.068 L 276.807 222.198 L 281.597 224.267 L 286.387 226.278 L 291.176 228.233 L 295.966 230.132 L 300.756 231.978 L 305.546 233.772 L 310.336 235.515 L 315.126 237.21 L 319.916 238.856 L 324.706 240.456 L 329.496 242.011 L 334.286 243.523 L 339.076 244.992 L 343.866 246.419 L 348.655 247.806 L 353.445 249.154 L 358.235 250.464 L 363.025 251.738 L 367.815 252.975 L 372.605 254.177 L 377.395 255.346 L 382.185 256.482 L 386.975 257.585 L 391.765 258.658 L 396.555 259.701 L 401.345 260.714 L 406.134 261.698 L 410.924 262.655 L 415.714 263.585 L 420.504 264.488 L 425.294 265.367 L 430.084 266.22 L 434.874 267.049 L 439.664 267.856 L 444.454 268.639 L 449.244 269.4 L 454.034 270.14 L 458.824 270.859 L 463.613 271.558 L 468.403 272.237 L 473.193 272.897 L 477.983 273.538 L 482.773 274.162 L 487.563 274.767 L 492.353 275.356 L 497.143 275.928 L 501.933 276.484 L 506.723 277.024 L 511.513 277.549 L 516.303 278.06 L 521.092 278.556 L 525.882 279.038 L 530.672 279.506 L 535.462 279.961 L 540.252 280.404 L 545.042 280.834 L 549.832 281.251 L 554.622 281.657 L 559.412 282.052 L 564.202 282.435 L 568.992 282.808 L 573.782 283.17 L 578.571 283.522 L 583.361 283.864 L 588.151 284.197 L 592.941 284.52 L 597.731 284.834 L 602.521 285.139 L 607.311 285.436 L 612.101 285.724 L 616.891 286.004 L 621.681 286.276 L 626.471 286.54 L 631.261 286.798 L 636.05 287.047 L 640.84 287.29 L 645.63 287.526 L 650.42 287.755 L 655.21 287.978 L 660 288.195" style="fill:none;stroke:var(--viz-blue);stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 90 292.778 L 94.7899 292.776 L 99.5798 292.766 L 104.37 292.746 L 109.16 292.715 L 113.95 292.67 L 118.739 292.611 L 123.529 292.536 L 128.319 292.445 L 133.109 292.337 L 137.899 292.21 L 142.689 292.064 L 147.479 291.898 L 152.269 291.711 L 157.059 291.504 L 161.849 291.274 L 166.639 291.022 L 171.429 290.747 L 176.218 290.449 L 181.008 290.126 L 185.798 289.779 L 190.588 289.406 L 195.378 289.008 L 200.168 288.584 L 204.958 288.133 L 209.748 287.655 L 214.538 287.149 L 219.328 286.615 L 224.118 286.053 L 228.908 285.462 L 233.697 284.842 L 238.487 284.193 L 243.277 283.513 L 248.067 282.803 L 252.857 282.062 L 257.647 281.29 L 262.437 280.486 L 267.227 279.651 L 272.017 278.783 L 276.807 277.883 L 281.597 276.95 L 286.387 275.984 L 291.176 274.984 L 295.966 273.95 L 300.756 272.882 L 305.546 271.779 L 310.336 270.642 L 315.126 269.469 L 319.916 268.261 L 324.706 267.018 L 329.496 265.738 L 334.286 264.422 L 339.076 263.069 L 343.866 261.679 L 348.655 260.252 L 353.445 258.788 L 358.235 257.286 L 363.025 255.746 L 367.815 254.167 L 372.605 252.55 L 377.395 250.894 L 382.185 249.199 L 386.975 247.465 L 391.765 245.691 L 396.555 243.877 L 401.345 242.024 L 406.134 240.129 L 410.924 238.195 L 415.714 236.219 L 420.504 234.202 L 425.294 232.144 L 430.084 230.044 L 434.874 227.903 L 439.664 225.719 L 444.454 223.493 L 449.244 221.225 L 454.034 218.914 L 458.824 216.56 L 463.613 214.163 L 468.403 211.722 L 473.193 209.238 L 477.983 206.709 L 482.773 204.137 L 487.563 201.521 L 492.353 198.86 L 497.143 196.154 L 501.933 193.403 L 506.723 190.607 L 511.513 187.766 L 516.303 184.879 L 521.092 181.947 L 525.882 178.968 L 530.672 175.944 L 535.462 172.872 L 540.252 169.755 L 545.042 166.59 L 549.832 163.379 L 554.622 160.12 L 559.412 156.814 L 564.202 153.461 L 568.992 150.06 L 573.782 146.61 L 578.571 143.113 L 583.361 139.567 L 588.151 135.973 L 592.941 132.33 L 597.731 128.638 L 602.521 124.897 L 607.311 121.107 L 612.101 117.267 L 616.891 113.378 L 621.681 109.439 L 626.471 105.45 L 631.261 101.411 L 636.05 97.3209 L 640.84 93.1807 L 645.63 88.9898 L 650.42 84.748 L 655.21 80.4552 L 660 76.1111" style="fill:none;stroke:var(--viz-bad);stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 90 34.2222 L 94.7899 40.5263 L 99.5798 46.6453 L 104.37 52.5817 L 109.16 58.3385 L 113.95 63.9191 L 118.739 69.3268 L 123.529 74.565 L 128.319 79.637 L 133.109 84.5461 L 137.899 89.2955 L 142.689 93.8885 L 147.479 98.3282 L 152.269 102.618 L 157.059 106.76 L 161.849 110.758 L 166.639 114.614 L 171.429 118.331 L 176.218 121.913 L 181.008 125.361 L 185.798 128.678 L 190.588 131.867 L 195.378 134.93 L 200.168 137.869 L 204.958 140.686 L 209.748 143.385 L 214.538 145.967 L 219.328 148.433 L 224.118 150.787 L 228.908 153.03 L 233.697 155.163 L 238.487 157.19 L 243.277 159.111 L 248.067 160.928 L 252.857 162.644 L 257.647 164.259 L 262.437 165.775 L 267.227 167.195 L 272.017 168.518 L 276.807 169.747 L 281.597 170.884 L 286.387 171.928 L 291.176 172.883 L 295.966 173.749 L 300.756 174.526 L 305.546 175.218 L 310.336 175.824 L 315.126 176.346 L 319.916 176.784 L 324.706 177.141 L 329.496 177.416 L 334.286 177.611 L 339.076 177.727 L 343.866 177.765 L 348.655 177.725 L 353.445 177.609 L 358.235 177.417 L 363.025 177.15 L 367.815 176.809 L 372.605 176.394 L 377.395 175.907 L 382.185 175.348 L 386.975 174.717 L 391.765 174.016 L 396.555 173.245 L 401.345 172.404 L 406.134 171.494 L 410.924 170.516 L 415.714 169.47 L 420.504 168.357 L 425.294 167.177 L 430.084 165.931 L 434.874 164.619 L 439.664 163.241 L 444.454 161.799 L 449.244 160.292 L 454.034 158.721 L 458.824 157.086 L 463.613 155.387 L 468.403 153.625 L 473.193 151.801 L 477.983 149.914 L 482.773 147.965 L 487.563 145.955 L 492.353 143.882 L 497.143 141.749 L 501.933 139.554 L 506.723 137.298 L 511.513 134.982 L 516.303 132.606 L 521.092 130.169 L 525.882 127.673 L 530.672 125.116 L 535.462 122.5 L 540.252 119.825 L 545.042 117.091 L 549.832 114.297 L 554.622 111.444 L 559.412 108.533 L 564.202 105.563 L 568.992 102.534 L 573.782 99.4473 L 578.571 96.3019 L 583.361 93.0983 L 588.151 89.8364 L 592.941 86.5166 L 597.731 83.1387 L 602.521 79.7029 L 607.311 76.2092 L 612.101 72.6577 L 616.891 69.0485 L 621.681 65.3815 L 626.471 61.6569 L 631.261 57.8747 L 636.05 54.0349 L 640.84 50.1375 L 645.63 46.1825 L 650.42 42.17 L 655.21 38.1001 L 660 33.9725" style="fill:none;stroke:var(--primary);stroke-width:3.6;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 343.866 300 L 343.866 177.765" style="fill:none;stroke:var(--viz-ok);stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:4 4;"/><circle cx="343.866" cy="177.765" r="6" style="fill:var(--viz-ok);stroke:var(--color-bg);stroke-width:2.5;"/><text x="343.866" y="161.765" text-anchor="middle" style="fill:var(--viz-ok);font-size:12.5px;font-weight:700;">optimum</text><text x="654" y="64" text-anchor="end" style="fill:var(--viz-bad);font-size:13px;font-weight:700;">variance</text><text x="104" y="64" text-anchor="start" style="fill:var(--viz-blue);font-size:13px;font-weight:700;">bias&#178;</text><text x="240" y="46" text-anchor="start" style="fill:var(--primary);font-size:13.5px;font-weight:700;">total error</text><text x="674" y="261.667" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-weight:400;">irreducible noise</text><text x="98" y="322" text-anchor="start" style="fill:var(--color-muted);font-size:12px;font-weight:400;">underfitting</text><text x="652" y="322" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-weight:400;">overfitting</text></svg><figcaption class="viz-caption"><strong>Figure.</strong> The classical decomposition. Squared bias falls as the class grows richer; variance rises; their sum is U-shaped and its minimum is the complexity worth choosing. No model can go below the noise floor.</figcaption></figure><p>Minimising empirical risk over a rich class is dangerous: a polynomial of degree <em>n</em>&minus;1 interpolates <em>n</em> points exactly, giving zero training error and, usually, appalling test error. The classical account of this is the <strong>bias&ndash;variance decomposition</strong> <a class="cite" href="#ref-geman1992">[5]</a>.</p><div class="box thm"><div class="box-title">Theorem — Bias&ndash;variance decomposition</div>Let y = g(x) + \(\epsilon\) with <strong>E</strong>[\(\epsilon ] = 0\) and Var(\(\epsilon ) = \sigma^2\), and let \(\hat{f}_{D}\) be the model fitted on a random training set D. Then for any fixed x, the expected squared error decomposes as:<div class="eq">\[\mathbf{E}_{D,\epsilon}[(y - \hat{f}_{D}(x))^2] = (g(x) - \mathbf{E}_{D}[\hat{f}_{D}(x)])^2 + Var_{D}(\hat{f}_{D}(x)) + \sigma^2\]</div><p style="margin:6px 0 0 0;">The three terms are the squared <strong>bias</strong> (systematic error from a class too poor to represent g), the <strong>variance</strong> (sensitivity to which particular training set was drawn), and the <strong>irreducible noise</strong> \(\sigma^2\), which no model can beat.</p></div><p>Increasing model complexity lowers bias and raises variance. The classical U-shaped test error curve is the sum of the two. This picture is not the whole story for very large models: Belkin et al. <a class="cite" href="#ref-belkin2019">[12]</a> documented a <em>double descent</em> regime in which test error falls again once the model passes the interpolation threshold, which is why heavily over-parameterised neural networks (Section 8) can still generalise.</p><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Drag the degree slider from 1 to 9 and watch the two error numbers move in opposite directions.</p><div id="jxg3" class="viz-board" style="height:470px;"></div><p class="viz-caption"><strong>Figure.</strong> Left: polynomial fits of the degree chosen by the slider to a fixed noisy sample of the true function (dashed). Right panel readout: training and test RMSE. Degree 1&ndash;2 underfits (high bias), degree 8&ndash;9 overfits (high variance) &mdash; the training error keeps falling while the test error turns up.</p></div><h2>1.5 Regularisation</h2><p>Rather than restricting the class by hand, we penalise complexity inside the objective. Two penalties dominate practice:</p><div class="eq">\[\mathbf{Ridge} [6]: J(\theta ) = \| y - X\theta \|^2_2 + \lambda \| \theta \|^2_2\]</div><div class="eq">\[\mathbf{Lasso} [7]: J(\theta ) = \| y - X\theta \|^2_2 + \lambda \| \theta \|_1\]</div><p>Ridge has the closed form \(\hat{\theta} = (X^{T}X + \lambda I)^{-1}X^{T}y\), which is well defined even when \(X^{T}X\) is singular &mdash; that was Hoerl and Kennard's original motivation for collinear designs. It shrinks coefficients smoothly toward zero but never exactly to zero.</p><p>The lasso penalty is not differentiable at the origin, and its level sets are diamonds whose corners lie on the axes. The solution therefore tends to land on a corner, setting coefficients exactly to zero: the lasso performs variable selection as a side effect of fitting.</p><table><thead><tr><th></th><th>Ridge (L2)</th><th>Lasso (L1)</th></tr></thead><tbody><tr><td>Closed form</td><td>yes</td><td>no (coordinate descent / LARS)</td></tr><tr><td>Sparse solution</td><td>no</td><td>yes</td></tr><tr><td>Correlated predictors</td><td>shares weight between them</td><td>picks one arbitrarily</td></tr><tr><td>Bayesian reading</td><td>Gaussian prior on \(\theta\)</td><td>Laplace prior on \(\theta\)</td></tr><tr><td>Typical use</td><td>stabilise ill-conditioned designs</td><td>select features when \(d \gt \gt n\)</td></tr></tbody></table><h2>1.6 Estimating generalisation honestly</h2><p>The training error is a biased estimate of the risk. Stone <a class="cite" href="#ref-stone1974">[8]</a> formalised <strong>K-fold cross-validation</strong>: split the data into K folds, fit on K&minus;1 and evaluate on the held-out fold, then average the K scores. K = 5 or 10 is the usual compromise &mdash; small K gives a pessimistic, high-bias estimate; K = n (leave-one-out) is nearly unbiased but has high variance and costs n fits.</p><div class="box warn"><div class="box-title">The most common leak in practice</div>Any preprocessing that <em>learns</em> from data &mdash; standardisation, feature selection, imputation, PCA &mdash; must be fitted <em>inside</em> each fold, on the training portion only. Standardising the whole dataset before splitting lets test information into the model and produces optimistic scores that vanish in production.</div><pre><code>def k_fold_indices(n, k, seed=0):
+    """Yield (train_idx, test_idx) for K-fold cross-validation."""
+    import random
+    idx = list(range(n))
+    random.Random(seed).shuffle(idx)
+    folds = [idx[i::k] for i in range(k)]
+    for i in range(k):
+        test = folds[i]
+        train = [j for f in range(k) if f != i for j in folds[f]]
+        yield train, test</code></pre><h2>Summary</h2><ul><li>Learning = minimising an <em>unobservable</em> expected risk through its empirical proxy; consistency of ERM is governed by the capacity of the hypothesis class <a class="cite" href="#ref-vapnik1991">[1]</a>.</li><li>Least squares has the closed-form solution \(\hat{\theta} = (X^{T}X)^{-1}X^{T}y\) and a clean geometric reading as orthogonal projection.</li><li>Gradient descent trades exactness for scalability; its speed is set by the condition number of \(X^{T}X\).</li><li>Test error = \(bias^2 +\) variance + noise <a class="cite" href="#ref-geman1992">[5]</a>; complexity moves the first two in opposite directions.</li><li>Ridge stabilises, lasso selects; both are ERM with a penalty and both need \(\lambda\) chosen by cross-validation <a class="cite" href="#ref-stone1974">[8]</a>.</li></ul><h2>References</h2><ol class="reflist"><li id="ref-vapnik1991">Vapnik, V. &amp; Chervonenkis, A. (1971). On the uniform convergence of relative frequencies of events to their probabilities. <em>Theory of Probability and its Applications</em>, 16(2), 264&ndash;280. DOI: 10.1137/1116025. <a href="https://doi.org/10.1137/1116025">https://doi.org/10.1137/1116025</a></li><li id="ref-vapnik1995">Vapnik, V. (1995). <em>The Nature of Statistical Learning Theory</em>. Springer. DOI: 10.1007/978-1-4757-2440-0. <a href="https://doi.org/10.1007/978-1-4757-2440-0">https://doi.org/10.1007/978-1-4757-2440-0</a></li><li id="ref-legendre1805">Legendre, A.-M. (1805). <em>Nouvelles m&eacute;thodes pour la d&eacute;termination des orbites des com&egrave;tes</em>. Firmin Didot, Paris. (First published statement of the method of least squares.) <a href="https://archive.org/details/nouvellesmthode00legegoog">https://archive.org/details/nouvellesmthode00legegoog</a></li><li id="ref-gauss1809">Gauss, C. F. (1809). <em>Theoria Motus Corporum Coelestium</em>. Perthes &amp; Besser, Hamburg. (Least squares derived from the Gaussian error law.) <a href="https://archive.org/details/theoriamotuscor00gausgoog">https://archive.org/details/theoriamotuscor00gausgoog</a></li><li id="ref-geman1992">Geman, S., Bienenstock, E. &amp; Doursat, R. (1992). Neural networks and the bias/variance dilemma. <em>Neural Computation</em>, 4(1), 1&ndash;58. DOI: 10.1162/neco.1992.4.1.1. <a href="https://doi.org/10.1162/neco.1992.4.1.1">https://doi.org/10.1162/neco.1992.4.1.1</a></li><li id="ref-hoerl1970">Hoerl, A. E. &amp; Kennard, R. W. (1970). Ridge regression: biased estimation for nonorthogonal problems. <em>Technometrics</em>, 12(1), 55&ndash;67. DOI: 10.1080/00401706.1970.10488634. <a href="https://doi.org/10.1080/00401706.1970.10488634">https://doi.org/10.1080/00401706.1970.10488634</a></li><li id="ref-tibshirani1996">Tibshirani, R. (1996). Regression shrinkage and selection via the Lasso. <em>Journal of the Royal Statistical Society B</em>, 58(1), 267&ndash;288. DOI: 10.1111/j.2517-6161.1996.tb02080.x <a href="https://doi.org/10.1111/j.2517-6161.1996.tb02080.x">https://doi.org/10.1111/j.2517-6161.1996.tb02080.x</a></li><li id="ref-stone1974">Stone, M. (1974). Cross-validatory choice and assessment of statistical predictions. <em>Journal of the Royal Statistical Society B</em>, 36(2), 111&ndash;147. DOI: 10.1111/j.2517-6161.1974.tb00994.x <a href="https://doi.org/10.1111/j.2517-6161.1974.tb00994.x">https://doi.org/10.1111/j.2517-6161.1974.tb00994.x</a></li><li id="ref-robbins1951">Robbins, H. &amp; Monro, S. (1951). A stochastic approximation method. <em>Annals of Mathematical Statistics</em>, 22(3), 400&ndash;407. DOI: 10.1214/aoms/1177729586 <a href="https://doi.org/10.1214/aoms/1177729586">https://doi.org/10.1214/aoms/1177729586</a></li><li id="ref-esl2009">Hastie, T., Tibshirani, R. &amp; Friedman, J. (2009). <em>The Elements of Statistical Learning</em> (2nd ed.). Springer. DOI: 10.1007/978-0-387-84858-7. <a href="https://doi.org/10.1007/978-0-387-84858-7">https://doi.org/10.1007/978-0-387-84858-7</a></li><li id="ref-wolpert1996">Wolpert, D. H. (1996). The lack of a priori distinctions between learning algorithms. <em>Neural Computation</em>, 8(7), 1341&ndash;1390. DOI: 10.1162/neco.1996.8.7.1341 <a href="https://doi.org/10.1162/neco.1996.8.7.1341">https://doi.org/10.1162/neco.1996.8.7.1341</a></li><li id="ref-belkin2019">Belkin, M., Hsu, D., Ma, S. &amp; Mandal, S. (2019). Reconciling modern machine-learning practice and the classical bias&ndash;variance trade-off. <em>PNAS</em>, 116(32), 15849&ndash;15854. DOI: 10.1073/pnas.1903070116 <a href="https://doi.org/10.1073/pnas.1903070116">https://doi.org/10.1073/pnas.1903070116</a></li></ol><nav class="lesson-nav"><div class="container"><a href="../index.html">Course index</a><a href="../02-classification/page.html">Section 2 — Classification \(\to\)</a></div></nav>
+</main>
+<footer class="site-footer"><strong>Machine Learning A&ndash;Z</strong> &middot; From empirical risk minimisation to graph neural networks<span class="footer-meta">Edition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">The interactive figure could not be loaded. Check your network connection.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+// Colours resolved from the stylesheet, so the figures follow the light/dark
+// theme. Each entry is a function: board attributes that are functions are
+// re-evaluated on update, so a theme switch only needs a redraw.
+var BOARDS = [];
+function cssv(name, fallback){
+    try {
+        var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback;
+    } catch (e) { return fallback; }
+}
+var PAL = {
+    text:  function(){ return cssv('--color-text',  '#1f2937'); },
+    muted: function(){ return cssv('--color-muted', '#6b7280'); },
+    axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+    ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+    grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+    cell:  function(){ return cssv('--cell-bg',     '#ffffff'); }
+};
+// Re-render every board when the theme attribute flips.
+if (window.MutationObserver) {
+    new MutationObserver(function(){
+        for (var i = 0; i < BOARDS.length; i++) {
+            try { BOARDS[i].fullUpdate(); } catch (e) {}
+        }
+    }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+
+
+// ---------------------------------------------------------------- Figure 1.1
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+    boundingbox: [-0.6, 10.2, 10.6, -1.6], axis: true, showCopyright: false,
+    showNavigation: false, keepaspectratio: false
+});
+var data = [[1,2.1],[2,3.4],[3,3.2],[4,5.1],[5,5.4],[6,7.3],[8,6.2]];
+var pts = data.map(function(d){
+    return b1.create('point', d, {size:4, name:'', fillColor:'#dc2626',
+                                  strokeColor:'#7f1d1d', strokeWidth:1.5});
+});
+function stats(){
+    var n = pts.length, sx=0, sy=0;
+    for (var i=0;i<n;i++){ sx += pts[i].X(); sy += pts[i].Y(); }
+    var mx = sx/n, my = sy/n, num=0, den=0;
+    for (i=0;i<n;i++){ num += (pts[i].X()-mx)*(pts[i].Y()-my); den += Math.pow(pts[i].X()-mx,2); }
+    var a = (den === 0) ? 0 : num/den;
+    var b = my - a*mx;
+    var sse = 0, sst = 0;
+    for (i=0;i<n;i++){
+        sse += Math.pow(pts[i].Y() - (a*pts[i].X()+b), 2);
+        sst += Math.pow(pts[i].Y() - my, 2);
+    }
+    return {a:a, b:b, sse:sse, r2: (sst===0?0:1-sse/sst)};
+}
+b1.create('functiongraph', [function(x){ var s=stats(); return s.a*x+s.b; }, -0.5, 10.5],
+          {strokeColor:'#026573', strokeWidth:3.5});
+pts.forEach(function(pt){
+    var foot = b1.create('point', [function(){ return pt.X(); },
+                                   function(){ var s=stats(); return s.a*pt.X()+s.b; }],
+                         {visible:false});
+    b1.create('segment', [pt, foot], {strokeColor:'#f97316', strokeWidth:2, dash:2});
+});
+b1.create('text', [0.2, 9.6, function(){
+    var s = stats();
+    return 'f(x) = ' + s.a.toFixed(3) + ' x + ' + s.b.toFixed(3);
+}], {fontSize:17, color:'#026573', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b1.create('text', [0.2, 8.7, function(){
+    var s = stats();
+    return 'SSE = ' + s.sse.toFixed(3) + '   |   R&sup2; = ' + s.r2.toFixed(3);
+}], {fontSize:15, color:'#7f1d1d', cssStyle:'font-family:Georgia,serif;'});
+
+// ---------------------------------------------------------------- Figure 1.2
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+    boundingbox: [-3.4, 11.5, 3.4, -2.6], axis: true, showCopyright: false,
+    showNavigation: false, keepaspectratio: false
+});
+// Loss J(t) = t^2 + 1  => J'(t) = 2t, Lipschitz constant L = 2, divergence for eta > 1
+var etaS  = b2.create('slider', [[-3.0, 10.6], [-0.4, 10.6], [0.02, 0.35, 1.10]],
+                      {name:'&eta;', snapWidth:0.01, strokeColor:'#026573',
+                       fillColor:'#026573', label:{fontSize:15}});
+var thS   = b2.create('slider', [[0.4, 10.6], [3.0, 10.6], [-3.0, 2.6, 3.0]],
+                      {name:'&theta;&#8320;', snapWidth:0.1, strokeColor:'#c9a227',
+                       fillColor:'#c9a227', label:{fontSize:15}});
+function J(t){ return t*t + 1; }
+b2.create('functiongraph', [J, -3.3, 3.3], {strokeColor:'#026573', strokeWidth:3});
+var NSTEP = 12;
+function iterates(){
+    var eta = etaS.Value(), t = thS.Value(), out = [t];
+    for (var i=0;i<NSTEP;i++){ t = t - eta*(2*t); if (!isFinite(t) || Math.abs(t) > 50) t = Math.sign(t)*50; out.push(t); }
+    return out;
+}
+for (var k=0;k<NSTEP;k++){
+    (function(kk){
+        var P = b2.create('point', [function(){ return iterates()[kk]; },
+                                    function(){ return J(iterates()[kk]); }],
+                          {size:3, name:'', fillColor:'#16a34a', strokeColor:'#14532d',
+                           fixed:true, highlight:false});
+        var Q = b2.create('point', [function(){ return iterates()[kk+1]; },
+                                    function(){ return J(iterates()[kk+1]); }],
+                          {visible:false});
+        b2.create('segment', [P, Q], {strokeColor:'#16a34a', strokeWidth:1.6,
+                                      lastArrow:{type:2, size:5}, highlight:false});
+    })(k);
+}
+b2.create('point', [0, 1], {size:4, name:'&theta;*', fillColor:'#dc2626',
+                            strokeColor:'#7f1d1d', fixed:true, label:{fontSize:15}});
+b2.create('text', [-3.15, 9.4, function(){
+    var it = iterates(), last = it[it.length-1];
+    var status = (etaS.Value() < 1.0) ? 'converging' : 'DIVERGING (&eta; &gt; 2/L = 1)';
+    return 'after 12 steps: &theta; = ' + last.toFixed(4) + '   &mdash;   ' + status;
+}], {fontSize:15, strokeColor:PAL.text, cssStyle:'font-family:Georgia,serif;'});
+
+// ---------------------------------------------------------------- Figure 1.3
+var b3 = JXG.JSXGraph.initBoard('jxg3', {
+    boundingbox: [-1.15, 3.9, 1.15, -2.4], axis: true, showCopyright: false,
+    showNavigation: false, keepaspectratio: false
+});
+// fixed pseudo-random sample of g(x) = 1.4*sin(2.2x) + 0.4x
+var TR = [[-1.00,-1.55],[-0.82,-1.35],[-0.63,-0.72],[-0.45,-0.55],[-0.28,-0.02],
+          [-0.10,-0.31],[0.08,0.55],[0.26,1.02],[0.44,1.36],[0.62,1.02],
+          [0.80,1.05],[0.98,0.72]];
+var TE = [[-0.91,-1.60],[-0.54,-0.95],[-0.19,-0.18],[0.17,0.72],[0.53,1.35],[0.89,0.98]];
+TR.forEach(function(d){ b3.create('point', d, {size:3.5, name:'', fillColor:'#dc2626',
+                                               strokeColor:'#7f1d1d', fixed:true}); });
+TE.forEach(function(d){ b3.create('point', d, {size:3.5, name:'', fillColor:'#ffffff',
+                                               strokeColor:'#1d4ed8', strokeWidth:2, fixed:true}); });
+b3.create('functiongraph', [function(x){ return 1.4*Math.sin(2.2*x) + 0.4*x; }, -1.1, 1.1],
+          {strokeColor:PAL.axis, strokeWidth:2, dash:2});
+var degS = b3.create('slider', [[-1.05, 3.5], [0.35, 3.5], [1, 3, 9]],
+                     {name:'degree', snapWidth:1, strokeColor:'#026573',
+                      fillColor:'#026573', label:{fontSize:15}});
+function solve(A, bvec){                      // Gaussian elimination with partial pivoting
+    var n = A.length, i, j, k;
+    for (i=0;i<n;i++) A[i].push(bvec[i]);
+    for (i=0;i<n;i++){
+        var piv = i;
+        for (k=i+1;k<n;k++) if (Math.abs(A[k][i]) > Math.abs(A[piv][i])) piv = k;
+        var tmp = A[i]; A[i] = A[piv]; A[piv] = tmp;
+        if (Math.abs(A[i][i]) < 1e-12) return null;
+        for (k=i+1;k<n;k++){
+            var f = A[k][i]/A[i][i];
+            for (j=i;j<=n;j++) A[k][j] -= f*A[i][j];
+        }
+    }
+    var x = new Array(n);
+    for (i=n-1;i>=0;i--){
+        var s = A[i][n];
+        for (j=i+1;j<n;j++) s -= A[i][j]*x[j];
+        x[i] = s/A[i][i];
+    }
+    return x;
+}
+var cache = {};
+function polyfit(deg){
+    if (cache[deg]) return cache[deg];
+    var m = deg + 1, i, j, k;
+    var A = [], bv = [];
+    for (i=0;i<m;i++){
+        A.push(new Array(m).fill(0)); bv.push(0);
+        for (k=0;k<TR.length;k++){
+            for (j=0;j<m;j++) A[i][j] += Math.pow(TR[k][0], i+j);
+            bv[i] += Math.pow(TR[k][0], i) * TR[k][1];
+        }
+    }
+    for (i=0;i<m;i++) A[i][i] += 1e-9;          // tiny ridge for numerical stability
+    var c = solve(A, bv) || new Array(m).fill(0);
+    cache[deg] = c;
+    return c;
+}
+function evalPoly(c, x){ var s=0; for (var i=c.length-1;i>=0;i--) s = s*x + c[i]; return s; }
+function rmse(c, S){ var s=0; S.forEach(function(d){ s += Math.pow(d[1]-evalPoly(c,d[0]),2); });
+                     return Math.sqrt(s/S.length); }
+b3.create('functiongraph', [function(x){ return evalPoly(polyfit(Math.round(degS.Value())), x); },
+                            -1.1, 1.1], {strokeColor:'#026573', strokeWidth:3.5});
+b3.create('text', [-1.05, -1.55, function(){
+    var c = polyfit(Math.round(degS.Value()));
+    return 'train RMSE = ' + rmse(c, TR).toFixed(4);
+}], {fontSize:15, color:'#7f1d1d', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b3.create('text', [-1.05, -1.95, function(){
+    var c = polyfit(Math.round(degS.Value()));
+    return 'test&nbsp; RMSE = ' + rmse(c, TE).toFixed(4);
+}], {fontSize:15, color:'#1d4ed8', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b3.create('text', [0.05, -1.95, 'filled = training,  hollow = test,  dashed = true g(x)'],
+          {fontSize:13, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algorithms of Section 4</title>
+<link href="../assets/style.css" rel="stylesheet">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+
+/* Use the full width the theme allows: the shared stylesheet caps a lesson at
+   880px, which leaves wide figures and tables boxed into the middle of a large
+   screen. --max-w is the theme's own page width, so this stays consistent with
+   the landing page. */
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) {
+  .lesson-content { padding-left: 16px; padding-right: 16px; }
+}
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule);
+               padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center;
+               padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.lesson-nav { max-width: 880px; margin: 0 auto 40px; padding: 0 24px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav .container { display: flex; gap: 18px; flex-wrap: wrap; width: 100%; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600;
+                font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.keypoints h4 { margin-top: 0; }
+
+.algo-tag { color: var(--color-muted); font-size: 0.86rem; font-style: italic;
+            margin: -0.4em 0 1em; }
+.algo-steps { border: 1px solid var(--color-rule); border-radius: var(--radius);
+              background: var(--proof-bg); padding: 4px 22px 14px;
+              margin: 1.2em 0; }
+.algo-steps-title { color: var(--primary); font-weight: 700; font-size: 0.8rem;
+                    letter-spacing: 0.09em; text-transform: uppercase;
+                    margin: 14px 0 4px; }
+.algo-steps ol { padding-left: 1.4em; }
+.algo-steps li { margin: 0.55em 0; line-height: 1.75; }
+.annex-toc { background: var(--primary-soft); border-radius: var(--radius);
+             padding: 16px 24px; margin: 1.4em 0; }
+.annex-toc ul { margin: 0.4em 0; }
+.annex-toc a { color: var(--primary-dark); font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Machine Learning A&ndash;Z</a> &middot; Course</div><span class="course-code">Graph-based machine learning</span></div></header>
+<section class="lesson-hero"><div class="container"><div class="lesson-label">Part I &middot; Section 4 &middot; Annex</div><h1>Algorithms of Section 4</h1><div class="lesson-sub">Lloyd's algorithm, careful seeding, principal components and the silhouette, set out step by step.</div></div></section>
+<main class="lesson-content">
+<h2>Annex &mdash; the algorithms of Section 4</h2><div class="box tip"><div class="box-title">How to read this annex</div><p>Each algorithm is set out the same way: what it is handed, what it must hand back, then the steps in the order you would carry them out. A small example is worked through by hand so you can check your understanding against real numbers, and the closing boxes say why the method is correct, why it stops, and what it costs. Nothing here assumes you can read a program &mdash; the point is the reasoning.</p></div><div class="annex-toc"><strong>Algorithms in this annex</strong><ul><li><a href="#algo1">Lloyd's algorithm for k-means</a></li><li><a href="#algo2">Careful seeding</a></li><li><a href="#algo3">Principal component analysis</a></li><li><a href="#algo4">The silhouette score</a></li></ul></div><span id="algo1"></span><h3>Lloyd's algorithm for k-means</h3><p class="algo-tag">Alternating method \(\cdot\) each half is exactly solvable</p><p>Divide observations into \(k\) groups so that each is tight around its own centre.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A table of observations, a number of groups \(k\), and \(k\) starting centres.</p><p><strong>Produce.</strong> A group label for every observation, and the final centres.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Assign.</strong> Give every observation to whichever centre is nearest. For fixed centres this is the best possible assignment &mdash; there is nothing to improve.</li><li><strong>Update.</strong> Move every centre to the average position of the observations assigned to it. For a fixed assignment this is the best possible placement, because the average is the point minimising total squared distance.</li><li><strong>Check.</strong> If no observation changed group, stop &mdash; nothing can change any more.</li><li><strong>Repeat.</strong> Otherwise go back and assign again.</li><li><strong>Restart and keep the best.</strong> The result depends entirely on where you started. Run the whole thing several times from different starts and keep the run with the smallest total squared distance.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Four points on a line at 0, 2, 10, 12, started deliberately badly with both centres on the left.</p><table><thead><tr><th>Round</th><th>Centres</th><th>Assignment</th><th>Total squared distance</th></tr></thead><tbody><tr><td>start</td><td>0.0 and 2.0</td><td>{0} and {2, 10, 12}</td><td>104.0</td></tr><tr><td>1</td><td>0.0 and 8.0</td><td>{0, 2} and {10, 12}</td><td>solved after update</td></tr><tr><td>2</td><td>1.0 and 11.0</td><td>{0, 2} and {10, 12}</td><td>4.0</td></tr><tr><td>3</td><td>1.0 and 11.0</td><td>unchanged &mdash; stop</td><td>4.0</td></tr></tbody></table><p>The total never rises. From a poor start it still recovers here; on harder data a poor start leaves two centres stranded inside one true group and the run is simply lost.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>Both steps can only reduce the total squared distance, and there are finitely many ways to divide the observations into groups. A quantity that never rises over a finite set of possibilities must settle.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>It settles at a local best, not necessarily the global one. Finding the global best is computationally intractable, even for two groups in the plane.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>\(n k d\) per round, and typically few rounds.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li><strong>The objective assumes round, similarly sized groups.</strong> On elongated, crescent-shaped or nested-ring data it fails predictably, because the boundary it can draw is always straight and halfway between two centres.</li><li>A group can lose all its members. Decide in advance what to do &mdash; usually re-seed that centre at the worst-fitted observation.</li><li>Inputs on different scales distort every distance. Standardise first.</li></ul></div><span id="algo2"></span><h3>Careful seeding</h3><p class="algo-tag">Initialisation \(\cdot\) comes with a guarantee</p><p>Choose starting centres that are spread out, so the alternating method begins somewhere sensible.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> The observations and the number of groups \(k\).</p><p><strong>Produce.</strong> \(k\) starting centres.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Take the first at random.</strong> Any observation will do.</li><li><strong>Measure everything's distance to the nearest chosen centre.</strong> For each observation, the distance to whichever centre so far is closest.</li><li><strong>Choose the next with probability proportional to that distance squared.</strong> Far-away observations are much likelier to be chosen, but nothing is impossible &mdash; which stops a single outlier from always being picked.</li><li><strong>Repeat until k centres are chosen.</strong> Recompute the distances after each choice, since a new centre may now be the nearest for many observations.</li><li><strong>Hand over.</strong> Run the alternating method from these centres.</li></ol></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>This seeding alone, before a single assign-update round, gives an expected total squared distance within a factor of order \(\log k\) of the best possible. Uniform random seeding offers no such bound at all.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>\(k\) rounds.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>\(n k d\) overall &mdash; comparable to a single round of the alternating method, so it is essentially free.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>Choosing the farthest point deterministically rather than at random loses the guarantee and picks outliers every time.</li></ul></div><div class="box tip"><div class="box-title">Worth knowing</div><p>This is the default in every serious implementation, and it usually makes the subsequent rounds converge faster as well.</p></div><span id="algo3"></span><h3>Principal component analysis</h3><p class="algo-tag">Direct method \(\cdot\) an eigenvalue problem</p><p>Find the directions along which the data vary most, and describe each observation by its position along a few of them.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A table of observations and a number of components to keep.</p><p><strong>Produce.</strong> New coordinates, and the share of the total variation each component explains.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Centre every column.</strong> Subtract each column's average. This is not optional: without it the first component simply points at the overall average and tells you nothing.</li><li><strong>Standardise if the units differ.</strong> If one column is in metres and another in milligrams, rescale each to unit spread. Otherwise the component analysis is really an analysis of which column has the largest units.</li><li><strong>Form the covariance summary.</strong> For each pair of columns, average the product of their centred values.</li><li><strong>Find its principal directions.</strong> Compute the directions in which this summary is largest, together with how large it is along each. They come out mutually perpendicular and ordered.</li><li><strong>Keep the leading few.</strong> Choose how many by looking at the share of total variation explained, or by finding the elbow in that sequence.</li><li><strong>Project.</strong> Describe each observation by its position along the kept directions.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>A cloud stretched along a diagonal.</p><table><thead><tr><th>Direction</th><th>Variation along it</th><th>Share of total</th><th>Running total</th></tr></thead><tbody><tr><td>first</td><td>4.82</td><td>89 %</td><td>89 %</td></tr><tr><td>second</td><td>0.51</td><td>9 %</td><td>98 %</td></tr><tr><td>third</td><td>0.08</td><td>1.5 %</td><td>99.5 %</td></tr><tr><td>fourth</td><td>0.03</td><td>0.5 %</td><td>100 %</td></tr></tbody></table><p>Two directions carry 98 % of the variation, so the four-column table can be described by two numbers per observation with very little loss.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>The directions found are simultaneously those of greatest spread and those giving the closest low-dimensional approximation to the original data. The two descriptions are equivalent.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Direct computation, no iteration.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>Cubic in the number of columns. Computed from the data table directly rather than from the covariance summary, for numerical accuracy.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li><strong>It can only rotate.</strong> Data lying on a curved surface will not be unrolled, and the number of components will be overstated.</li><li>Components are chosen for variance, not usefulness. A low-variance direction may be the one carrying the signal you want.</li><li>Signs are arbitrary: a component and its negative are equally valid.</li></ul></div><span id="algo4"></span><h3>The silhouette score</h3><p class="algo-tag">Evaluation \(\cdot\) has an actual optimum</p><p>Judge a grouping without knowing the truth, and use it to choose how many groups there are.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> Observations with an assigned group label.</p><p><strong>Produce.</strong> A number between &minus;1 and 1 for each observation, and their average.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>For one observation, measure how well it fits its own group.</strong> Average distance from it to the other members of its group, excluding itself. Small is good.</li><li><strong>Measure how well it would fit the best alternative.</strong> For every other group, the average distance from it to that group's members. Take the smallest.</li><li><strong>Combine.</strong> Subtract the first from the second and divide by whichever is larger. Near 1 means comfortably placed; near 0 means on a boundary; negative means it belongs to a different group.</li><li><strong>Average over all observations.</strong> The result summarises the whole grouping.</li><li><strong>Repeat for each candidate number of groups.</strong> Unlike total squared distance, which always falls as you add groups, this peaks at a sensible number.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Three well-separated groups of five, scored with different \(k\).</p><table><thead><tr><th>\(k\)</th><th>Total squared distance</th><th>Average silhouette</th></tr></thead><tbody><tr><td>2</td><td>84.1</td><td>0.58</td></tr><tr><td><strong>3</strong></td><td><strong>21.3</strong></td><td><strong>0.79</strong></td></tr><tr><td>4</td><td>16.8</td><td>0.61</td></tr><tr><td>5</td><td>12.4</td><td>0.49</td></tr></tbody></table><p>Total squared distance keeps falling and so cannot choose. The silhouette peaks at three, which is the answer.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>It measures whether observations are closer to their own group than to any other &mdash; a property any reasonable grouping should have, and one that does not depend on which method produced it.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Direct.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>Quadratic in the number of observations, since every pair is compared. On large data, compute it on a random subsample.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>It rewards round, well-separated groups, so it will quietly favour methods that produce them. On genuinely elongated groups a low score does not necessarily mean the grouping is wrong.</li><li>No internal measure can tell you the grouping is <em>meaningful</em>. It can only tell you it is geometrically clean.</li></ul></div><nav class="lesson-nav"><div class="container"><a href="../index.html">Course index</a><a href="page.html">&#8592; Back to the section</a></div></nav>
+</main>
+<footer class="site-footer"><strong>Machine Learning A&ndash;Z</strong> &middot; From empirical risk minimisation to graph neural networks<span class="footer-meta">Edition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">The interactive figure could not be loaded. Check your network connection.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+// Colours resolved from the stylesheet, so the figures follow the light/dark
+// theme. Each entry is a function: board attributes that are functions are
+// re-evaluated on update, so a theme switch only needs a redraw.
+var BOARDS = [];
+function cssv(name, fallback){
+    try {
+        var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback;
+    } catch (e) { return fallback; }
+}
+var PAL = {
+    text:  function(){ return cssv('--color-text',  '#1f2937'); },
+    muted: function(){ return cssv('--color-muted', '#6b7280'); },
+    axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+    ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+    grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+    cell:  function(){ return cssv('--cell-bg',     '#ffffff'); }
+};
+// Re-render every board when the theme attribute flips.
+if (window.MutationObserver) {
+    new MutationObserver(function(){
+        for (var i = 0; i < BOARDS.length; i++) {
+            try { BOARDS[i].fullUpdate(); } catch (e) {}
+        }
+    }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+
+
+})();
+</script>
+</body>
+</html>

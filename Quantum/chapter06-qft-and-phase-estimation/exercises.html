@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 6 exercises — The Quantum Fourier Transform and Phase Estimation</title>
+<meta name="description" content="Exercises for chapter 6: The Quantum Fourier Transform and Phase Estimation">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = {tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]}, svg:{fontCache:"global"}};</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Quantum Computing</a> · <a href="course.html">Chapter 6</a> · Exercises</div><span class="course-code">Exercise sheet</span></div></header>
+<section class="lesson-hero"><div class="container">
+  <div class="lesson-label">Chapter 6 · exercise sheet</div>
+  <h1>The Quantum Fourier Transform and Phase Estimation</h1>
+  <p class="lesson-sub">4 programming exercises ·
+     3 problems with symbolic answers. Every solution is hidden behind a
+     toggle — attempt each one before opening it.</p>
+</div></section>
+<div class="lesson-content">
+<h2>Programming exercises</h2>
+<p>Each exercise is checked automatically against hidden test cases. Only NumPy is required, and the function names in the statement must be used exactly as written.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 6.1</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C6.Q1 — Definition and basic properties</p><p>\((F_N)_{kj}=\omega_N^{jk}/\sqrt N\) with \(\omega_N=e^{2\pi i/N}\). It is unitary, symmetric, and satisfies \(F_N^{4}=I\).</p></div><p>Write <code>qft_matrix(n)</code> returning the \(2^{n}\times2^{n}\) QFT matrix, and <code>qft_apply(psi)</code> applying it to a state vector whose length is a power of two.</p><div class="stmt"><pre>qft_matrix(1)  ==  H
+qft_apply(|0&gt;^n)  -&gt;  uniform superposition</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def qft_matrix(n):
+    ...
+
+def qft_apply(psi):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+H = np.array([[1,1],[1,-1]], dtype=complex)/np.sqrt(2)
+print(np.allclose(qft_matrix(1), H))
+→ True</code></pre><pre><code>import numpy as np
+v = np.zeros(8, dtype=complex); v[0]=1
+print(np.allclose(qft_apply(v), np.full(8, 1/np.sqrt(8))))
+→ True</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def qft_matrix(n):
+    N = 2 ** n
+    j = np.arange(N).reshape(-1, 1)
+    k = np.arange(N).reshape(1, -1)
+    return np.exp(2j * np.pi * j * k / N) / np.sqrt(N)
+
+def qft_apply(psi):
+    psi = np.asarray(psi, dtype=complex).ravel()
+    n = int(round(np.log2(len(psi))))
+    return qft_matrix(n) @ psi
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 6.2</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C6.Q2 — Building the O(n^2) circuit</p><p>The product form of §1 becomes a circuit with \(n\) Hadamards, \(\binom{n}{2}\) controlled rotations \(R_m=\mathrm{diag}(1,e^{2\pi i/2^{m}})\), and a final qubit reversal.</p></div><p>Write <code>qft_circuit_matrix(n)</code> that <em>constructs</em> the QFT as a product of these elementary gates (do not return <code>qft_matrix(n)</code> directly) and returns the resulting \(2^{n}\times2^{n}\) matrix. Also write <code>gate_count(n)</code> returning the tuple <code>(hadamards, controlled_rotations)</code>.</p><div class="stmt"><pre>gate_count(4) -&gt; (4, 6)
+qft_circuit_matrix(3)  ==  qft_matrix(3)</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def qft_circuit_matrix(n):
+    # H on qubit l, then controlled-R_m from qubit l+m-1, then reverse the qubit order
+    ...
+
+def gate_count(n):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>print(gate_count(4))
+→ (4, 6)</code></pre><pre><code>import numpy as np
+def qft_matrix(n):
+    N = 2 ** n
+    j = np.arange(N).reshape(-1,1); k = np.arange(N).reshape(1,-1)
+    return np.exp(2j*np.pi*j*k/N)/np.sqrt(N)
+print(np.allclose(qft_circuit_matrix(3), qft_matrix(3)))
+→ True</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+H = np.array([[1, 1], [1, -1]], dtype=complex) / np.sqrt(2)
+
+def _embed1(U, q, n):
+    ops = [np.eye(2, dtype=complex)] * n
+    ops[q] = U
+    out = np.array([[1.0 + 0j]])
+    for o in ops:
+        out = np.kron(out, o)
+    return out
+
+def _cphase(theta, c, t, n):
+    N = 2 ** n
+    diag = np.ones(N, dtype=complex)
+    for x in range(N):
+        bits = [(x &gt;&gt; (n - 1 - k)) &amp; 1 for k in range(n)]
+        if bits[c] == 1 and bits[t] == 1:
+            diag[x] = np.exp(1j * theta)
+    return np.diag(diag)
+
+def _swap(a, b, n):
+    N = 2 ** n
+    P = np.zeros((N, N), dtype=complex)
+    for x in range(N):
+        bits = [(x &gt;&gt; (n - 1 - k)) &amp; 1 for k in range(n)]
+        bits[a], bits[b] = bits[b], bits[a]
+        y = 0
+        for k in range(n):
+            y = (y &lt;&lt; 1) | bits[k]
+        P[y, x] = 1
+    return P
+
+def qft_circuit_matrix(n):
+    N = 2 ** n
+    U = np.eye(N, dtype=complex)
+    for l in range(n):
+        U = _embed1(H, l, n) @ U
+        for m in range(2, n - l + 1):
+            U = _cphase(2 * np.pi / 2 ** m, l + m - 1, l, n) @ U
+    for a in range(n // 2):
+        U = _swap(a, n - 1 - a, n) @ U
+    return U
+
+def gate_count(n):
+    return (n, n * (n - 1) // 2)
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 6.3</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C6.Q3 — Reading an eigenphase</p><p>With \(t\) ancillas, controlled powers of \(U\) followed by \(F^{\dagger}\) concentrate the ancilla register on the best \(t\)-bit approximation of \(\varphi\).</p></div><p>Write <code>qpe_state(phi, t)</code> returning the ancilla state \(\tfrac1{\sqrt{2^{t}}}\sum_y e^{2\pi i\varphi y}|y\rangle\) <em>after</em> applying the inverse QFT; <code>qpe_probs(phi, t)</code> returning the measurement distribution (rounded to 10 decimals); and <code>qpe_estimate(phi, t)</code> returning the most likely \(y/2^{t}\) as a float.</p><div class="stmt"><pre>qpe_estimate(0.25, 3)  -&gt;  0.25   (exact, 3 bits suffice)
+qpe_estimate(0.3, 5)   -&gt;  0.3125 (= 10/32, nearest 5-bit value)</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def qpe_state(phi, t):
+    ...
+
+def qpe_probs(phi, t):
+    ...
+
+def qpe_estimate(phi, t):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>print(qpe_estimate(0.25, 3), qpe_estimate(0.5, 3))
+→ 0.25 0.5</code></pre><pre><code>print(qpe_estimate(0.3, 5))
+→ 0.3125</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def _qft(n):
+    N = 2 ** n
+    j = np.arange(N).reshape(-1, 1)
+    k = np.arange(N).reshape(1, -1)
+    return np.exp(2j * np.pi * j * k / N) / np.sqrt(N)
+
+def qpe_state(phi, t):
+    N = 2 ** t
+    y = np.arange(N)
+    pre = np.exp(2j * np.pi * phi * y) / np.sqrt(N)
+    return _qft(t).conj().T @ pre
+
+def qpe_probs(phi, t):
+    return np.round(np.abs(qpe_state(phi, t)) ** 2, 10)
+
+def qpe_estimate(phi, t):
+    return float(int(np.argmax(qpe_probs(phi, t))) / 2 ** t)
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 6.4</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C6.Q4 — One bit of phase per shot, and how many bits you really need</p><p>The Hadamard test measures \(\mathrm{Re}\langle u|U|u\rangle\); the accuracy theorem of §4 fixes the number of ancillas needed for \(n\)-bit precision at confidence \(1-\varepsilon\).</p></div><p>Write <code>hadamard_test_p0(phi)</code> returning \(\cos^{2}(\pi\varphi)\) rounded to 6 decimals; <code>qpe_ancillas(n, eps)</code> returning \(t=n+\lceil\log_2(2+\tfrac1{2\varepsilon})\rceil\) as an <code>int</code>; and <code>success_prob(phi, t)</code> returning the total probability that the measured \(y\) satisfies \(|y/2^{t}-\varphi|\le2^{-t}\) (taking the difference modulo 1), rounded to 6 decimals.</p><div class="stmt"><pre>qpe_ancillas(4, 0.01) -&gt; 4 + ceil(log2(52)) = 4 + 6 = 10</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def hadamard_test_p0(phi):
+    ...
+
+def qpe_ancillas(n, eps):
+    ...
+
+def success_prob(phi, t):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>print(hadamard_test_p0(0.0), hadamard_test_p0(0.5))
+→ 1.0 0.0</code></pre><pre><code>print(qpe_ancillas(4, 0.01))
+→ 10</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def hadamard_test_p0(phi):
+    return round(float(np.cos(np.pi * phi) ** 2), 6)
+
+def qpe_ancillas(n, eps):
+    return int(n + int(np.ceil(np.log2(2 + 1 / (2 * eps)))))
+
+def _probs(phi, t):
+    N = 2 ** t
+    y = np.arange(N)
+    d = phi - y / N
+    with np.errstate(divide=&#x27;ignore&#x27;, invalid=&#x27;ignore&#x27;):
+        amp = np.where(np.abs(np.sin(np.pi * d)) &lt; 1e-14, 1.0,
+                       np.sin(np.pi * N * d) / (N * np.sin(np.pi * d)))
+    return amp ** 2
+
+def success_prob(phi, t):
+    N = 2 ** t
+    y = np.arange(N)
+    d = np.abs((y / N - phi + 0.5) % 1.0 - 0.5)
+    pr = _probs(phi, t)
+    return round(float(pr[d &lt;= 1 / N + 1e-12].sum()), 6)
+</code></pre></details>
+</div>
+<h2>Problems with symbolic answers</h2>
+<p>Answers here are expressions rather than numbers, and any algebraically equivalent form is accepted. Give fractions and radicals exactly; decimal approximations are not accepted.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 6.1</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C6.S1 — The transform itself</p></div><p>Let \(n={@n@}\), \(N=2^{n}\) and \(F_N|j\rangle=\frac{1}{\sqrt N}\sum_k e^{2\pi ijk/N}|k\rangle\).</p><p>(a) Give the matrix element \(\langle k|F_N|j\rangle\) for general \(j,k,N\) (use <code>j</code>, <code>k</code>, <code>N</code>).</p><p>\(\langle k|F_N|j\rangle=\) <span>your answer</span> </p><p>(b) Give the number of controlled-rotation gates in the standard QFT circuit on \(n\) qubits, as a function of <code>n</code>.</p><p>gates \(=\) <span>your answer</span> </p><p>(c) Evaluate that count for \(n={@n@}\).</p><p>value \(=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) Directly from the definition, \(\langle k|F_N|j\rangle=e^{2\pi ijk/N}/\sqrt N\).</p><p>(b) Qubit \(\ell\) receives one Hadamard and controlled rotations from every later qubit, giving \(\sum_{\ell=1}^{n}(n-\ell)=\binom{n}{2}=\frac{n(n-1)}{2}\).</p><p>(c) For \(n={@n@}\) this is \({@ta3@}\).</p><p>Compare the classical FFT at \(\Theta(N\log N)=\Theta(n2^{n})\): the quantum circuit is exponentially smaller, but it transforms amplitudes, which cannot be read out directly. Truncating rotations below \(2\pi/2^{O(\log(n/\varepsilon))}\) yields the approximate QFT with only \(O(n\log(n/\varepsilon))\) gates.</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 6.2</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C6.S2 — One qubit of phase information</p></div><p>Let \(U|u\rangle=e^{2\pi i\varphi}|u\rangle\). Prepare the control in \(|+\rangle\), apply controlled-\(U\), then a Hadamard on the control, then measure it.</p><p>(a) Give \(\Pr[0]\) as a simplified function of <code>phi</code>.</p><p>\(\Pr[0]=\) <span>your answer</span> </p><p>(b) Give \(\Pr[0]-\Pr[1]\), again as a function of <code>phi</code>.</p><p>\(\Pr[0]-\Pr[1]=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>After the controlled operation the control is \(\frac{1}{\sqrt2}(|0\rangle+e^{2\pi i\varphi}|1\rangle)\) and the target is untouched — this is phase kickback. The Hadamard turns it into \(\frac{1+e^{2\pi i\varphi}}{2}|0\rangle+\frac{1-e^{2\pi i\varphi}}{2}|1\rangle\).</p><p>(a) \(\Pr[0]=\left|\frac{1+e^{2\pi i\varphi}}{2}\right|^{2}=\cos^{2}(\pi\varphi)\).</p><p>(b) \(\Pr[0]-\Pr[1]=\cos(2\pi\varphi)=\mathrm{Re}\,\langle u|U|u\rangle\).</p><p>Each shot therefore gives one Bernoulli sample of a quantity whose mean encodes the phase. Estimating \(\varphi\) this way costs \(O(1/\varepsilon^{2})\) shots; full QPE costs \(O(1/\varepsilon)\) applications of \(U\), the Heisenberg-limited scaling.</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 6.3</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C6.S3 — Sizing the register</p></div><p>(a) Give the guaranteed lower bound on the probability that \(t\)-qubit phase estimation returns the nearest \(t\)-bit approximation of \(\varphi\) (an exact expression).</p><p>\(p_{\min}=\) <span>your answer</span> </p><p>(b) Give the number of ancillas \(t\) needed for \(n\) bits of precision with failure probability at most \(\varepsilon\) (use <code>n</code> and <code>eps</code>; you may use <code>ceiling</code>).</p><p>\(t=\) <span>your answer</span> </p><p>(c) Evaluate it for \(n={@nn@}\) and \(\varepsilon=1/100\).</p><p>\(t=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) The geometric-sum amplitude at the nearest integer satisfies \(|\alpha_b|^{2}\ge 4/\pi^{2}\approx0.405\), independently of \(t\) and \(\varphi\).</p><p>(b) Bounding the tail of the Fejér kernel gives \(t=n+\left\lceil\log_2\left(2+\frac{1}{2\varepsilon}\right)\right\rceil\).</p><p>(c) With \(n={@nn@}\), \(\varepsilon=1/100\): \(\lceil\log_2 52\rceil=6\), so \(t={@nn@}+6={@ta3@}\).</p><p>Alternatively, repeat the \(t=n\) circuit \(O(\log(1/\varepsilon))\) times and take the median — the standard powering trick, cheaper in qubits but more expensive in circuit repetitions.</p></details>
+</div>
+<div class="exo-banner"><div><strong>Back to the theory</strong><span>Every exercise above is worked from a result proved in the chapter</span></div><a href="course.html">Open chapter 6</a></div>
+</div>
+<nav class="lesson-nav"><a class="prev" href="../chapter05-density-matrices-and-channels/exercises.html"><span class="dir">Previous chapter</span><span class="ttl">5. Density Operators, Open Systems and Quantum Channels</span></a><a class="next" href="../chapter07-shor-and-hidden-subgroup/exercises.html"><span class="dir">Next chapter</span><span class="ttl">7. Shor&#x27;s Algorithm, Order Finding and the Hidden Subgroup Problem</span></a></nav>
+<footer class="site-footer"><div class="container"><strong>Quantum Computing — Theory and Practice</strong> · ten chapters · forty programming exercises · thirty symbolic problems<span class="footer-meta">Edition 2026</span></div></footer></body></html>

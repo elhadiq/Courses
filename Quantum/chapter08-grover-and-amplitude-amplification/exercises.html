@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 8 exercises — Grover Search, Amplitude Amplification and Query Lower Bounds</title>
+<meta name="description" content="Exercises for chapter 8: Grover Search, Amplitude Amplification and Query Lower Bounds">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = {tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]}, svg:{fontCache:"global"}};</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Quantum Computing</a> · <a href="course.html">Chapter 8</a> · Exercises</div><span class="course-code">Exercise sheet</span></div></header>
+<section class="lesson-hero"><div class="container">
+  <div class="lesson-label">Chapter 8 · exercise sheet</div>
+  <h1>Grover Search, Amplitude Amplification and Query Lower Bounds</h1>
+  <p class="lesson-sub">4 programming exercises ·
+     3 problems with symbolic answers. Every solution is hidden behind a
+     toggle — attempt each one before opening it.</p>
+</div></section>
+<div class="lesson-content">
+<h2>Programming exercises</h2>
+<p>Each exercise is checked automatically against hidden test cases. Only NumPy is required, and the function names in the statement must be used exactly as written.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 8.1</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C8.Q1 — Two reflections make a rotation</p><p>\(G=D\,O_f\) rotates the state by \(2\theta\) in the good/bad plane, with \(\sin\theta=\sqrt{M/N}\).</p></div><p>Write <code>grover_operator(N, marked)</code> returning the explicit \(N\times N\) iterate; <code>optimal_iterations(N, M)</code> returning \(\lfloor\pi/(4\arcsin\sqrt{M/N})\rfloor\) as an <code>int</code>; and <code>success_probability(N, M, k)</code> returning \(\sin^{2}((2k+1)\theta)\) rounded to 6 decimals.</p><div class="stmt"><pre>optimal_iterations(1024, 1) -&gt; 25
+success_probability(16, 1, 3) -&gt; 0.961319</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def grover_operator(N, marked):
+    ...
+
+def optimal_iterations(N, M):
+    ...
+
+def success_probability(N, M, k):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>print(optimal_iterations(1024, 1), optimal_iterations(16, 1))
+→ 25 3</code></pre><pre><code>print(success_probability(16, 1, 3))
+→ 0.961319</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def grover_operator(N, marked):
+    O = np.eye(N, dtype=complex)
+    for m in marked:
+        O[m, m] = -1
+    psi = np.full(N, 1 / np.sqrt(N), dtype=complex)
+    D = 2 * np.outer(psi, psi.conj()) - np.eye(N, dtype=complex)
+    return D @ O
+
+def optimal_iterations(N, M):
+    theta = np.arcsin(np.sqrt(M / N))
+    return int(np.floor(np.pi / (4 * theta)))
+
+def success_probability(N, M, k):
+    theta = np.arcsin(np.sqrt(M / N))
+    return round(float(np.sin((2 * k + 1) * theta) ** 2), 6)
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 8.2</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C8.Q2 — The periodicity of the success probability</p><p>Because \(G\) is a rotation, iterating past \(k_{\text{opt}}\) <em>decreases</em> the success probability — a purely quantum failure mode with no classical analogue.</p></div><p>Write <code>run_grover(N, marked, k)</code> returning the state after \(k\) iterations starting from the uniform superposition, and <code>marked_probability(psi, marked)</code> returning the total probability on the marked indices, rounded to 6 decimals. Then <code>best_k(N, marked, kmax)</code> returning the \(k\le k_{\max}\) maximising that probability.</p><div class="stmt"><pre>N=16, one marked: probabilities peak at k=3 and fall again by k=6</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def run_grover(N, marked, k):
+    ...
+
+def marked_probability(psi, marked):
+    ...
+
+def best_k(N, marked, kmax):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>print(marked_probability(run_grover(16, [5], 3), [5]))
+→ 0.961319</code></pre><pre><code>print(best_k(16, [5], 5))
+→ 3</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def _G(N, marked):
+    O = np.eye(N, dtype=complex)
+    for m in marked:
+        O[m, m] = -1
+    psi = np.full(N, 1 / np.sqrt(N), dtype=complex)
+    return (2 * np.outer(psi, psi.conj()) - np.eye(N, dtype=complex)) @ O
+
+def run_grover(N, marked, k):
+    G = _G(N, marked)
+    psi = np.full(N, 1 / np.sqrt(N), dtype=complex)
+    for _ in range(k):
+        psi = G @ psi
+    return psi
+
+def marked_probability(psi, marked):
+    psi = np.asarray(psi, dtype=complex)
+    return round(float(sum(abs(psi[m]) ** 2 for m in marked)), 6)
+
+def best_k(N, marked, kmax):
+    G = _G(N, marked)
+    psi = np.full(N, 1 / np.sqrt(N), dtype=complex)
+    best, bp = 0, marked_probability(psi, marked)
+    for k in range(1, kmax + 1):
+        psi = G @ psi
+        pk = marked_probability(psi, marked)
+        if pk &gt; bp:
+            best, bp = k, pk
+    return best
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 8.3</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C8.Q3 — Beyond the uniform superposition</p><p>Replace \(H^{\otimes n}\) by any \(A\) with \(A|0\rangle=|\psi\rangle\). Then \(Q=-A S_0 A^{\dagger} S_f\) amplifies the good component at the same quadratic rate, with \(\sin\theta=\|\Pi_{\text{good}}|\psi\rangle\|\).</p></div><p>Write <code>amplitude_amplification_operator(A, marked)</code> returning \(Q=-A S_0 A^{\dagger} S_f\) (with \(S_0=I-2|0\rangle\langle0|\) and \(S_f\) the phase oracle), and <code>amplify(A, marked, k)</code> returning the state after \(k\) applications of \(Q\) to \(A|0\rangle\).</p><div class="stmt"><pre>With A = H^{tensor n} this reproduces the Grover iterate up to sign.</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def amplitude_amplification_operator(A, marked):
+    ...
+
+def amplify(A, marked, k):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+H = np.array([[1,1],[1,-1]], dtype=complex)/np.sqrt(2)
+A = np.array([[1.0+0j]])
+for _ in range(4):
+    A = np.kron(A, H)
+print(round(float(abs(amplify(A, [5], 0)[5])**2), 6))
+→ 0.0625</code></pre><pre><code>import numpy as np
+H = np.array([[1,1],[1,-1]], dtype=complex)/np.sqrt(2)
+A = np.array([[1.0+0j]])
+for _ in range(4):
+    A = np.kron(A, H)
+psi = amplify(A, [5], 3)
+print(round(float(abs(psi[5])**2), 6))
+→ 0.961319</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def amplitude_amplification_operator(A, marked):
+    A = np.asarray(A, dtype=complex)
+    N = A.shape[0]
+    S0 = np.eye(N, dtype=complex)
+    S0[0, 0] = -1
+    Sf = np.eye(N, dtype=complex)
+    for m in marked:
+        Sf[m, m] = -1
+    return -A @ S0 @ A.conj().T @ Sf
+
+def amplify(A, marked, k):
+    A = np.asarray(A, dtype=complex)
+    N = A.shape[0]
+    e0 = np.zeros(N, dtype=complex)
+    e0[0] = 1
+    psi = A @ e0
+    Q = amplitude_amplification_operator(A, marked)
+    for _ in range(k):
+        psi = Q @ psi
+    return psi
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 8.4</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C8.Q4 — Estimating M without finding a marked item</p><p>The Grover iterate has eigenvalues \(e^{\pm2i\theta}\) on the good/bad plane. Phase estimation on \(G\) therefore returns \(\theta\), and \(M=N\sin^{2}\theta\).</p></div><p>Write <code>grover_angle(N, M)</code> returning \(\theta=\arcsin\sqrt{M/N}\); <code>counting_estimate(N, y, t)</code> returning the estimate \(N\sin^{2}(\pi y/2^{t})\) rounded to 4 decimals; and <code>counting_error_bound(N, M, t)</code> returning the worst-case bound \(2\pi\sqrt{M(N-M)}/2^{t}+\pi^{2}N/4^{t}\), rounded to 4 decimals.</p><div class="stmt"><pre>N=256, M=4  -&gt;  theta ~ 0.1253
+counting_estimate(256, 5, 6) -&gt; 15.1141</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def grover_angle(N, M):
+    ...
+
+def counting_estimate(N, y, t):
+    ...
+
+def counting_error_bound(N, M, t):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>print(round(grover_angle(256, 4), 4))
+→ 0.1253</code></pre><pre><code>print(counting_estimate(256, 5, 6))
+→ 15.1141</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def grover_angle(N, M):
+    return float(np.arcsin(np.sqrt(M / N)))
+
+def counting_estimate(N, y, t):
+    return round(float(N * np.sin(np.pi * y / 2 ** t) ** 2), 4)
+
+def counting_error_bound(N, M, t):
+    K = 2 ** t
+    return round(float(2 * np.pi * np.sqrt(M * (N - M)) / K + np.pi ** 2 * N / K ** 2), 4)
+</code></pre></details>
+</div>
+<h2>Problems with symbolic answers</h2>
+<p>Answers here are expressions rather than numbers, and any algebraically equivalent form is accepted. Give fractions and radicals exactly; decimal approximations are not accepted.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 8.1</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C8.S1 — Sizing a Grover search</p></div><p>Let \(N=2^{ {@n@} }\) and let there be \(M={@M@}\) marked items. Write \(\theta=\arcsin\sqrt{M/N}\).</p><p>(a) Give the success probability after \(k\) iterations, as a function of <code>k</code> and <code>theta</code>.</p><p>\(p_k=\) <span>your answer</span> </p><p>(b) Give the leading-order optimal number of iterations (ignoring the floor), in terms of <code>N</code> and <code>M</code>.</p><p>\(k_{\mathrm{opt}}\approx\) <span>your answer</span> </p><p>(c) Evaluate that expression numerically for the values above (exact expression, no decimals).</p><p><span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) \(G\) rotates by \(2\theta\) in the good/bad plane starting at angle \(\theta\), so after \(k\) steps the good amplitude is \(\sin((2k+1)\theta)\) and \(p_k=\sin^{2}((2k+1)\theta)\).</p><p>(b) Solving \((2k+1)\theta=\pi/2\) gives \(k=\frac{\pi}{4\theta}-\frac12\); for \(M\ll N\), \(\theta\approx\sqrt{M/N}\) and \(k_{\mathrm{opt}}\approx\frac{\pi}{4}\sqrt{N/M}\).</p><p>(c) With \(N=2^{ {@n@} }\) and \(M={@M@}\): \(k\approx{@ta3@}\).</p><p>Note \(p_k\) is periodic in \(k\): running too long rotates past the target and lowers the success probability. This is why the number of iterations must be chosen in advance, and why unknown \(M\) requires the BBHT exponential schedule.</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 8.2</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C8.S2 — The geometry of the Grover iterate</p></div><p>(a) The product of reflections about two lines meeting at angle \(\alpha\) is a rotation. Give the rotation angle in terms of <code>alpha</code>.</p><p><span>your answer</span> </p><p>(b) Give the two eigenvalues of the Grover iterate restricted to the good/bad plane, as an ordered list, in terms of <code>theta</code> (use <code>%e</code> and <code>%i</code>).</p><p><span>your answer</span> </p><p>(c) Amplitude estimation with \(K\) applications of \(G\) estimates \(a=\sin^2\theta\) to additive error scaling as \(K^{-\gamma}\) at leading order. Give \(\gamma\).</p><p>\(\gamma=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) \(2\alpha\). Applied with \(\alpha=\theta\) (the angle between \(|\text{bad}\rangle\) and \(|\psi\rangle\)) this gives the \(2\theta\) rotation per Grover step.</p><p>(b) A planar rotation by \(2\theta\) has eigenvalues \(e^{\pm 2i\theta}\).</p><p>(c) \(\gamma=1\): the error is \(O(1/K)\), quadratically better than the \(O(1/\sqrt K)\) of classical Monte Carlo. This is the same Heisenberg scaling as phase estimation in Chapter 6 — unsurprising, since amplitude estimation <em>is</em> phase estimation applied to \(G\).</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 8.3</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C8.S3 — Lower bounds and cryptographic consequences</p></div><p>(a) Give the BBBV lower bound on the number of oracle queries needed to search \(N\) items with bounded error, as a function of <code>N</code> (give the growth rate, e.g. <code>sqrt(N)</code>).</p><p><span>your answer</span> </p><p>(b) A symmetric cipher has a \(b\)-bit key. Give the number of Grover iterations needed for exhaustive key search, in terms of <code>b</code> (leading order, ignoring the \(\pi/4\)).</p><p><span>your answer</span> </p><p>(c) Give the key length \(b\) needed so that a Grover attack costs at least \(2^{ {@s@} }\) iterations.</p><p>\(b=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) \(\Omega(\sqrt N)\), by the hybrid argument: after \(T\) queries the algorithm can only have distinguished the flipped oracle if \(T=\Omega(\sqrt N)\). Grover matches it, so unstructured search is settled up to constants.</p><p>(b) \(N=2^{b}\), so \(\sqrt N=2^{b/2}\) iterations.</p><p>(c) \(2^{b/2}\ge 2^{ {@s@} }\) requires \(b\ge {@ta3@}\).</p><p>This is the origin of the "double your symmetric key length" rule for post-quantum security: AES-256 retains roughly 128 bits of security against Grover. Note the rule is conservative — Grover parallelises badly, and the fault-tolerant constant factors are enormous, so the effective margin is larger than the bare exponent suggests.</p></details>
+</div>
+<div class="exo-banner"><div><strong>Back to the theory</strong><span>Every exercise above is worked from a result proved in the chapter</span></div><a href="course.html">Open chapter 8</a></div>
+</div>
+<nav class="lesson-nav"><a class="prev" href="../chapter07-shor-and-hidden-subgroup/exercises.html"><span class="dir">Previous chapter</span><span class="ttl">7. Shor&#x27;s Algorithm, Order Finding and the Hidden Subgroup Problem</span></a><a class="next" href="../chapter09-error-correction-fault-tolerance/exercises.html"><span class="dir">Next chapter</span><span class="ttl">9. Quantum Error Correction and Fault Tolerance</span></a></nav>
+<footer class="site-footer"><div class="container"><strong>Quantum Computing — Theory and Practice</strong> · ten chapters · forty programming exercises · thirty symbolic problems<span class="footer-meta">Edition 2026</span></div></footer></body></html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 9 exercises — Quantum Error Correction and Fault Tolerance</title>
+<meta name="description" content="Exercises for chapter 9: Quantum Error Correction and Fault Tolerance">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = {tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]}, svg:{fontCache:"global"}};</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Quantum Computing</a> · <a href="course.html">Chapter 9</a> · Exercises</div><span class="course-code">Exercise sheet</span></div></header>
+<section class="lesson-hero"><div class="container">
+  <div class="lesson-label">Chapter 9 · exercise sheet</div>
+  <h1>Quantum Error Correction and Fault Tolerance</h1>
+  <p class="lesson-sub">4 programming exercises ·
+     3 problems with symbolic answers. Every solution is hidden behind a
+     toggle — attempt each one before opening it.</p>
+</div></section>
+<div class="lesson-content">
+<h2>Programming exercises</h2>
+<p>Each exercise is checked automatically against hidden test cases. Only NumPy is required, and the function names in the statement must be used exactly as written.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 9.1</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C9.Q1 — Encode, corrupt, diagnose, correct</p><p>\(\alpha|0\rangle+\beta|1\rangle\mapsto\alpha|000\rangle+\beta|111\rangle\), with syndrome \((Z_1Z_2, Z_2Z_3)\).</p></div><p>Write <code>encode3(alpha, beta)</code> returning the 8-dimensional encoded state; <code>apply_x(state, q)</code> applying \(X\) to qubit \(q\) (0 = most significant); <code>syndrome3(state)</code> returning the tuple of \(\pm1\) eigenvalues of \(Z_1Z_2\) and \(Z_2Z_3\) as <code>int</code>s; and <code>correct3(state)</code> returning the corrected state.</p><div class="stmt"><pre>syndrome3(no error) -&gt; (1, 1)
+syndrome3(X on qubit 0) -&gt; (-1, 1)
+syndrome3(X on qubit 1) -&gt; (-1, -1)
+syndrome3(X on qubit 2) -&gt; (1, -1)</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def encode3(alpha, beta):
+    ...
+
+def apply_x(state, q):
+    ...
+
+def syndrome3(state):
+    ...
+
+def correct3(state):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+v = encode3(0.6, 0.8)
+print(syndrome3(v))
+→ (1, 1)</code></pre><pre><code>import numpy as np
+v = encode3(0.6, 0.8)
+print([syndrome3(apply_x(v, q)) for q in range(3)])
+→ [(-1, 1), (-1, -1), (1, -1)]</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+X = np.array([[0, 1], [1, 0]], dtype=complex)
+Z = np.array([[1, 0], [0, -1]], dtype=complex)
+I2 = np.eye(2, dtype=complex)
+
+def _embed(U, q, n=3):
+    ops = [I2] * n
+    ops[q] = U
+    out = np.array([[1.0 + 0j]])
+    for o in ops:
+        out = np.kron(out, o)
+    return out
+
+def encode3(alpha, beta):
+    v = np.zeros(8, dtype=complex)
+    v[0] = alpha
+    v[7] = beta
+    return v
+
+def apply_x(state, q):
+    return _embed(X, q) @ np.asarray(state, dtype=complex)
+
+def syndrome3(state):
+    state = np.asarray(state, dtype=complex)
+    S1 = _embed(Z, 0) @ _embed(Z, 1)
+    S2 = _embed(Z, 1) @ _embed(Z, 2)
+    return tuple(int(round(float(np.real(np.vdot(state, S @ state))))) for S in (S1, S2))
+
+def correct3(state):
+    s = syndrome3(state)
+    table = {(1, 1): None, (-1, 1): 0, (-1, -1): 1, (1, -1): 2}
+    q = table[s]
+    return np.asarray(state, dtype=complex) if q is None else apply_x(state, q)
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 9.2</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C9.Q2 — Syndromes as linear algebra over GF(2)</p><p>A Pauli on \(n\) qubits is a binary vector \((x|z)\); two Paulis commute iff \(x_1\!\cdot\!z_2+z_1\!\cdot\!x_2=0 \bmod 2\).</p></div><p>Write <code>commutes(p1, p2, n)</code> returning a <code>bool</code>; <code>syndrome(error, stabilizers, n)</code> returning a tuple of bits; <code>is_valid_stabilizer_group(gens, n)</code> checking that all generators pairwise commute; and <code>weight(pauli, n)</code> returning the number of qubits on which the Pauli acts non-trivially.</p><div class="stmt"><pre>Steane code X-generators: IIIXXXX, IXXIIXX, XIXIXIX
+and the mirrored Z-generators.</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def commutes(p1, p2, n):
+    ...
+
+def syndrome(error, stabilizers, n):
+    ...
+
+def is_valid_stabilizer_group(gens, n):
+    ...
+
+def weight(pauli, n):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+n=1
+Xp=[1,0]; Zp=[0,1]
+print(commutes(Xp, Zp, n), commutes(Xp, Xp, n))
+→ False True</code></pre><pre><code>import numpy as np
+n = 3
+S = [[0,0,0, 1,1,0], [0,0,0, 0,1,1]]
+errs = [[1,0,0, 0,0,0], [0,1,0, 0,0,0], [0,0,1, 0,0,0]]
+print([syndrome(e, S, n) for e in errs])
+→ [(1, 0), (1, 1), (0, 1)]</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def commutes(p1, p2, n):
+    p1 = np.asarray(p1, dtype=int)
+    p2 = np.asarray(p2, dtype=int)
+    s = (np.dot(p1[:n], p2[n:]) + np.dot(p1[n:], p2[:n])) % 2
+    return bool(s == 0)
+
+def syndrome(error, stabilizers, n):
+    return tuple(0 if commutes(error, g, n) else 1 for g in stabilizers)
+
+def is_valid_stabilizer_group(gens, n):
+    for i in range(len(gens)):
+        for j in range(i + 1, len(gens)):
+            if not commutes(gens[i], gens[j], n):
+                return False
+    return True
+
+def weight(pauli, n):
+    pauli = np.asarray(pauli, dtype=int)
+    return int(sum(1 for i in range(n) if pauli[i] or pauli[n + i]))
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 9.3</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C9.Q3 — Is this code correcting?</p><p>\(P E_a^{\dagger}E_b P=c_{ab}P\) is necessary and sufficient. Checking it numerically for a small code is a direct matrix computation.</p></div><p>Write <code>code_projector(basis)</code> returning \(P=\sum_i |c_i\rangle\langle c_i|\) for an orthonormal list of codewords; and <code>knill_laflamme(P, errors, tol=1e-9)</code> returning <code>True</code> iff \(PE_a^{\dagger}E_bP\) is a scalar multiple of \(P\) for every pair.</p><div class="stmt"><pre>3-qubit bit-flip code with errors {I, X1, X2, X3} -&gt; True
+same code with a Z error added                    -&gt; False</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def code_projector(basis):
+    ...
+
+def knill_laflamme(P, errors, tol=1e-9):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+c0 = np.zeros(8, dtype=complex); c0[0] = 1
+c1 = np.zeros(8, dtype=complex); c1[7] = 1
+P = code_projector([c0, c1])
+print(np.allclose(P @ P, P), round(float(np.real(np.trace(P))), 6))
+→ True 2.0</code></pre><pre><code>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex); I2 = np.eye(2, dtype=complex)
+def emb(U, q):
+    ops = [I2]*3; ops[q] = U
+    out = np.array([[1.0+0j]])
+    for o in ops: out = np.kron(out, o)
+    return out
+c0 = np.zeros(8, dtype=complex); c0[0] = 1
+c1 = np.zeros(8, dtype=complex); c1[7] = 1
+P = code_projector([c0, c1])
+errs = [np.eye(8, dtype=complex)] + [emb(X, q) for q in range(3)]
+print(knill_laflamme(P, errs))
+→ True</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def code_projector(basis):
+    P = None
+    for c in basis:
+        c = np.asarray(c, dtype=complex).ravel()
+        c = c / np.linalg.norm(c)
+        term = np.outer(c, c.conj())
+        P = term if P is None else P + term
+    return P
+
+def knill_laflamme(P, errors, tol=1e-9):
+    P = np.asarray(P, dtype=complex)
+    nrm = np.real(np.trace(P @ P))
+    for Ea in errors:
+        for Eb in errors:
+            M = P @ np.asarray(Ea, dtype=complex).conj().T @ np.asarray(Eb, dtype=complex) @ P
+            c = np.trace(P @ M) / nrm
+            if not np.allclose(M, c * P, atol=tol):
+                return False
+    return True
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 9.4</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C9.Q4 — When does error correction actually help?</p><p>A distance-\(d\) code suppresses errors as \(p_L\approx A(p/p_{\text{th}})^{\lfloor(d+1)/2\rfloor}\); concatenating \(\ell\) levels of a distance-3 code gives \(p_L\approx p_{\text{th}}(p/p_{\text{th}})^{2^{\ell}}\). Below threshold, more qubits help; above it, they hurt.</p></div><p>Write <code>logical_error_surface(p, p_th, d, A=0.1)</code>; <code>logical_error_concat(p, p_th, levels)</code>; and <code>min_distance_for(p, p_th, target, A=0.1)</code> returning the smallest odd \(d\ge3\) with <code>logical_error_surface(p, p_th, d, A) <= target</code> (search up to \(d=101\), return <code>None</code> if none works). Round the two error rates to 12 decimals.</p><div class="stmt"><pre>logical_error_surface(1e-3, 1e-2, 3) -&gt; 0.1 * (0.1)^2 = 0.001
+min_distance_for(1e-3, 1e-2, 1e-12) -&gt; 21</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def logical_error_surface(p, p_th, d, A=0.1):
+    ...
+
+def logical_error_concat(p, p_th, levels):
+    ...
+
+def min_distance_for(p, p_th, target, A=0.1):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>print(logical_error_surface(1e-3, 1e-2, 3))
+→ 0.001</code></pre><pre><code>print(min_distance_for(1e-3, 1e-2, 1e-12))
+→ 21</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def logical_error_surface(p, p_th, d, A=0.1):
+    return round(float(A * (p / p_th) ** ((d + 1) // 2)), 12)
+
+def logical_error_concat(p, p_th, levels):
+    return round(float(p_th * (p / p_th) ** (2 ** levels)), 12)
+
+def min_distance_for(p, p_th, target, A=0.1):
+    if p &gt;= p_th:
+        return None
+    for d in range(3, 102, 2):
+        if logical_error_surface(p, p_th, d, A) &lt;= target:
+            return d
+    return None
+</code></pre></details>
+</div>
+<h2>Problems with symbolic answers</h2>
+<p>Answers here are expressions rather than numbers, and any algebraically equivalent form is accepted. Give fractions and radicals exactly; decimal approximations are not accepted.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 9.1</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C9.S1 — Reading [[n,k,d]]</p></div><p>A stabilizer code has parameters \([[n,k,d]]\) with \(d={@d@}\).</p><p>(a) Give the number of arbitrary single-qubit errors it can correct, in terms of <code>d</code> (use <code>floor</code>).</p><p>\(t=\) <span>your answer</span> </p><p>(b) Give the number of independent stabilizer generators, in terms of <code>n</code> and <code>k</code>.</p><p><span>your answer</span> </p><p>(c) The quantum Singleton bound reads \(n-k\ge \alpha(d-1)\). Give \(\alpha\).</p><p>\(\alpha=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) \(t=\lfloor (d-1)/2\rfloor\). For \(d={@d@}\) this is \({@ta1@}\). A distance-\(d\) code <em>detects</em> \(d-1\) errors but only <em>corrects</em> half that many, since two correctable errors must map the code space to distinguishable subspaces.</p><p>(b) The code space is the joint \(+1\) eigenspace of \(n-k\) independent generators, each halving the dimension: \(2^{n}/2^{n-k}=2^{k}\).</p><p>(c) \(\alpha=2\): the quantum Singleton bound is \(n-k\ge2(d-1)\), twice the classical one, because both bit and phase errors must be corrected. Codes meeting it with equality are called quantum MDS; the \([[5,1,3]]\) code is an example.</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 9.2</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C9.S2 — The threshold theorem, quantitatively</p></div><p>For a distance-\(d\) surface code, \(p_L\approx A\,(p/p_{\mathrm{th}})^{(d+1)/2}\) with \(d\) odd.</p><p>(a) Give \(p_L\) for \(A=1\), \(p_{\mathrm{th}}=10^{-2}\), \(p=10^{-3}\) and \(d={@d@}\) (exact expression, no decimals).</p><p>\(p_L=\) <span>your answer</span> </p><p>(b) Concatenating \(\ell\) levels of a distance-3 code gives \(p_L=p_{\mathrm{th}}(p/p_{\mathrm{th}})^{e(\ell)}\). Give the exponent \(e(\ell)\) in terms of <code>l</code>.</p><p>\(e(\ell)=\) <span>your answer</span> </p><p>(c) Give the number of physical qubits per logical qubit for a distance-\(d\) surface code (leading order, in terms of <code>d</code>).</p><p><span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) The exponent is \((d+1)/2\); with \(p/p_{\mathrm{th}}=10^{-1}\) this gives \(p_L=10^{-(d+1)/2}={@ta1@}\).</p><p>(b) Each concatenation level squares the ratio, so \(e(\ell)=2^{\ell}\): the suppression is doubly exponential in the number of levels, and only \(\mathrm{polylog}\) levels are needed for any target — the content of the threshold theorem.</p><p>(c) \(d^{2}\) (or \(2d^{2}-1\) counting ancillas, depending on the layout). At \(p/p_{\mathrm{th}}=1/10\) and a target of \(10^{-12}\), \(d\approx23\), so roughly \(500\)–\(1000\) physical qubits per logical qubit — before accounting for magic state factories, which typically dominate the total footprint.</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 9.3</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C9.S3 — Counting states and syndromes</p></div><p>The Steane code is \([[7,1,3]]\).</p><p>(a) Give the number of independent stabilizer generators.</p><p><span>your answer</span> </p><p>(b) Give the number of distinct non-trivial syndromes available, and compare with the number of weight-1 Pauli errors on 7 qubits. Enter the ordered pair <code>[syndromes, errors]</code>.</p><p><span>your answer</span> </p><p>(c) For a general \([[n,1,3]]\) code, the quantum Hamming bound requires \(2^{n-1}\ge 1+3n\). Give the smallest \(n\) satisfying it.</p><p>\(n=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) \(n-k=7-1=6\).</p><p>(b) Six generators give \(2^{6}=64\) syndromes, of which \(63\) are non-trivial. There are \(3\times7=21\) weight-1 Pauli errors, so the syndromes are far from exhausted — the Steane code is not perfect. (It is, however, CSS and admits transversal Clifford gates, which matters more in practice.)</p><p>(c) \(2^{n-1}\ge 1+3n\): at \(n=5\), \(16\ge16\) holds with equality, so \(n=5\). That is the \([[5,1,3]]\) perfect code, which saturates the bound — every non-trivial syndrome corresponds to exactly one correctable error.</p></details>
+</div>
+<div class="exo-banner"><div><strong>Back to the theory</strong><span>Every exercise above is worked from a result proved in the chapter</span></div><a href="course.html">Open chapter 9</a></div>
+</div>
+<nav class="lesson-nav"><a class="prev" href="../chapter08-grover-and-amplitude-amplification/exercises.html"><span class="dir">Previous chapter</span><span class="ttl">8. Grover Search, Amplitude Amplification and Query Lower Bounds</span></a><a class="next" href="../chapter10-complexity-nisq-and-qiskit/exercises.html"><span class="dir">Next chapter</span><span class="ttl">10. Quantum Complexity, NISQ Algorithms and Qiskit in Practice</span></a></nav>
+<footer class="site-footer"><div class="container"><strong>Quantum Computing — Theory and Practice</strong> · ten chapters · forty programming exercises · thirty symbolic problems<span class="footer-meta">Edition 2026</span></div></footer></body></html>

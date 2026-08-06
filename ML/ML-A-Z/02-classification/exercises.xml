@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Sigmoid and logistic prediction</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q1 &amp;mdash; LOGISTIC REGRESSION&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Section 2.3 models the log-odds as a linear function, which is the same as squashing a linear score through the logistic sigmoid.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;sigmoid(z)&lt;/code&gt;&lt;/strong&gt; and &lt;strong&gt;&lt;code&gt;predict_proba(x, theta)&lt;/code&gt;&lt;/strong&gt;, where &lt;code&gt;x&lt;/code&gt; already contains its bias term 1.0 and &lt;code&gt;theta&lt;/code&gt; is the parameter list. &lt;code&gt;sigmoid&lt;/code&gt; must be &lt;em&gt;numerically stable&lt;/em&gt;: it must not overflow for z = &amp;minus;1000.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;sigmoid(0)     -&amp;gt;  0.5
+sigmoid(-1000) -&amp;gt;  0.0   (must not raise OverflowError)&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; For z &amp;lt; 0 use e&lt;sup&gt;z&lt;/sup&gt;/(1+e&lt;sup&gt;z&lt;/sup&gt;) instead of 1/(1+e&lt;sup&gt;&amp;minus;z&lt;/sup&gt;).&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import math
+
+
+def sigmoid(z):
+    # Completer : attention au depassement pour z tres negatif
+    ...
+
+
+def predict_proba(x, theta):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import math
+
+
+def sigmoid(z):
+    if z &gt;= 0:
+        return 1.0 / (1.0 + math.exp(-z))
+    ez = math.exp(z)
+    return ez / (1.0 + ez)
+
+
+def predict_proba(x, theta):
+    return sigmoid(sum(a * b for a, b in zip(x, theta)))
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(sigmoid(0))
+</text></testcode><stdin><text /></stdin><expected><text>0.5
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(round(sigmoid(2.0), 6), round(sigmoid(-2.0), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.880797 0.119203
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(sigmoid(-1000.0), sigmoid(1000.0))
+</text></testcode><stdin><text /></stdin><expected><text>0.0 1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(round(predict_proba([1.0, 2.0], [0.5, -0.25]), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.5
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(round(sigmoid(1.5) + sigmoid(-1.5), 10))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Cross-entropy loss</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q2 &amp;mdash; THE RIGHT LOSS FOR CLASSIFICATION&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Section 2.5 showed that the squared loss penalises confidently correct predictions, which is why classification uses cross-entropy instead.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;cross_entropy(ys, ps)&lt;/code&gt;&lt;/strong&gt; returning the mean &amp;minus;[y log p + (1&amp;minus;y) log(1&amp;minus;p)] over all pairs. Clip each probability into &lt;code&gt;[1e-12, 1 - 1e-12]&lt;/code&gt; first, so that a confident wrong prediction gives a large finite number instead of a math domain error.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;cross_entropy([1, 0], [0.9, 0.1])  -&amp;gt;  0.10536...&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; Clipping is not cosmetic: without it, p = 0.0 with y = 1 crashes the whole training run.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import math
+
+EPS = 1e-12
+
+
+def cross_entropy(ys, ps):
+    # Completer : ne pas oublier le clipping
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import math
+
+EPS = 1e-12
+
+
+def cross_entropy(ys, ps):
+    total = 0.0
+    for y, p in zip(ys, ps):
+        p = min(max(p, EPS), 1.0 - EPS)
+        total += -(y * math.log(p) + (1 - y) * math.log(1 - p))
+    return total / len(ys)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(round(cross_entropy([1, 0], [0.9, 0.1]), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.105361
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(round(cross_entropy([1, 1, 0, 0], [0.5, 0.5, 0.5, 0.5]), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.693147
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>v = cross_entropy([1], [0.0])
+print(v &gt; 20, isinstance(v, float))
+</text></testcode><stdin><text /></stdin><expected><text>True True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(round(cross_entropy([1, 0, 1], [0.99, 0.01, 0.99]), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.01005
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>a = cross_entropy([1], [0.8])
+b = cross_entropy([1], [0.6])
+print(a &lt; b)
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — k-nearest-neighbours classifier</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q3 &amp;mdash; K-NEAREST NEIGHBOURS&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Cover and Hart proved that 1-NN is asymptotically within a factor 2 of the Bayes rate (Section 2.2). The algorithm itself is three lines.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;knn_predict(train_X, train_y, x, k)&lt;/code&gt;&lt;/strong&gt; returning the majority label among the k nearest training points under Euclidean distance. &lt;strong&gt;Tie-breaking rule:&lt;/strong&gt; if two labels tie, return the smaller label.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;train_X = [[0,0],[1,1],[2,2]], train_y = [0,0,1]
+knn_predict(train_X, train_y, [0.1,0.1], 1)  -&amp;gt;  0&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; Sort the (distance, label) pairs, take the first k, then count.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import math
+
+
+def knn_predict(train_X, train_y, x, k):
+    # Completer : en cas d'egalite, retourner la plus petite etiquette
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import math
+
+
+def knn_predict(train_X, train_y, x, k):
+    pairs = []
+    for xi, yi in zip(train_X, train_y):
+        d = math.sqrt(sum((a - b) ** 2 for a, b in zip(xi, x)))
+        pairs.append((d, yi))
+    pairs.sort(key=lambda t: t[0])
+    counts = {}
+    for _, lab in pairs[:k]:
+        counts[lab] = counts.get(lab, 0) + 1
+    best = max(counts.values())
+    return min(lab for lab, c in counts.items() if c == best)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>tX = [[0, 0], [1, 1], [2, 2]]
+ty = [0, 0, 1]
+print(knn_predict(tX, ty, [0.1, 0.1], 1))
+</text></testcode><stdin><text /></stdin><expected><text>0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>tX = [[0, 0], [1, 1], [2, 2], [3, 3]]
+ty = [0, 0, 1, 1]
+print(knn_predict(tX, ty, [1.6, 1.6], 3))
+</text></testcode><stdin><text /></stdin><expected><text>1
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>tX = [[0, 0], [2, 2]]
+ty = [1, 0]
+print(knn_predict(tX, ty, [1, 1], 2))
+</text></testcode><stdin><text /></stdin><expected><text>0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>tX = [[0], [1], [2], [3], [4]]
+ty = [0, 0, 0, 1, 1]
+print([knn_predict(tX, ty, [v], 3) for v in [0, 1, 2, 3, 4]])
+</text></testcode><stdin><text /></stdin><expected><text>[0, 0, 0, 1, 1]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>tX = [[5, 5]]
+ty = [7]
+print(knn_predict(tX, ty, [0, 0], 1))
+</text></testcode><stdin><text /></stdin><expected><text>7
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q4 — Confusion matrix, precision, recall and F1</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q4 &amp;mdash; EVALUATING A CLASSIFIER&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Section 2.6 warned that accuracy is meaningless under class imbalance: predicting the majority class always scores well and catches nothing.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;confusion(y_true, y_pred)&lt;/code&gt;&lt;/strong&gt; returning the tuple &lt;code&gt;(tp, fp, tn, fn)&lt;/code&gt; for binary labels 0/1, and &lt;strong&gt;&lt;code&gt;prf(y_true, y_pred)&lt;/code&gt;&lt;/strong&gt; returning &lt;code&gt;(precision, recall, f1)&lt;/code&gt;. Any metric whose denominator is zero must be &lt;code&gt;0.0&lt;/code&gt;.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;y_true = [1, 1, 0, 0], y_pred = [1, 0, 0, 0]
+confusion -&amp;gt; (1, 0, 2, 1)
+prf       -&amp;gt; (1.0, 0.5, 0.666...)&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; F&amp;#8321; is the harmonic mean 2PR/(P+R) &amp;mdash; it is small unless &lt;em&gt;both&lt;/em&gt; are large.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def confusion(y_true, y_pred):
+    # Completer
+    ...
+
+
+def prf(y_true, y_pred):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def confusion(y_true, y_pred):
+    tp = fp = tn = fn = 0
+    for t, p in zip(y_true, y_pred):
+        if t == 1 and p == 1:
+            tp += 1
+        elif t == 0 and p == 1:
+            fp += 1
+        elif t == 0 and p == 0:
+            tn += 1
+        else:
+            fn += 1
+    return (tp, fp, tn, fn)
+
+
+def prf(y_true, y_pred):
+    tp, fp, tn, fn = confusion(y_true, y_pred)
+    precision = tp / (tp + fp) if (tp + fp) else 0.0
+    recall = tp / (tp + fn) if (tp + fn) else 0.0
+    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) else 0.0
+    return (precision, recall, f1)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(confusion([1, 1, 0, 0], [1, 0, 0, 0]))
+</text></testcode><stdin><text /></stdin><expected><text>(1, 0, 2, 1)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>p, r, f = prf([1, 1, 0, 0], [1, 0, 0, 0])
+print(round(p, 4), round(r, 4), round(f, 4))
+</text></testcode><stdin><text /></stdin><expected><text>1.0 0.5 0.6667
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>y = [1] + [0] * 99
+pred = [0] * 100
+acc = sum(a == b for a, b in zip(y, pred)) / 100
+p, r, f = prf(y, pred)
+print(acc, p, r, f)
+</text></testcode><stdin><text /></stdin><expected><text>0.99 0.0 0.0 0.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(confusion([0, 0, 0], [1, 1, 1]))
+</text></testcode><stdin><text /></stdin><expected><text>(0, 3, 0, 0)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>p, r, f = prf([1, 1, 1], [1, 1, 1])
+print(p, r, f)
+</text></testcode><stdin><text /></stdin><expected><text>1.0 1.0 1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q5 — Hinge loss and the margin</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q5 &amp;mdash; THE SVM OBJECTIVE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Section 2.5 showed that the soft-margin SVM is exactly regularised ERM with the hinge loss, and that hinge is zero once the margin exceeds 1.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;hinge_loss(ys, scores)&lt;/code&gt;&lt;/strong&gt; returning the mean of max(0, 1 &amp;minus; y&amp;middot;s) for labels y &amp;isin; {&amp;minus;1, +1}, and &lt;strong&gt;&lt;code&gt;n_support(ys, scores)&lt;/code&gt;&lt;/strong&gt; counting the points with margin y&amp;middot;s &amp;le; 1 &amp;mdash; those are the ones the SVM solution actually depends on.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;hinge_loss([1, -1], [2.0, -2.0])  -&amp;gt;  0.0
+n_support([1, -1, 1], [2.0, -0.5, 0.9])  -&amp;gt;  2&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; A point with margin strictly greater than 1 contributes nothing and can be deleted without changing the solution.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def hinge_loss(ys, scores):
+    # Completer
+    ...
+
+
+def n_support(ys, scores):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def hinge_loss(ys, scores):
+    return sum(max(0.0, 1.0 - y * s) for y, s in zip(ys, scores)) / len(ys)
+
+
+def n_support(ys, scores):
+    return sum(1 for y, s in zip(ys, scores) if y * s &lt;= 1)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(hinge_loss([1, -1], [2.0, -2.0]))
+</text></testcode><stdin><text /></stdin><expected><text>0.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(n_support([1, -1, 1], [2.0, -0.5, 0.9]))
+</text></testcode><stdin><text /></stdin><expected><text>2
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(round(hinge_loss([1, 1, -1, -1], [0.5, 1.5, -0.2, -3.0]), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.325
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(round(hinge_loss([1], [-5.0]), 6), n_support([1], [-5.0]))
+</text></testcode><stdin><text /></stdin><expected><text>6.0 1
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>ys = [1, -1, 1, -1]
+sc = [3.0, -3.0, 4.0, -2.5]
+print(hinge_loss(ys, sc), n_support(ys, sc))
+</text></testcode><stdin><text /></stdin><expected><text>0.0 0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

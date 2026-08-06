@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algorithms of Section 5</title>
+<link href="../assets/style.css" rel="stylesheet">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+
+/* Use the full width the theme allows: the shared stylesheet caps a lesson at
+   880px, which leaves wide figures and tables boxed into the middle of a large
+   screen. --max-w is the theme's own page width, so this stays consistent with
+   the landing page. */
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) {
+  .lesson-content { padding-left: 16px; padding-right: 16px; }
+}
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule);
+               padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center;
+               padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.lesson-nav { max-width: 880px; margin: 0 auto 40px; padding: 0 24px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav .container { display: flex; gap: 18px; flex-wrap: wrap; width: 100%; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600;
+                font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.keypoints h4 { margin-top: 0; }
+
+.algo-tag { color: var(--color-muted); font-size: 0.86rem; font-style: italic;
+            margin: -0.4em 0 1em; }
+.algo-steps { border: 1px solid var(--color-rule); border-radius: var(--radius);
+              background: var(--proof-bg); padding: 4px 22px 14px;
+              margin: 1.2em 0; }
+.algo-steps-title { color: var(--primary); font-weight: 700; font-size: 0.8rem;
+                    letter-spacing: 0.09em; text-transform: uppercase;
+                    margin: 14px 0 4px; }
+.algo-steps ol { padding-left: 1.4em; }
+.algo-steps li { margin: 0.55em 0; line-height: 1.75; }
+.annex-toc { background: var(--primary-soft); border-radius: var(--radius);
+             padding: 16px 24px; margin: 1.4em 0; }
+.annex-toc ul { margin: 0.4em 0; }
+.annex-toc a { color: var(--primary-dark); font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Machine Learning A&ndash;Z</a> &middot; Course</div><span class="course-code">Graph-based machine learning</span></div></header>
+<section class="lesson-hero"><div class="container"><div class="lesson-label">Part II &middot; Section 5 &middot; Annex</div><h1>Algorithms of Section 5</h1><div class="lesson-sub">Components, walk counting, the Laplacian and label propagation, set out step by step.</div></div></section>
+<main class="lesson-content">
+<h2>Annex &mdash; the algorithms of Section 5</h2><div class="box tip"><div class="box-title">How to read this annex</div><p>Each algorithm is set out the same way: what it is handed, what it must hand back, then the steps in the order you would carry them out. A small example is worked through by hand so you can check your understanding against real numbers, and the closing boxes say why the method is correct, why it stops, and what it costs. Nothing here assumes you can read a program &mdash; the point is the reasoning.</p></div><div class="annex-toc"><strong>Algorithms in this annex</strong><ul><li><a href="#algo1">Finding the connected components</a></li><li><a href="#algo2">Counting walks with matrix powers</a></li><li><a href="#algo3">Building the Laplacian and measuring smoothness</a></li><li><a href="#algo4">Label propagation</a></li></ul></div><span id="algo1"></span><h3>Finding the connected components</h3><p class="algo-tag">Traversal \(\cdot\) visits every node once</p><p>Split a graph into the pieces that are actually connected to each other.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A list of nodes and a list of edges.</p><p><strong>Produce.</strong> A component number for every node, and the count of components.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Build the neighbour lists.</strong> For each node, the list of nodes joined to it. Add each edge to both endpoints' lists &mdash; forgetting the second direction is the classic first mistake.</li><li><strong>Mark every node unvisited.</strong> Keep a component number for each node, initially blank.</li><li><strong>Take the lowest unvisited node.</strong> Give it the next component number and put it in a waiting queue.</li><li><strong>Drain the queue.</strong> Take a node from the front of the queue; for each of its neighbours that is still blank, give it the same component number and add it to the back of the queue. Continue until the queue empties.</li><li><strong>Repeat.</strong> Go back and take the next still-blank node. When none remain, the number of component numbers issued is the answer.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Six nodes, edges 0&ndash;1, 1&ndash;2 and 3&ndash;4.</p><table><thead><tr><th>Step</th><th>Queue</th><th>Assigned so far</th></tr></thead><tbody><tr><td>start at 0</td><td>[0]</td><td>\(0\to A\)</td></tr><tr><td>drain 0</td><td>[1]</td><td>0,\(1\to A\)</td></tr><tr><td>drain 1</td><td>[2]</td><td>0,1,\(2\to A\)</td></tr><tr><td>drain 2</td><td>[ ]</td><td>component A complete</td></tr><tr><td>start at 3</td><td>[4]</td><td>3,\(4\to B\)</td></tr><tr><td>drain 4</td><td>[ ]</td><td>component B complete</td></tr><tr><td>start at 5</td><td>[ ]</td><td>\(5\to C\), alone</td></tr></tbody></table><p>Three components. This matters far beyond bookkeeping: the number of components is exactly the number of zero eigenvalues of the Laplacian, which is the fact spectral clustering rests on.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>Every node reachable from the starting node receives its number, and no node outside that set does. The queue holds exactly the nodes found but not yet expanded.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Each node enters the queue at most once, because it is numbered as it is added and only blank nodes are added.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>Every node and every edge is examined a constant number of times: \(O(n+m)\), which is the best possible.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>Adding a node to the queue without numbering it immediately lets it be added several times, and on a dense graph the queue explodes.</li><li>On a directed graph this finds only what is reachable, which is a different and weaker notion than a component.</li></ul></div><span id="algo2"></span><h3>Counting walks with matrix powers</h3><p class="algo-tag">Direct computation \(\cdot\) the key structural fact</p><p>Count how many ways one can walk from each node to each other node in exactly \(k\) steps.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> The adjacency table of the graph and a length \(k\).</p><p><strong>Produce.</strong> A table whose entry in row \(u\), column \(v\) is the number of walks of length \(k\) from \(utov\).</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Write down the adjacency table.</strong> One row and column per node; a 1 where an edge exists, 0 elsewhere. For an undirected graph this table is symmetric.</li><li><strong>Understand what one step means.</strong> The table itself already answers the question for \(k = 1\): there is one walk of length 1 from \(utov\) exactly when they are joined.</li><li><strong>Combine two step-counts.</strong> To count walks of length \(k+1\) from \(utov\), go over every possible node \(z\) in the middle: the number of ways to reach \(zink\) steps, times the number of ways to go from \(ztov\) in one. Add these up.</li><li><strong>Repeat to the length you need.</strong> Each combination advances the walk length by one.</li><li><strong>Read the diagonal for closed walks.</strong> The entry in row \(u\), column \(u\) counts walks that return to where they started. At length three, the total down the diagonal is six times the number of triangles &mdash; each triangle counted once per starting node and once per direction.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>A triangle on three nodes.</p><table><thead><tr><th>Length</th><th>Row 0 of the table</th><th>Meaning</th></tr></thead><tbody><tr><td>1</td><td>0, 1, 1</td><td>one step reaches each neighbour</td></tr><tr><td>2</td><td>2, 1, 1</td><td>two steps return home two ways, or reach each neighbour one way</td></tr><tr><td>3</td><td>2, 3, 3</td><td>diagonal total is 6 = \(6 \times 1\) triangle</td></tr></tbody></table><p>This is the fact that makes everything later work: multiplying by the adjacency table is <em>one hop of propagation</em>. Doing it repeatedly is what a random walk does, and what each layer of a graph network does.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>Proved by induction. It holds for one step by definition, and the combination step enumerates every walk of length \(k+1\) exactly once, by its unique node at position \(k\).</p></div><div class="box method"><div class="box-title">Why it stops</div><p>\(k\) combinations, fixed in advance.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>Each combination is cubic in the number of nodes if done densely. Real graphs are sparse, so in practice one never forms these tables &mdash; one multiplies a single vector by the adjacency structure, at cost \(O(m)\) per step.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>A walk may revisit nodes and edges. It is not a path. The counts grow very quickly and overflow ordinary integers for moderate \(k\).</li><li>For large \(k\) the entries become dominated by the principal direction of the graph and stop distinguishing nodes &mdash; the same phenomenon that limits how deep a graph network can usefully be.</li></ul></div><span id="algo3"></span><h3>Building the Laplacian and measuring smoothness</h3><p class="algo-tag">Direct computation \(\cdot\) the central object</p><p>Build the matrix that measures how much a quantity spread over the nodes disagrees across edges.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> The graph, and optionally a value attached to each node.</p><p><strong>Produce.</strong> The Laplacian table, and the smoothness number of the given values.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Count the degrees.</strong> For each node, how many edges touch it.</li><li><strong>Place the degrees on the diagonal.</strong> Start from a table of zeros and write each node's degree in its own diagonal position.</li><li><strong>Subtract the adjacency.</strong> Put &minus;1 in every position corresponding to an edge, both ways round.</li><li><strong>Check the row sums.</strong> Every row must now add to zero. This is the arithmetic statement that a constant value over all nodes has no disagreement anywhere, and it is worth verifying because it catches most construction errors immediately.</li><li><strong>Measure the smoothness of a set of values.</strong> Do not use the table for this. Go over the edges directly: for each edge, square the difference between the values at its two ends, and add up. That sum is exactly the quantity the Laplacian computes, obtained in time proportional to the number of edges rather than its square.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>A path 0&ndash;1&ndash;2 with values attached to the nodes.</p><table><thead><tr><th>Values on 0, 1, 2</th><th>Edge 0&ndash;1 contributes</th><th>Edge 1&ndash;2 contributes</th><th>Smoothness</th></tr></thead><tbody><tr><td>5, 5, 5</td><td>0</td><td>0</td><td><strong>0</strong> &mdash; perfectly smooth</td></tr><tr><td>0, 1, 0</td><td>1</td><td>1</td><td>2</td></tr><tr><td>0, 1, 2</td><td>1</td><td>1</td><td>2</td></tr><tr><td>0, 10, 0</td><td>100</td><td>100</td><td>200 &mdash; very rough</td></tr></tbody></table><p>Any constant assignment scores zero, whatever the constant. That is why the constant direction is the one associated with the smallest possible smoothness value, and why the <em>second</em> smallest is the interesting one.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>The smoothness number is a sum of squares, so it is never negative, and it is zero exactly when the values are constant on each connected piece of the graph.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Direct.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>\(O(m)\) for the smoothness number; \(O(n^2)\) memory if you insist on building the full table, which for a real graph you should not.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>On graphs where some nodes have far more edges than others, the high-degree nodes dominate the smoothness number. Dividing through by degree gives the normalised variants used in the next section.</li><li>Forgetting to place both &minus;1 entries breaks the symmetry and every conclusion that follows.</li></ul></div><span id="algo4"></span><h3>Label propagation</h3><p class="algo-tag">Iterative method \(\cdot\) needs no training at all</p><p>Spread known labels from a few nodes to all the others along the edges.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A graph, and labels for a small subset of nodes.</p><p><strong>Produce.</strong> A value for every unlabelled node.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Fix the known values.</strong> The labelled nodes keep their labels throughout and are never updated.</li><li><strong>Start the rest anywhere.</strong> Zero will do. The starting point does not affect where this ends up.</li><li><strong>Replace each unknown by the average of its neighbours.</strong> Sweep over the unlabelled nodes, setting each to the average of the current values at the nodes joined to it.</li><li><strong>Repeat until settled.</strong> Continue until no value changes by more than a small tolerance.</li><li><strong>Read off the answer.</strong> Threshold the final values to obtain labels, or keep them as confidences.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>A path of five nodes; node 0 is known to be 1 and node 4 known to be 0.</p><table><thead><tr><th>Sweep</th><th>Node 1</th><th>Node 2</th><th>Node 3</th></tr></thead><tbody><tr><td>start</td><td>0.000</td><td>0.000</td><td>0.000</td></tr><tr><td>1</td><td>0.500</td><td>0.250</td><td>0.125</td></tr><tr><td>2</td><td>0.625</td><td>0.375</td><td>0.188</td></tr><tr><td>5</td><td>0.740</td><td>0.490</td><td>0.245</td></tr><tr><td>settled</td><td><strong>0.750</strong></td><td><strong>0.500</strong></td><td><strong>0.250</strong></td></tr></tbody></table><p>The final values fall evenly between the two known ends. That is exactly what minimising disagreement across edges produces on a path, and it can be read off without any iteration at all &mdash; the iteration is simply a convenient way to reach it.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>At rest, every unknown equals the average of its neighbours. That is precisely the condition for the total disagreement across edges to be as small as possible given the fixed known values.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Each sweep moves the values closer to the resting point by a constant factor, provided every unlabelled node can reach a labelled one.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>\(O(m)\) per sweep.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li><strong>It assumes connected nodes share labels.</strong> On a graph where edges tend to join <em>different</em> classes, this actively destroys the signal. Measure that tendency before trusting it.</li><li>A group of unlabelled nodes with no path to any labelled node will sit at whatever they started from. Detect them and abstain.</li></ul></div><div class="box tip"><div class="box-title">Worth knowing</div><p>Free of parameters and of training, this is a genuinely strong baseline. Elaborate graph networks are quite often unable to beat it.</p></div><nav class="lesson-nav"><div class="container"><a href="../index.html">Course index</a><a href="page.html">&#8592; Back to the section</a></div></nav>
+</main>
+<footer class="site-footer"><strong>Machine Learning A&ndash;Z</strong> &middot; From empirical risk minimisation to graph neural networks<span class="footer-meta">Edition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">The interactive figure could not be loaded. Check your network connection.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+// Colours resolved from the stylesheet, so the figures follow the light/dark
+// theme. Each entry is a function: board attributes that are functions are
+// re-evaluated on update, so a theme switch only needs a redraw.
+var BOARDS = [];
+function cssv(name, fallback){
+    try {
+        var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback;
+    } catch (e) { return fallback; }
+}
+var PAL = {
+    text:  function(){ return cssv('--color-text',  '#1f2937'); },
+    muted: function(){ return cssv('--color-muted', '#6b7280'); },
+    axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+    ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+    grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+    cell:  function(){ return cssv('--cell-bg',     '#ffffff'); }
+};
+// Re-render every board when the theme attribute flips.
+if (window.MutationObserver) {
+    new MutationObserver(function(){
+        for (var i = 0; i < BOARDS.length; i++) {
+            try { BOARDS[i].fullUpdate(); } catch (e) {}
+        }
+    }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+
+
+})();
+</script>
+</body>
+</html>

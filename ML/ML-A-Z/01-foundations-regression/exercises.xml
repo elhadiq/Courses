@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Ordinary least squares in one dimension</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q1 &amp;mdash; ORDINARY LEAST SQUARES&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Section 1.2 derived the closed-form solution of simple linear regression as a ratio of a covariance to a variance.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write a function &lt;strong&gt;&lt;code&gt;fit_ols(xs, ys)&lt;/code&gt;&lt;/strong&gt; that returns the tuple &lt;code&gt;(slope, intercept)&lt;/code&gt; of the least-squares line through the given points. Return &lt;code&gt;(0.0, mean(ys))&lt;/code&gt; if every x is identical (the denominator vanishes).&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;fit_ols([1, 2, 3, 4], [2, 4, 6, 8])  -&amp;gt;  (2.0, 0.0)&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; slope = &amp;sum;(x&amp;minus;x&amp;#772;)(y&amp;minus;y&amp;#772;) / &amp;sum;(x&amp;minus;x&amp;#772;)&amp;sup2;, then intercept = y&amp;#772; &amp;minus; slope &amp;middot; x&amp;#772;.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def fit_ols(xs, ys):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def fit_ols(xs, ys):
+    n = len(xs)
+    mx = sum(xs) / n
+    my = sum(ys) / n
+    num = sum((x - mx) * (y - my) for x, y in zip(xs, ys))
+    den = sum((x - mx) ** 2 for x in xs)
+    if den == 0:
+        return (0.0, my)
+    slope = num / den
+    return (slope, my - slope * mx)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(fit_ols([1, 2, 3, 4], [2, 4, 6, 8]))
+</text></testcode><stdin><text /></stdin><expected><text>(2.0, 0.0)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>s, b = fit_ols([1, 2, 3, 4, 5], [2.1, 3.9, 6.2, 7.8, 10.1])
+print(round(s, 4), round(b, 4))
+</text></testcode><stdin><text /></stdin><expected><text>1.99 0.05
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>s, b = fit_ols([0, 1, 2, 3], [5, 5, 5, 5])
+print(round(s, 6), round(b, 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.0 5.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(fit_ols([2, 2, 2], [1.0, 2.0, 6.0]))
+</text></testcode><stdin><text /></stdin><expected><text>(0.0, 3.0)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>s, b = fit_ols([-3, -1, 0, 2, 4], [7.0, 3.5, 2.0, -1.5, -5.0])
+print(round(s, 4), round(b, 4))
+</text></testcode><stdin><text /></stdin><expected><text>-1.7089 1.8836
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Mean squared error and R squared</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q2 &amp;mdash; GOODNESS OF FIT&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;A slope and intercept mean nothing without a measure of how well they explain the data.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;mse(ys, preds)&lt;/code&gt;&lt;/strong&gt; returning the mean squared error, and &lt;strong&gt;&lt;code&gt;r_squared(ys, preds)&lt;/code&gt;&lt;/strong&gt; returning 1 &amp;minus; SS&lt;sub&gt;res&lt;/sub&gt;/SS&lt;sub&gt;tot&lt;/sub&gt;. If SS&lt;sub&gt;tot&lt;/sub&gt; is 0, &lt;code&gt;r_squared&lt;/code&gt; must return &lt;code&gt;0.0&lt;/code&gt;.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;mse([1, 2, 3], [1, 2, 4])       -&amp;gt;  0.3333...
+r_squared([1, 2, 3], [1, 2, 3]) -&amp;gt;  1.0&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; SS&lt;sub&gt;res&lt;/sub&gt; = &amp;sum;(y &amp;minus; y&amp;#770;)&amp;sup2; and SS&lt;sub&gt;tot&lt;/sub&gt; = &amp;sum;(y &amp;minus; y&amp;#772;)&amp;sup2;.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def mse(ys, preds):
+    # Completer
+    ...
+
+
+def r_squared(ys, preds):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def mse(ys, preds):
+    return sum((y - p) ** 2 for y, p in zip(ys, preds)) / len(ys)
+
+
+def r_squared(ys, preds):
+    my = sum(ys) / len(ys)
+    ss_res = sum((y - p) ** 2 for y, p in zip(ys, preds))
+    ss_tot = sum((y - my) ** 2 for y in ys)
+    if ss_tot == 0:
+        return 0.0
+    return 1.0 - ss_res / ss_tot
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(round(mse([1, 2, 3], [1, 2, 4]), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.333333
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(round(r_squared([1, 2, 3], [1, 2, 3]), 6))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>ys = [2.0, 4.0, 6.0, 8.0]
+preds = [2.5, 3.5, 6.5, 7.5]
+print(round(mse(ys, preds), 6), round(r_squared(ys, preds), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.25 0.95
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(round(r_squared([5, 5, 5], [5, 5, 5]), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>ys = [1.0, 2.0, 3.0]
+mean_pred = [2.0, 2.0, 2.0]
+print(round(r_squared(ys, mean_pred), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — One step of gradient descent</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q3 &amp;mdash; GRADIENT DESCENT&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Section 1.3 gave the batch gradient of the squared loss as &amp;nabla;J(&amp;theta;) = &amp;minus;(2/n) X&lt;sup&gt;T&lt;/sup&gt;(y &amp;minus; X&amp;theta;).&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;gd_step(X, y, theta, eta)&lt;/code&gt;&lt;/strong&gt; performing one gradient descent update and returning the new parameter list. &lt;code&gt;X&lt;/code&gt; is a list of rows (each row already contains its bias term 1.0), &lt;code&gt;y&lt;/code&gt; and &lt;code&gt;theta&lt;/code&gt; are lists of floats.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;X = [[1, 0], [1, 1]], y = [0, 2], theta = [0, 0], eta = 0.1
+-&amp;gt;  [0.2, 0.2]&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; First compute the residual r&lt;sub&gt;i&lt;/sub&gt; = y&lt;sub&gt;i&lt;/sub&gt; &amp;minus; &amp;theta;&amp;middot;x&lt;sub&gt;i&lt;/sub&gt;, then gradient component j is &amp;minus;(2/n)&amp;sum;&lt;sub&gt;i&lt;/sub&gt; r&lt;sub&gt;i&lt;/sub&gt;x&lt;sub&gt;ij&lt;/sub&gt;.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def gd_step(X, y, theta, eta):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def gd_step(X, y, theta, eta):
+    n = len(X)
+    d = len(theta)
+    residual = [y[i] - sum(theta[j] * X[i][j] for j in range(d)) for i in range(n)]
+    grad = [-(2.0 / n) * sum(residual[i] * X[i][j] for i in range(n)) for j in range(d)]
+    return [theta[j] - eta * grad[j] for j in range(d)]
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>X = [[1, 0], [1, 1]]
+y = [0, 2]
+print([round(v, 6) for v in gd_step(X, y, [0.0, 0.0], 0.1)])
+</text></testcode><stdin><text /></stdin><expected><text>[0.2, 0.2]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>X = [[1, 0], [1, 1], [1, 2]]
+y = [1.0, 3.0, 5.0]
+theta = [0.0, 0.0]
+for _ in range(50):
+    theta = gd_step(X, y, theta, 0.1)
+print([round(v, 3) for v in theta])
+</text></testcode><stdin><text /></stdin><expected><text>[1.016, 1.988]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>X = [[1, 0], [1, 1], [1, 2]]
+y = [1.0, 3.0, 5.0]
+theta = [1.0, 2.0]
+print([round(v, 6) for v in gd_step(X, y, theta, 0.1)])
+</text></testcode><stdin><text /></stdin><expected><text>[1.0, 2.0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>X = [[1.0]]
+y = [4.0]
+theta = [0.0]
+for _ in range(200):
+    theta = gd_step(X, y, theta, 0.05)
+print(round(theta[0], 4))
+</text></testcode><stdin><text /></stdin><expected><text>4.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>X = [[1, 0], [1, 1]]
+y = [0, 2]
+print([round(v, 6) for v in gd_step(X, y, [0.0, 0.0], 0.0)])
+</text></testcode><stdin><text /></stdin><expected><text>[0.0, 0.0]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q4 — K-fold cross-validation splits</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q4 &amp;mdash; CROSS-VALIDATION&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Section 1.6 stressed that the training error is a biased estimate of the risk, and that K-fold cross-validation is the standard remedy.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;k_fold_indices(n, k)&lt;/code&gt;&lt;/strong&gt; returning a list of k tuples &lt;code&gt;(train_idx, test_idx)&lt;/code&gt;. Use the deterministic &lt;em&gt;strided&lt;/em&gt; assignment: fold &lt;em&gt;f&lt;/em&gt; receives the indices &lt;code&gt;f, f+k, f+2k, ...&lt;/code&gt;. Within each tuple both index lists must be sorted in increasing order.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;k_fold_indices(6, 3)[0]  -&amp;gt;  ([1, 2, 4, 5], [0, 3])&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; Build the folds first, then for each fold concatenate the others and sort.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def k_fold_indices(n, k):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def k_fold_indices(n, k):
+    folds = [list(range(f, n, k)) for f in range(k)]
+    out = []
+    for f in range(k):
+        test = sorted(folds[f])
+        train = sorted(i for g in range(k) if g != f for i in folds[g])
+        out.append((train, test))
+    return out
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(k_fold_indices(6, 3)[0])
+</text></testcode><stdin><text /></stdin><expected><text>([1, 2, 4, 5], [0, 3])
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>for tr, te in k_fold_indices(7, 3):
+    print(tr, te)
+</text></testcode><stdin><text /></stdin><expected><text>[1, 2, 4, 5] [0, 3, 6]
+[0, 2, 3, 5, 6] [1, 4]
+[0, 1, 3, 4, 6] [2, 5]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>res = k_fold_indices(10, 5)
+print(len(res), all(len(tr) + len(te) == 10 for tr, te in res))
+</text></testcode><stdin><text /></stdin><expected><text>5 True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>res = k_fold_indices(9, 3)
+covered = sorted(i for _, te in res for i in te)
+print(covered)
+</text></testcode><stdin><text /></stdin><expected><text>[0, 1, 2, 3, 4, 5, 6, 7, 8]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(k_fold_indices(4, 4))
+</text></testcode><stdin><text /></stdin><expected><text>[([1, 2, 3], [0]), ([0, 2, 3], [1]), ([0, 1, 3], [2]), ([0, 1, 2], [3])]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

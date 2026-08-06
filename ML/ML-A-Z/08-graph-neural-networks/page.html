@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 8 — Graph Neural Networks</title>
+<link href="../assets/style.css" rel="stylesheet">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+
+/* Use the full width the theme allows: the shared stylesheet caps a lesson at
+   880px, which leaves wide figures and tables boxed into the middle of a large
+   screen. --max-w is the theme's own page width, so this stays consistent with
+   the landing page. */
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) {
+  .lesson-content { padding-left: 16px; padding-right: 16px; }
+}
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule);
+               padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center;
+               padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.lesson-nav { max-width: 880px; margin: 0 auto 40px; padding: 0 24px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav .container { display: flex; gap: 18px; flex-wrap: wrap; width: 100%; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600;
+                font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.keypoints h4 { margin-top: 0; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Machine Learning A&ndash;Z</a> &middot; Course</div><span class="course-code">Graph-based machine learning</span></div></header>
+<section class="lesson-hero"><div class="container"><div class="lesson-label">Part II &middot; Section 8</div><h1>Section 8 — Graph Neural Networks</h1><div class="lesson-sub">Message passing, the propagation rule, inductive and attention variants, the expressiveness ceiling, and the two pathologies of depth.</div></div></section>
+<main class="lesson-content">
+<div class="box method"><div class="box-title">Companion annex</div><p>Every algorithm in this section is also set out <strong><a href="algorithms.html">step by step in the annex</a></strong>: what it is given, what it produces, the steps in order, a small example worked by hand, and why it is correct, why it stops and what it costs &mdash; described in words, with no program code.</p></div><h2>8.1 The message-passing framework</h2><p>Section 7 closed with three defects of shallow embeddings: no parameter sharing, no inductive capability, and no use of node features. All three are cured by the same move &mdash; replace the lookup table with a <em>learned function of the neighbourhood</em>. Gilmer et al. <a class="cite" href="#ref-gilmer2017">[8]</a> showed that essentially every architecture proposed for graphs fits one template, applied for L rounds:</p><div class="eq">\[m_{u}^{(l)} = \mathbf{\operatorname{AGGREGATE}}^{(l)}( \{ h_{v}^{(l-1)} : v \in N(u) \} )\]</div><div class="eq">\[h_{u}^{(l)} = \mathbf{\operatorname{UPDATE}}^{(l)}( h_{u}^{(l-1)}, m_{u}^{(l)} )\]</div><p>with \(h_{u}^{(0)} = x_{u}\), the input features. For graph-level tasks a final <strong>READOUT</strong> (sum, mean or max over all nodes) collapses the node representations into one vector.</p><div class="box def"><div class="box-title">The permutation requirement</div>AGGREGATE takes a <em>multiset</em> and must be invariant to the order in which neighbours are listed &mdash; there is no canonical ordering (Section 5.1). Sum, mean and max qualify; concatenation does not. The whole layer is then <strong>permutation-equivariant</strong>: relabelling the nodes relabels the outputs identically. This is the same design principle that makes CNNs translation-equivariant, and it is the organising idea of geometric deep learning <a class="cite" href="#ref-bronstein2021">[15]</a>.</div><p>Two immediate consequences, both from Section 5.2. After L rounds, \(h_{u}^{(L)}\) depends exactly on the <strong>L-hop neighbourhood</strong> of u &mdash; multiplying by A is one hop. And because real graphs are small-world, L = 2 or 3 already covers a large fraction of the graph, which is why GNNs are shallow where image networks are deep.</p><p>The idea is not new: Gori, Monfardini and Scarselli <a class="cite" href="#ref-gori2005">[1]</a> <a class="cite" href="#ref-scarselli2009">[2]</a> proposed recurrent message passing to a fixed point in 2005. What changed after 2016 was making the recursion a fixed, small number of differentiable layers trained end-to-end.</p><h2>8.2 From spectral filters to the GCN</h2><p>The modern line starts spectrally. Bruna et al. <a class="cite" href="#ref-bruna2014">[3]</a> defined convolution on graphs through the Laplacian eigenbasis of Section 5.3: \(g_{\theta}\) &#8902; x = \(Ug_{\theta}(\Lambda )U^{T}x\). Two problems: computing U costs O(\(n^3\)), and the learned filter has O(n) parameters and no locality.</p><p>Defferrard et al. <a class="cite" href="#ref-defferrard2016">[4]</a> fixed both by restricting \(g_{\theta}\) to a degree-K <strong>Chebyshev polynomial</strong> of the scaled Laplacian. A polynomial of degree K in L is automatically K-hop localised and needs only sparse matrix&ndash;vector products, giving O(\(K\cdot m\)) cost with K free parameters.</p><p>Kipf and Welling <a class="cite" href="#ref-kipf2017">[5]</a> then took the aggressive step: set K = 1, approximate \(\lambda_{\max} \approx 2\), and tie the two remaining coefficients (\(\theta_0 = -\theta_1\)). One layer collapses to</p><div class="eq">\[g_{\theta} &#8902; x \approx \theta ( I + D^{-1/2}AD^{-1/2} ) x\]</div><div class="box warn"><div class="box-title">The renormalisation trick</div>I + \(D^{-1/2}AD^{-1/2}\) has spectrum in [0, 2], so stacking L such layers multiplies the signal by up to \(2^{L}\) &mdash; numerically explosive. Kipf and Welling therefore replace it by <strong>\(\tilde{A} = A + I\)</strong> with degree matrix \(\tilde{D}\), giving \(\tilde{D}^{-1/2}\tilde{A}\tilde{D}^{-1/2}\), whose spectrum lies in (&minus;1, 1]. Adding self-loops is thus not cosmetic: it is what makes deep stacking numerically possible, and it also lets a node keep its own features.</div><div class="eq">\[H^{(l+1)} = \sigma ( \tilde{D}^{-1/2} \tilde{A} \tilde{D}^{-1/2} H^{(l)} W^{(l)} )\]</div><p>Per node this reads \(h_{u} \leftarrow \sigma ( W \sum_{v\in N(u)\cup \{u\}} h_{v} / \sqrt{\tilde{d}_{u}\tilde{d}_{v}} )\) &mdash; a symmetrically normalised weighted average of the neighbours, followed by a linear map and a non-linearity. The whole layer costs O(\(m\cdot d\)) and is a handful of lines of code.</p><pre><code>import torch
+import torch.nn as nn
+
+class GCNLayer(nn.Module):
+    """H' = sigma( D^-1/2 (A+I) D^-1/2 H W ). A_hat is precomputed and sparse."""
+    def __init__(self, d_in, d_out):
+        super().__init__()
+        self.lin = nn.Linear(d_in, d_out, bias=False)
+
+    def forward(self, H, A_hat_norm):
+        return torch.sparse.mm(A_hat_norm, self.lin(H))
+
+
+def normalize_adj(A, n):
+    """D~^-1/2 (A + I) D~^-1/2 as a dense tensor (use sparse ops for real graphs)."""
+    A_tilde = A + torch.eye(n)
+    deg = A_tilde.sum(dim=1)
+    d_inv_sqrt = deg.pow(-0.5)
+    return d_inv_sqrt.unsqueeze(1) * A_tilde * d_inv_sqrt.unsqueeze(0)</code></pre><p>Trained with a cross-entropy loss on the few labelled nodes, a two-layer GCN beat every prior method on the standard citation benchmarks by a wide margin. Note what it is doing: smoothing the feature signal over the graph, exactly the low-pass filter of Section 5.3, with a learned channel mixing. <em>It works because those graphs are homophilous.</em></p><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Move the layer slider L from 0 upward and watch both the green outlines and the colours.</p><div id="jxg22" class="viz-board" style="height:540px;"></div><p class="viz-caption"><strong>Figure.</strong> Two things at once. <strong>Receptive field</strong>: nodes within L hops of node 0 are outlined in green, and the count saturates after only 3&ndash;4 hops &mdash; the small-world property, and the reason GNNs are shallow. <strong>Features</strong>: each node starts with a noisy scalar (blue&ndash;red) and each round replaces it by the normalised neighbourhood average. At L = 0 the signal is noisy; by L = 2 the two communities are cleanly separated and node 6 &mdash; the bridge &mdash; sits ambiguously between them. That is the GCN working. Push further and the Dirichlet energy readout keeps falling: the representations are slowly collapsing toward a single value, which is over-smoothing. On this graph the collapse is <em>slow</em>, because the bottleneck gives it a small spectral gap &mdash; the next figure quantifies exactly that.</p></div><h2>8.3 Aggregation variants</h2><h3>GraphSAGE — inductive, and sampled</h3><p>The GCN as published is transductive: the normalised adjacency of the <em>whole</em> graph appears in the forward pass. Hamilton, Ying and Leskovec <a class="cite" href="#ref-hamilton2017">[6]</a> made three changes that together yield an inductive model:</p><ol><li><strong>Sample</strong> a fixed number of neighbours per node per layer (say 25 then 10), bounding the computation per node regardless of degree &mdash; essential on graphs with hubs (Section 5.4).</li><li><strong>Separate</strong> the node's own representation from the aggregate: \(h_{u} \leftarrow \sigma ( W \cdot\) CONCAT(\(h_{u}\), AGG{\(h_{v}\})\)), instead of folding self into the average.</li><li><strong>Generalise</strong> AGG to mean, max-pool (an MLP then element-wise max) or an LSTM over a random permutation.</li></ol><p>Because the parameters are shared functions of features rather than per-node vectors, an unseen node &mdash; or an entirely unseen graph &mdash; can be embedded at inference time. This is what makes GNNs deployable on evolving production graphs.</p><h3>Graph Attention Networks</h3><p>Both GCN and GraphSAGE weight neighbours by a fixed function of degree. Veli&#269;kovi&#263; et al. <a class="cite" href="#ref-velickovic2018">[7]</a> let the model <em>learn</em> the weights:</p><div class="eq">\[e_{uv} = LeakyReLU( a^{T}[Wh_{u} \| Wh_{v}] ), \alpha_{uv} = softmax_{v\in N(u)}(e_{uv})\]</div><div class="eq">\[h_{u}' = \sigma ( \sum_{v\in N(u)} \alpha_{uv} W h_{v} )\]</div><p>Attention is computed only over edges, so cost stays O(m); multiple heads are concatenated for stability, as in the Transformer. The gain is real on heterophilous or noisy graphs, where a node needs to <em>ignore</em> some neighbours &mdash; something a degree-based average cannot express. On clean homophilous benchmarks the advantage over GCN is modest.</p><table><thead><tr><th>Model</th><th>AGGREGATE</th><th>Inductive</th><th>Cost / layer</th><th>Best when</th></tr></thead><tbody><tr><td>GCN <a class="cite" href="#ref-kipf2017">[5]</a></td><td>degree-normalised mean, self-loops</td><td>no</td><td>O(\(m\cdot d\))</td><td>homophilous, features informative, small graphs</td></tr><tr><td>GraphSAGE <a class="cite" href="#ref-hamilton2017">[6]</a></td><td>mean / max-pool / LSTM on sampled neighbours</td><td><strong>yes</strong></td><td>O(\(\prod s_{l}\cdot d\))</td><td>large, evolving graphs; new nodes at inference</td></tr><tr><td>GAT <a class="cite" href="#ref-velickovic2018">[7]</a></td><td>learned attention weights</td><td>yes</td><td>O(\(m\cdot d) \times\) heads</td><td>noisy or heterophilous neighbourhoods</td></tr><tr><td>GIN <a class="cite" href="#ref-xu2019">[9]</a></td><td>sum, then MLP</td><td>yes</td><td>O(\(m\cdot d\))</td><td>graph-level tasks where structure must be counted</td></tr></tbody></table><h2>8.4 How expressive is message passing?</h2><p>A sharp theoretical answer exists, and it is one of the most useful results in the field.</p><div class="box def"><div class="box-title">The 1-Weisfeiler&ndash;Leman colour-refinement test <a class="cite" href="#ref-weisfeiler1968">[10]</a></div>Give every node the same initial colour. Repeat: recolour each node by hashing the pair (its own colour, the <em>multiset</em> of its neighbours' colours). Stop when the partition stabilises. Two graphs whose final colour multisets differ are certainly non-isomorphic; if the multisets agree, the test is inconclusive.</div><div class="box thm"><div class="box-title">Theorem — Xu et al. (2019) <a class="cite" href="#ref-xu2019">[9]</a></div>Any message-passing GNN of the AGGREGATE/UPDATE form is <strong>at most as powerful as 1-WL</strong> at distinguishing non-isomorphic graphs. It attains that bound if and only if AGGREGATE, UPDATE and READOUT are all <em>injective</em> on multisets.<p style="margin:8px 0 0 0;">Mean and max aggregation are <em>not</em> injective: mean cannot tell {a, a} from {a}, and max cannot tell {a, b} from {a, a, b}. Sum can. This is the whole argument for <strong>GIN</strong>:</p><div class="eq">\[h_{u}^{(l)} = \operatorname{MLP}^{(l)}( (1 + \epsilon^{(l)}) h_{u}^{(l-1)} + \sum_{v\in N(u)} h_{v}^{(l-1)} )\]</div><p style="margin:6px 0 0 0;">Sum aggregation preserves multiset cardinality, and the MLP can approximate any injective function on it (universal approximation). GIN is provably 1-WL-expressive, and it is the strongest simple choice for graph-level tasks.</p></div><p>The bound bites. No message-passing GNN can count triangles, distinguish a 6-cycle from two disjoint triangles, or in general recognise cycle length &mdash; properties that matter enormously in chemistry, where rings determine molecular behaviour. Escapes exist: augment node features with random identifiers or structural descriptors (cycle counts, distances), use higher-order k-WL architectures, or add positional encodings from the Laplacian eigenvectors of Section 6 &mdash; the spectral tools return as a fix for the expressiveness gap.</p><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Step the refinement round and compare the colour multisets under each graph.</p><div id="jxg23" class="viz-board" style="height:500px;"></div><p class="viz-caption"><strong>Figure.</strong> Two non-isomorphic graphs that 1-WL cannot separate: two disjoint triangles (left) and a 6-cycle (right). Every node has degree 2 in both, so after every refinement round each node's colour is identical and the two colour multisets match at every step. No message-passing GNN can tell these apart &mdash; nor count the triangles &mdash; regardless of depth, width or training.</p></div><h2>8.5 The two pathologies of depth</h2><figure class="viz"><div class="viz-title">Over-smoothing against over-squashing</div><svg viewBox="0 0 760 300" role="img" style="width:100%;height:auto;display:block;font-family:inherit;"><text x="190" y="32" text-anchor="middle" style="fill:var(--viz-bad);font-size:14px;font-weight:700;">Over-smoothing</text><text x="190" y="50" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-weight:400;">too many layers</text><text x="545" y="32" text-anchor="middle" style="fill:var(--viz-alt);font-size:14px;font-weight:700;">Over-squashing</text><text x="545" y="50" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-weight:400;">too few, through a bottleneck</text><text x="52" y="95" text-anchor="end" style="fill:var(--color-muted);font-size:11px;font-weight:400;">L=0</text><circle cx="84" cy="90" r="12" style="fill:var(--viz-blue);opacity:0.25;stroke:var(--color-bg);stroke-width:2;"/><circle cx="118" cy="90" r="12" style="fill:var(--viz-blue);opacity:0.466667;stroke:var(--color-bg);stroke-width:2;"/><circle cx="152" cy="90" r="12" style="fill:var(--viz-blue);opacity:0.683333;stroke:var(--color-bg);stroke-width:2;"/><circle cx="186" cy="90" r="12" style="fill:var(--primary);opacity:0.9;stroke:var(--color-bg);stroke-width:2;"/><circle cx="220" cy="90" r="12" style="fill:var(--viz-bad);opacity:0.683333;stroke:var(--color-bg);stroke-width:2;"/><circle cx="254" cy="90" r="12" style="fill:var(--viz-bad);opacity:0.466667;stroke:var(--color-bg);stroke-width:2;"/><circle cx="288" cy="90" r="12" style="fill:var(--viz-bad);opacity:0.25;stroke:var(--color-bg);stroke-width:2;"/><path d="M 320 106 L 320 128" style="fill:none;stroke:var(--viz-ref);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;"/><text x="52" y="151" text-anchor="end" style="fill:var(--color-muted);font-size:11px;font-weight:400;">L=3</text><circle cx="84" cy="146" r="12" style="fill:var(--viz-blue);opacity:0.375;stroke:var(--color-bg);stroke-width:2;"/><circle cx="118" cy="146" r="12" style="fill:var(--viz-blue);opacity:0.483333;stroke:var(--color-bg);stroke-width:2;"/><circle cx="152" cy="146" r="12" style="fill:var(--viz-blue);opacity:0.591667;stroke:var(--color-bg);stroke-width:2;"/><circle cx="186" cy="146" r="12" style="fill:var(--primary);opacity:0.7;stroke:var(--color-bg);stroke-width:2;"/><circle cx="220" cy="146" r="12" style="fill:var(--viz-bad);opacity:0.591667;stroke:var(--color-bg);stroke-width:2;"/><circle cx="254" cy="146" r="12" style="fill:var(--viz-bad);opacity:0.483333;stroke:var(--color-bg);stroke-width:2;"/><circle cx="288" cy="146" r="12" style="fill:var(--viz-bad);opacity:0.375;stroke:var(--color-bg);stroke-width:2;"/><path d="M 320 162 L 320 184" style="fill:none;stroke:var(--viz-ref);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;"/><text x="52" y="207" text-anchor="end" style="fill:var(--color-muted);font-size:11px;font-weight:400;">L=6</text><circle cx="84" cy="202" r="12" style="fill:var(--primary);opacity:0.5;stroke:var(--color-bg);stroke-width:2;"/><circle cx="118" cy="202" r="12" style="fill:var(--primary);opacity:0.5;stroke:var(--color-bg);stroke-width:2;"/><circle cx="152" cy="202" r="12" style="fill:var(--primary);opacity:0.5;stroke:var(--color-bg);stroke-width:2;"/><circle cx="186" cy="202" r="12" style="fill:var(--primary);opacity:0.5;stroke:var(--color-bg);stroke-width:2;"/><circle cx="220" cy="202" r="12" style="fill:var(--primary);opacity:0.5;stroke:var(--color-bg);stroke-width:2;"/><circle cx="254" cy="202" r="12" style="fill:var(--primary);opacity:0.5;stroke:var(--color-bg);stroke-width:2;"/><circle cx="288" cy="202" r="12" style="fill:var(--primary);opacity:0.5;stroke:var(--color-bg);stroke-width:2;"/><text x="190" y="262" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-weight:400;">representations converge; nodes become</text><text x="190" y="279" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-weight:400;">indistinguishable and accuracy collapses</text><path d="M 430 100 L 430 150" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 430 100 L 430 200" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 430 100 L 472 125" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 430 100 L 472 175" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 430 150 L 430 200" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 430 150 L 472 125" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 430 150 L 472 175" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 430 200 L 472 125" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 430 200 L 472 175" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 472 125 L 472 175" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 660 100 L 660 150" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 660 100 L 660 200" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 660 150 L 660 200" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 618 125 L 660 100" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 618 125 L 660 150" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 618 125 L 660 200" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 618 125 L 618 175" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 618 175 L 660 100" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 618 175 L 660 150" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 618 175 L 660 200" style="fill:none;stroke:var(--viz-ref);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 472 150 L 545 150" style="fill:none;stroke:var(--viz-alt);stroke-width:3.4;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 545 150 L 618 150" style="fill:none;stroke:var(--viz-alt);stroke-width:3.4;stroke-linejoin:round;stroke-linecap:round;"/><circle cx="430" cy="100" r="10" style="fill:var(--viz-blue);stroke:var(--color-bg);stroke-width:2;"/><circle cx="430" cy="150" r="10" style="fill:var(--viz-blue);stroke:var(--color-bg);stroke-width:2;"/><circle cx="430" cy="200" r="10" style="fill:var(--viz-blue);stroke:var(--color-bg);stroke-width:2;"/><circle cx="472" cy="125" r="10" style="fill:var(--viz-blue);stroke:var(--color-bg);stroke-width:2;"/><circle cx="472" cy="175" r="10" style="fill:var(--viz-blue);stroke:var(--color-bg);stroke-width:2;"/><circle cx="660" cy="100" r="10" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><circle cx="660" cy="150" r="10" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><circle cx="660" cy="200" r="10" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><circle cx="618" cy="125" r="10" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><circle cx="618" cy="175" r="10" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><circle cx="545" cy="150" r="13" style="fill:var(--viz-alt);stroke:var(--color-bg);stroke-width:2.5;"/><text x="545" y="122" text-anchor="middle" style="fill:var(--viz-alt);font-size:11px;font-weight:700;">bottleneck</text><text x="545" y="262" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-weight:400;">an exponentially large neighbourhood is squeezed</text><text x="545" y="279" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-weight:400;">through one edge into a fixed-size vector</text><path d="M 365 70 L 365 250" style="fill:none;stroke:var(--color-rule);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:5 5;"/></svg><figcaption class="viz-caption"><strong>Figure.</strong> The two failure modes pull in opposite directions. Depth is what cures a limited receptive field and what causes representations to collapse; there is no single depth that escapes both on a graph that has a bottleneck and long-range dependencies.</figcaption></figure><h3>Over-smoothing</h3><p>Li, Han and Wu <a class="cite" href="#ref-li2018">[11]</a> identified the first, and it is exactly the operator theory of Section 5. The GCN propagation matrix is a low-pass filter; applying it L times drives every node representation toward the dominant eigenvector, which is (degree-weighted) constant. Node representations converge, and all discriminative information is destroyed.</p><div class="eq">\[as L \to \infty , h_{u}^{(L)} \to c \cdot \sqrt{\tilde{d}_{u}} \text{for every } u &mdash; \text{the Dirichlet energy } \sum_{(u,v)\in E}\| h_{u} - h_{v}\|^2 \text{decays geometrically }\]</div><p>Standard remedies: residual/skip connections, initial-residual plus identity mapping as in GCNII <a class="cite" href="#ref-chen2020">[14]</a> (which trains usefully at 64 layers), PairNorm and similar normalisations, DropEdge, or simply <em>not going deep</em> &mdash; which, given small-world diameters, is usually the right call.</p><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">The over-smoothing curve: normalised Dirichlet energy against depth.</p><div id="jxg24" class="viz-board" style="height:470px;"></div><p class="viz-caption"><strong>Figure.</strong> Dirichlet energy after L rounds of GCN propagation, on a <em>logarithmic</em> vertical axis. The straight tail is the signature of geometric decay: the energy falls like \(\mu_2^{2L}\), where \(\mu_2\) is the second eigenvalue of \(\tilde{D}^{-1/2}\tilde{A}\tilde{D}^{-1/2}\). The measured rate is printed on the figure. Note the honest detail: this particular graph has a strong bottleneck, hence a small spectral gap, so it takes tens of layers to collapse &mdash; whereas on a well-connected benchmark graph (\(\mu_2\) far from 1) the same curve reaches the floor by \(L \approx 5\). The rate, not the phenomenon, is graph-dependent.</p></div><h3>Over-squashing</h3><p>Alon and Yahav <a class="cite" href="#ref-alon2021">[12]</a> identified the opposite failure. To use information from L hops away, a node must compress an exponentially growing receptive field (up to \(d^{L}\) nodes) into a <em>fixed-size</em> vector. Signal from distant nodes is squashed to nothing, so tasks with genuinely long-range dependencies fail even when the network is deep enough in principle.</p><p>Topping et al. <a class="cite" href="#ref-topping2022">[13]</a> localised the cause: over-squashing concentrates at edges of high <em>negative curvature</em> &mdash; graph bottlenecks. Their remedy, <strong>graph rewiring</strong>, surgically adds edges around those bottlenecks. Other approaches add a virtual node connected to everything, or replace message passing with a graph transformer using global attention plus Laplacian positional encodings.</p><div class="box warn"><div class="box-title">The two pathologies pull in opposite directions</div>Over-smoothing punishes depth; over-squashing punishes the shallowness that avoids it. There is no setting of L that escapes both on a graph with long-range dependencies and a bottleneck. Recognising which one you face &mdash; measure the Dirichlet energy for the first, the task's dependency range for the second &mdash; is more useful than trying architectures at random.</div><h2>8.6 Practical guidance</h2><ul><li><strong>Establish baselines first.</strong> Logistic regression on node features alone, and label propagation (Section 5.3) on structure alone. Shchur et al. <a class="cite" href="#ref-shchur2018">[16]</a> showed that with fair hyperparameter budgets and multiple random splits, the ranking of published GNNs on the standard benchmarks largely dissolves &mdash; and simple baselines are often competitive.</li><li><strong>Measure homophily before choosing.</strong> If h is low, a GCN will underperform an MLP; reach for GAT, or for architectures designed for heterophily.</li><li><strong>Use 2&ndash;3 layers</strong> unless you have a specific reason and a specific remedy for over-smoothing.</li><li><strong>Report mean and standard deviation over several splits and seeds.</strong> GNN variance across seeds routinely exceeds the gaps between competing methods <a class="cite" href="#ref-shchur2018">[16]</a>.</li><li><strong>Sample neighbours</strong> (GraphSAGE-style) or use cluster-based batching as soon as the graph does not fit in memory.</li></ul><h2>Summary</h2><ul><li>Every GNN is AGGREGATE / UPDATE message passing <a class="cite" href="#ref-gilmer2017">[8]</a>; L rounds see the L-hop neighbourhood.</li><li>The GCN <a class="cite" href="#ref-kipf2017">[5]</a> is a first-order polynomial filter, \(\tilde{D}^{-1/2}\tilde{A}\tilde{D}^{-1/2}\)HW &mdash; the renormalisation trick keeps the spectrum bounded.</li><li>GraphSAGE <a class="cite" href="#ref-hamilton2017">[6]</a> adds inductive capability and neighbour sampling; GAT <a class="cite" href="#ref-velickovic2018">[7]</a> learns the neighbour weights.</li><li>Message passing is bounded by 1-WL <a class="cite" href="#ref-xu2019">[9]</a> <a class="cite" href="#ref-weisfeiler1968">[10]</a>; sum aggregation (GIN) attains the bound, mean and max do not.</li><li>Over-smoothing <a class="cite" href="#ref-li2018">[11]</a> and over-squashing <a class="cite" href="#ref-alon2021">[12]</a> are opposing limits on depth.</li><li>Benchmark honestly: strong non-GNN baselines, multiple splits, reported variance <a class="cite" href="#ref-shchur2018">[16]</a>.</li></ul><h2>References</h2><ol class="reflist"><li id="ref-gori2005">Gori, M., Monfardini, G. &amp; Scarselli, F. (2005). A new model for learning in graph domains. <em>IJCNN '05</em>, 729&ndash;734. DOI: 10.1109/IJCNN.2005.1555942 <a href="https://doi.org/10.1109/IJCNN.2005.1555942">https://doi.org/10.1109/IJCNN.2005.1555942</a></li><li id="ref-scarselli2009">Scarselli, F., Gori, M., Tsoi, A. C., Hagenbuchner, M. &amp; Monfardini, G. (2009). The graph neural network model. <em>IEEE Transactions on Neural Networks</em>, 20(1), 61&ndash;80. DOI: 10.1109/TNN.2008.2005605 <a href="https://doi.org/10.1109/TNN.2008.2005605">https://doi.org/10.1109/TNN.2008.2005605</a></li><li id="ref-bruna2014">Bruna, J., Zaremba, W., Szlam, A. &amp; LeCun, Y. (2014). Spectral networks and locally connected networks on graphs. <em>ICLR '14</em>. arXiv:1312.6203 <a href="https://arxiv.org/abs/1312.6203">https://arxiv.org/abs/1312.6203</a></li><li id="ref-defferrard2016">Defferrard, M., Bresson, X. &amp; Vandergheynst, P. (2016). Convolutional neural networks on graphs with fast localized spectral filtering (ChebNet). <em>NeurIPS 29</em>. arXiv:1606.09375 <a href="https://arxiv.org/abs/1606.09375">https://arxiv.org/abs/1606.09375</a></li><li id="ref-kipf2017">Kipf, T. N. &amp; Welling, M. (2017). Semi-supervised classification with graph convolutional networks. <em>ICLR '17</em>. arXiv:1609.02907 <a href="https://arxiv.org/abs/1609.02907">https://arxiv.org/abs/1609.02907</a></li><li id="ref-hamilton2017">Hamilton, W. L., Ying, R. &amp; Leskovec, J. (2017). Inductive representation learning on large graphs (GraphSAGE). <em>NeurIPS 30</em>. arXiv:1706.02216 <a href="https://arxiv.org/abs/1706.02216">https://arxiv.org/abs/1706.02216</a></li><li id="ref-velickovic2018">Veli&#269;kovi&#263;, P., Cucurull, G., Casanova, A., Romero, A., Li&ograve;, P. &amp; Bengio, Y. (2018). Graph attention networks. <em>ICLR '18</em>. arXiv:1710.10903 <a href="https://arxiv.org/abs/1710.10903">https://arxiv.org/abs/1710.10903</a></li><li id="ref-gilmer2017">Gilmer, J., Schoenholz, S. S., Riley, P. F., Vinyals, O. &amp; Dahl, G. E. (2017). Neural message passing for quantum chemistry. <em>ICML '17</em>. arXiv:1704.01212 <a href="https://arxiv.org/abs/1704.01212">https://arxiv.org/abs/1704.01212</a></li><li id="ref-xu2019">Xu, K., Hu, W., Leskovec, J. &amp; Jegelka, S. (2019). How powerful are graph neural networks? (GIN). <em>ICLR '19</em>. arXiv:1810.00826 <a href="https://arxiv.org/abs/1810.00826">https://arxiv.org/abs/1810.00826</a></li><li id="ref-weisfeiler1968">Weisfeiler, B. &amp; Leman, A. A. (1968). The reduction of a graph to canonical form and the algebra which appears therein. <em>Nauchno-Technicheskaya Informatsia</em>, 2(9), 12&ndash;16. English translation by G. Ryabov. <a href="https://www.iti.zcu.cz/wl2018/pdf/wl_paper_translation.pdf">https://www.iti.zcu.cz/wl2018/pdf/wl_paper_translation.pdf</a></li><li id="ref-li2018">Li, Q., Han, Z. &amp; Wu, X.-M. (2018). Deeper insights into graph convolutional networks for semi-supervised learning. <em>AAAI '18</em>. arXiv:1801.07606 <a href="https://arxiv.org/abs/1801.07606">https://arxiv.org/abs/1801.07606</a></li><li id="ref-alon2021">Alon, U. &amp; Yahav, E. (2021). On the bottleneck of graph neural networks and its practical implications. <em>ICLR '21</em>. arXiv:2006.05205 <a href="https://arxiv.org/abs/2006.05205">https://arxiv.org/abs/2006.05205</a></li><li id="ref-topping2022">Topping, J., Di Giovanni, F., Chamberlain, B. P., Dong, X. &amp; Bronstein, M. M. (2022). Understanding over-squashing and bottlenecks on graphs via curvature. <em>ICLR '22</em>. arXiv:2111.14522 <a href="https://arxiv.org/abs/2111.14522">https://arxiv.org/abs/2111.14522</a></li><li id="ref-chen2020">Chen, M., Wei, Z., Huang, Z., Ding, B. &amp; Li, Y. (2020). Simple and deep graph convolutional networks (GCNII). <em>ICML '20</em>. arXiv:2007.02133 <a href="https://arxiv.org/abs/2007.02133">https://arxiv.org/abs/2007.02133</a></li><li id="ref-bronstein2021">Bronstein, M. M., Bruna, J., Cohen, T. &amp; Veli&#269;kovi&#263;, P. (2021). Geometric deep learning: grids, groups, graphs, geodesics and gauges. arXiv:2104.13478 <a href="https://arxiv.org/abs/2104.13478">https://arxiv.org/abs/2104.13478</a></li><li id="ref-shchur2018">Shchur, O., Mumme, M., Bojchevski, A. &amp; G&uuml;nnemann, S. (2018). Pitfalls of graph neural network evaluation. <em>NeurIPS Relational Representation Learning Workshop</em>. arXiv:1811.05868 <a href="https://arxiv.org/abs/1811.05868">https://arxiv.org/abs/1811.05868</a></li></ol><nav class="lesson-nav"><div class="container"><a href="../index.html">Course index</a><a href="../07-node-embeddings/page.html">\(\leftarrow\) Section 7</a></div></nav>
+</main>
+<footer class="site-footer"><strong>Machine Learning A&ndash;Z</strong> &middot; From empirical risk minimisation to graph neural networks<span class="footer-meta">Edition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">The interactive figure could not be loaded. Check your network connection.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+// Colours resolved from the stylesheet, so the figures follow the light/dark
+// theme. Each entry is a function: board attributes that are functions are
+// re-evaluated on update, so a theme switch only needs a redraw.
+var BOARDS = [];
+function cssv(name, fallback){
+    try {
+        var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback;
+    } catch (e) { return fallback; }
+}
+var PAL = {
+    text:  function(){ return cssv('--color-text',  '#1f2937'); },
+    muted: function(){ return cssv('--color-muted', '#6b7280'); },
+    axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+    ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+    grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+    cell:  function(){ return cssv('--cell-bg',     '#ffffff'); }
+};
+// Re-render every board when the theme attribute flips.
+if (window.MutationObserver) {
+    new MutationObserver(function(){
+        for (var i = 0; i < BOARDS.length; i++) {
+            try { BOARDS[i].fullUpdate(); } catch (e) {}
+        }
+    }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+
+
+// ================================================== shared two-community graph
+var S_N = 14;
+var S_E = [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3],[2,4],[3,4],[1,4],[4,5],[0,5],[5,2],
+           [7,8],[7,9],[7,10],[8,9],[8,10],[9,10],[9,11],[10,11],[8,11],[11,12],[7,12],[12,9],
+           [5,6],[6,12],[6,13],[13,5]];
+var S_POS = [[1.8,7.0],[3.4,8.0],[3.2,5.6],[1.4,4.8],[4.6,6.6],[2.2,8.8],
+             [6.6,5.4],
+             [11.2,7.0],[9.8,8.0],[10.0,5.6],[11.8,4.8],[8.6,6.6],[10.6,8.8],[7.4,3.6]];
+var S_ADJ = [];
+for (var i=0;i<S_N;i++) S_ADJ.push([]);
+S_E.forEach(function(e){ S_ADJ[e[0]].push(e[1]); S_ADJ[e[1]].push(e[0]); });
+
+// initial scalar features: community A near +1, community B near -1, plus noise
+var F0 = [];
+(function(){
+    var s = 4242;
+    function rnd(){ s = (1103515245*s + 12345) % 2147483648; return s/2147483648; }
+    var commA = [0,1,2,3,4,5];
+    for (var v=0; v<S_N; v++){
+        var base = (commA.indexOf(v) >= 0) ? 0.75 : -0.75;
+        if (v === 6 || v === 13) base = 0.0;
+        F0.push(base + 0.55*(rnd()-0.5)*2);
+    }
+})();
+// GCN propagation with self-loops and symmetric normalisation
+var dt = [];
+for (i=0;i<S_N;i++) dt.push(S_ADJ[i].length + 1);
+function propagate(f){
+    var out = new Array(S_N).fill(0);
+    for (var u=0;u<S_N;u++){
+        var s = f[u]/dt[u];                                  // self-loop term
+        S_ADJ[u].forEach(function(v){ s += f[v]/Math.sqrt(dt[u]*dt[v]); });
+        out[u] = s;
+    }
+    return out;
+}
+var featCache = {0: F0.slice()};
+function feats(L){
+    if (!featCache[L]) featCache[L] = propagate(feats(L-1));
+    return featCache[L];
+}
+function scaled(L){                       // rescale to [-1,1] so colour stays visible
+    var f = feats(L), mx = Math.max.apply(null, f.map(Math.abs)) || 1;
+    return f.map(function(x){ return x/mx; });
+}
+function dirichlet(L){
+    // Degree-normalised Dirichlet energy, the standard over-smoothing measure:
+    //   E(h) = sum_{(u,v) in E} ( h_u/sqrt(d~_u) - h_v/sqrt(d~_v) )^2  /  ||h||^2
+    // This is the quadratic form of L_sym, so it vanishes exactly on the dominant
+    // eigenvector D~^{1/2}1 -- i.e. it goes to 0 precisely when the network has
+    // over-smoothed. Dividing instead by the raw differences would plateau at a
+    // positive constant and understate the collapse.
+    var f = feats(L), s = 0, n2 = 0;
+    S_E.forEach(function(e){
+        s += Math.pow(f[e[0]]/Math.sqrt(dt[e[0]]) - f[e[1]]/Math.sqrt(dt[e[1]]), 2);
+    });
+    f.forEach(function(x){ n2 += x*x; });
+    return n2 < 1e-30 ? 0 : s/n2;
+}
+function hops(src, L){
+    var dist = new Array(S_N).fill(-1);
+    dist[src] = 0;
+    var q = [src];
+    while (q.length){
+        var u = q.shift();
+        if (dist[u] >= L) continue;
+        S_ADJ[u].forEach(function(v){ if (dist[v] < 0){ dist[v] = dist[u]+1; q.push(v); } });
+    }
+    return dist;
+}
+function heat2(t){
+    var s = (t+1)/2;
+    var r = Math.round(37 + s*(220-37)), g = Math.round(99 - s*(99-38)),
+        b = Math.round(235 - s*(235-38));
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+}
+
+// ---------------------------------------------------------------- Figure 8.1
+var b22 = JXG.JSXGraph.initBoard('jxg22', {
+    boundingbox: [-1.0, 10.6, 13.4, -3.0], axis: false, showCopyright: false,
+    showNavigation: false, keepaspectratio: false
+});
+var LS = b22.create('slider', [[0.0, 10.1], [4.6, 10.1], [0, 0, 6]],
+                    {name:'layers L', snapWidth:1, strokeColor:'#026573',
+                     fillColor:'#026573', label:{fontSize:16}});
+var SRC = 0;
+var sNodes = S_POS.map(function(pos, v){
+    return b22.create('point', pos, {
+        name:String(v), fixed:true, size:10,
+        label:{fontSize:12, offset:[0,19], cssStyle:'font-family:Georgia,serif;'},
+        fillColor: function(){ return heat2(scaled(Math.round(LS.Value()))[v]); },
+        strokeColor: function(){
+            var d = hops(SRC, Math.round(LS.Value()))[v];
+            return (v === SRC) ? PAL.text() : (d >= 0 ? '#16a34a' : PAL.ref());
+        },
+        strokeWidth: function(){
+            var d = hops(SRC, Math.round(LS.Value()))[v];
+            return (v === SRC) ? 4 : (d >= 0 ? 3 : 1);
+        }
+    });
+});
+S_E.forEach(function(e){
+    var bridge = (e[0]===5&&e[1]===6)||(e[0]===6&&e[1]===12)||(e[0]===6&&e[1]===13)||
+                 (e[0]===13&&e[1]===5);
+    b22.create('segment', [sNodes[e[0]], sNodes[e[1]]],
+               {strokeColor: bridge ? '#f59e0b' : PAL.ref(),
+                strokeWidth: bridge ? 3 : 2, layer:4, highlight:false});
+});
+b22.create('text', [5.6, 10.1, function(){
+    var L = Math.round(LS.Value()), d = hops(SRC, L);
+    var cnt = d.filter(function(x){ return x >= 0; }).length;
+    return 'receptive field of node 0 at L = ' + L + ':  ' + cnt + ' / ' + S_N + ' nodes';
+}], {fontSize:15, color:'#16a34a', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b22.create('text', [5.6, 9.4, function(){
+    var L = Math.round(LS.Value());
+    return 'Dirichlet energy (normalised) = ' + dirichlet(L).toFixed(5);
+}], {fontSize:15, color:'#dc2626', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b22.create('text', [-0.9, -1.3, function(){
+    var L = Math.round(LS.Value());
+    if (L === 0) return 'L = 0: raw features. Noisy &mdash; community membership is not clean.';
+    if (L <= 3)  return 'L = ' + L + ': neighbourhood averaging has denoised the features; the two ' +
+                        'communities are clearly separated. This is the regime GNNs are used in.';
+    return 'L = ' + L + ': OVER-SMOOTHING &mdash; every node is converging to the same value and ' +
+           'the communities are no longer distinguishable.';
+}], {fontSize:14.5, strokeColor:PAL.text, cssStyle:'font-family:Georgia,serif;'});
+b22.create('text', [-0.9, -2.2,
+    'green outline = inside the receptive field;  fill colour = current feature;  orange = bridge edges'],
+    {fontSize:13, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+// value bars under each node
+b22.create('text', [-0.9, -0.5, function(){
+    var f = scaled(Math.round(LS.Value()));
+    var mn = Math.min.apply(null, f), mx = Math.max.apply(null, f);
+    return 'spread of node features:  min = ' + mn.toFixed(3) + ',  max = ' + mx.toFixed(3) +
+           ',  range = ' + (mx-mn).toFixed(3);
+}], {fontSize:14, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+
+// ---------------------------------------------------------------- Figure 8.2
+var b23 = JXG.JSXGraph.initBoard('jxg23', {
+    boundingbox: [-1.2, 6.6, 13.2, -3.4], axis: false, showCopyright: false,
+    showNavigation: false, keepaspectratio: true
+});
+var rndS = b23.create('slider', [[0.0, 6.2], [4.0, 6.2], [0, 0, 4]],
+                      {name:'WL round', snapWidth:1, strokeColor:'#026573',
+                       fillColor:'#026573', label:{fontSize:15}});
+// Graph A: two disjoint triangles.  Graph B: a 6-cycle.
+var GA_E = [[0,1],[1,2],[2,0],[3,4],[4,5],[5,3]];
+var GA_P = [[1.0,4.4],[2.6,5.4],[2.6,3.4],[1.0,0.6],[2.6,1.6],[2.6,-0.4]];
+var GB_E = [[0,1],[1,2],[2,3],[3,4],[4,5],[5,0]];
+var GB_P = [[9.0,4.6],[10.6,4.6],[11.4,3.2],[10.6,1.8],[9.0,1.8],[8.2,3.2]];
+function wlColours(n, edges, rounds){
+    var adj = [];
+    for (var i=0;i<n;i++) adj.push([]);
+    edges.forEach(function(e){ adj[e[0]].push(e[1]); adj[e[1]].push(e[0]); });
+    var col = new Array(n).fill(0);
+    for (var r=0;r<rounds;r++){
+        var sig = col.map(function(c, u){
+            return c + '|' + adj[u].map(function(v){ return col[v]; }).sort().join(',');
+        });
+        var uniq = sig.slice().sort().filter(function(x, i, a){ return i === 0 || x !== a[i-1]; });
+        col = sig.map(function(s){ return uniq.indexOf(s); });
+    }
+    return col;
+}
+var WLPAL = ['#026573', '#dc2626', '#c9a227', '#9333ea', '#16a34a', '#0891b2'];
+function drawWL(edges, pos, xoff, tag){
+    var pts = pos.map(function(p, v){
+        return b23.create('point', p, {
+            name:'', size:11, fixed:true, strokeColor:PAL.text, strokeWidth:2,
+            fillColor: function(){
+                return WLPAL[wlColours(6, edges, Math.round(rndS.Value()))[v] % 6];
+            }});
+    });
+    edges.forEach(function(e){
+        b23.create('segment', [pts[e[0]], pts[e[1]]],
+                   {strokeColor:PAL.axis, strokeWidth:2.5, layer:4, highlight:false});
+    });
+    b23.create('text', [xoff, 5.6, tag], {fontSize:15, strokeColor:PAL.text,
+              cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+    b23.create('text', [xoff, -1.4, function(){
+        var c = wlColours(6, edges, Math.round(rndS.Value())).slice().sort();
+        var counts = {};
+        c.forEach(function(x){ counts[x] = (counts[x]||0)+1; });
+        var parts = Object.keys(counts).map(function(k){ return counts[k] + '&times;c' + k; });
+        return 'colour multiset: { ' + parts.join(',  ') + ' }';
+    }], {fontSize:13.5, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+    b23.create('text', [xoff, -2.1, function(){
+        var deg = new Array(6).fill(0);
+        edges.forEach(function(e){ deg[e[0]]++; deg[e[1]]++; });
+        return 'degrees: [' + deg.join(', ') + ']';
+    }], {fontSize:13.5, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+}
+drawWL(GA_E, GA_P, -1.0, 'Graph A — two disjoint triangles');
+drawWL(GB_E, GB_P,  7.4, 'Graph B — one 6-cycle');
+b23.create('text', [-1.1, -3.0, function(){
+    var a = wlColours(6, GA_E, Math.round(rndS.Value())).slice().sort().join(',');
+    var b = wlColours(6, GB_E, Math.round(rndS.Value())).slice().sort().join(',');
+    return (a === b) ? 'multisets IDENTICAL at this round  &rarr;  1-WL (and every message-passing GNN) cannot tell A from B'
+                     : 'multisets differ  &rarr;  the graphs are distinguished';
+}], {fontSize:14.5, color:'#b91c1c', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b23.create('text', [5.0, 3.2, 'vs'], {fontSize:22, strokeColor:PAL.axis,
+          cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+
+// ---------------------------------------------------------------- Figure 8.3
+// log10 of the normalised Dirichlet energy against depth, plotted far enough
+// that the geometric decay to zero is actually visible on THIS graph.
+var b24 = JXG.JSXGraph.initBoard('jxg24', {
+    boundingbox: [-14, 0.9, 132, -6.6], axis: true, showCopyright: false,
+    showNavigation: false, keepaspectratio: false
+});
+var e0 = dirichlet(0) || 1;
+function logE(L){
+    var r = dirichlet(L)/e0;
+    return r < 1e-12 ? -12 : Math.log(r)/Math.LN10;
+}
+// measured per-layer decay factor mu2^2, read off the tail of the curve
+var MU2SQ = dirichlet(100)/dirichlet(99);
+// useful-regime band: L = 1..4
+b24.create('polygon', [[1, -6.5], [4, -6.5], [4, 0.85], [1, 0.85]], {
+    vertices:{visible:false}, borders:{visible:false}, highlight:false,
+    fillColor:'#16a34a', fillOpacity:0.12});
+b24.create('text', [5.0, 0.55, 'useful regime (L = 1&ndash;4)'], {fontSize:13.5,
+          color:'#16a34a', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+var pts = [];
+for (var L=0; L<=128; L+=2) pts.push([L, logE(L)]);
+b24.create('curve', [pts.map(function(p){ return p[0]; }),
+                     pts.map(function(p){ return p[1]; })],
+           {strokeColor:'#dc2626', strokeWidth:3.5, highlight:false});
+[0, 2, 4, 8, 16, 32, 64, 128].forEach(function(L){
+    b24.create('point', [L, logE(L)], {size:3.5, name:'', fixed:true,
+               fillColor:'#026573', strokeColor:'#013f47', highlight:false});
+    b24.create('text', [L + 2.5, logE(L) + 0.28, 'L=' + L], {fontSize:12,
+               strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+});
+b24.create('text', [-13, 0.72,
+    'log&#8321;&#8320; of the normalised Dirichlet energy  E(H<sup>(L)</sup>) / E(H<sup>(0)</sup>)'],
+    {fontSize:14.5, color:'#026573', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b24.create('text', [42, -1.15, function(){
+    return 'measured per-layer decay factor &mu;&#8322;&sup2; &asymp; ' + MU2SQ.toFixed(4);
+}], {fontSize:14, strokeColor:PAL.text, cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b24.create('text', [42, -1.75, function(){
+    return 'spectral gap 1 &minus; &mu;&#8322; &asymp; ' + (1 - Math.sqrt(MU2SQ)).toFixed(4)
+           + '  &mdash; a bottlenecked graph, so the collapse is slow';
+}], {fontSize:13.5, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+b24.create('text', [42, -2.35, function(){
+    return 'energy remaining:  L=4 &rarr; ' + (100*dirichlet(4)/e0).toFixed(1)
+           + ' %,   L=32 &rarr; ' + (100*dirichlet(32)/e0).toFixed(1)
+           + ' %,   L=128 &rarr; ' + (100*dirichlet(128)/e0).toExponential(1) + ' %';
+}], {fontSize:13.5, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+b24.create('text', [42, -3.1,
+    'The straight tail is the signature: energy &prop; &mu;&#8322;<sup>2L</sup>, so on a'],
+    {fontSize:13.5, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+b24.create('text', [42, -3.6,
+    'well-connected graph (&mu;&#8322; small) the same collapse happens by L &asymp; 5.'],
+    {fontSize:13.5, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+b24.create('text', [48, -6.3, 'number of layers L'], {fontSize:13, strokeColor:PAL.muted,
+          cssStyle:'font-family:Georgia,serif;'});
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>C9.Q1 — The three-qubit bit-flip code, end to end</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C9.Q1 — Encode, corrupt, diagnose, correct&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;\(\alpha|0\rangle+\beta|1\rangle\mapsto\alpha|000\rangle+\beta|111\rangle\), with syndrome \((Z_1Z_2, Z_2Z_3)\).&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;encode3(alpha, beta)&lt;/code&gt; returning the 8-dimensional encoded state; &lt;code&gt;apply_x(state, q)&lt;/code&gt; applying \(X\) to qubit \(q\) (0 = most significant); &lt;code&gt;syndrome3(state)&lt;/code&gt; returning the tuple of \(\pm1\) eigenvalues of \(Z_1Z_2\) and \(Z_2Z_3\) as &lt;code&gt;int&lt;/code&gt;s; and &lt;code&gt;correct3(state)&lt;/code&gt; returning the corrected state.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;syndrome3(no error) -&amp;gt; (1, 1)
+syndrome3(X on qubit 0) -&amp;gt; (-1, 1)
+syndrome3(X on qubit 1) -&amp;gt; (-1, -1)
+syndrome3(X on qubit 2) -&amp;gt; (1, -1)&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def encode3(alpha, beta):
+    ...
+
+def apply_x(state, q):
+    ...
+
+def syndrome3(state):
+    ...
+
+def correct3(state):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+X = np.array([[0, 1], [1, 0]], dtype=complex)
+Z = np.array([[1, 0], [0, -1]], dtype=complex)
+I2 = np.eye(2, dtype=complex)
+
+def _embed(U, q, n=3):
+    ops = [I2] * n
+    ops[q] = U
+    out = np.array([[1.0 + 0j]])
+    for o in ops:
+        out = np.kron(out, o)
+    return out
+
+def encode3(alpha, beta):
+    v = np.zeros(8, dtype=complex)
+    v[0] = alpha
+    v[7] = beta
+    return v
+
+def apply_x(state, q):
+    return _embed(X, q) @ np.asarray(state, dtype=complex)
+
+def syndrome3(state):
+    state = np.asarray(state, dtype=complex)
+    S1 = _embed(Z, 0) @ _embed(Z, 1)
+    S2 = _embed(Z, 1) @ _embed(Z, 2)
+    return tuple(int(round(float(np.real(np.vdot(state, S @ state))))) for S in (S1, S2))
+
+def correct3(state):
+    s = syndrome3(state)
+    table = {(1, 1): None, (-1, 1): 0, (-1, -1): 1, (1, -1): 2}
+    q = table[s]
+    return np.asarray(state, dtype=complex) if q is None else apply_x(state, q)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+v = encode3(0.6, 0.8)
+print(syndrome3(v))
+</text></testcode><stdin><text /></stdin><expected><text>(1, 1)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+v = encode3(0.6, 0.8)
+print([syndrome3(apply_x(v, q)) for q in range(3)])
+</text></testcode><stdin><text /></stdin><expected><text>[(-1, 1), (-1, -1), (1, -1)]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+v = encode3(0.6, 0.8)
+print(all(np.allclose(correct3(apply_x(v, q)), v) for q in range(3)))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+v = encode3(1/np.sqrt(2), 1j/np.sqrt(2))
+print(np.allclose(correct3(v), v))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+v = encode3(0.6, 0.8)
+w = apply_x(apply_x(v, 0), 1)
+print(syndrome3(w), np.allclose(correct3(w), v))
+</text></testcode><stdin><text /></stdin><expected><text>(1, -1) False
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C9.Q2 — Stabilizer codes in the symplectic representation</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C9.Q2 — Syndromes as linear algebra over GF(2)&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;A Pauli on \(n\) qubits is a binary vector \((x|z)\); two Paulis commute iff \(x_1\!\cdot\!z_2+z_1\!\cdot\!x_2=0 \bmod 2\).&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;commutes(p1, p2, n)&lt;/code&gt; returning a &lt;code&gt;bool&lt;/code&gt;; &lt;code&gt;syndrome(error, stabilizers, n)&lt;/code&gt; returning a tuple of bits; &lt;code&gt;is_valid_stabilizer_group(gens, n)&lt;/code&gt; checking that all generators pairwise commute; and &lt;code&gt;weight(pauli, n)&lt;/code&gt; returning the number of qubits on which the Pauli acts non-trivially.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;Steane code X-generators: IIIXXXX, IXXIIXX, XIXIXIX
+and the mirrored Z-generators.&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def commutes(p1, p2, n):
+    ...
+
+def syndrome(error, stabilizers, n):
+    ...
+
+def is_valid_stabilizer_group(gens, n):
+    ...
+
+def weight(pauli, n):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def commutes(p1, p2, n):
+    p1 = np.asarray(p1, dtype=int)
+    p2 = np.asarray(p2, dtype=int)
+    s = (np.dot(p1[:n], p2[n:]) + np.dot(p1[n:], p2[:n])) % 2
+    return bool(s == 0)
+
+def syndrome(error, stabilizers, n):
+    return tuple(0 if commutes(error, g, n) else 1 for g in stabilizers)
+
+def is_valid_stabilizer_group(gens, n):
+    for i in range(len(gens)):
+        for j in range(i + 1, len(gens)):
+            if not commutes(gens[i], gens[j], n):
+                return False
+    return True
+
+def weight(pauli, n):
+    pauli = np.asarray(pauli, dtype=int)
+    return int(sum(1 for i in range(n) if pauli[i] or pauli[n + i]))
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+n=1
+Xp=[1,0]; Zp=[0,1]
+print(commutes(Xp, Zp, n), commutes(Xp, Xp, n))
+</text></testcode><stdin><text /></stdin><expected><text>False True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+n = 3
+S = [[0,0,0, 1,1,0], [0,0,0, 0,1,1]]
+errs = [[1,0,0, 0,0,0], [0,1,0, 0,0,0], [0,0,1, 0,0,0]]
+print([syndrome(e, S, n) for e in errs])
+</text></testcode><stdin><text /></stdin><expected><text>[(1, 0), (1, 1), (0, 1)]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+n = 7
+Xg = [[0,0,0,1,1,1,1] + [0]*7, [0,1,1,0,0,1,1] + [0]*7, [1,0,1,0,1,0,1] + [0]*7]
+Zg = [[0]*7 + [0,0,0,1,1,1,1], [0]*7 + [0,1,1,0,0,1,1], [0]*7 + [1,0,1,0,1,0,1]]
+print(is_valid_stabilizer_group(Xg + Zg, n))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+n = 7
+Xg = [[0,0,0,1,1,1,1] + [0]*7, [0,1,1,0,0,1,1] + [0]*7, [1,0,1,0,1,0,1] + [0]*7]
+Zg = [[0]*7 + [0,0,0,1,1,1,1], [0]*7 + [0,1,1,0,0,1,1], [0]*7 + [1,0,1,0,1,0,1]]
+S = Xg + Zg
+seen = set()
+for i in range(7):
+    e = [0]*14; e[i] = 1                    # X error on qubit i
+    seen.add(syndrome(e, S, n))
+print(len(seen), (0,)*6 in seen)
+</text></testcode><stdin><text /></stdin><expected><text>7 False
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(weight([1,0,1, 0,1,0], 3), weight([0,0,0, 0,0,0], 3))
+</text></testcode><stdin><text /></stdin><expected><text>3 0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C9.Q3 — Verifying the Knill–Laflamme conditions</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C9.Q3 — Is this code correcting?&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;\(P E_a^{\dagger}E_b P=c_{ab}P\) is necessary and sufficient. Checking it numerically for a small code is a direct matrix computation.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;code_projector(basis)&lt;/code&gt; returning \(P=\sum_i |c_i\rangle\langle c_i|\) for an orthonormal list of codewords; and &lt;code&gt;knill_laflamme(P, errors, tol=1e-9)&lt;/code&gt; returning &lt;code&gt;True&lt;/code&gt; iff \(PE_a^{\dagger}E_bP\) is a scalar multiple of \(P\) for every pair.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;3-qubit bit-flip code with errors {I, X1, X2, X3} -&amp;gt; True
+same code with a Z error added                    -&amp;gt; False&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def code_projector(basis):
+    ...
+
+def knill_laflamme(P, errors, tol=1e-9):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def code_projector(basis):
+    P = None
+    for c in basis:
+        c = np.asarray(c, dtype=complex).ravel()
+        c = c / np.linalg.norm(c)
+        term = np.outer(c, c.conj())
+        P = term if P is None else P + term
+    return P
+
+def knill_laflamme(P, errors, tol=1e-9):
+    P = np.asarray(P, dtype=complex)
+    nrm = np.real(np.trace(P @ P))
+    for Ea in errors:
+        for Eb in errors:
+            M = P @ np.asarray(Ea, dtype=complex).conj().T @ np.asarray(Eb, dtype=complex) @ P
+            c = np.trace(P @ M) / nrm
+            if not np.allclose(M, c * P, atol=tol):
+                return False
+    return True
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+c0 = np.zeros(8, dtype=complex); c0[0] = 1
+c1 = np.zeros(8, dtype=complex); c1[7] = 1
+P = code_projector([c0, c1])
+print(np.allclose(P @ P, P), round(float(np.real(np.trace(P))), 6))
+</text></testcode><stdin><text /></stdin><expected><text>True 2.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex); I2 = np.eye(2, dtype=complex)
+def emb(U, q):
+    ops = [I2]*3; ops[q] = U
+    out = np.array([[1.0+0j]])
+    for o in ops: out = np.kron(out, o)
+    return out
+c0 = np.zeros(8, dtype=complex); c0[0] = 1
+c1 = np.zeros(8, dtype=complex); c1[7] = 1
+P = code_projector([c0, c1])
+errs = [np.eye(8, dtype=complex)] + [emb(X, q) for q in range(3)]
+print(knill_laflamme(P, errs))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+Z = np.array([[1,0],[0,-1]], dtype=complex); I2 = np.eye(2, dtype=complex)
+def emb(U, q):
+    ops = [I2]*3; ops[q] = U
+    out = np.array([[1.0+0j]])
+    for o in ops: out = np.kron(out, o)
+    return out
+c0 = np.zeros(8, dtype=complex); c0[0] = 1
+c1 = np.zeros(8, dtype=complex); c1[7] = 1
+P = code_projector([c0, c1])
+errs = [np.eye(8, dtype=complex)] + [emb(X, q) for q in range(3)] + [emb(Z, 0)]
+print(knill_laflamme(P, errs))
+</text></testcode><stdin><text /></stdin><expected><text>False
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex); I2 = np.eye(2, dtype=complex)
+def emb(U, q):
+    ops = [I2]*3; ops[q] = U
+    out = np.array([[1.0+0j]])
+    for o in ops: out = np.kron(out, o)
+    return out
+c0 = np.zeros(8, dtype=complex); c0[0] = 1
+c1 = np.zeros(8, dtype=complex); c1[7] = 1
+P = code_projector([c0, c1])
+errs = [np.eye(8, dtype=complex), emb(X, 0), emb(X, 1), emb(X, 2), emb(X,0) @ emb(X,1)]
+print(knill_laflamme(P, errs))
+</text></testcode><stdin><text /></stdin><expected><text>False
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+c0 = np.array([1, 0], dtype=complex)
+P = code_projector([c0])
+print(knill_laflamme(P, [np.eye(2, dtype=complex)]))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C9.Q4 — Thresholds, concatenation and overhead</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C9.Q4 — When does error correction actually help?&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;A distance-\(d\) code suppresses errors as \(p_L\approx A(p/p_{\text{th}})^{\lfloor(d+1)/2\rfloor}\); concatenating \(\ell\) levels of a distance-3 code gives \(p_L\approx p_{\text{th}}(p/p_{\text{th}})^{2^{\ell}}\). Below threshold, more qubits help; above it, they hurt.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;logical_error_surface(p, p_th, d, A=0.1)&lt;/code&gt;; &lt;code&gt;logical_error_concat(p, p_th, levels)&lt;/code&gt;; and &lt;code&gt;min_distance_for(p, p_th, target, A=0.1)&lt;/code&gt; returning the smallest odd \(d\ge3\) with &lt;code&gt;logical_error_surface(p, p_th, d, A) &lt;= target&lt;/code&gt; (search up to \(d=101\), return &lt;code&gt;None&lt;/code&gt; if none works). Round the two error rates to 12 decimals.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;logical_error_surface(1e-3, 1e-2, 3) -&amp;gt; 0.1 * (0.1)^2 = 0.001
+min_distance_for(1e-3, 1e-2, 1e-12) -&amp;gt; 21&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def logical_error_surface(p, p_th, d, A=0.1):
+    ...
+
+def logical_error_concat(p, p_th, levels):
+    ...
+
+def min_distance_for(p, p_th, target, A=0.1):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def logical_error_surface(p, p_th, d, A=0.1):
+    return round(float(A * (p / p_th) ** ((d + 1) // 2)), 12)
+
+def logical_error_concat(p, p_th, levels):
+    return round(float(p_th * (p / p_th) ** (2 ** levels)), 12)
+
+def min_distance_for(p, p_th, target, A=0.1):
+    if p &gt;= p_th:
+        return None
+    for d in range(3, 102, 2):
+        if logical_error_surface(p, p_th, d, A) &lt;= target:
+            return d
+    return None
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(logical_error_surface(1e-3, 1e-2, 3))
+</text></testcode><stdin><text /></stdin><expected><text>0.001
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(min_distance_for(1e-3, 1e-2, 1e-12))
+</text></testcode><stdin><text /></stdin><expected><text>21
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(logical_error_concat(1e-3, 1e-2, 0), logical_error_concat(1e-3, 1e-2, 2))
+</text></testcode><stdin><text /></stdin><expected><text>0.001 1e-06
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(min_distance_for(2e-2, 1e-2, 1e-12))
+</text></testcode><stdin><text /></stdin><expected><text>None
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(logical_error_surface(1e-3, 1e-2, 5) &lt; logical_error_surface(1e-3, 1e-2, 3))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

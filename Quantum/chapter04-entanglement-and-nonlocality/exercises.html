@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 4 exercises — Entanglement, Non-locality and Communication Protocols</title>
+<meta name="description" content="Exercises for chapter 4: Entanglement, Non-locality and Communication Protocols">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = {tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]}, svg:{fontCache:"global"}};</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Quantum Computing</a> · <a href="course.html">Chapter 4</a> · Exercises</div><span class="course-code">Exercise sheet</span></div></header>
+<section class="lesson-hero"><div class="container">
+  <div class="lesson-label">Chapter 4 · exercise sheet</div>
+  <h1>Entanglement, Non-locality and Communication Protocols</h1>
+  <p class="lesson-sub">4 programming exercises ·
+     3 problems with symbolic answers. Every solution is hidden behind a
+     toggle — attempt each one before opening it.</p>
+</div></section>
+<div class="lesson-content">
+<h2>Programming exercises</h2>
+<p>Each exercise is checked automatically against hidden test cases. Only NumPy is required, and the function names in the statement must be used exactly as written.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 4.1</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C4.Q1 — Quantifying bipartite entanglement</p><p>The Schmidt coefficients of a bipartite pure state are the singular values of its coefficient matrix; the entropy of entanglement is the Shannon entropy of their squares.</p></div><p>Write <code>schmidt(psi, dA, dB)</code> returning the singular values in descending order (as a NumPy array), <code>schmidt_rank(psi, dA, dB, tol=1e-10)</code> returning an <code>int</code>, and <code>entanglement_entropy(psi, dA, dB)</code> returning a <code>float</code> in bits, rounded to 6 decimals.</p><div class="stmt"><pre>Bell state    -&gt; rank 2, entropy 1.0
+|00&gt;          -&gt; rank 1, entropy 0.0</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def schmidt(psi, dA, dB):
+    # reshape to dA x dB and take singular values
+    ...
+
+def schmidt_rank(psi, dA, dB, tol=1e-10):
+    ...
+
+def entanglement_entropy(psi, dA, dB):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+bell = np.array([1,0,0,1], dtype=complex)/np.sqrt(2)
+print(schmidt_rank(bell,2,2), entanglement_entropy(bell,2,2))
+→ 2 1.0</code></pre><pre><code>import numpy as np
+prod = np.array([1,0,0,0], dtype=complex)
+print(schmidt_rank(prod,2,2), entanglement_entropy(prod,2,2))
+→ 1 0.0</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def schmidt(psi, dA, dB):
+    C = np.asarray(psi, dtype=complex).reshape(dA, dB)
+    s = np.linalg.svd(C, compute_uv=False)
+    return np.sort(s)[::-1]
+
+def schmidt_rank(psi, dA, dB, tol=1e-10):
+    return int(np.sum(schmidt(psi, dA, dB) &gt; tol))
+
+def entanglement_entropy(psi, dA, dB):
+    s = schmidt(psi, dA, dB) ** 2
+    s = s[s &gt; 1e-15]
+    return round(float(abs(-np.sum(s * np.log2(s)))), 6)
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 4.2</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C4.Q2 — The entangling circuit and its inverse</p><p>\(\mathrm{CNOT}_{01}(H\otimes I)\) maps \(|xy\rangle\) to the Bell state indexed by \((x,y)\); its adjoint implements a Bell measurement in the computational basis.</p></div><p>Write <code>bell_state(x, y)</code> returning the 4-vector \(\mathrm{CNOT}(H\otimes I)|xy\rangle\), and <code>bell_probs(psi)</code> returning the array of four probabilities of the Bell outcomes \(\Phi^{+},\Phi^{-},\Psi^{+},\Psi^{-}\) in the order produced by <code>bell_state(0,0), (1,0), (0,1), (1,1)</code>, rounded to 8 decimals.</p><div class="stmt"><pre>bell_state(0,0) -&gt; (|00&gt; + |11&gt;)/sqrt(2)
+bell_probs(bell_state(1,1)) -&gt; [0, 0, 0, 1]</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def bell_state(x, y):
+    ...
+
+def bell_probs(psi):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+print(np.round(bell_state(0,0).real, 6).tolist())
+→ [0.707107, 0.0, 0.0, 0.707107]</code></pre><pre><code>import numpy as np
+print(bell_probs(bell_state(1,1)).tolist())
+→ [0.0, 0.0, 0.0, 1.0]</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+H = np.array([[1, 1], [1, -1]], dtype=complex) / np.sqrt(2)
+CNOT = np.array([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]], dtype=complex)
+
+def bell_state(x, y):
+    v = np.zeros(4, dtype=complex)
+    v[2 * x + y] = 1
+    return CNOT @ np.kron(H, np.eye(2, dtype=complex)) @ v
+
+ORDER = [(0, 0), (1, 0), (0, 1), (1, 1)]
+
+def bell_probs(psi):
+    psi = np.asarray(psi, dtype=complex).ravel()
+    psi = psi / np.linalg.norm(psi)
+    return np.round([abs(np.vdot(bell_state(x, y), psi)) ** 2 for x, y in ORDER], 8)
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 4.3</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C4.Q3 — One ebit + two cbits = one qubit</p><p>Alice holds an unknown \(|\psi\rangle\) and half of \(|\Phi^{+}\rangle\). She Bell-measures her two qubits, sends the two classical bits, and Bob corrects.</p></div><p>Write <code>teleport(psi, outcome)</code> returning Bob's corrected state for a Bell outcome in <code>{0,1,2,3}</code> (order \(\Phi^{+},\Phi^{-},\Psi^{+},\Psi^{-}\)), and <code>fidelity(a, b)</code> returning \(|\langle a|b\rangle|^{2}\) rounded to 6 decimals. Correct output: fidelity 1.0 for every outcome, for every input state.</p><div class="stmt"><pre>corrections: Phi+ -&gt; I,  Phi- -&gt; Z,  Psi+ -&gt; X,  Psi- -&gt; XZ</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def teleport(psi, outcome):
+    # apply the byproduct Pauli, then the correction
+    ...
+
+def fidelity(a, b):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+psi = np.array([0.6, 0.8], dtype=complex)
+print([fidelity(teleport(psi, k), psi) for k in range(4)])
+→ [1.0, 1.0, 1.0, 1.0]</code></pre><pre><code>import numpy as np
+psi = np.array([1, 1j], dtype=complex)/np.sqrt(2)
+print(fidelity(teleport(psi, 2), psi))
+→ 1.0</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+I2 = np.eye(2, dtype=complex)
+X = np.array([[0, 1], [1, 0]], dtype=complex)
+Z = np.array([[1, 0], [0, -1]], dtype=complex)
+
+# byproduct operator applied to Bob&#x27;s qubit, per Bell outcome
+BYPRODUCT = [I2, Z, X, X @ Z]
+CORRECTION = [I2, Z, X, Z @ X]
+
+def teleport(psi, outcome):
+    psi = np.asarray(psi, dtype=complex).reshape(2)
+    psi = psi / np.linalg.norm(psi)
+    bob = BYPRODUCT[outcome] @ psi
+    return CORRECTION[outcome] @ bob
+
+def fidelity(a, b):
+    a = np.asarray(a, dtype=complex).ravel(); a = a / np.linalg.norm(a)
+    b = np.asarray(b, dtype=complex).ravel(); b = b / np.linalg.norm(b)
+    return round(float(abs(np.vdot(a, b)) ** 2), 6)
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 4.4</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C4.Q4 — Certifying non-locality numerically</p><p>For observables \(A_x,B_y\) with \(\pm1\) spectrum, \(S=\langle A_0B_0\rangle+\langle A_0B_1\rangle+\langle A_1B_0\rangle-\langle A_1B_1\rangle\). Locality forces \(|S|\le2\); quantum mechanics reaches \(2\sqrt2\).</p></div><p>Write <code>correlator(psi, A, B)</code> returning \(\langle\psi|A\otimes B|\psi\rangle\) as a float rounded to 6 decimals, and <code>chsh(psi, A0, A1, B0, B1)</code> returning \(S\) rounded to 6 decimals. Do <em>not</em> round the intermediate correlators inside <code>chsh</code> — round only the final sum.</p><div class="stmt"><pre>Phi+, A0=Z, A1=X, B0=(Z+X)/sqrt2, B1=(Z-X)/sqrt2  -&gt;  S = 2.828427</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def correlator(psi, A, B):
+    ...
+
+def chsh(psi, A0, A1, B0, B1):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+phi = np.array([1,0,0,1], dtype=complex)/np.sqrt(2)
+B0 = (Z + X)/np.sqrt(2); B1 = (Z - X)/np.sqrt(2)
+print(chsh(phi, Z, X, B0, B1))
+→ 2.828427</code></pre><pre><code>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+phi = np.array([1,0,0,1], dtype=complex)/np.sqrt(2)
+print(correlator(phi, Z, Z), correlator(phi, X, X))
+→ 1.0 1.0</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def _corr(psi, A, B):
+    psi = np.asarray(psi, dtype=complex).ravel()
+    psi = psi / np.linalg.norm(psi)
+    M = np.kron(np.asarray(A, dtype=complex), np.asarray(B, dtype=complex))
+    return float(np.real(np.vdot(psi, M @ psi)))
+
+def correlator(psi, A, B):
+    return round(_corr(psi, A, B), 6)
+
+def chsh(psi, A0, A1, B0, B1):
+    s = (_corr(psi, A0, B0) + _corr(psi, A0, B1)
+         + _corr(psi, A1, B0) - _corr(psi, A1, B1))
+    return round(float(s), 6)
+</code></pre></details>
+</div>
+<h2>Problems with symbolic answers</h2>
+<p>Answers here are expressions rather than numbers, and any algebraically equivalent form is accepted. Give fractions and radicals exactly; decimal approximations are not accepted.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 4.1</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C4.S1 — Schmidt coefficients and entropy</p></div><p>Let \(|\psi\rangle=\cos\theta\,|00\rangle+\sin\theta\,|11\rangle\) with \(\theta\in(0,\pi/2)\).</p><p>(a) Give the larger eigenvalue of the reduced state \(\rho_A\) (assume \(\theta\in(0,\pi/4)\)).</p><p>\(\lambda_{\max}=\) <span>your answer</span> </p><p>(b) Give the entropy of entanglement in bits, as a function of <code>theta</code>. Use <code>log(x)/log(2)</code> for \(\log_2 x\).</p><p>\(E=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>The state is already in Schmidt form with \(\lambda_1=\cos\theta\), \(\lambda_2=\sin\theta\), so \(\rho_A=\mathrm{diag}(\cos^2\theta,\sin^2\theta)\).</p><p>(a) For \(\theta\in(0,\pi/4)\), \(\cos^2\theta>\sin^2\theta\), so \(\lambda_{\max}=\cos^2\theta\).</p><p>(b) \(E=-\cos^2\theta\log_2\cos^2\theta-\sin^2\theta\log_2\sin^2\theta\).</p><p>Check the limits: \(\theta\to0\) gives a product state and \(E\to0\); \(\theta=\pi/4\) gives the Bell state and \(E=1\) ebit. Since local unitaries cannot change the Schmidt coefficients, \(E\) is invariant under \(U_A\otimes U_B\), as any entanglement measure must be.</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 4.2</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C4.S2 — Bell and Tsirelson bounds</p></div><p>(a) Give the maximum of \(|S|\) over all local hidden-variable models.</p><p>\(S_{\mathrm{LHV}}=\) <span>your answer</span> </p><p>(b) Give the exact maximum of \(|S|\) allowed by quantum mechanics (the Tsirelson bound), as an exact expression.</p><p>\(S_{Q}=\) <span>your answer</span> </p><p>(c) On \(|\Phi^{+}\rangle\) with \(A_0=Z\), \(A_1=X\) and Bob measuring \(\cos\beta\,Z+\sin\beta\,X\), the correlator \(\langle A_0 B\rangle\) equals a simple function of \(\beta\). Give it.</p><p>\(\langle A_0B\rangle=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) In a deterministic local model \(A_0(B_0+B_1)+A_1(B_0-B_1)=\pm2\) pointwise, and general local models are convex mixtures, so \(|S|\le2\).</p><p>(b) Tsirelson: \(|S|\le2\sqrt2\), attained with the settings of §3. The gap between \(2\) and \(2\sqrt2\) is the experimentally certified non-locality; no-signalling alone would allow \(4\).</p><p>(c) On \(|\Phi^{+}\rangle\), \(\langle Z\otimes Z\rangle=1\) and \(\langle Z\otimes X\rangle=0\), so \(\langle A_0B\rangle=\cos\beta\).</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 4.3</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C4.S3 — Counting resources</p></div><p>(a) Teleporting one qubit consumes one ebit and how many classical bits?</p><p>cbits \(=\) <span>your answer</span> </p><p>(b) Superdense coding transmits how many classical bits per transmitted qubit, given one shared ebit?</p><p>cbits \(=\) <span>your answer</span> </p><p>(c) Alice and Bob share \(n={@n@}\) Bell pairs. Give the maximum number of classical bits Alice can convey to Bob by sending \(n\) qubits using dense coding.</p><p>bits \(=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) Two: the Bell measurement has four equally likely outcomes, so Alice must send \(\log_2 4=2\) bits. Fewer would allow superluminal signalling, since Bob\'s marginal is \(I/2\) until he learns the outcome.</p><p>(b) Two, by the Bennett–Wiesner protocol: the four Bell states are perfectly distinguishable and are reached by \(I,X,Z,XZ\) acting on one half.</p><p>(c) \(2n=2\cdot{@n@}={@ta3@}\) bits. This is optimal: the Holevo bound caps the accessible information at \(2n\) bits for \(n\) transmitted qubits assisted by entanglement.</p></details>
+</div>
+<div class="exo-banner"><div><strong>Back to the theory</strong><span>Every exercise above is worked from a result proved in the chapter</span></div><a href="course.html">Open chapter 4</a></div>
+</div>
+<nav class="lesson-nav"><a class="prev" href="../chapter03-gates-circuits-universality/exercises.html"><span class="dir">Previous chapter</span><span class="ttl">3. Quantum Gates, Circuits and Universality</span></a><a class="next" href="../chapter05-density-matrices-and-channels/exercises.html"><span class="dir">Next chapter</span><span class="ttl">5. Density Operators, Open Systems and Quantum Channels</span></a></nav>
+<footer class="site-footer"><div class="container"><strong>Quantum Computing — Theory and Practice</strong> · ten chapters · forty programming exercises · thirty symbolic problems<span class="footer-meta">Edition 2026</span></div></footer></body></html>

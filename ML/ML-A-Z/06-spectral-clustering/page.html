@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 6 — Graph Cuts and Spectral Clustering</title>
+<link href="../assets/style.css" rel="stylesheet">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+
+/* Use the full width the theme allows: the shared stylesheet caps a lesson at
+   880px, which leaves wide figures and tables boxed into the middle of a large
+   screen. --max-w is the theme's own page width, so this stays consistent with
+   the landing page. */
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) {
+  .lesson-content { padding-left: 16px; padding-right: 16px; }
+}
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule);
+               padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center;
+               padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.lesson-nav { max-width: 880px; margin: 0 auto 40px; padding: 0 24px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav .container { display: flex; gap: 18px; flex-wrap: wrap; width: 100%; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600;
+                font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.keypoints h4 { margin-top: 0; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Machine Learning A&ndash;Z</a> &middot; Course</div><span class="course-code">Graph-based machine learning</span></div></header>
+<section class="lesson-hero"><div class="container"><div class="lesson-label">Part II &middot; Section 6</div><h1>Section 6 — Graph Cuts and Spectral Clustering</h1><div class="lesson-sub">From the NP-hard balanced-cut problem to an eigenvector computation: the relaxation that lets linear algebra find communities k-means cannot see.</div></div></section>
+<main class="lesson-content">
+<div class="box method"><div class="box-title">Companion annex</div><p>Every algorithm in this section is also set out <strong><a href="algorithms.html">step by step in the annex</a></strong>: what it is given, what it produces, the steps in order, a small example worked by hand, and why it is correct, why it stops and what it costs &mdash; described in words, with no program code.</p></div><h2>6.1 Clustering as a cut problem</h2><p>Section 4 ended with a failure: k-means cannot separate two interleaved crescents or two concentric rings, because its objective assumes clusters are Euclidean balls. Spectral clustering replaces that assumption with a different one &mdash; that clusters are <em>well-connected regions of a similarity graph</em> &mdash; and the change of assumption is the entire content of the method.</p><p>First build a graph from the data if you do not already have one. Three standard choices <a class="cite" href="#ref-luxburg2007">[6]</a>:</p><ul><li><strong>\(\epsilon -\)neighbourhood</strong>: join points closer than \(\epsilon\). Unweighted, and fragile when densities vary.</li><li><strong>k-nearest-neighbour</strong>: join u to its k nearest neighbours (symmetrised by OR, or by AND for the "mutual" variant). Robust to varying density &mdash; the usual default.</li><li><strong>Fully connected with a Gaussian kernel</strong>: \(w_{uv} =exp(-\| x_{u} - x_{v}\|^2 / 2\sigma^2\)). Dense, so O(\(n^2\)), but smooth.</li></ul><div class="box warn"><div class="box-title">\(\sigma\) and k are the real hyperparameters</div>Spectral clustering is highly sensitive to the similarity graph, far more than to anything downstream. \(A \sigma\) too large connects everything and the graph has one community; too small and it shatters into singletons. Zelnik-Manor and Perona <a class="cite" href="#ref-zelnik2004">[11]</a> proposed a local scale \(\sigma_{u} =\) distance to u's 7th nearest neighbour, giving \(w_{uv} =exp(-d^2/\sigma_{u}\sigma_{v}\)) &mdash; a cheap fix that handles clusters of different densities and should generally be preferred to a global \(\sigma\).</div><h3>Which cut?</h3><div class="box def"><div class="box-title">Definition — Cut, RatioCut, NCut</div>For a partition into A and its complement \(\overline{A}\), write cut(A, \(\overline{A}) = \sum_{u\in A, v\in \overline{A}} w_{uv}\). Then<div class="eq">\[RatioCut(A) = cut(A,\overline{A})/|A| + cut(A,\overline{A})/|\overline{A}| NCut(A) = cut(A,\overline{A})/vol(A) + cut(A,\overline{A})/vol(\overline{A})\]</div><p style="margin:6px 0 0 0;">where vol(A) = \(\sum_{u\in A}d_{u}\). RatioCut balances by <em>number of nodes</em>, NCut by <em>total degree</em>.</p></div><p>The plain minimum cut is useless for clustering: it is solvable in polynomial time, but its optimum almost always isolates a single low-degree node, since that costs only one edge. The denominators in RatioCut and NCut are what force balance &mdash; and they are also what makes the problem <strong>NP-hard</strong> <a class="cite" href="#ref-wagner1993">[8]</a>. As with trees (Section 3) and k-means (Section 4), we relax rather than solve.</p><h2>6.2 The relaxation</h2><p>Take k = 2 and encode the partition in a single vector. Following Hagen and Kahng <a class="cite" href="#ref-hagen1992">[3]</a>, define</p><div class="eq">\[f_{u} = \sqrt{|\overline{A}|/|A|} if u \in A, -\sqrt{|A|/|\overline{A}|} if u \in \overline{A}\]</div><p>Three short computations (all in <a class="cite" href="#ref-luxburg2007">[6]</a>) show that this f satisfies:</p><div class="eq">\[f^{T}Lf = |V| \cdot RatioCut(A), f \perp \mathbf{1}, \| f\|^2 = |V|\]</div><p>So minimising RatioCut is <em>exactly equivalent</em> to</p><div class="eq">\[\min_{f} f^{T}Lf \text{subject to } f \perp \mathbf{1}, \| f\| = \sqrt{n}, f \text{taking only those two values }\]</div><p>The last constraint &mdash; discreteness &mdash; is the NP-hard part. <strong>Drop it</strong> and allow \(f \in\) <strong>R</strong>\(^{n}\). What remains is a Rayleigh-quotient minimisation over the subspace orthogonal to the constant vector, and the Courant&ndash;Fischer theorem answers it immediately.</p><div class="box thm"><div class="box-title">Theorem — Rayleigh&ndash;Ritz / Courant&ndash;Fischer</div>For a symmetric L with eigenvalues 0 = \(\lambda_1 \le \lambda_2 \le\) &hellip; and eigenvectors \(u_1 =\) <strong>1</strong>/\(\sqrt{n}, u_2\), &hellip;,<div class="eq">\[\min_{f \perp u_1, f \ne 0} f^{T}Lf / f^{T}f = \lambda_2, \text{attained at } f = u_2\]</div><p style="margin:6px 0 0 0;">The solution of the relaxed problem is therefore the <strong>Fiedler vector</strong> <a class="cite" href="#ref-fiedler1973b">[2]</a>. Recovering a partition from it requires a rounding step: take the sign of each entry, or the median, or &mdash; best &mdash; sweep over all thresholds and keep the one with the lowest cut.</p></div><p>Because we relaxed, \(\lambda_2/2 \cdot n\) is only a <em>lower bound</em> on the true RatioCut <a class="cite" href="#ref-donath1973">[1]</a>. How loose can the bound be? Cheeger's inequality <a class="cite" href="#ref-cheeger1970">[9]</a> in its graph form <a class="cite" href="#ref-alon1985">[10]</a> gives the answer, and it is a strong one.</p><div class="box thm"><div class="box-title">Theorem — Cheeger's inequality (graph form)</div>Let \(\phi (G) =\min_{A}cut(A,\overline{A})/\)min(vol A, vol \(\overline{A}\)) be the <em>conductance</em> of G, and \(\lambda_2\) the second eigenvalue of \(L_{sym}\). Then<div class="eq">\[\lambda_2 / 2 \le \phi (G) \le \sqrt{2\lambda_2}\]</div><p style="margin:6px 0 0 0;">The relaxation is provably within a quadratic factor of optimal, and the sweep cut over the Fiedler vector <em>achieves</em> the upper bound. This is why a method that ignores an NP-hard constraint nevertheless works: the spectral gap and the best cut control each other. Lee, Oveis Gharan and Trevisan <a class="cite" href="#ref-lee2014">[12]</a> extended this to k-way partitions using the first k eigenvectors.</p></div><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Move the slider to add edges between the two communities.</p><div id="jxg16" class="viz-board" style="height:520px;"></div><p class="viz-caption"><strong>Figure.</strong> The Fiedler vector of a graph with two dense communities joined by a few bridges. Node colour is the entry of \(u_2 (\)blue negative, red positive), node position on the horizontal axis of the lower panel is that same value. The vector is nearly piecewise constant &mdash; the relaxation almost recovers the discrete indicator it was relaxed from &mdash; and the gap in the middle is where any reasonable threshold lands. Add bridges with the slider and watch the gap close: the two communities merge, \(\lambda_2\) rises, and the cut becomes genuinely ambiguous.</p></div><h2>6.3 The algorithms</h2><figure class="viz"><div class="viz-title">The spectral clustering pipeline</div><svg viewBox="0 0 760 230" role="img" style="width:100%;height:auto;display:block;font-family:inherit;"><rect x="40" y="80" width="118" height="66" rx="9" style="fill:var(--color-bg);stroke:var(--primary);stroke-width:2;"/><text x="99" y="108" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;">similarity graph</text><text x="99" y="128" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-weight:400;">build W from the data</text><path d="M 160 113 L 178 113" style="fill:none;stroke:var(--viz-axis);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 179 113 l -6 -4 l 0 8 z" style="fill:var(--viz-axis);"/><rect x="178" y="80" width="118" height="66" rx="9" style="fill:var(--color-bg);stroke:var(--primary);stroke-width:2;"/><text x="237" y="108" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;">Laplacian</text><text x="237" y="128" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-weight:400;">L = D &#8722; A</text><path d="M 298 113 L 316 113" style="fill:none;stroke:var(--viz-axis);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 317 113 l -6 -4 l 0 8 z" style="fill:var(--viz-axis);"/><rect x="316" y="80" width="118" height="66" rx="9" style="fill:var(--color-bg);stroke:var(--primary);stroke-width:2;"/><text x="375" y="108" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;">eigenvectors</text><text x="375" y="128" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-weight:400;">k smallest of L</text><path d="M 436 113 L 454 113" style="fill:none;stroke:var(--viz-axis);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 455 113 l -6 -4 l 0 8 z" style="fill:var(--viz-axis);"/><rect x="454" y="80" width="118" height="66" rx="9" style="fill:var(--color-bg);stroke:var(--primary);stroke-width:2;"/><text x="513" y="108" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;">embedding</text><text x="513" y="128" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-weight:400;">row i = new coords</text><path d="M 574 113 L 592 113" style="fill:none;stroke:var(--viz-axis);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 593 113 l -6 -4 l 0 8 z" style="fill:var(--viz-axis);"/><rect x="592" y="80" width="118" height="66" rx="9" style="fill:var(--color-bg);stroke:var(--viz-ok);stroke-width:2;"/><text x="651" y="108" text-anchor="middle" style="fill:var(--viz-ok);font-size:12.5px;font-weight:700;">k-means</text><text x="651" y="128" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-weight:400;">in the new space</text><text x="360" y="44" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-weight:700;">the whole method is a change of coordinates, then ordinary clustering</text><text x="360" y="182" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-weight:400;">k-means failed on the raw geometry; in the spectral coordinates the same crescents become separated blobs</text><text x="360" y="206" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-weight:400;">cost O(n&#179;) for a full decomposition &#8212; the reason this does not scale, and why Sections 7&#8211;8 exist</text></svg><figcaption class="viz-caption"><strong>Figure.</strong> Spectral clustering in five steps. Nothing in the pipeline is exotic: the only real idea is that the eigenvectors of the Laplacian give coordinates in which connectivity has become distance.</figcaption></figure><p>Three variants are in common use. They differ only in which Laplacian is used and whether rows are renormalised <a class="cite" href="#ref-luxburg2007">[6]</a>.</p><table><thead><tr><th>Algorithm</th><th>Matrix</th><th>Embedding rows</th><th>Relaxes</th></tr></thead><tbody><tr><td>Unnormalised <a class="cite" href="#ref-hagen1992">[3]</a></td><td>L = D &minus; A</td><td>first k eigenvectors as columns</td><td>RatioCut</td></tr><tr><td>Shi&ndash;Malik <a class="cite" href="#ref-shi2000">[4]</a></td><td>\(L_{rw} = D^{-1}L\)</td><td>generalised eigenvectors Lu = \(\lambda\)Du</td><td>NCut</td></tr><tr><td>Ng&ndash;Jordan&ndash;Weiss <a class="cite" href="#ref-ng2001">[5]</a></td><td>\(L_{sym} = D^{-1/2}LD^{-1/2}\)</td><td>rows normalised to unit length</td><td>NCut</td></tr></tbody></table><div class="box def"><div class="box-title">The algorithm in five lines</div><strong>1.</strong> Build the similarity graph and its weight matrix W. <strong>2.</strong> Form the chosen Laplacian. <strong>3.</strong> Compute the eigenvectors \(u_1\), &hellip;, \(u_{k}\) of the k smallest eigenvalues. <strong>4.</strong> Stack them as columns of \(U \in\) <strong>R</strong>\(^{n\times k}\); row i is the new representation of node i (normalise rows for NJW). <strong>5.</strong> Run k-means on those n rows.</div><p>Step 5 deserves comment. It looks circular &mdash; we invoked spectral methods precisely because k-means failed &mdash; but the failure was one of <em>geometry</em>, not of the algorithm. The spectral embedding is a change of coordinates in which the crescents become well-separated blobs, and in those coordinates k-means is exactly the right tool. <strong>Spectral clustering is k-means applied after a non-linear, connectivity-driven re-embedding.</strong></p><p>The embedding itself has independent value: it is precisely the <strong>Laplacian eigenmap</strong> of Belkin and Niyogi <a class="cite" href="#ref-belkin2003">[7]</a>, the manifold-learning method promised at the end of Section 4. Minimising \(\sum_{uv}w_{uv}\| y_{u} - y_{v}\|^2\) subject to an orthogonality constraint is the same eigenproblem &mdash; embedding for visualisation and clustering by cuts are, algebraically, one procedure.</p><pre><code>import numpy as np
+
+def spectral_clustering(W, k):
+    """Ng-Jordan-Weiss spectral clustering on a similarity matrix W (n x n, symmetric)."""
+    d = W.sum(axis=1)
+    d_inv_sqrt = 1.0 / np.sqrt(np.maximum(d, 1e-12))
+    L_sym = np.eye(len(d)) - (d_inv_sqrt[:, None] * W * d_inv_sqrt[None, :])
+
+    vals, vecs = np.linalg.eigh(L_sym)          # ascending, orthonormal
+    U = vecs[:, :k]                             # k smallest eigenvalues
+
+    norms = np.linalg.norm(U, axis=1, keepdims=True)
+    U = U / np.maximum(norms, 1e-12)            # NJW row normalisation
+
+    return kmeans(U, k), vals                   # any k-means from Section 4</code></pre><h3>Choosing k: the eigengap heuristic</h3><p>If the graph had exactly k connected components, L would have eigenvalue 0 with multiplicity k and \(\lambda_{k+1} \gt 0 (\)Section 5.2). Real graphs are perturbations of that ideal, so by matrix perturbation theory the first k eigenvalues stay near zero and a visible <strong>gap</strong> opens before \(\lambda_{k+1}\). Choose k at the largest gap <a class="cite" href="#ref-luxburg2007">[6]</a>.</p><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Add inter-community edges with the slider and watch the eigengap after \(\lambda_3\) erode.</p><div id="jxg17" class="viz-board" style="height:480px;"></div><p class="viz-caption"><strong>Figure.</strong> Eigenvalues of the unnormalised Laplacian, sorted. With no bridges the graph has three components and exactly three zero eigenvalues; the gap to \(\lambda_4\) is large and unmistakable. As bridging edges are added the zeros lift off but stay small, and the gap &mdash; though shrinking &mdash; still identifies k = 3. Push far enough and the gap disappears entirely: the heuristic is honest about telling you there is no clear community structure left to find.</p></div><h2>6.4 Practical limits</h2><table><thead><tr><th>Issue</th><th>Consequence</th><th>Mitigation</th></tr></thead><tbody><tr><td>Full eigendecomposition is O(\(n^3\))</td><td>infeasible past ~\(10^4\) nodes</td><td>Lanczos / ARPACK on the sparse matrix (only k eigenvectors needed), or Nystr&ouml;m sub-sampling</td></tr><tr><td>Transductive by construction</td><td>a new point requires recomputing the eigenvectors</td><td>out-of-sample extension via the Nystr&ouml;m formula; or move to a GNN (Section 8)</td></tr><tr><td>Very sensitive to \(\sigma\) and k of the graph</td><td>unstable clusterings</td><td>local scaling <a class="cite" href="#ref-zelnik2004">[11]</a>; inspect the graph before trusting the output</td></tr><tr><td>Assumes balanced clusters</td><td>NCut's denominator penalises small clusters</td><td>use k larger than expected and merge, or switch to a density method</td></tr><tr><td>Rounding is heuristic</td><td>the relaxed solution is not a partition</td><td>sweep cut with the Cheeger guarantee <a class="cite" href="#ref-cheeger1970">[9]</a> rather than a plain sign cut</td></tr></tbody></table><p>Even with these caveats spectral clustering remains a first-choice method whenever the data come as a graph, or whenever cluster shape is unknown and n is moderate. Shi and Malik's normalized cuts <a class="cite" href="#ref-shi2000">[4]</a> was the state of the art in image segmentation for a decade for exactly this reason, and its NCut objective is still a standard baseline.</p><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Conductance of every prefix cut along the Fiedler ordering.</p><div id="jxg18" class="viz-board" style="height:480px;"></div><p class="viz-caption"><strong>Figure.</strong> The sweep cut. Nodes are sorted by their Fiedler value and the conductance \(\phi =\) cut / min(vol A, vol \(\overline{A}\)) is computed for each of the n&minus;1 prefix cuts. The minimum (marked) is the partition returned, and Cheeger's inequality guarantees it is within a factor \(\sqrt{2/\lambda_2}\) of the optimum. Note that the naive sign cut &mdash; split at value 0 &mdash; is often close but not always equal to the sweep minimum.</p></div><h2>Summary</h2><ul><li>Balanced graph cuts (RatioCut, NCut) are NP-hard <a class="cite" href="#ref-wagner1993">[8]</a>; spectral clustering drops the discreteness constraint.</li><li>The relaxed problem is min \(f^{T}\)Lf over \(f \perp\) <strong>1</strong>, solved by the Fiedler vector <a class="cite" href="#ref-fiedler1973b">[2]</a>.</li><li>Cheeger's inequality \(\lambda_2/2 \le \phi (G) \le \sqrt{2\lambda_2}\) bounds how much the relaxation can lose <a class="cite" href="#ref-cheeger1970">[9]</a> <a class="cite" href="#ref-alon1985">[10]</a>.</li><li>RatioCut \(\to L, NCut\to L_{rw}\) <a class="cite" href="#ref-shi2000">[4]</a> or \(L_{sym}\) <a class="cite" href="#ref-ng2001">[5]</a>.</li><li>The k eigenvectors give an embedding &mdash; identical to Laplacian eigenmaps <a class="cite" href="#ref-belkin2003">[7]</a> &mdash; in which k-means finally works.</li><li>Choose k by the eigengap; choose the similarity graph very carefully <a class="cite" href="#ref-luxburg2007">[6]</a>.</li><li>O(\(n^3\)) cost and transductivity are the two limits that motivate the scalable, inductive methods of Sections 7 and 8.</li></ul><h2>References</h2><ol class="reflist"><li id="ref-donath1973">Donath, W. E. &amp; Hoffman, A. J. (1973). Lower bounds for the partitioning of graphs. <em>IBM Journal of Research and Development</em>, 17(5), 420&ndash;425. DOI: 10.1147/rd.175.0420 <a href="https://doi.org/10.1147/rd.175.0420">https://doi.org/10.1147/rd.175.0420</a></li><li id="ref-fiedler1973b">Fiedler, M. (1973). Algebraic connectivity of graphs. <em>Czechoslovak Mathematical Journal</em>, 23(2), 298&ndash;305. DOI: 10.21136/CMJ.1973.101168 <a href="https://doi.org/10.21136/CMJ.1973.101168">https://doi.org/10.21136/CMJ.1973.101168</a></li><li id="ref-hagen1992">Hagen, L. &amp; Kahng, A. B. (1992). New spectral methods for ratio cut partitioning and clustering. <em>IEEE Transactions on CAD</em>, 11(9), 1074&ndash;1085. DOI: 10.1109/43.159993 <a href="https://doi.org/10.1109/43.159993">https://doi.org/10.1109/43.159993</a></li><li id="ref-shi2000">Shi, J. &amp; Malik, J. (2000). Normalized cuts and image segmentation. <em>IEEE TPAMI</em>, 22(8), 888&ndash;905. DOI: 10.1109/34.868688 <a href="https://doi.org/10.1109/34.868688">https://doi.org/10.1109/34.868688</a></li><li id="ref-ng2001">Ng, A. Y., Jordan, M. I. &amp; Weiss, Y. (2001). On spectral clustering: analysis and an algorithm. <em>NeurIPS 14</em>, 849&ndash;856. <a href="https://papers.nips.cc/paper/2092-on-spectral-clustering-analysis-and-an-algorithm">https://papers.nips.cc/paper/2092-on-spectral-clustering-analysis-and-an-algorithm</a></li><li id="ref-luxburg2007">von Luxburg, U. (2007). A tutorial on spectral clustering. <em>Statistics and Computing</em>, 17(4), 395&ndash;416. DOI: 10.1007/s11222-007-9033-z <a href="https://doi.org/10.1007/s11222-007-9033-z">https://doi.org/10.1007/s11222-007-9033-z</a></li><li id="ref-belkin2003">Belkin, M. &amp; Niyogi, P. (2003). Laplacian eigenmaps for dimensionality reduction and data representation. <em>Neural Computation</em>, 15(6), 1373&ndash;1396. DOI: 10.1162/089976603321780317 <a href="https://doi.org/10.1162/089976603321780317">https://doi.org/10.1162/089976603321780317</a></li><li id="ref-wagner1993">Wagner, D. &amp; Wagner, F. (1993). Between min cut and graph bisection. <em>MFCS '93</em>, LNCS 711, 744&ndash;750. DOI: 10.1007/3-540-57182-5_65 (NP-hardness of balanced cuts). <a href="https://doi.org/10.1007/3-540-57182-5_65">https://doi.org/10.1007/3-540-57182-5_65</a></li><li id="ref-cheeger1970">Cheeger, J. (1970). A lower bound for the smallest eigenvalue of the Laplacian. In <em>Problems in Analysis</em>, Princeton University Press, 195&ndash;199. DOI: 10.1515/9781400869312-013 <a href="https://doi.org/10.1515/9781400869312-013">https://doi.org/10.1515/9781400869312-013</a></li><li id="ref-alon1985">Alon, N. &amp; Milman, V. D. (1985). \(\lambda_1\), isoperimetric inequalities for graphs, and superconcentrators. <em>Journal of Combinatorial Theory B</em>, 38(1), 73&ndash;88. DOI: 10.1016/0095-8956(85)90092-9 <a href="https://doi.org/10.1016/0095-8956(85)90092-9">https://doi.org/10.1016/0095-8956(85)90092-9</a></li><li id="ref-zelnik2004">Zelnik-Manor, L. &amp; Perona, P. (2004). Self-tuning spectral clustering. <em>NeurIPS 17</em>, 1601&ndash;1608. <a href="https://papers.nips.cc/paper/2619-self-tuning-spectral-clustering">https://papers.nips.cc/paper/2619-self-tuning-spectral-clustering</a></li><li id="ref-lee2014">Lee, J. R., Oveis Gharan, S. &amp; Trevisan, L. (2014). Multiway spectral partitioning and higher-order Cheeger inequalities. <em>Journal of the ACM</em>, 61(6), article 37. DOI: 10.1145/2665063 <a href="https://doi.org/10.1145/2665063">https://doi.org/10.1145/2665063</a></li><li id="ref-chung1997b">Chung, F. R. K. (1997). <em>Spectral Graph Theory</em>. AMS. <a href="https://bookstore.ams.org/cbms-92">https://bookstore.ams.org/cbms-92</a></li></ol><nav class="lesson-nav"><div class="container"><a href="../index.html">Course index</a><a href="../05-graph-foundations/page.html">\(\leftarrow\) Section 5</a><a href="../07-node-embeddings/page.html">Section 7 — Node Embeddings &amp; PageRank \(\to\)</a></div></nav>
+</main>
+<footer class="site-footer"><strong>Machine Learning A&ndash;Z</strong> &middot; From empirical risk minimisation to graph neural networks<span class="footer-meta">Edition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">The interactive figure could not be loaded. Check your network connection.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+// Colours resolved from the stylesheet, so the figures follow the light/dark
+// theme. Each entry is a function: board attributes that are functions are
+// re-evaluated on update, so a theme switch only needs a redraw.
+var BOARDS = [];
+function cssv(name, fallback){
+    try {
+        var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback;
+    } catch (e) { return fallback; }
+}
+var PAL = {
+    text:  function(){ return cssv('--color-text',  '#1f2937'); },
+    muted: function(){ return cssv('--color-muted', '#6b7280'); },
+    axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+    ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+    grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+    cell:  function(){ return cssv('--cell-bg',     '#ffffff'); }
+};
+// Re-render every board when the theme attribute flips.
+if (window.MutationObserver) {
+    new MutationObserver(function(){
+        for (var i = 0; i < BOARDS.length; i++) {
+            try { BOARDS[i].fullUpdate(); } catch (e) {}
+        }
+    }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+
+
+// ================================================== linear algebra helpers
+function jacobiEig(Ain){                       // symmetric eigendecomposition, n small
+    var n = Ain.length, i, j, k, p, q;
+    var A = Ain.map(function(r){ return r.slice(); });
+    var V = [];
+    for (i=0;i<n;i++){ V.push(new Array(n).fill(0)); V[i][i] = 1; }
+    for (var sweep=0; sweep<100; sweep++){
+        var off = 0;
+        for (i=0;i<n;i++) for (j=i+1;j<n;j++) off += A[i][j]*A[i][j];
+        if (off < 1e-14) break;
+        for (p=0;p<n-1;p++){
+            for (q=p+1;q<n;q++){
+                if (Math.abs(A[p][q]) < 1e-15) continue;
+                var theta = (A[q][q] - A[p][p])/(2*A[p][q]);
+                var t = Math.sign(theta || 1)/(Math.abs(theta) + Math.sqrt(theta*theta + 1));
+                var c = 1/Math.sqrt(t*t + 1), s = t*c;
+                for (k=0;k<n;k++){
+                    var akp = A[k][p], akq = A[k][q];
+                    A[k][p] = c*akp - s*akq;  A[k][q] = s*akp + c*akq;
+                }
+                for (k=0;k<n;k++){
+                    var apk = A[p][k], aqk = A[q][k];
+                    A[p][k] = c*apk - s*aqk;  A[q][k] = s*apk + c*aqk;
+                }
+                for (k=0;k<n;k++){
+                    var vkp = V[k][p], vkq = V[k][q];
+                    V[k][p] = c*vkp - s*vkq;  V[k][q] = s*vkp + c*vkq;
+                }
+            }
+        }
+    }
+    var pairs = [];
+    for (i=0;i<n;i++) pairs.push({val:A[i][i], vec:V.map(function(r){ return r[i]; })});
+    pairs.sort(function(a,b){ return a.val - b.val; });
+    return pairs;
+}
+function laplacianOf(n, edges){
+    var L = [];
+    for (var i=0;i<n;i++) L.push(new Array(n).fill(0));
+    edges.forEach(function(e){
+        L[e[0]][e[1]] -= 1; L[e[1]][e[0]] -= 1;
+        L[e[0]][e[0]] += 1; L[e[1]][e[1]] += 1;
+    });
+    return L;
+}
+
+// ================================================== two-community graph, figures 6.1 & 6.3
+var C_N = 12;
+var C_BASE = [[0,1],[0,2],[1,2],[1,3],[2,3],[0,3],[2,4],[3,4],[0,4],[1,4],
+              [6,7],[6,8],[7,8],[7,9],[8,9],[6,9],[8,10],[9,10],[6,10],[7,10],
+              [5,0],[5,1],[5,2],[11,6],[11,7],[11,8]];
+var C_BRIDGE = [[4,6],[3,11],[5,10],[0,7],[2,9],[1,8]];
+var C_POS = [[1.6,6.6],[1.0,4.6],[2.9,5.4],[2.4,7.6],[3.8,6.4],[0.6,6.0],
+             [8.2,6.4],[9.4,7.6],[9.0,5.4],[10.6,6.0],[10.2,7.2],[11.2,5.2]];
+
+function commEdges(nb){ return C_BASE.concat(C_BRIDGE.slice(0, nb)); }
+
+// ---------------------------------------------------------------- Figure 6.1
+var b16 = JXG.JSXGraph.initBoard('jxg16', {
+    boundingbox: [-0.8, 9.4, 12.4, -5.2], axis: false, showCopyright: false,
+    showNavigation: false, keepaspectratio: false
+});
+var brS = b16.create('slider', [[0.0, 8.9], [4.2, 8.9], [0, 1, 6]],
+                     {name:'bridges', snapWidth:1, strokeColor:'#026573',
+                      fillColor:'#026573', label:{fontSize:15}});
+var fiedCache = {};
+function fiedler(nb){
+    if (!fiedCache[nb]){
+        var pairs = jacobiEig(laplacianOf(C_N, commEdges(nb)));
+        var v = pairs[1].vec;
+        var mx = Math.max.apply(null, v.map(Math.abs)) || 1;
+        v = v.map(function(x){ return x/mx; });
+        if (v[0] < 0) v = v.map(function(x){ return -x; });   // fix the sign for display
+        fiedCache[nb] = {vec:v, l2:Math.max(0, pairs[1].val),
+                         lam:pairs.map(function(p){ return Math.max(0, p.val); })};
+    }
+    return fiedCache[nb];
+}
+function heat(t){                                    // t in [-1,1]
+    var s = (t+1)/2;
+    var r = Math.round(37 + s*(220-37)), g = Math.round(99 - s*(99-38)),
+        b = Math.round(235 - s*(235-38));
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+}
+var cNodes = C_POS.map(function(pos, v){
+    return b16.create('point', pos, {
+        name:String(v), size:9, strokeColor:PAL.text, strokeWidth:1.5, fixed:true,
+        label:{fontSize:12, offset:[0,18], cssStyle:'font-family:Georgia,serif;'},
+        fillColor: function(){ return heat(fiedler(Math.round(brS.Value())).vec[v]); }
+    });
+});
+C_BASE.forEach(function(e){
+    b16.create('segment', [cNodes[e[0]], cNodes[e[1]]],
+               {strokeColor:PAL.ref, strokeWidth:2, highlight:false, layer:4});
+});
+C_BRIDGE.forEach(function(e, idx){
+    b16.create('segment', [cNodes[e[0]], cNodes[e[1]]], {
+        highlight:false, layer:4, strokeColor:'#dc2626',
+        strokeWidth: function(){ return Math.round(brS.Value()) > idx ? 3 : 0; }
+    });
+});
+// lower panel: the Fiedler value of each node on a line
+b16.create('segment', [[0.5, -2.6], [11.5, -2.6]], {strokeColor:PAL.axis, strokeWidth:2,
+          highlight:false});
+b16.create('text', [0.2, -3.3, '&minus;1'], {fontSize:13, strokeColor:PAL.muted,
+          cssStyle:'font-family:Georgia,serif;'});
+b16.create('text', [11.3, -3.3, '+1'], {fontSize:13, strokeColor:PAL.muted,
+          cssStyle:'font-family:Georgia,serif;'});
+b16.create('segment', [[6.0, -2.2], [6.0, -3.0]], {strokeColor:PAL.text, strokeWidth:2,
+          dash:2, highlight:false});
+b16.create('text', [5.55, -3.3, 'sign cut'], {fontSize:12.5, strokeColor:PAL.text,
+          cssStyle:'font-family:Georgia,serif;'});
+for (var v=0; v<C_N; v++){
+    (function(vv){
+        b16.create('point', [function(){ return 6.0 + 5.2*fiedler(Math.round(brS.Value())).vec[vv]; },
+                             -2.6],
+                   {size:6, name:String(vv), fixed:true, strokeColor:PAL.text, strokeWidth:1.5,
+                    label:{fontSize:11, offset:[0,15], cssStyle:'font-family:Georgia,serif;'},
+                    fillColor: function(){ return heat(fiedler(Math.round(brS.Value())).vec[vv]); }});
+    })(v);
+}
+b16.create('text', [-0.7, -1.5, 'entries of the Fiedler vector u&#8322;'],
+          {fontSize:15, color:'#026573', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b16.create('text', [5.2, 8.9, function(){
+    return '&lambda;&#8322; = ' + fiedler(Math.round(brS.Value())).l2.toFixed(4);
+}], {fontSize:16, color:'#026573', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b16.create('text', [5.2, 8.2, function(){
+    var nb = Math.round(brS.Value());
+    var v = fiedler(nb).vec;
+    var gap = Math.min.apply(null, v.filter(function(x){ return x > 0; })) -
+              Math.max.apply(null, v.filter(function(x){ return x <= 0; }));
+    return (nb <= 2) ? 'clean separation &mdash; u&#8322; is nearly piecewise constant'
+                     : (nb <= 4 ? 'separation weakening &mdash; entries drifting to the middle'
+                                : 'communities merged &mdash; no meaningful bipartition left');
+}], {fontSize:14, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+b16.create('text', [-0.7, -4.6, 'blue = negative entry,  red = positive.  Red edges are the bridges.'],
+          {fontSize:13, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+
+// ---------------------------------------------------------------- Figure 6.2
+var b17 = JXG.JSXGraph.initBoard('jxg17', {
+    boundingbox: [-1.0, 7.2, 13.5, -1.9], axis: false, showCopyright: false,
+    showNavigation: false, keepaspectratio: false
+});
+var T_N = 12;
+var T_BASE = [[0,1],[1,2],[2,3],[3,0],[0,2],
+              [4,5],[5,6],[6,7],[7,4],[4,6],
+              [8,9],[9,10],[10,11],[11,8],[8,10]];
+var T_BRIDGE = [[3,4],[7,8],[11,0],[2,5],[6,9],[10,1]];
+var trS = b17.create('slider', [[0.0, 6.7], [4.2, 6.7], [0, 0, 6]],
+                     {name:'bridges', snapWidth:1, strokeColor:'#026573',
+                      fillColor:'#026573', label:{fontSize:15}});
+var specCache = {};
+function spectrum(nb){
+    if (!specCache[nb]){
+        specCache[nb] = jacobiEig(laplacianOf(T_N, T_BASE.concat(T_BRIDGE.slice(0, nb))))
+                        .map(function(p){ return Math.max(0, p.val); });
+    }
+    return specCache[nb];
+}
+var SCALE = 0.85;
+for (var i=0;i<T_N;i++){
+    (function(ii){
+        var x = 0.4 + ii*1.05;
+        b17.create('polygon', [[x, 0], [x+0.72, 0],
+                               [x+0.72, function(){ return SCALE*spectrum(Math.round(trS.Value()))[ii]; }],
+                               [x, function(){ return SCALE*spectrum(Math.round(trS.Value()))[ii]; }]], {
+            vertices:{visible:false}, highlight:false,
+            borders:{strokeColor:'#014a54', strokeWidth:1.2, highlight:false},
+            fillColor: (ii < 3) ? '#dc2626' : '#026573', fillOpacity:0.85
+        });
+        b17.create('text', [x+0.36, -0.45, '&lambda;<sub>' + (ii+1) + '</sub>'],
+                   {fontSize:12.5, anchorX:'middle', strokeColor:PAL.muted,
+                    cssStyle:'font-family:Georgia,serif;'});
+        b17.create('text', [x+0.36, function(){
+            return SCALE*spectrum(Math.round(trS.Value()))[ii] + 0.22;
+        }, function(){
+            return spectrum(Math.round(trS.Value()))[ii].toFixed(2);
+        }], {fontSize:11.5, anchorX:'middle', strokeColor:PAL.text,
+             cssStyle:'font-family:Courier New,monospace;'});
+    })(i);
+}
+b17.create('segment', [[0.2, 0], [13.0, 0]], {strokeColor:PAL.text, strokeWidth:2,
+          highlight:false});
+b17.create('text', [5.2, 6.7, function(){
+    var s = spectrum(Math.round(trS.Value()));
+    var gaps = [], mx = 0, arg = 1;
+    for (var t=1;t<8;t++){ var g = s[t]-s[t-1]; if (g > mx){ mx = g; arg = t; } }
+    return 'largest eigengap after &lambda;<sub>' + arg + '</sub>  &rarr;  choose k = ' + arg;
+}], {fontSize:16, color:'#026573', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b17.create('text', [5.2, 6.0, function(){
+    var s = spectrum(Math.round(trS.Value()));
+    return '&lambda;&#8324; &minus; &lambda;&#8323; = ' + (s[3]-s[2]).toFixed(4);
+}], {fontSize:14, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+b17.create('text', [-0.9, -1.4, 'red bars: the three smallest eigenvalues (zero when the graph has 3 components)'],
+          {fontSize:13, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+
+// ---------------------------------------------------------------- Figure 6.3
+var b18 = JXG.JSXGraph.initBoard('jxg18', {
+    boundingbox: [-1.4, 1.15, 12.4, -0.42], axis: false, showCopyright: false,
+    showNavigation: false, keepaspectratio: false
+});
+function sweep(nb){
+    var E = commEdges(nb), v = fiedler(nb).vec;
+    var order = [];
+    for (var i=0;i<C_N;i++) order.push(i);
+    order.sort(function(a,b){ return v[a]-v[b]; });
+    var deg = new Array(C_N).fill(0);
+    E.forEach(function(e){ deg[e[0]]++; deg[e[1]]++; });
+    var volAll = deg.reduce(function(u,w){ return u+w; }, 0);
+    var inA = new Array(C_N).fill(false), res = [];
+    var volA = 0;
+    for (var k=0;k<C_N-1;k++){
+        inA[order[k]] = true;
+        volA += deg[order[k]];
+        var cut = 0;
+        E.forEach(function(e){ if (inA[e[0]] !== inA[e[1]]) cut++; });
+        var denom = Math.min(volA, volAll - volA) || 1;
+        res.push({k:k+1, phi:cut/denom, cut:cut});
+    }
+    return res;
+}
+var SW = sweep(1);
+var best = SW.reduce(function(a, b){ return b.phi < a.phi ? b : a; }, SW[0]);
+var mxPhi = Math.max.apply(null, SW.map(function(r){ return r.phi; })) || 1;
+SW.forEach(function(r, idx){
+    var x = 0.4 + idx*1.02;
+    b18.create('polygon', [[x, 0], [x+0.7, 0], [x+0.7, r.phi/mxPhi], [x, r.phi/mxPhi]], {
+        vertices:{visible:false}, highlight:false,
+        borders:{strokeColor:'#014a54', strokeWidth:1.2, highlight:false},
+        fillColor: (r.k === best.k) ? '#16a34a' : '#026573', fillOpacity:0.85});
+    b18.create('text', [x+0.35, -0.12, '|A|=' + r.k], {fontSize:11.5, anchorX:'middle',
+              strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+    b18.create('text', [x+0.35, r.phi/mxPhi + 0.05, r.phi.toFixed(3)],
+              {fontSize:11, anchorX:'middle', strokeColor:PAL.text,
+               cssStyle:'font-family:Courier New,monospace;'});
+});
+b18.create('segment', [[0.2, 0], [11.8, 0]], {strokeColor:PAL.text, strokeWidth:2,
+          highlight:false});
+b18.create('text', [-1.3, 1.08,
+    'sweep cut on the Fiedler ordering:  minimum conductance &phi; = ' + best.phi.toFixed(4) +
+    ' at |A| = ' + best.k],
+    {fontSize:15, color:'#16a34a', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b18.create('text', [-1.3, 0.94, function(){
+    var l2 = fiedler(1).l2;
+    return 'Cheeger bounds:  &lambda;&#8322;/2 = ' + (l2/2).toFixed(4) +
+           '  &le;  &phi;(G)  &le;  &radic;(2&lambda;&#8322;) = ' + Math.sqrt(2*l2).toFixed(4);
+}], {fontSize:14, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+b18.create('text', [-1.3, -0.33, 'prefix cuts of the nodes sorted by their Fiedler value (1 bridge)'],
+          {fontSize:13, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+
+})();
+</script>
+</body>
+</html>

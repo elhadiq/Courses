@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algorithms of Section 1</title>
+<link href="../assets/style.css" rel="stylesheet">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+
+/* Use the full width the theme allows: the shared stylesheet caps a lesson at
+   880px, which leaves wide figures and tables boxed into the middle of a large
+   screen. --max-w is the theme's own page width, so this stays consistent with
+   the landing page. */
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) {
+  .lesson-content { padding-left: 16px; padding-right: 16px; }
+}
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule);
+               padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center;
+               padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.lesson-nav { max-width: 880px; margin: 0 auto 40px; padding: 0 24px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav .container { display: flex; gap: 18px; flex-wrap: wrap; width: 100%; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600;
+                font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.keypoints h4 { margin-top: 0; }
+
+.algo-tag { color: var(--color-muted); font-size: 0.86rem; font-style: italic;
+            margin: -0.4em 0 1em; }
+.algo-steps { border: 1px solid var(--color-rule); border-radius: var(--radius);
+              background: var(--proof-bg); padding: 4px 22px 14px;
+              margin: 1.2em 0; }
+.algo-steps-title { color: var(--primary); font-weight: 700; font-size: 0.8rem;
+                    letter-spacing: 0.09em; text-transform: uppercase;
+                    margin: 14px 0 4px; }
+.algo-steps ol { padding-left: 1.4em; }
+.algo-steps li { margin: 0.55em 0; line-height: 1.75; }
+.annex-toc { background: var(--primary-soft); border-radius: var(--radius);
+             padding: 16px 24px; margin: 1.4em 0; }
+.annex-toc ul { margin: 0.4em 0; }
+.annex-toc a { color: var(--primary-dark); font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Machine Learning A&ndash;Z</a> &middot; Course</div><span class="course-code">Graph-based machine learning</span></div></header>
+<section class="lesson-hero"><div class="container"><div class="lesson-label">Part I &middot; Section 1 &middot; Annex</div><h1>Algorithms of Section 1</h1><div class="lesson-sub">Least squares, gradient descent, cross-validation and ridge regression, set out step by step.</div></div></section>
+<main class="lesson-content">
+<h2>Annex &mdash; the algorithms of Section 1</h2><div class="box tip"><div class="box-title">How to read this annex</div><p>Each algorithm is set out the same way: what it is handed, what it must hand back, then the steps in the order you would carry them out. A small example is worked through by hand so you can check your understanding against real numbers, and the closing boxes say why the method is correct, why it stops, and what it costs. Nothing here assumes you can read a program &mdash; the point is the reasoning.</p></div><div class="annex-toc"><strong>Algorithms in this annex</strong><ul><li><a href="#algo1">Ordinary least squares by the normal equations</a></li><li><a href="#algo2">Batch gradient descent</a></li><li><a href="#algo3">K-fold cross-validation</a></li><li><a href="#algo4">Ridge regression</a></li></ul></div><span id="algo1"></span><h3>Ordinary least squares by the normal equations</h3><p class="algo-tag">Direct method \(\cdot\) exact solution in one shot</p><p>Fit a straight line (or a hyperplane) through a cloud of points so that the total squared vertical distance to the line is as small as possible.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A table of \(n\) observations. Each row has \(d\) input numbers and one output number.</p><p><strong>Produce.</strong> The \(d+1\) coefficients of the fitted function: one intercept and one slope per input.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Add a column of ones.</strong> Put a column of 1s at the front of the input table. This is a bookkeeping trick: the intercept then behaves like any other coefficient and needs no special treatment.</li><li><strong>Form the square summary matrix.</strong> For every pair of columns, multiply them entry by entry and add up. This gives a small square table with one row and column per input &mdash; the matrix \(X^{T}X\). Its size does not depend on how many observations you have, only on how many inputs.</li><li><strong>Form the right-hand side.</strong> For every input column, multiply it entry by entry with the output column and add up. This gives one number per input &mdash; the vector \(X^{T}y\).</li><li><strong>Solve the small linear system.</strong> Solve \(X^{T}X\,\theta = X^{T}y\) for \(\theta\). This is an ordinary system of \(d+1\) equations in \(d+1\) unknowns, solved by elimination. Do <em>not</em> compute the inverse matrix and multiply &mdash; solving directly is faster and far more accurate numerically.</li><li><strong>Read off the answer.</strong> The first coefficient is the intercept, the rest are the slopes.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Four points, one input. The columns to accumulate are shown in full.</p><table><thead><tr><th>Observation</th><th>\(x\)</th><th>\(y\)</th><th>\(x^2\)</th><th>\(xy\)</th></tr></thead><tbody><tr><td>1</td><td>1</td><td>2</td><td>1</td><td>2</td></tr><tr><td>2</td><td>2</td><td>4</td><td>4</td><td>8</td></tr><tr><td>3</td><td>3</td><td>5</td><td>9</td><td>15</td></tr><tr><td>4</td><td>4</td><td>9</td><td>16</td><td>36</td></tr><tr><td><strong>Totals</strong></td><td><strong>10</strong></td><td><strong>20</strong></td><td><strong>30</strong></td><td><strong>61</strong></td></tr></tbody></table><p>With \(n=4\), the two normal equations are \(4\theta_0 + 10\theta_1 = 20\) and \(10\theta_0 + 30\theta_1 = 61\). Eliminating gives \(\theta_1 = 2.1\) and \(\theta_0 = -0.25\), so the fitted line is \(y = 2.1x - 0.25\).</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>The fitted values are the orthogonal projection of the outputs onto the space of things the inputs can express. Because the projection is orthogonal, the leftover errors are at right angles to every input column: no input carries any unused information. That is exactly the condition the normal equations state, so any solution of them is a minimiser, and the objective being convex means there is no other.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>There is no loop to worry about. Elimination on a system of \(d+1\) equations finishes after a fixed number of steps.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>Building the summary matrix dominates: about \(n(d+1)^2\) multiplications, then roughly \((d+1)^3/3\) to solve. Linear in the number of observations, cubic in the number of inputs &mdash; so it is the <em>width</em> of the table, not its length, that hurts.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>If two inputs are exact copies of one another, or one is a sum of others, the summary matrix cannot be solved &mdash; infinitely many coefficient sets fit equally well. Drop the redundant column, or use the ridge variant below.</li><li>If two inputs are <em>almost</em> redundant, the solution still exists but swings wildly with tiny changes in the data. Watch for huge coefficients of opposite sign.</li><li>One far-away point can drag the whole line towards it, because the cost grows with the <em>square</em> of the error.</li></ul></div><span id="algo2"></span><h3>Batch gradient descent</h3><p class="algo-tag">Iterative method \(\cdot\) approaches the answer gradually</p><p>Reach the same best-fitting coefficients without ever building or solving a matrix system, by repeatedly nudging the coefficients downhill.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> The same table, a starting guess for the coefficients (all zeros will do), a step size \(\eta\), and a number of rounds.</p><p><strong>Produce.</strong> Coefficients that are close to the best-fitting ones &mdash; closer the more rounds you run.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Predict with the current coefficients.</strong> For every observation, combine its inputs with the current coefficients to get a predicted output.</li><li><strong>Measure the leftovers.</strong> Subtract each prediction from the true output. A positive leftover means the prediction was too low.</li><li><strong>Ask each coefficient how it contributed.</strong> For each input column, multiply the leftovers by that column entry by entry and average. A large positive value means increasing this coefficient would reduce the error.</li><li><strong>Take a step.</strong> Move each coefficient a little in the direction that reduces the error, the size of the move being \(\eta\) times the quantity just computed.</li><li><strong>Repeat.</strong> Go back to the first step. Stop when the coefficients barely move, or after the agreed number of rounds.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>One input, no intercept, two points \((1,2)\) and \((2,4)\), starting from \(\theta = 0\) with \(\eta = 0.1\). The exact answer is \(\theta = 2\).</p><table><thead><tr><th>Round</th><th>coefficient</th><th>predictions</th><th>leftovers</th><th>downhill direction</th></tr></thead><tbody><tr><td>0</td><td>0.00</td><td>0, 0</td><td>2, 4</td><td>10.0</td></tr><tr><td>1</td><td>1.00</td><td>1, 2</td><td>1, 2</td><td>5.0</td></tr><tr><td>2</td><td>1.50</td><td>1.5, 3</td><td>0.5, 1</td><td>2.5</td></tr><tr><td>3</td><td>1.75</td><td>1.75, 3.5</td><td>0.25, 0.5</td><td>1.25</td></tr><tr><td>4</td><td>1.88</td><td>1.88, 3.75</td><td>0.12, 0.25</td><td>0.63</td></tr></tbody></table><p>Each round closes half the remaining gap. The distance to the answer is multiplied by the same factor every time &mdash; that is what geometric convergence looks like in a table.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>Provided the step is not too large, every round leaves the total error no larger than before. The error surface for this problem is a bowl with a single lowest point, so a sequence that never goes uphill and never stalls can only be heading for that point.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>It does not stop by itself. You stop it &mdash; after a fixed number of rounds, or once the change in the coefficients falls below a threshold you choose.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>One pass over the whole table per round: about \(nd\) multiplications. Cheap per round, but you need many rounds. Attractive exactly when \(d\) is too large for the direct method.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>Too large a step and the coefficients oscillate and then blow up. The safe ceiling is governed by the largest curvature of the bowl.</li><li>Too small a step and it crawls; you may stop while still far away and mistake that for the answer.</li><li>If one input ranges over thousands and another over fractions, the bowl becomes a long narrow valley and progress is painfully slow. Rescale every input to a comparable range first.</li></ul></div><div class="box tip"><div class="box-title">Worth knowing</div><p>Using one randomly chosen observation per round instead of all of them gives the stochastic variant. Each step is then noisy but \(n\) times cheaper, which is the only practical option on very large tables.</p></div><span id="algo3"></span><h3>K-fold cross-validation</h3><p class="algo-tag">Evaluation procedure \(\cdot\) wraps around any method</p><p>Estimate honestly how well a fitted model will do on data it has never seen, using only the data you already have.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> The full dataset, a number of folds \(K\) (5 or 10 in practice), and a fitting method to assess.</p><p><strong>Produce.</strong> One error estimate, together with a spread that tells you how much to trust it.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Shuffle, then deal into K piles.</strong> Shuffle the observations once, then deal them out into \(K\) piles of roughly equal size, like dealing cards.</li><li><strong>Hold out one pile.</strong> Set pile number one aside. It is now untouchable.</li><li><strong>Fit on the rest.</strong> Fit the model using only the other \(K-1\) piles. Every choice the method makes &mdash; including any preprocessing that learns from data &mdash; must be made from these piles alone.</li><li><strong>Score on the held-out pile.</strong> Predict the observations in the pile you set aside and record the error. These predictions are honest, because nothing about that pile influenced the fit.</li><li><strong>Rotate.</strong> Put the pile back, set aside the next one, and repeat until every pile has been the held-out one exactly once.</li><li><strong>Combine.</strong> Average the \(K\) recorded errors. Report the spread alongside the average &mdash; an average of 0.30 with a spread of 0.02 means something quite different from the same average with a spread of 0.15.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Six observations, three folds. Dealing in turn puts observation 1 in fold A, 2 in B, 3 in C, 4 in A, and so on.</p><table><thead><tr><th>Round</th><th>Held out</th><th>Fitted on</th><th>Gives</th></tr></thead><tbody><tr><td>1</td><td>1, 4</td><td>2, 3, 5, 6</td><td>error on 1 and 4</td></tr><tr><td>2</td><td>2, 5</td><td>1, 3, 4, 6</td><td>error on 2 and 5</td></tr><tr><td>3</td><td>3, 6</td><td>1, 2, 4, 5</td><td>error on 3 and 6</td></tr></tbody></table><p>Every observation is predicted exactly once by a model that never saw it, so all six contribute to the estimate without any of them being scored by a model that had already met them.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>Each prediction is made by a model fitted without that observation. The estimate is therefore of the error on genuinely new data, not of the error the model makes on what it memorised.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Exactly \(K\) rounds, decided before you start.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>\(K\) complete fits. That is the whole price, and it is why \(K = n\) (holding out one observation at a time) is rarely worth it.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li><strong>The classic mistake:</strong> standardising, selecting features, or imputing missing values on the whole dataset before splitting. Information from the held-out pile then leaks into the fit and the estimate comes out flattering. Every such step belongs <em>inside</em> the loop.</li><li>With grouped data &mdash; several readings from the same patient, several sentences from the same document &mdash; deal whole groups into piles, never individual rows.</li><li>With ordered data, dealing at random lets the model learn from the future to predict the past. Split by time instead.</li></ul></div><span id="algo4"></span><h3>Ridge regression</h3><p class="algo-tag">Direct method \(\cdot\) least squares with a brake</p><p>Fit the same kind of function, but discourage large coefficients so the answer is stable when inputs are nearly redundant.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> The same table, plus a penalty strength \(\lambda \gt 0\).</p><p><strong>Produce.</strong> Coefficients that fit slightly less well but move far less when the data are perturbed.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Standardise the inputs.</strong> Rescale every input column to have average 0 and spread 1. This matters here in a way it did not before: the penalty treats all coefficients alike, so they must be on comparable scales or the penalty is arbitrary.</li><li><strong>Build the same summary matrix.</strong> Exactly as for ordinary least squares.</li><li><strong>Add the penalty to the diagonal.</strong> Add \(\lambda\) to each entry running down the main diagonal, and to that diagonal only. Do not penalise the intercept.</li><li><strong>Solve.</strong> Solve the resulting system as before.</li><li><strong>Choose the penalty by cross-validation.</strong> Repeat the whole thing for a range of \(\lambda\) spaced by factors of ten, score each by cross-validation, and keep the best.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Two inputs that are nearly identical, so ordinary least squares is unstable. Watch what the penalty does to the coefficients.</p><table><thead><tr><th>\(\lambda\)</th><th>coefficient 1</th><th>coefficient 2</th><th>sum</th><th>fit quality</th></tr></thead><tbody><tr><td>0</td><td>+41.2</td><td>&minus;39.3</td><td>1.9</td><td>best</td></tr><tr><td>0.01</td><td>+8.7</td><td>&minus;6.8</td><td>1.9</td><td>almost as good</td></tr><tr><td>0.1</td><td>+2.1</td><td>&minus;0.2</td><td>1.9</td><td>slightly worse</td></tr><tr><td>1</td><td>+1.0</td><td>+0.9</td><td>1.9</td><td>noticeably worse</td></tr></tbody></table><p>The two coefficients start out enormous and opposed, nearly cancelling. The penalty pulls them together without changing their sum, which is the part the data actually determine.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>Adding a positive number to the diagonal makes the system solvable even when the original one was not, and the solution it produces is the unique minimiser of the fitting error plus the penalty.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Direct, like ordinary least squares.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>The same as ordinary least squares, plus one full repeat per candidate penalty value.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>Forgetting to standardise makes the penalty fall unevenly and the result meaningless.</li><li>Penalising the intercept shrinks the overall level of the predictions towards zero, which is almost never what you want.</li><li>Choosing \(\lambda\) by looking at the fitting error picks zero every time. It must be chosen on held-out data.</li></ul></div><div class="box tip"><div class="box-title">Worth knowing</div><p>Penalising the sum of absolute values instead of squares gives the lasso, which drives some coefficients to exactly zero and so selects inputs. That variant has no closed form and needs an iterative solver.</p></div><nav class="lesson-nav"><div class="container"><a href="../index.html">Course index</a><a href="page.html">&#8592; Back to the section</a></div></nav>
+</main>
+<footer class="site-footer"><strong>Machine Learning A&ndash;Z</strong> &middot; From empirical risk minimisation to graph neural networks<span class="footer-meta">Edition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">The interactive figure could not be loaded. Check your network connection.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+// Colours resolved from the stylesheet, so the figures follow the light/dark
+// theme. Each entry is a function: board attributes that are functions are
+// re-evaluated on update, so a theme switch only needs a redraw.
+var BOARDS = [];
+function cssv(name, fallback){
+    try {
+        var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback;
+    } catch (e) { return fallback; }
+}
+var PAL = {
+    text:  function(){ return cssv('--color-text',  '#1f2937'); },
+    muted: function(){ return cssv('--color-muted', '#6b7280'); },
+    axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+    ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+    grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+    cell:  function(){ return cssv('--cell-bg',     '#ffffff'); }
+};
+// Re-render every board when the theme attribute flips.
+if (window.MutationObserver) {
+    new MutationObserver(function(){
+        for (var i = 0; i < BOARDS.length; i++) {
+            try { BOARDS[i].fullUpdate(); } catch (e) {}
+        }
+    }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+
+
+})();
+</script>
+</body>
+</html>

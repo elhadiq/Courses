@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 10 exercises — Quantum Complexity, NISQ Algorithms and Qiskit in Practice</title>
+<meta name="description" content="Exercises for chapter 10: Quantum Complexity, NISQ Algorithms and Qiskit in Practice">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = {tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]}, svg:{fontCache:"global"}};</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Quantum Computing</a> · <a href="course.html">Chapter 10</a> · Exercises</div><span class="course-code">Exercise sheet</span></div></header>
+<section class="lesson-hero"><div class="container">
+  <div class="lesson-label">Chapter 10 · exercise sheet</div>
+  <h1>Quantum Complexity, NISQ Algorithms and Qiskit in Practice</h1>
+  <p class="lesson-sub">4 programming exercises ·
+     3 problems with symbolic answers. Every solution is hidden behind a
+     toggle — attempt each one before opening it.</p>
+</div></section>
+<div class="lesson-content">
+<h2>Programming exercises</h2>
+<p>Each exercise is checked automatically against hidden test cases. Only NumPy is required, and the function names in the statement must be used exactly as written.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 10.1</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C10.Q1 — The input format of every variational algorithm</p><p>A Hamiltonian is given as a list of (Pauli string, coefficient) pairs. Its expectation value on a state is the weighted sum of the individual Pauli expectations — exactly what a device measures.</p></div><p>Write <code>pauli_string(s)</code> building the matrix of a string over <code>{'I','X','Y','Z'}</code>; <code>hamiltonian(terms)</code> summing the weighted terms; <code>expectation(psi, H)</code> returning \(\langle\psi|H|\psi\rangle\) as a real float rounded to 6 decimals; and <code>ground_energy(H)</code> returning the smallest eigenvalue, rounded to 6 decimals.</p><div class="stmt"><pre>hamiltonian([('ZZ',1.0)]) -&gt; diag(1,-1,-1,1)
+ground_energy(hamiltonian([('ZZ',1.0),('XI',0.5),('IX',0.5)])) -&gt; -1.414214</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def pauli_string(s):
+    ...
+
+def hamiltonian(terms):
+    ...
+
+def expectation(psi, H):
+    ...
+
+def ground_energy(H):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+print(np.round(np.diag(hamiltonian([(&#x27;ZZ&#x27;,1.0)])).real, 6).tolist())
+→ [1.0, -1.0, -1.0, 1.0]</code></pre><pre><code>import numpy as np
+H = hamiltonian([(&#x27;ZZ&#x27;,1.0),(&#x27;XI&#x27;,0.5),(&#x27;IX&#x27;,0.5)])
+print(ground_energy(H))
+→ -1.414214</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+I2 = np.eye(2, dtype=complex)
+X = np.array([[0, 1], [1, 0]], dtype=complex)
+Y = np.array([[0, -1j], [1j, 0]], dtype=complex)
+Z = np.array([[1, 0], [0, -1]], dtype=complex)
+PAULI = {&#x27;I&#x27;: I2, &#x27;X&#x27;: X, &#x27;Y&#x27;: Y, &#x27;Z&#x27;: Z}
+
+def pauli_string(s):
+    out = np.array([[1.0 + 0j]])
+    for ch in s:
+        out = np.kron(out, PAULI[ch])
+    return out
+
+def hamiltonian(terms):
+    n = len(terms[0][0])
+    H = np.zeros((2 ** n, 2 ** n), dtype=complex)
+    for s, c in terms:
+        H = H + c * pauli_string(s)
+    return H
+
+def expectation(psi, H):
+    psi = np.asarray(psi, dtype=complex).ravel()
+    psi = psi / np.linalg.norm(psi)
+    return round(float(np.real(np.vdot(psi, np.asarray(H, dtype=complex) @ psi))), 6)
+
+def ground_energy(H):
+    H = np.asarray(H, dtype=complex)
+    return round(float(np.linalg.eigvalsh((H + H.conj().T) / 2)[0]), 6)
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 10.2</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C10.Q2 — A complete variational loop</p><p>For \(U(\theta)=e^{-i\theta P/2}\) with \(P^{2}=I\), \(\partial_\theta\langle A\rangle=\tfrac12[\langle A\rangle_{\theta+\pi/2}-\langle A\rangle_{\theta-\pi/2}]\) exactly.</p></div><p>Take the single-qubit ansatz \(|\psi(\theta)\rangle=R_y(\theta)|0\rangle\) with \(R_y(\theta)=\begin{pmatrix}\cos\frac\theta2&-\sin\frac\theta2\\\sin\frac\theta2&\cos\frac\theta2\end{pmatrix}\). Write <code>energy(theta, H)</code>; <code>grad_parameter_shift(theta, H)</code> using the exact rule; and <code>vqe(H, theta0, lr=0.3, steps=300)</code> returning <code>(theta_final, energy_final)</code> with the energy rounded to 6 decimals, by plain gradient descent.</p><div class="stmt"><pre>H = Z:   ground energy -1 at theta = 0
+H = X:   ground energy -1 at theta = -pi/2 (mod 2pi)</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def energy(theta, H):
+    ...
+
+def grad_parameter_shift(theta, H):
+    ...
+
+def vqe(H, theta0, lr=0.3, steps=300):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+print(energy(0.0, Z), energy(np.pi, Z))
+→ 1.0 -1.0</code></pre><pre><code>import numpy as np
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+print(grad_parameter_shift(np.pi/2, Z))
+→ -1.0</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def _ry(theta):
+    c, s = np.cos(theta / 2), np.sin(theta / 2)
+    return np.array([[c, -s], [s, c]], dtype=complex)
+
+def _state(theta):
+    return _ry(theta) @ np.array([1, 0], dtype=complex)
+
+def energy(theta, H):
+    psi = _state(theta)
+    return round(float(np.real(np.vdot(psi, np.asarray(H, dtype=complex) @ psi))), 6)
+
+def _raw_energy(theta, H):
+    psi = _state(theta)
+    return float(np.real(np.vdot(psi, np.asarray(H, dtype=complex) @ psi)))
+
+def grad_parameter_shift(theta, H):
+    return round(0.5 * (_raw_energy(theta + np.pi / 2, H)
+                        - _raw_energy(theta - np.pi / 2, H)), 6)
+
+def vqe(H, theta0, lr=0.3, steps=300):
+    th = float(theta0)
+    for _ in range(steps):
+        g = 0.5 * (_raw_energy(th + np.pi / 2, H) - _raw_energy(th - np.pi / 2, H))
+        th = th - lr * g
+    return (th, energy(th, H))
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 10.3</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C10.Q3 — Combinatorial optimisation, variationally</p><p>MaxCut on a graph \(G=(V,E)\) maximises \(C=\sum_{(i,j)\in E}\tfrac12(1-z_iz_j)\). Encode it as \(H_C=\sum_{(i,j)\in E}\tfrac12(I-Z_iZ_j)\), and use the mixer \(H_M=\sum_i X_i\).</p></div><p>Write <code>maxcut_hamiltonian(n, edges)</code>; <code>qaoa_state(n, edges, gamma, beta)</code> returning \(e^{-i\beta H_M}e^{-i\gamma H_C}|+\rangle^{\otimes n}\); <code>qaoa_expectation(n, edges, gamma, beta)</code> rounded to 6 decimals; and <code>best_cut(n, edges)</code> returning the exact optimum by brute force over the \(2^{n}\) assignments.</p><div class="stmt"><pre>triangle graph: best_cut = 2
+square graph:   best_cut = 4</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+from itertools import product
+
+def maxcut_hamiltonian(n, edges):
+    ...
+
+def qaoa_state(n, edges, gamma, beta):
+    ...
+
+def qaoa_expectation(n, edges, gamma, beta):
+    ...
+
+def best_cut(n, edges):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>print(best_cut(3, [(0,1),(1,2),(0,2)]), best_cut(4, [(0,1),(1,2),(2,3),(3,0)]))
+→ 2 4</code></pre><pre><code>import numpy as np
+print(np.round(np.diag(maxcut_hamiltonian(2, [(0,1)])).real, 6).tolist())
+→ [0.0, 1.0, 1.0, 0.0]</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+from itertools import product
+
+I2 = np.eye(2, dtype=complex)
+X = np.array([[0, 1], [1, 0]], dtype=complex)
+Z = np.array([[1, 0], [0, -1]], dtype=complex)
+
+def _embed(U, q, n):
+    ops = [I2] * n
+    ops[q] = U
+    out = np.array([[1.0 + 0j]])
+    for o in ops:
+        out = np.kron(out, o)
+    return out
+
+def maxcut_hamiltonian(n, edges):
+    H = np.zeros((2 ** n, 2 ** n), dtype=complex)
+    for i, j in edges:
+        H = H + 0.5 * (np.eye(2 ** n, dtype=complex) - _embed(Z, i, n) @ _embed(Z, j, n))
+    return H
+
+def _expm_diag(H, t):
+    w, v = np.linalg.eigh((H + H.conj().T) / 2)
+    return (v * np.exp(-1j * t * w)) @ v.conj().T
+
+def qaoa_state(n, edges, gamma, beta):
+    HC = maxcut_hamiltonian(n, edges)
+    HM = np.zeros((2 ** n, 2 ** n), dtype=complex)
+    for i in range(n):
+        HM = HM + _embed(X, i, n)
+    psi = np.full(2 ** n, 1 / np.sqrt(2 ** n), dtype=complex)
+    psi = _expm_diag(HC, gamma) @ psi
+    psi = _expm_diag(HM, beta) @ psi
+    return psi
+
+def qaoa_expectation(n, edges, gamma, beta):
+    psi = qaoa_state(n, edges, gamma, beta)
+    HC = maxcut_hamiltonian(n, edges)
+    return round(float(np.real(np.vdot(psi, HC @ psi))), 6)
+
+def best_cut(n, edges):
+    best = 0
+    for bits in product([0, 1], repeat=n):
+        cut = sum(1 for i, j in edges if bits[i] != bits[j])
+        best = max(best, cut)
+    return best
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 10.4</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C10.Q4 — Error mitigation, and what it costs</p><p>Zero-noise extrapolation measures an observable at several amplified noise levels \(\lambda_k\) and extrapolates to \(\lambda=0\). Richardson extrapolation is polynomial interpolation evaluated at zero.</p></div><p>Write <code>richardson(lams, vals)</code> returning the value at \(\lambda=0\) of the interpolating polynomial through the given points (use the Lagrange formula, no <code>numpy.polyfit</code> required but allowed), rounded to 6 decimals; and <code>shots_needed(variance, eps)</code> returning \(\lceil \mathrm{Var}/\varepsilon^{2}\rceil\) as an <code>int</code> — the sampling cost of estimating an expectation value to additive error \(\varepsilon\).</p><div class="stmt"><pre>richardson([1,2,3], [0.9, 0.8, 0.7]) -&gt; 1.0
+shots_needed(1.0, 1e-3) -&gt; 1000000</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+from math import ceil
+
+def richardson(lams, vals):
+    ...
+
+def shots_needed(variance, eps):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>print(richardson([1,2,3], [0.9, 0.8, 0.7]))
+→ 1.0</code></pre><pre><code>print(shots_needed(1.0, 1e-3))
+→ 1000000</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+from math import ceil
+
+def richardson(lams, vals):
+    lams = [float(x) for x in lams]
+    vals = [float(v) for v in vals]
+    total = 0.0
+    for i, (li, vi) in enumerate(zip(lams, vals)):
+        term = vi
+        for j, lj in enumerate(lams):
+            if i != j:
+                term *= (0.0 - lj) / (li - lj)
+        total += term
+    return round(total, 6)
+
+def shots_needed(variance, eps):
+    return int(ceil(float(variance) / float(eps) ** 2))
+</code></pre></details>
+</div>
+<h2>Problems with symbolic answers</h2>
+<p>Answers here are expressions rather than numbers, and any algebraically equivalent form is accepted. Give fractions and radicals exactly; decimal approximations are not accepted.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 10.1</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C10.S1 — Counting and classifying</p></div><p>(a) A general \(n\)-qubit Hamiltonian is expanded in the Pauli basis. Give the number of terms, in terms of <code>n</code>.</p><p><span>your answer</span> </p><p>(b) Evaluate that for \(n={@n@}\).</p><p><span>your answer</span> </p><p>(c) A BQP algorithm has success probability \(2/3\). By the Chernoff bound, the number of repetitions needed for failure probability \(\delta\) scales as \(c\cdot\log(1/\delta)\). Give the exponent \(\alpha\) in "repetitions \(=\Theta(\log^{\alpha}(1/\delta))\)".</p><p>\(\alpha=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) The Pauli strings \(\sigma_{\mu_1}\otimes\cdots\otimes\sigma_{\mu_n}\) with \(\mu_i\in\{I,X,Y,Z\}\) number \(4^{n}\), and they form an orthogonal basis of the \(4^{n}\)-dimensional real space of Hermitian operators.</p><p>(b) For \(n={@n@}\): \({@ta2@}\).</p><p>(c) \(\alpha=1\): majority voting over \(O(\log(1/\delta))\) runs suffices, so the constant \(2/3\) in the definition of BQP is arbitrary. Physically relevant Hamiltonians are \(k\)-local with only \(O(n^{k})\) terms — the exponential count above is why <em>arbitrary</em> Hamiltonians are hopeless and structure is everything.</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 10.2</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C10.S2 — Exact gradients from shifted circuits</p></div><p>Let \(U(\theta)=e^{-i\theta P/2}\) with \(P^{2}=I\), and let \(f(\theta)=\langle 0|U^{\dagger}(\theta)\,A\,U(\theta)|0\rangle\).</p><p>(a) Write \(U(\theta)\) in the form \(\alpha(\theta)I-i\beta(\theta)P\) and give \(\alpha(\theta)\).</p><p>\(\alpha(\theta)=\) <span>your answer</span> </p><p>(b) The parameter-shift rule reads \(f\'(\theta)=r\,[f(\theta+s)-f(\theta-s)]\). Give the ordered pair <code>[r, s]</code>.</p><p><span>your answer</span> </p><p>(c) \(f\) is a trigonometric polynomial in \(\theta\). Give its period.</p><p><span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) Since \(P^2=I\), splitting the exponential series gives \(U(\theta)=\cos(\theta/2)I-i\sin(\theta/2)P\), so \(\alpha=\cos(\theta/2)\) — the same identity as in Chapter 1.</p><p>(b) Expanding, \(f(\theta)=a+b\cos\theta+c\sin\theta\). Then \(f(\theta+\pi/2)-f(\theta-\pi/2)=-2b\sin\theta+2c\cos\theta=2f\'(\theta)\), so \(r=1/2\) and \(s=\pi/2\).</p><p>(c) \(2\pi\), from the same expansion.</p><p>Note the rule is <em>exact</em>, not a finite-difference approximation: it evaluates the same circuit at two shifted parameter values, so it adds no depth and introduces no discretisation bias — only shot noise.</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 10.3</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C10.S3 — Why NISQ is hard, quantitatively</p></div><p>(a) Estimating \(\langle A\rangle\) with \(A^{2}=I\) to additive error \(\varepsilon\) requires how many shots, at leading order in <code>eps</code>? (Use variance \(\le 1\).)</p><p><span>your answer</span> </p><p>(b) A chemistry Hamiltonian has \(M\) Pauli terms measured independently, each to error \(\varepsilon/\sqrt M\). Give the total shot count in terms of <code>M</code> and <code>eps</code>.</p><p><span>your answer</span> </p><p>(c) In a barren plateau the gradient variance scales as \(2^{-n}\). Give the number of shots needed to resolve the gradient sign, in terms of <code>n</code> (leading order).</p><p><span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) The sample mean of a bounded random variable has standard error \(\sigma/\sqrt N\), so \(N=\Theta(1/\varepsilon^{2})\).</p><p>(b) Each of the \(M\) terms needs \(M/\varepsilon^{2}\) shots, for a total of \(M^{2}/\varepsilon^{2}\). With \(M=O(n^{4})\) spin-orbital terms and chemical accuracy \(\varepsilon=1.6\times10^{-3}\) Ha, this reaches \(10^{9}\)–\(10^{12}\) shots for molecules of interest — the arithmetic behind most scepticism about near-term VQE. Grouping commuting terms into cliques reduces \(M\), but not the asymptotic form.</p><p>(c) Resolving a quantity of size \(2^{-n/2}\) needs \(N\sim2^{n}\) shots: gradient estimation becomes exponentially expensive, which is exactly the barren-plateau obstruction. Note that this is a statement about <em>trainability</em>, independent of whether the ansatz could in principle represent the ground state.</p></details>
+</div>
+<div class="exo-banner"><div><strong>Back to the theory</strong><span>Every exercise above is worked from a result proved in the chapter</span></div><a href="course.html">Open chapter 10</a></div>
+</div>
+<nav class="lesson-nav"><a class="prev" href="../chapter09-error-correction-fault-tolerance/exercises.html"><span class="dir">Previous chapter</span><span class="ttl">9. Quantum Error Correction and Fault Tolerance</span></a><a class="next" href="../index.html"><span class="dir">Next chapter</span><span class="ttl">Table of contents</span></a></nav>
+<footer class="site-footer"><div class="container"><strong>Quantum Computing — Theory and Practice</strong> · ten chapters · forty programming exercises · thirty symbolic problems<span class="footer-meta">Edition 2026</span></div></footer></body></html>

@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Adjacency matrix and degrees</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q1 &amp;mdash; MATRIX REPRESENTATIONS&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Section 5.2 introduced the adjacency matrix and the handshaking lemma &amp;sum;&lt;sub&gt;u&lt;/sub&gt;d&lt;sub&gt;u&lt;/sub&gt; = 2m.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;adjacency(n, edges)&lt;/code&gt;&lt;/strong&gt; building the n&amp;times;n symmetric matrix of an undirected unweighted graph (a list of lists of ints), and &lt;strong&gt;&lt;code&gt;degrees(A)&lt;/code&gt;&lt;/strong&gt; returning the list of degrees. Edges are given as &lt;code&gt;(u, v)&lt;/code&gt; pairs.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;adjacency(3, [(0,1),(1,2)])
+-&amp;gt;  [[0, 1, 0], [1, 0, 1], [0, 1, 0]]
+degrees(...)  -&amp;gt;  [1, 2, 1]&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; Set both A[u][v] and A[v][u] &amp;mdash; forgetting the symmetry is the classic first bug.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def adjacency(n, edges):
+    # Completer
+    ...
+
+
+def degrees(A):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def adjacency(n, edges):
+    A = [[0] * n for _ in range(n)]
+    for u, v in edges:
+        A[u][v] = 1
+        A[v][u] = 1
+    return A
+
+
+def degrees(A):
+    return [sum(row) for row in A]
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>A = adjacency(3, [(0, 1), (1, 2)])
+for row in A:
+    print(row)
+</text></testcode><stdin><text /></stdin><expected><text>[0, 1, 0]
+[1, 0, 1]
+[0, 1, 0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>A = adjacency(4, [(0, 1), (1, 2), (2, 3), (3, 0)])
+print(degrees(A))
+</text></testcode><stdin><text /></stdin><expected><text>[2, 2, 2, 2]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>edges = [(0, 1), (0, 2), (1, 2), (2, 3)]
+A = adjacency(4, edges)
+print(sum(degrees(A)), 2 * len(edges))
+</text></testcode><stdin><text /></stdin><expected><text>8 8
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>A = adjacency(3, [])
+print(A, degrees(A))
+</text></testcode><stdin><text /></stdin><expected><text>[[0, 0, 0], [0, 0, 0], [0, 0, 0]] [0, 0, 0]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>A = adjacency(5, [(0, 4), (4, 0)])
+print(degrees(A))
+</text></testcode><stdin><text /></stdin><expected><text>[1, 0, 0, 0, 1]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Counting walks with matrix powers</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q2 &amp;mdash; POWERS OF THE ADJACENCY MATRIX&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Section 5.2 proved by induction that (A&lt;sup&gt;k&lt;/sup&gt;)&lt;sub&gt;uv&lt;/sub&gt; counts the walks of length exactly k from u to v. This is the fact that makes 'multiplying by A' mean 'one hop of propagation' &amp;mdash; the idea behind both PageRank and graph neural networks.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;matmul(A, B)&lt;/code&gt;&lt;/strong&gt; and &lt;strong&gt;&lt;code&gt;matpow(A, k)&lt;/code&gt;&lt;/strong&gt; for k &amp;ge; 1, then &lt;strong&gt;&lt;code&gt;count_triangles(A)&lt;/code&gt;&lt;/strong&gt; using the identity trace(A&amp;sup3;) = 6 &amp;times; (number of triangles).&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;A = adjacency of a triangle on 3 nodes
+count_triangles(A)  -&amp;gt;  1&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; Each triangle is counted once per starting vertex (3) and per direction (2), hence the 6.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def matmul(A, B):
+    # Completer
+    ...
+
+
+def matpow(A, k):
+    # Completer
+    ...
+
+
+def count_triangles(A):
+    # Completer : utiliser trace(A^3)
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def matmul(A, B):
+    n = len(A)
+    m = len(B[0])
+    p = len(B)
+    C = [[0] * m for _ in range(n)]
+    for i in range(n):
+        for k in range(p):
+            if A[i][k] == 0:
+                continue
+            aik = A[i][k]
+            for j in range(m):
+                C[i][j] += aik * B[k][j]
+    return C
+
+
+def matpow(A, k):
+    R = [row[:] for row in A]
+    for _ in range(k - 1):
+        R = matmul(R, A)
+    return R
+
+
+def count_triangles(A):
+    A3 = matpow(A, 3)
+    trace = sum(A3[i][i] for i in range(len(A)))
+    return trace // 6
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>A = [[0, 1, 1], [1, 0, 1], [1, 1, 0]]
+print(count_triangles(A))
+</text></testcode><stdin><text /></stdin><expected><text>1
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>A = [[0, 1, 0], [1, 0, 1], [0, 1, 0]]
+A2 = matpow(A, 2)
+for row in A2:
+    print(row)
+</text></testcode><stdin><text /></stdin><expected><text>[1, 0, 1]
+[0, 2, 0]
+[1, 0, 1]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>A = [[0, 1, 1, 0], [1, 0, 1, 1], [1, 1, 0, 1], [0, 1, 1, 0]]
+print(count_triangles(A))
+</text></testcode><stdin><text /></stdin><expected><text>2
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text># a 4-cycle has no triangle
+A = [[0, 1, 0, 1], [1, 0, 1, 0], [0, 1, 0, 1], [1, 0, 1, 0]]
+print(count_triangles(A))
+</text></testcode><stdin><text /></stdin><expected><text>0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>A = [[0, 1], [1, 0]]
+print(matpow(A, 1), matpow(A, 3))
+</text></testcode><stdin><text /></stdin><expected><text>[[0, 1], [1, 0]] [[0, 1], [1, 0]]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — The Laplacian and its quadratic form</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q3 &amp;mdash; THE LAPLACIAN QUADRATIC FORM&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;The central identity of Section 5.2 is f&lt;sup&gt;T&lt;/sup&gt;Lf = &amp;sum;&lt;sub&gt;(u,v)&amp;isin;E&lt;/sub&gt;(f&lt;sub&gt;u&lt;/sub&gt;&amp;minus;f&lt;sub&gt;v&lt;/sub&gt;)&amp;sup2;: the Laplacian measures how much a signal disagrees across edges, in O(m) time.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;laplacian(n, edges)&lt;/code&gt;&lt;/strong&gt; returning L = D &amp;minus; A, and &lt;strong&gt;&lt;code&gt;quad_form(n, edges, f)&lt;/code&gt;&lt;/strong&gt; computing f&lt;sup&gt;T&lt;/sup&gt;Lf &lt;em&gt;directly from the edge list&lt;/em&gt; (do not build the matrix). Then write &lt;strong&gt;&lt;code&gt;quad_form_matrix(L, f)&lt;/code&gt;&lt;/strong&gt; computing it as &amp;sum;&lt;sub&gt;i,j&lt;/sub&gt;f&lt;sub&gt;i&lt;/sub&gt;L&lt;sub&gt;ij&lt;/sub&gt;f&lt;sub&gt;j&lt;/sub&gt;; the two must agree.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;edges = [(0,1),(1,2)], f = [1, 1, 1]  -&amp;gt;  0.0   (constant signal, no disagreement)
+edges = [(0,1),(1,2)], f = [0, 1, 0]  -&amp;gt;  2.0&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; L1 = 0 always: a constant signal is in the kernel, which is why &amp;lambda;&amp;#8321; = 0.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def laplacian(n, edges):
+    # Completer : L = D - A
+    ...
+
+
+def quad_form(n, edges, f):
+    # Completer : somme sur les aretes, sans construire la matrice
+    ...
+
+
+def quad_form_matrix(L, f):
+    # Completer : double somme f_i L_ij f_j
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def laplacian(n, edges):
+    L = [[0] * n for _ in range(n)]
+    for u, v in edges:
+        L[u][v] -= 1
+        L[v][u] -= 1
+        L[u][u] += 1
+        L[v][v] += 1
+    return L
+
+
+def quad_form(n, edges, f):
+    return float(sum((f[u] - f[v]) ** 2 for u, v in edges))
+
+
+def quad_form_matrix(L, f):
+    n = len(L)
+    return float(sum(f[i] * L[i][j] * f[j] for i in range(n) for j in range(n)))
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>L = laplacian(3, [(0, 1), (1, 2)])
+for row in L:
+    print(row)
+</text></testcode><stdin><text /></stdin><expected><text>[1, -1, 0]
+[-1, 2, -1]
+[0, -1, 1]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2)]
+print(quad_form(3, e, [1, 1, 1]), quad_form(3, e, [0, 1, 0]))
+</text></testcode><stdin><text /></stdin><expected><text>0.0 2.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2), (2, 0)]
+f = [1.0, -2.0, 0.5]
+L = laplacian(3, e)
+print(round(quad_form(3, e, f), 6), round(quad_form_matrix(L, f), 6))
+</text></testcode><stdin><text /></stdin><expected><text>15.5 15.5
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text># the all-ones vector is always in the kernel
+e = [(0, 1), (1, 2), (2, 3), (3, 0)]
+L = laplacian(4, e)
+print([sum(row) for row in L])
+</text></testcode><stdin><text /></stdin><expected><text>[0, 0, 0, 0]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1)]
+print(quad_form(2, e, [3, 7]))
+</text></testcode><stdin><text /></stdin><expected><text>16.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q4 — Connected components and the kernel of L</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q4 &amp;mdash; DIM KER L = NUMBER OF COMPONENTS&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Section 5.2 proved that the multiplicity of eigenvalue 0 in the Laplacian equals the number of connected components &amp;mdash; the entire theoretical basis of spectral clustering. Here we compute that number combinatorially.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;components(n, edges)&lt;/code&gt;&lt;/strong&gt; returning a list mapping each node to its component id, where ids are assigned &lt;strong&gt;0, 1, 2, ... in increasing order of the smallest node they contain&lt;/strong&gt;. Then write &lt;strong&gt;&lt;code&gt;n_components(n, edges)&lt;/code&gt;&lt;/strong&gt;.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;components(4, [(0,1)])  -&amp;gt;  [0, 0, 1, 2]
+n_components(4, [(0,1)])  -&amp;gt;  3&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; A breadth-first search started from each not-yet-visited node, in increasing order, gives exactly this numbering.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def components(n, edges):
+    # Completer : BFS depuis chaque sommet non visite, dans l'ordre croissant
+    ...
+
+
+def n_components(n, edges):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def components(n, edges):
+    adj = [[] for _ in range(n)]
+    for u, v in edges:
+        adj[u].append(v)
+        adj[v].append(u)
+    comp = [-1] * n
+    cid = 0
+    for s in range(n):
+        if comp[s] != -1:
+            continue
+        queue = [s]
+        comp[s] = cid
+        while queue:
+            u = queue.pop(0)
+            for w in adj[u]:
+                if comp[w] == -1:
+                    comp[w] = cid
+                    queue.append(w)
+        cid += 1
+    return comp
+
+
+def n_components(n, edges):
+    return max(components(n, edges)) + 1 if n &gt; 0 else 0
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(components(4, [(0, 1)]))
+</text></testcode><stdin><text /></stdin><expected><text>[0, 0, 1, 2]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(n_components(4, [(0, 1)]))
+</text></testcode><stdin><text /></stdin><expected><text>3
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(components(6, [(0, 1), (1, 2), (3, 4)]), n_components(6, [(0, 1), (1, 2), (3, 4)]))
+</text></testcode><stdin><text /></stdin><expected><text>[0, 0, 0, 1, 1, 2] 3
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(n_components(5, []))
+</text></testcode><stdin><text /></stdin><expected><text>5
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 0)]
+print(components(5, e), n_components(5, e))
+</text></testcode><stdin><text /></stdin><expected><text>[0, 0, 0, 0, 0] 1
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q5 — Edge homophily</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q5 &amp;mdash; MEASURE HOMOPHILY BEFORE YOU SMOOTH&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Section 5.3 defined the edge homophily ratio h as the fraction of edges joining same-label nodes. Every smoothing method &amp;mdash; label propagation, spectral clustering, the GCN &amp;mdash; assumes h is high. On heterophilous graphs they actively destroy signal.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;homophily(edges, labels)&lt;/code&gt;&lt;/strong&gt; returning h, with &lt;code&gt;0.0&lt;/code&gt; for an empty edge list. Then write &lt;strong&gt;&lt;code&gt;verdict(h)&lt;/code&gt;&lt;/strong&gt; returning the string &lt;code&gt;'homophilous'&lt;/code&gt; if h &amp;gt; 0.6, &lt;code&gt;'heterophilous'&lt;/code&gt; if h &amp;lt; 0.4, and &lt;code&gt;'mixed'&lt;/code&gt; otherwise.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;edges = [(0,1),(1,2),(2,3)], labels = [0,0,1,1]
+homophily -&amp;gt; 0.666...   verdict -&amp;gt; 'homophilous'&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; A bipartite-ish graph where every edge joins different classes has h = 0 &amp;mdash; there, a plain MLP on node features beats a GCN.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def homophily(edges, labels):
+    # Completer
+    ...
+
+
+def verdict(h):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def homophily(edges, labels):
+    if not edges:
+        return 0.0
+    same = sum(1 for u, v in edges if labels[u] == labels[v])
+    return same / len(edges)
+
+
+def verdict(h):
+    if h &gt; 0.6:
+        return 'homophilous'
+    if h &lt; 0.4:
+        return 'heterophilous'
+    return 'mixed'
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2), (2, 3)]
+lab = [0, 0, 1, 1]
+print(round(homophily(e, lab), 4), verdict(homophily(e, lab)))
+</text></testcode><stdin><text /></stdin><expected><text>0.6667 homophilous
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2), (2, 3)]
+lab = [0, 1, 0, 1]
+print(homophily(e, lab), verdict(homophily(e, lab)))
+</text></testcode><stdin><text /></stdin><expected><text>0.0 heterophilous
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2)]
+lab = [5, 5, 5]
+print(homophily(e, lab), verdict(homophily(e, lab)))
+</text></testcode><stdin><text /></stdin><expected><text>1.0 homophilous
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(homophily([], [0, 1]))
+</text></testcode><stdin><text /></stdin><expected><text>0.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2), (2, 3), (3, 4)]
+lab = [0, 0, 1, 1, 0]
+print(round(homophily(e, lab), 4), verdict(homophily(e, lab)))
+</text></testcode><stdin><text /></stdin><expected><text>0.5 mixed
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

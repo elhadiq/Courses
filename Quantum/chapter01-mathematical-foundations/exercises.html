@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 1 exercises — Mathematical Foundations of Quantum Computation</title>
+<meta name="description" content="Exercises for chapter 1: Mathematical Foundations of Quantum Computation">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = {tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]}, svg:{fontCache:"global"}};</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Quantum Computing</a> · <a href="course.html">Chapter 1</a> · Exercises</div><span class="course-code">Exercise sheet</span></div></header>
+<section class="lesson-hero"><div class="container">
+  <div class="lesson-label">Chapter 1 · exercise sheet</div>
+  <h1>Mathematical Foundations of Quantum Computation</h1>
+  <p class="lesson-sub">4 programming exercises ·
+     3 problems with symbolic answers. Every solution is hidden behind a
+     toggle — attempt each one before opening it.</p>
+</div></section>
+<div class="lesson-content">
+<h2>Programming exercises</h2>
+<p>Each exercise is checked automatically against hidden test cases. Only NumPy is required, and the function names in the statement must be used exactly as written.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 1.1</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C1.Q1 — Operator predicates</p><p>Numerical linear algebra is the substrate of every simulation in this course. Before anything else we need reliable predicates for the operator classes of \S2.</p></div><p>Write three functions using <strong>NumPy only</strong>: <code>dagger(A)</code> returning the conjugate transpose; <code>is_unitary(A, tol=1e-9)</code> returning a Python <code>bool</code>; and <code>is_hermitian(A, tol=1e-9)</code> returning a Python <code>bool</code>. Use <code>numpy.allclose</code> with <code>atol=tol</code>; do not test exact equality.</p><div class="stmt"><pre>dagger([[0,1j],[0,0]])  -&gt;  [[0, 0], [-1j, 0]]
+is_unitary(X)           -&gt;  True
+is_hermitian(X @ Y)     -&gt;  False</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def dagger(A):
+    # TODO: conjugate transpose
+    ...
+
+def is_unitary(A, tol=1e-9):
+    # TODO
+    ...
+
+def is_hermitian(A, tol=1e-9):
+    # TODO
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+print(is_unitary(X), is_hermitian(X))
+→ True True</code></pre><pre><code>import numpy as np
+A = np.array([[0,1j],[0,0]], dtype=complex)
+print(np.allclose(dagger(A), np.array([[0,0],[-1j,0]])))
+→ True</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def dagger(A):
+    return np.asarray(A, dtype=complex).conj().T
+
+def is_unitary(A, tol=1e-9):
+    A = np.asarray(A, dtype=complex)
+    n = A.shape[0]
+    return bool(np.allclose(dagger(A) @ A, np.eye(n), atol=tol))
+
+def is_hermitian(A, tol=1e-9):
+    A = np.asarray(A, dtype=complex)
+    return bool(np.allclose(A, dagger(A), atol=tol))
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 1.2</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C1.Q2 — Building the n-qubit algebra</p><p>Multi-qubit gates are built from single-qubit ones by tensoring with identities. Getting the factor ordering right is the most common source of simulator bugs.</p></div><p>Write <code>kron_all(ops)</code> returning the Kronecker product of a list of matrices (returning the \(1\times1\) identity for an empty list), and <code>embed(op, target, n)</code> returning the \(2^{n}\times2^{n}\) operator that applies the single-qubit <code>op</code> to qubit index <code>target</code> (0 = leftmost/most significant factor) and the identity elsewhere.</p><div class="stmt"><pre>embed(X, 0, 2)  ==  kron(X, I)
+embed(Z, 1, 3)  ==  kron(I, kron(Z, I))</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def kron_all(ops):
+    # TODO: iterate with np.kron starting from [[1]]
+    ...
+
+def embed(op, target, n):
+    # TODO
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+print(embed(X, 0, 2).shape)
+→ (4, 4)</code></pre><pre><code>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+I = np.eye(2, dtype=complex)
+print(np.allclose(embed(X, 1, 2), np.kron(I, X)))
+→ True</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def kron_all(ops):
+    out = np.array([[1.0 + 0j]])
+    for op in ops:
+        out = np.kron(out, np.asarray(op, dtype=complex))
+    return out
+
+def embed(op, target, n):
+    I2 = np.eye(2, dtype=complex)
+    factors = [np.asarray(op, dtype=complex) if k == target else I2 for k in range(n)]
+    return kron_all(factors)
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 1.3</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C1.Q3 — Exponentiating a Hamiltonian</p><p>By the spectral theorem, \(f(A)=\sum_k f(\lambda_k)P_k\). Implementing \(e^{-iHt}\) this way — rather than by truncating the power series — is both exact and numerically stable.</p></div><p>Write <code>spectral_projectors(H)</code> returning <code>(eigenvalues, projectors)</code> where eigenvalues is a sorted 1-D real array and projectors[k] is the rank-one projector onto the \(k\)-th eigenvector; and <code>evolve(H, t)</code> returning \(e^{-iHt}\) built from that decomposition. Use <code>numpy.linalg.eigh</code> (never <code>scipy</code>).</p><div class="stmt"><pre>evolve(Z, pi/2)  -&gt;  diag(exp(-i*pi/2), exp(+i*pi/2))</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def spectral_projectors(H):
+    # TODO: use np.linalg.eigh and np.outer
+    ...
+
+def evolve(H, t):
+    # TODO: sum exp(-i*lambda*t) * P
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+vals, projs = spectral_projectors(Z)
+print(np.round(vals, 6).tolist())
+→ [-1.0, 1.0]</code></pre><pre><code>import numpy as np
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+U = evolve(Z, np.pi/2)
+print(np.allclose(U, np.diag([np.exp(-1j*np.pi/2), np.exp(1j*np.pi/2)])))
+→ True</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def spectral_projectors(H):
+    H = np.asarray(H, dtype=complex)
+    vals, vecs = np.linalg.eigh(H)
+    projs = [np.outer(vecs[:, k], vecs[:, k].conj()) for k in range(len(vals))]
+    return vals, projs
+
+def evolve(H, t):
+    vals, projs = spectral_projectors(H)
+    n = np.asarray(H).shape[0]
+    U = np.zeros((n, n), dtype=complex)
+    for lam, P in zip(vals, projs):
+        U = U + np.exp(-1j * lam * t) * P
+    return U
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 1.4</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C1.Q4 — Coordinates in the Pauli basis</p><p>Variational algorithms (Chapter 10) and the stabilizer formalism (Chapter 9) both express Hamiltonians as real linear combinations of Pauli strings. The coefficients come from the Hilbert–Schmidt inner product \(a_{\mu}=\tfrac{1}{2^{n}}\operatorname{tr}(\sigma_{\mu}A)\).</p></div><p>Write <code>pauli_coeffs(A)</code> for a single qubit, returning the list <code>[a_i, a_x, a_y, a_z]</code> of coefficients such that \(A=a_I I + a_x X + a_y Y + a_z Z\). Round each coefficient to 6 decimals and return them as Python <code>complex</code> numbers is not required — return floats when the imaginary part is negligible by taking <code>numpy.real_if_close</code>, then convert with <code>float</code> if real.</p><div class="stmt"><pre>pauli_coeffs(Z)          -&gt;  [0.0, 0.0, 0.0, 1.0]
+pauli_coeffs(eye(2))     -&gt;  [1.0, 0.0, 0.0, 0.0]</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def pauli_coeffs(A):
+    # coefficient a_mu = trace(sigma_mu^dagger @ A) / 2
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+print(pauli_coeffs(Z))
+→ [0.0, 0.0, 0.0, 1.0]</code></pre><pre><code>import numpy as np
+print(pauli_coeffs(np.eye(2, dtype=complex)))
+→ [1.0, 0.0, 0.0, 0.0]</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def pauli_coeffs(A):
+    A = np.asarray(A, dtype=complex)
+    I2 = np.eye(2, dtype=complex)
+    X = np.array([[0, 1], [1, 0]], dtype=complex)
+    Y = np.array([[0, -1j], [1j, 0]], dtype=complex)
+    Z = np.array([[1, 0], [0, -1]], dtype=complex)
+    out = []
+    for S in (I2, X, Y, Z):
+        c = np.trace(S.conj().T @ A) / 2
+        c = np.real_if_close(c, tol=1000)
+        out.append(round(float(c.real), 6) if np.abs(np.imag(c)) &lt; 1e-9 else complex(round(c.real, 6), round(c.imag, 6)))
+    return out
+</code></pre></details>
+</div>
+<h2>Problems with symbolic answers</h2>
+<p>Answers here are expressions rather than numbers, and any algebraically equivalent form is accepted. Give fractions and radicals exactly; decimal approximations are not accepted.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 1.1</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C1.S1 — Normalisation</p></div><p>A qubit is prepared in the state \(|\psi\rangle = \frac{1}{\sqrt{ {@a@} }}|0\rangle + b\,|1\rangle\) with \(b\) real and positive.</p><p>Determine \(b\) so that \(\langle\psi|\psi\rangle = 1\). Give an exact expression (no decimals).</p><p>\(b=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>Normalisation requires \(|a_0|^2+|a_1|^2=1\), i.e. \(\frac{1}{ {@a@} } + b^2 = 1\).</p><p>Hence \(b^2 = 1-\frac{1}{ {@a@} } = \frac{ {@a-1@} }{ {@a@} }\) and, taking the positive root, \(b = {@ta@}\).</p><p>Note that the global phase of \(|\psi\rangle\) is unobservable, but the sign of \(b\) relative to the \(|0\rangle\) amplitude is not — it is a relative phase. Here positivity was imposed by the statement.</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 1.2</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C1.S2 — Born rule and expectation values</p></div><p>Let \(|\psi\rangle=\cos(\theta/2)|0\rangle+\sin(\theta/2)|1\rangle\) with \(\theta\in[0,\pi]\).</p><p>(a) Give \(\langle\psi|Z|\psi\rangle\) as a simplified function of \(\theta\) (use <code>theta</code> for \(\theta\)).</p><p>\(\langle Z\rangle=\) <span>your answer</span> </p><p>(b) Give \(\langle\psi|X|\psi\rangle\) as a simplified function of \(\theta\).</p><p>\(\langle X\rangle=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>Write \(|\psi\rangle=(\cos(\theta/2),\sin(\theta/2))^{T}\).</p><p>\(Z|\psi\rangle=(\cos(\theta/2),-\sin(\theta/2))^{T}\), so \(\langle Z\rangle=\cos^{2}(\theta/2)-\sin^{2}(\theta/2)=\cos\theta\).</p><p>\(X|\psi\rangle=(\sin(\theta/2),\cos(\theta/2))^{T}\), so \(\langle X\rangle=2\sin(\theta/2)\cos(\theta/2)=\sin\theta\).</p><p>These are precisely the \(z\)- and \(x\)-coordinates of the Bloch vector of \(|\psi\rangle\) (Chapter 2), confirming \(\langle X\rangle^2+\langle Y\rangle^2+\langle Z\rangle^2=1\) for a pure state.</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 1.3</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C1.S3 — Pauli algebra</p></div><p>(a) The Pauli matrices satisfy \([\sigma_a,\sigma_b]=2i\varepsilon_{abc}\sigma_c\). Writing \([X,Y]=k\,Z\), give the scalar \(k\) (use <code>i</code> for the imaginary unit).</p><p>\(k=\) <span>your answer</span> </p><p>(b) Using \((\hat n\cdot\vec\sigma)^2=I\), the rotation \(e^{-i\theta(\hat n\cdot\vec\sigma)/2}\) equals \(\alpha(\theta) I - i\beta(\theta)(\hat n\cdot\vec\sigma)\). Give \(\beta(\theta)\) (use <code>theta</code>).</p><p>\(\beta(\theta)=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) Direct computation: \(XY=iZ\) and \(YX=-iZ\), hence \([X,Y]=2iZ\) and \(k=2i\).</p><p>(b) Split the exponential series. Even powers give \(\sum_k \frac{(-1)^k(\theta/2)^{2k}}{(2k)!}I=\cos(\theta/2)I\); odd powers give \(-i\sin(\theta/2)(\hat n\cdot\vec\sigma)\). Therefore \(\beta(\theta)=\sin(\theta/2)\).</p><p>This identity is the algebraic content of the isomorphism \(SU(2)/\{\pm I\}\cong SO(3)\): a \(2\pi\) rotation returns \(-I\), not \(I\).</p></details>
+</div>
+<div class="exo-banner"><div><strong>Back to the theory</strong><span>Every exercise above is worked from a result proved in the chapter</span></div><a href="course.html">Open chapter 1</a></div>
+</div>
+<nav class="lesson-nav"><a class="prev" href="../index.html"><span class="dir">Previous chapter</span><span class="ttl">Table of contents</span></a><a class="next" href="../chapter02-qubits-and-measurement/exercises.html"><span class="dir">Next chapter</span><span class="ttl">2. Qubits, the Bloch Sphere and Quantum Measurement</span></a></nav>
+<footer class="site-footer"><div class="container"><strong>Quantum Computing — Theory and Practice</strong> · ten chapters · forty programming exercises · thirty symbolic problems<span class="footer-meta">Edition 2026</span></div></footer></body></html>

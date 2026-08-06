@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>C7.Q1 — Continued fractions and convergents</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C7.Q1 — Recovering s/r from a noisy estimate&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;Phase estimation returns \(x=y/2^{t}\) with \(|x-s/r|\le1/(2r^{2})\). Legendre's theorem guarantees \(s/r\) is a convergent of the continued-fraction expansion of \(x\).&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;cf_expansion(x, depth)&lt;/code&gt; returning the list of partial quotients \([a_0;a_1,\dots]\) (stopping early if the remainder vanishes); &lt;code&gt;convergents(x, depth)&lt;/code&gt; returning the list of &lt;code&gt;(p, q)&lt;/code&gt; pairs; and &lt;code&gt;best_denominator(x, qmax)&lt;/code&gt; returning the largest-\(q\) convergent denominator with \(q\le q_{\max}\). Use integers only in the recurrences \(p_k=a_kp_{k-1}+p_{k-2}\), \(q_k=a_kq_{k-1}+q_{k-2}\).&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;cf_expansion(0.3125, 10)   -&amp;gt; [0, 3, 5]        (5/16)
+best_denominator(0.3125, 15) -&amp;gt; 3              (1/3 is the best q&amp;lt;=15)&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>from fractions import Fraction
+
+def cf_expansion(x, depth):
+    # hint: Fraction(x).limit_denominator(10**6) first, then exact integer recurrences
+    ...
+
+def convergents(x, depth):
+    ...
+
+def best_denominator(x, qmax):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>from fractions import Fraction
+
+def cf_expansion(x, depth):
+    # work in exact rational arithmetic: floating-point recurrences are unstable here
+    x = Fraction(x).limit_denominator(10 ** 6)
+    out = []
+    for _ in range(depth):
+        a = x.numerator // x.denominator
+        out.append(a)
+        x = x - a
+        if x == 0:
+            break
+        x = 1 / x
+    return out
+
+def convergents(x, depth):
+    a = cf_expansion(x, depth)
+    res, pm1, pm2, qm1, qm2 = [], 1, 0, 0, 1
+    for ak in a:
+        pk = ak * pm1 + pm2
+        qk = ak * qm1 + qm2
+        res.append((pk, qk))
+        pm2, pm1 = pm1, pk
+        qm2, qm1 = qm1, qk
+    return res
+
+def best_denominator(x, qmax):
+    best = 1
+    for _, q in convergents(x, 40):
+        if 0 &lt; q &lt;= qmax:
+            best = q
+    return best
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(cf_expansion(0.3125, 10))
+</text></testcode><stdin><text /></stdin><expected><text>[0, 3, 5]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(convergents(0.3125, 10))
+</text></testcode><stdin><text /></stdin><expected><text>[(0, 1), (1, 3), (5, 16)]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(best_denominator(0.3125, 15))
+</text></testcode><stdin><text /></stdin><expected><text>3
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(best_denominator(0.25, 100), best_denominator(0.75, 100))
+</text></testcode><stdin><text /></stdin><expected><text>4 4
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(convergents(5/13, 12)[-1])
+</text></testcode><stdin><text /></stdin><expected><text>(5, 13)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C7.Q2 — The classical reduction: order to factors</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C7.Q2 — From r to a non-trivial divisor&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;If \(r=\mathrm{ord}_N(a)\) is even and \(a^{r/2}\not\equiv-1\), then \(\gcd(a^{r/2}\pm1,N)\) are proper factors.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;order(a, N)&lt;/code&gt; (brute force is fine here), &lt;code&gt;factors_from_order(a, r, N)&lt;/code&gt; returning a sorted tuple of two non-trivial factors or &lt;code&gt;None&lt;/code&gt; when the order is unusable, and &lt;code&gt;shor_classical(N, seed)&lt;/code&gt; which loops over random \(a\) drawn with &lt;code&gt;random.Random(seed)&lt;/code&gt; until it succeeds, returning the sorted tuple of factors. Use &lt;code&gt;math.gcd&lt;/code&gt; and &lt;code&gt;pow(a, e, N)&lt;/code&gt;.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;order(7, 15) -&amp;gt; 4
+factors_from_order(7, 4, 15) -&amp;gt; (3, 5)
+shor_classical(15, 0) -&amp;gt; (3, 5)&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>from math import gcd
+import random
+
+def order(a, N):
+    ...
+
+def factors_from_order(a, r, N):
+    ...
+
+def shor_classical(N, seed):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>from math import gcd
+import random
+
+def order(a, N):
+    r, x = 1, a % N
+    while x != 1:
+        x = (x * a) % N
+        r += 1
+    return r
+
+def factors_from_order(a, r, N):
+    if r % 2 != 0:
+        return None
+    h = pow(a, r // 2, N)
+    if h == N - 1:
+        return None
+    f = tuple(sorted({gcd(h - 1, N), gcd(h + 1, N)} - {1, N}))
+    if len(f) != 2:
+        cand = [d for d in (gcd(h - 1, N), gcd(h + 1, N)) if 1 &lt; d &lt; N]
+        if not cand:
+            return None
+        d = cand[0]
+        return tuple(sorted((d, N // d)))
+    return f
+
+def shor_classical(N, seed):
+    rng = random.Random(seed)
+    while True:
+        a = rng.randrange(2, N)
+        g = gcd(a, N)
+        if g &gt; 1:
+            return tuple(sorted((g, N // g)))
+        f = factors_from_order(a, order(a, N), N)
+        if f:
+            return f
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(order(7, 15), order(2, 15))
+</text></testcode><stdin><text /></stdin><expected><text>4 4
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(factors_from_order(7, 4, 15))
+</text></testcode><stdin><text /></stdin><expected><text>(3, 5)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(factors_from_order(14, 2, 15))
+</text></testcode><stdin><text /></stdin><expected><text>None
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(shor_classical(15, 0), shor_classical(21, 1), shor_classical(35, 2))
+</text></testcode><stdin><text /></stdin><expected><text>(3, 5) (3, 7) (5, 7)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(order(2, 21), factors_from_order(2, order(2,21), 21))
+</text></testcode><stdin><text /></stdin><expected><text>6 (3, 7)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C7.Q3 — Simulating the eigenphase sampling of order finding</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C7.Q3 — The quantum subroutine, exactly&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;Phase estimation on \(U_a|x\rangle=|ax\bmod N\rangle\) starting from \(|1\rangle\) samples \(s\) uniformly in \(\{0,\dots,r-1\}\) and outputs \(y\) distributed as a Fejér kernel around \(2^{t}s/r\).&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;phase_distribution(r, t)&lt;/code&gt; returning the exact distribution over the \(2^{t}\) outcomes \(y\), averaged uniformly over \(s=0,\dots,r-1\); and &lt;code&gt;sample_order(a, N, t, seed, trials)&lt;/code&gt; which draws &lt;code&gt;trials&lt;/code&gt; outcomes from that distribution, converts each to a candidate denominator by continued fractions, and returns the smallest candidate \(r'\) with \(a^{r'}\equiv1\pmod N\) (or &lt;code&gt;None&lt;/code&gt;).&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;phase_distribution(4, 4) is supported on y = 0, 4, 8, 12
+sample_order(7, 15, 8, 0, 20) -&amp;gt; 4&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+from fractions import Fraction
+
+def phase_distribution(r, t):
+    ...
+
+def sample_order(a, N, t, seed, trials):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+from fractions import Fraction
+
+def phase_distribution(r, t):
+    N = 2 ** t
+    y = np.arange(N)
+    total = np.zeros(N)
+    for s in range(r):
+        d = s / r - y / N
+        amp = np.where(np.abs(np.sin(np.pi * d)) &lt; 1e-14, 1.0,
+                       np.sin(np.pi * N * d) / (N * np.sin(np.pi * d)))
+        total += amp ** 2
+    return total / r
+
+def sample_order(a, N, t, seed, trials):
+    r_true = 1
+    x = a % N
+    while x != 1:
+        x = (x * a) % N
+        r_true += 1
+    pr = phase_distribution(r_true, t)
+    pr = pr / pr.sum()
+    rng = np.random.default_rng(seed)
+    ys = rng.choice(2 ** t, size=trials, p=pr)
+    cands = []
+    for y in ys:
+        q = Fraction(int(y), 2 ** t).limit_denominator(N).denominator
+        if q &gt; 0 and pow(a, q, N) == 1:
+            cands.append(q)
+    return min(cands) if cands else None
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+pr = phase_distribution(4, 4)
+print(np.round(pr, 6).tolist().count(0.25))
+</text></testcode><stdin><text /></stdin><expected><text>4
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(sample_order(7, 15, 8, 0, 20))
+</text></testcode><stdin><text /></stdin><expected><text>4
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+print(round(float(phase_distribution(6, 8).sum()), 6))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(sample_order(2, 21, 10, 3, 30), sample_order(2, 15, 8, 1, 20))
+</text></testcode><stdin><text /></stdin><expected><text>6 4
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+pr = phase_distribution(1, 5)
+print(int(np.argmax(pr)), round(float(pr.max()), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0 1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C7.Q4 — End-to-end Shor (simulated quantum subroutine)</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C7.Q4 — Putting it together&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;Combine the classical reduction of Q2 with the sampled order finding of Q3. This is the complete algorithm, with the only idealisation being that the eigenphase distribution is computed analytically instead of by state-vector simulation.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;shor(N, seed, t=None, trials=30)&lt;/code&gt; returning a sorted tuple of two non-trivial factors of \(N\). Default \(t=2\lceil\log_2N\rceil+1\). Handle the easy cases first: even \(N\), and \(\gcd(a,N)&gt;1\).&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;shor(15, 0) -&amp;gt; (3, 5)
+shor(21, 1) -&amp;gt; (3, 7)
+shor(91, 5) -&amp;gt; (7, 13)&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+from math import gcd, ceil, log2
+from fractions import Fraction
+import random
+
+def shor(N, seed, t=None, trials=30):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+from math import gcd, ceil, log2
+from fractions import Fraction
+import random
+
+def _phase_distribution(r, t):
+    N = 2 ** t
+    y = np.arange(N)
+    total = np.zeros(N)
+    for s in range(r):
+        d = s / r - y / N
+        amp = np.where(np.abs(np.sin(np.pi * d)) &lt; 1e-14, 1.0,
+                       np.sin(np.pi * N * d) / (N * np.sin(np.pi * d)))
+        total += amp ** 2
+    return total / r
+
+def _true_order(a, N):
+    r, x = 1, a % N
+    while x != 1:
+        x = (x * a) % N
+        r += 1
+    return r
+
+def shor(N, seed, t=None, trials=30):
+    if N % 2 == 0:
+        return tuple(sorted((2, N // 2)))
+    if t is None:
+        t = 2 * int(ceil(log2(N))) + 1
+    rng = random.Random(seed)
+    nprng = np.random.default_rng(seed)
+    while True:
+        a = rng.randrange(2, N)
+        g = gcd(a, N)
+        if g &gt; 1:
+            return tuple(sorted((g, N // g)))
+        pr = _phase_distribution(_true_order(a, N), t)
+        pr = pr / pr.sum()
+        for y in nprng.choice(2 ** t, size=trials, p=pr):
+            r = Fraction(int(y), 2 ** t).limit_denominator(N).denominator
+            if r == 0 or pow(a, r, N) != 1 or r % 2:
+                continue
+            h = pow(a, r // 2, N)
+            if h == N - 1:
+                continue
+            for d in (gcd(h - 1, N), gcd(h + 1, N)):
+                if 1 &lt; d &lt; N:
+                    return tuple(sorted((d, N // d)))
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(shor(15, 0))
+</text></testcode><stdin><text /></stdin><expected><text>(3, 5)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(shor(21, 1))
+</text></testcode><stdin><text /></stdin><expected><text>(3, 7)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(shor(91, 5))
+</text></testcode><stdin><text /></stdin><expected><text>(7, 13)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(shor(33, 7), shor(35, 2))
+</text></testcode><stdin><text /></stdin><expected><text>(3, 11) (5, 7)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(shor(143, 11))
+</text></testcode><stdin><text /></stdin><expected><text>(11, 13)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

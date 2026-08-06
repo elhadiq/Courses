@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algorithms of Section 7</title>
+<link href="../assets/style.css" rel="stylesheet">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+
+/* Use the full width the theme allows: the shared stylesheet caps a lesson at
+   880px, which leaves wide figures and tables boxed into the middle of a large
+   screen. --max-w is the theme's own page width, so this stays consistent with
+   the landing page. */
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) {
+  .lesson-content { padding-left: 16px; padding-right: 16px; }
+}
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule);
+               padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center;
+               padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.lesson-nav { max-width: 880px; margin: 0 auto 40px; padding: 0 24px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav .container { display: flex; gap: 18px; flex-wrap: wrap; width: 100%; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600;
+                font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.keypoints h4 { margin-top: 0; }
+
+.algo-tag { color: var(--color-muted); font-size: 0.86rem; font-style: italic;
+            margin: -0.4em 0 1em; }
+.algo-steps { border: 1px solid var(--color-rule); border-radius: var(--radius);
+              background: var(--proof-bg); padding: 4px 22px 14px;
+              margin: 1.2em 0; }
+.algo-steps-title { color: var(--primary); font-weight: 700; font-size: 0.8rem;
+                    letter-spacing: 0.09em; text-transform: uppercase;
+                    margin: 14px 0 4px; }
+.algo-steps ol { padding-left: 1.4em; }
+.algo-steps li { margin: 0.55em 0; line-height: 1.75; }
+.annex-toc { background: var(--primary-soft); border-radius: var(--radius);
+             padding: 16px 24px; margin: 1.4em 0; }
+.annex-toc ul { margin: 0.4em 0; }
+.annex-toc a { color: var(--primary-dark); font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Machine Learning A&ndash;Z</a> &middot; Course</div><span class="course-code">Graph-based machine learning</span></div></header>
+<section class="lesson-hero"><div class="container"><div class="lesson-label">Part II &middot; Section 7 &middot; Annex</div><h1>Algorithms of Section 7</h1><div class="lesson-sub">PageRank, random walks, the biased walk and link scoring, set out step by step.</div></div></section>
+<main class="lesson-content">
+<h2>Annex &mdash; the algorithms of Section 7</h2><div class="box tip"><div class="box-title">How to read this annex</div><p>Each algorithm is set out the same way: what it is handed, what it must hand back, then the steps in the order you would carry them out. A small example is worked through by hand so you can check your understanding against real numbers, and the closing boxes say why the method is correct, why it stops, and what it costs. Nothing here assumes you can read a program &mdash; the point is the reasoning.</p></div><div class="annex-toc"><strong>Algorithms in this annex</strong><ul><li><a href="#algo1">PageRank by repeated averaging</a></li><li><a href="#algo2">Generating random walks</a></li><li><a href="#algo3">The biased second-order walk</a></li><li><a href="#algo4">Scoring candidate links</a></li></ul></div><span id="algo1"></span><h3>PageRank by repeated averaging</h3><p class="algo-tag">Iterative method \(\cdot\) converges geometrically</p><p>Rank the nodes of a directed graph by importance, where being pointed at by an important node counts for more than being pointed at by an obscure one.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A directed graph and a damping factor \(\alpha\), conventionally 0.85.</p><p><strong>Produce.</strong> A score for every node; the scores add to one.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Start with everything equal.</strong> Give every node the same score, one divided by the number of nodes.</li><li><strong>Let each node pass on its score.</strong> Every node splits its current score equally among the nodes it points to.</li><li><strong>Deal with nodes that point nowhere.</strong> A node with no outgoing links would absorb score and never release it. Collect the score held by all such nodes and redistribute it evenly over every node.</li><li><strong>Apply damping.</strong> Keep only the fraction \(\alpha\) of what was passed on, and distribute the remaining fraction evenly over all nodes. This models a surfer who occasionally jumps somewhere at random, and it is what stops small groups of mutually linking nodes from hoarding all the score.</li><li><strong>Repeat until settled.</strong> Fifty to a hundred rounds suffice for any graph, because the error shrinks by a factor of \(\alpha\) every round.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Two nodes pointing at each other, plus a third that points at the first but is pointed at by nobody.</p><table><thead><tr><th>Round</th><th>Node A</th><th>Node B</th><th>Node C</th></tr></thead><tbody><tr><td>0</td><td>0.333</td><td>0.333</td><td>0.333</td></tr><tr><td>1</td><td>0.383</td><td>0.383</td><td>0.050</td></tr><tr><td>2</td><td>0.454</td><td>0.376</td><td>0.050</td></tr><tr><td>settled</td><td><strong>0.462</strong></td><td><strong>0.438</strong></td><td><strong>0.050</strong></td></tr></tbody></table><p>Node C keeps only the score every node receives from random jumping, because nothing points at it. A and B sustain each other and end up far ahead. Note that the final ranking is <em>not</em> the ranking by number of incoming links &mdash; that is the entire point.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>Damping makes it possible to get from anywhere to anywhere, which guarantees that a single set of settled scores exists and that repeated averaging finds it regardless of the starting point.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Guaranteed: the distance to the answer is multiplied by \(\alpha\) each round.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>\(O(m)\) per round, so linear in the number of edges overall.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>Ignoring nodes with no outgoing links causes the scores to leak away and stop adding to one. This is the most common implementation bug.</li><li>Pushing \(\alpha\) towards 1 respects the link structure more but converges far more slowly and is easier to manipulate.</li></ul></div><div class="box tip"><div class="box-title">Worth knowing</div><p>Replacing the uniform random jump by a jump back to one chosen node gives personalised scores, which measure closeness to that node. This is the standard graph-based recommendation primitive.</p></div><span id="algo2"></span><h3>Generating random walks</h3><p class="algo-tag">Sampling \(\cdot\) turns a graph into sequences</p><p>Produce sequences of nodes that can be treated like sentences, so that methods designed for text can be applied to a graph.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A graph, a walk length, and a number of walks to start from each node.</p><p><strong>Produce.</strong> A collection of node sequences.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Choose a starting node.</strong> Work through every node in turn, so that none is neglected.</li><li><strong>Step to a random neighbour.</strong> Pick uniformly among the nodes joined to the current one.</li><li><strong>Continue to the required length.</strong> Typically 40 to 80 steps.</li><li><strong>Repeat from the same start.</strong> Ten walks per node is usual; different walks explore different directions.</li><li><strong>Read the sequences as sentences.</strong> Nodes appearing near one another in these sequences are treated as related, in the way that words appearing near one another in text are.</li></ol></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>On an undirected graph, a very long walk visits each node in proportion to how many edges it has &mdash; and nothing more. So a long walk tells you only the degree. All the information is in <em>short</em> walks, which is why the length is deliberately limited.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Fixed length, fixed count.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>Proportional to the total number of steps taken.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>Walks get trapped in dense regions and rarely cross weak bridges, so sparsely connected parts are under-represented.</li><li>Too long a walk washes out local structure, for the reason above.</li></ul></div><span id="algo3"></span><h3>The biased second-order walk</h3><p class="algo-tag">Sampling \(\cdot\) two knobs that change the meaning</p><p>Steer the walk so that it either stays near where it started or pushes away, and thereby choose what 'similar' will mean.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A graph and two numbers: \(p\) controlling return, \(q\) controlling outward movement.</p><p><strong>Produce.</strong> Sequences whose statistics reflect the chosen bias.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Remember the previous node.</strong> Unlike an ordinary walk, this one looks back one step. That is what makes it second-order.</li><li><strong>Classify each candidate next node.</strong> From the current node, each neighbour is one of three things: the node just left; a node also joined to the one just left; or a node further away.</li><li><strong>Give each class a weight.</strong> Weight one divided by \(p\) for going back, one for staying at the same distance, one divided by \(q\) for moving outward.</li><li><strong>Normalise and step.</strong> Divide the weights by their total to get probabilities, and choose accordingly.</li><li><strong>Choose the knobs deliberately.</strong> Larger \(q\) keeps the walk local, so nodes playing similar structural roles look alike. Smaller \(q\) lets it roam, so nodes in the same region look alike. These are different notions of similarity and different tasks want different ones.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>From node \(t\) the walk has just moved to \(v\). Where does it go next?</p><table><thead><tr><th>Candidate</th><th>Weight</th><th>\(q = 0.25\) (roams)</th><th>\(q = 4\) (stays local)</th></tr></thead><tbody><tr><td>back to \(t\)</td><td>1/p</td><td>0.14</td><td>0.40</td></tr><tr><td>also joined to \(t\)</td><td>1</td><td>0.14</td><td>0.40</td></tr><tr><td>two hops from \(t\)</td><td>1/q</td><td>0.57</td><td>0.10</td></tr><tr><td>two hops from \(t\)</td><td>1/q</td><td>0.14</td><td>0.10</td></tr></tbody></table><p>With \(q\) small most of the probability goes to nodes further out; with \(q\) large the walk stays in the neighbourhood it started in. One parameter, two entirely different notions of similarity.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>The walk is still memoryless once you regard the pair (previous, current) as the state, so the usual theory applies to that enlarged description.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Fixed length.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>Slightly more than an ordinary walk, since the neighbours of the previous node must be consulted. Precomputing these lookups costs memory proportional to the sum of squared degrees, which is prohibitive on graphs with very large hubs.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>Both knobs need choosing on held-out data. Their best values are task-dependent and not transferable between graphs.</li></ul></div><span id="algo4"></span><h3>Scoring candidate links</h3><p class="algo-tag">Scoring \(\cdot\) needs no training</p><p>Guess which pairs of currently unconnected nodes are likely to become connected.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A graph and a list of candidate pairs.</p><p><strong>Produce.</strong> A score per pair; higher means likelier.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Count the shared neighbours.</strong> For a pair, the number of nodes joined to both. Two people with many mutual friends are likely to meet.</li><li><strong>Correct for popularity.</strong> Divide by the total number of distinct nodes joined to either. Otherwise two very well-connected nodes always score highly regardless of any real affinity.</li><li><strong>Weight rare neighbours more heavily.</strong> A shared neighbour joined to only three nodes is far more informative than one joined to ten thousand. Give each shared neighbour a weight falling off with how connected it is, and add these up.</li><li><strong>Rank.</strong> Sort the candidate pairs by score.</li><li><strong>Evaluate honestly.</strong> Remove the edges you intend to test <em>before</em> computing anything. Otherwise every method reads the answer off the graph it was given.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Two candidate pairs, each sharing exactly one neighbour.</p><table><thead><tr><th>Pair</th><th>Shared neighbour</th><th>That neighbour's connections</th><th>Weighted score</th></tr></thead><tbody><tr><td>A and B</td><td>one</td><td>3</td><td>0.91</td></tr><tr><td>C and D</td><td>one</td><td>10 000</td><td>0.11</td></tr></tbody></table><p>Counting alone rates these pairs identically. Weighting by rarity separates them by nearly a factor of ten, and matches intuition: sharing an obscure acquaintance means far more than both using the same railway station.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>These are heuristics with no optimality claim. Their justification is empirical &mdash; they remain hard to beat on many real networks.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Direct.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>Proportional to the product of the two nodes' degrees per pair.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li><strong>Choosing the negatives carelessly makes the numbers meaningless.</strong> There are vastly more non-edges than edges, and a randomly chosen non-edge is usually two nodes on opposite sides of the graph &mdash; trivially easy. Compare against hard negatives, such as pairs exactly two hops apart.</li><li>None of these scores can propose a link between two nodes with no shared neighbours at all, whatever the rest of the structure suggests.</li></ul></div><nav class="lesson-nav"><div class="container"><a href="../index.html">Course index</a><a href="page.html">&#8592; Back to the section</a></div></nav>
+</main>
+<footer class="site-footer"><strong>Machine Learning A&ndash;Z</strong> &middot; From empirical risk minimisation to graph neural networks<span class="footer-meta">Edition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">The interactive figure could not be loaded. Check your network connection.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+// Colours resolved from the stylesheet, so the figures follow the light/dark
+// theme. Each entry is a function: board attributes that are functions are
+// re-evaluated on update, so a theme switch only needs a redraw.
+var BOARDS = [];
+function cssv(name, fallback){
+    try {
+        var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback;
+    } catch (e) { return fallback; }
+}
+var PAL = {
+    text:  function(){ return cssv('--color-text',  '#1f2937'); },
+    muted: function(){ return cssv('--color-muted', '#6b7280'); },
+    axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+    ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+    grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+    cell:  function(){ return cssv('--cell-bg',     '#ffffff'); }
+};
+// Re-render every board when the theme attribute flips.
+if (window.MutationObserver) {
+    new MutationObserver(function(){
+        for (var i = 0; i < BOARDS.length; i++) {
+            try { BOARDS[i].fullUpdate(); } catch (e) {}
+        }
+    }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>C5.Q1 — Partial trace and reduced states</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C5.Q1 — Marginals of a multipartite state&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;The partial trace is the unique operation reproducing all local measurement statistics. Implemented on the reshaped tensor it is a sequence of traces over paired axes.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;partial_trace(rho, dims, keep)&lt;/code&gt; for a density matrix on subsystems of dimensions &lt;code&gt;dims&lt;/code&gt;, keeping the (sorted) indices in &lt;code&gt;keep&lt;/code&gt;; and &lt;code&gt;purity(rho)&lt;/code&gt; returning \(\operatorname{tr}\rho^{2}\) as a float rounded to 6 decimals.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;Bell state, keep=[0]  -&amp;gt;  I/2, purity 0.5
+product state         -&amp;gt;  purity 1.0&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def partial_trace(rho, dims, keep):
+    # reshape to dims+dims, then np.trace over the paired axes of the discarded systems
+    ...
+
+def purity(rho):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def partial_trace(rho, dims, keep):
+    n = len(dims)
+    keep = sorted(keep)
+    rho = np.asarray(rho, dtype=complex).reshape(list(dims) + list(dims))
+    for ax in sorted(set(range(n)) - set(keep), reverse=True):
+        half = rho.ndim // 2
+        rho = np.trace(rho, axis1=ax, axis2=ax + half)
+    d = int(np.prod([dims[k] for k in keep]))
+    return rho.reshape(d, d)
+
+def purity(rho):
+    rho = np.asarray(rho, dtype=complex)
+    return round(float(np.real(np.trace(rho @ rho))), 6)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+bell = np.array([1,0,0,1], dtype=complex)/np.sqrt(2)
+rho = np.outer(bell, bell.conj())
+print(np.round(partial_trace(rho, [2,2], [0]).real, 6).tolist())
+</text></testcode><stdin><text /></stdin><expected><text>[[0.5, 0.0], [0.0, 0.5]]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+bell = np.array([1,0,0,1], dtype=complex)/np.sqrt(2)
+rho = np.outer(bell, bell.conj())
+print(purity(rho), purity(partial_trace(rho, [2,2], [0])))
+</text></testcode><stdin><text /></stdin><expected><text>1.0 0.5
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+v = np.zeros(4, dtype=complex); v[0]=1
+rho = np.outer(v, v.conj())
+print(purity(partial_trace(rho, [2,2], [1])))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+ghz = np.zeros(8, dtype=complex); ghz[0]=ghz[7]=1/np.sqrt(2)
+rho = np.outer(ghz, ghz.conj())
+r01 = partial_trace(rho, [2,2,2], [0,1])
+print(r01.shape, purity(r01))
+</text></testcode><stdin><text /></stdin><expected><text>(4, 4) 0.5
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+rng = np.random.default_rng(4)
+v = rng.normal(size=6) + 1j*rng.normal(size=6); v/=np.linalg.norm(v)
+rho = np.outer(v, v.conj())
+rA = partial_trace(rho, [2,3], [0])
+print(rA.shape, round(float(np.real(np.trace(rA))), 6))
+</text></testcode><stdin><text /></stdin><expected><text>(2, 2) 1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C5.Q2 — Kraus operators and standard noise channels</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C5.Q2 — Applying and validating a channel&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;A CPTP map has Kraus operators with \(\sum_k K_k^{\dagger}K_k=I\). Depolarizing, dephasing and amplitude damping are the workhorse noise models.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;apply_kraus(rho, Ks)&lt;/code&gt;; &lt;code&gt;is_cptp(Ks, tol=1e-9)&lt;/code&gt; returning a &lt;code&gt;bool&lt;/code&gt;; and the three constructors &lt;code&gt;depolarizing(p)&lt;/code&gt;, &lt;code&gt;dephasing(p)&lt;/code&gt;, &lt;code&gt;amplitude_damping(g)&lt;/code&gt; returning lists of Kraus operators exactly as tabulated in §3.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;depolarizing(1.0) applied to any rho  -&amp;gt;  I/2
+amplitude_damping(1.0) applied to any rho  -&amp;gt;  |0&amp;gt;&amp;lt;0|&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def apply_kraus(rho, Ks):
+    ...
+
+def is_cptp(Ks, tol=1e-9):
+    ...
+
+def depolarizing(p):
+    ...
+
+def dephasing(p):
+    ...
+
+def amplitude_damping(g):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+I2 = np.eye(2, dtype=complex)
+X = np.array([[0, 1], [1, 0]], dtype=complex)
+Y = np.array([[0, -1j], [1j, 0]], dtype=complex)
+Z = np.array([[1, 0], [0, -1]], dtype=complex)
+
+def apply_kraus(rho, Ks):
+    rho = np.asarray(rho, dtype=complex)
+    out = np.zeros_like(rho)
+    for K in Ks:
+        K = np.asarray(K, dtype=complex)
+        out = out + K @ rho @ K.conj().T
+    return out
+
+def is_cptp(Ks, tol=1e-9):
+    d = np.asarray(Ks[0]).shape[1]
+    S = sum(np.asarray(K, dtype=complex).conj().T @ np.asarray(K, dtype=complex) for K in Ks)
+    return bool(np.allclose(S, np.eye(d), atol=tol))
+
+def depolarizing(p):
+    return [np.sqrt(1 - 3 * p / 4) * I2, np.sqrt(p) / 2 * X,
+            np.sqrt(p) / 2 * Y, np.sqrt(p) / 2 * Z]
+
+def dephasing(p):
+    return [np.sqrt(1 - p) * I2, np.sqrt(p) * Z]
+
+def amplitude_damping(g):
+    K0 = np.array([[1, 0], [0, np.sqrt(1 - g)]], dtype=complex)
+    K1 = np.array([[0, np.sqrt(g)], [0, 0]], dtype=complex)
+    return [K0, K1]
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+print(is_cptp(depolarizing(0.3)), is_cptp(dephasing(0.2)), is_cptp(amplitude_damping(0.7)))
+</text></testcode><stdin><text /></stdin><expected><text>True True True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+rho = np.array([[1,0],[0,0]], dtype=complex)
+print(np.round(apply_kraus(rho, depolarizing(1.0)).real, 6).tolist())
+</text></testcode><stdin><text /></stdin><expected><text>[[0.5, 0.0], [0.0, 0.5]]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+rho = np.array([[0,0],[0,1]], dtype=complex)
+print(np.round(apply_kraus(rho, amplitude_damping(1.0)).real, 6).tolist())
+</text></testcode><stdin><text /></stdin><expected><text>[[1.0, 0.0], [0.0, 0.0]]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+plus = np.array([1,1], dtype=complex)/np.sqrt(2)
+rho = np.outer(plus, plus.conj())
+out = apply_kraus(rho, dephasing(0.5))
+print(np.round(out.real, 6).tolist())
+</text></testcode><stdin><text /></stdin><expected><text>[[0.5, 0.0], [0.0, 0.5]]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+rng = np.random.default_rng(9)
+v = rng.normal(size=2)+1j*rng.normal(size=2); v/=np.linalg.norm(v)
+rho = np.outer(v, v.conj())
+out = apply_kraus(rho, depolarizing(0.37))
+print(round(float(np.real(np.trace(out))), 6))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C5.Q3 — The Choi matrix and complete positivity</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C5.Q3 — Channel–state duality&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;The Choi–Jamiołkowski isomorphism turns a channel into a state: \(J(\mathcal E)=(\mathrm{id}\otimes\mathcal E)(|\Omega\rangle\langle\Omega|)\) with \(|\Omega\rangle=\tfrac1{\sqrt d}\sum_i|ii\rangle\). \(\mathcal E\) is completely positive iff \(J\ge0\).&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;choi(Ks, d=2)&lt;/code&gt; returning the \(d^{2}\times d^{2}\) Choi matrix of the channel with Kraus operators &lt;code&gt;Ks&lt;/code&gt;; &lt;code&gt;is_cp_from_choi(J, tol=1e-9)&lt;/code&gt; returning a &lt;code&gt;bool&lt;/code&gt; (all eigenvalues \(\ge-\)tol); and &lt;code&gt;kraus_rank(J, tol=1e-9)&lt;/code&gt; returning the number of strictly positive eigenvalues.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;identity channel   -&amp;gt;  Choi = |Omega&amp;gt;&amp;lt;Omega|, rank 1
+depolarizing(1.0)  -&amp;gt;  rank 4&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def choi(Ks, d=2):
+    # (id (x) E) applied to |Omega&gt;&lt;Omega|
+    ...
+
+def is_cp_from_choi(J, tol=1e-9):
+    ...
+
+def kraus_rank(J, tol=1e-9):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def choi(Ks, d=2):
+    omega = np.zeros(d * d, dtype=complex)
+    for i in range(d):
+        omega[i * d + i] = 1 / np.sqrt(d)
+    rho = np.outer(omega, omega.conj()).reshape(d, d, d, d)
+    out = np.zeros((d, d, d, d), dtype=complex)
+    for K in Ks:
+        K = np.asarray(K, dtype=complex)
+        tmp = np.einsum('ab,ibjc,dc-&gt;iajd', K, rho.transpose(0, 1, 2, 3), K.conj())
+        out = out + tmp
+    return out.reshape(d * d, d * d)
+
+def is_cp_from_choi(J, tol=1e-9):
+    w = np.linalg.eigvalsh((np.asarray(J) + np.asarray(J).conj().T) / 2)
+    return bool(np.all(w &gt;= -tol))
+
+def kraus_rank(J, tol=1e-9):
+    w = np.linalg.eigvalsh((np.asarray(J) + np.asarray(J).conj().T) / 2)
+    return int(np.sum(w &gt; tol))
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+J = choi([np.eye(2, dtype=complex)])
+print(np.round(J.real, 6).tolist())
+</text></testcode><stdin><text /></stdin><expected><text>[[0.5, 0.0, 0.0, 0.5], [0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0], [0.5, 0.0, 0.0, 0.5]]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+J = choi([np.eye(2, dtype=complex)])
+print(is_cp_from_choi(J), kraus_rank(J))
+</text></testcode><stdin><text /></stdin><expected><text>True 1
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+I2 = np.eye(2, dtype=complex)
+X = np.array([[0,1],[1,0]], dtype=complex)
+Y = np.array([[0,-1j],[1j,0]], dtype=complex)
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+Ks = [np.sqrt(1-3*1.0/4)*I2, 0.5*X, 0.5*Y, 0.5*Z]
+J = choi(Ks)
+print(kraus_rank(J), np.allclose(J, np.eye(4)/4))
+</text></testcode><stdin><text /></stdin><expected><text>4 True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+K0 = np.array([[1,0],[0,np.sqrt(1-0.3)]], dtype=complex)
+K1 = np.array([[0,np.sqrt(0.3)],[0,0]], dtype=complex)
+J = choi([K0, K1])
+print(is_cp_from_choi(J), kraus_rank(J), round(float(np.real(np.trace(J))), 6))
+</text></testcode><stdin><text /></stdin><expected><text>True 2 1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+# transposition is positive but not completely positive: its Choi matrix has a negative eigenvalue
+E = [np.array([[1,0],[0,0]], dtype=complex), np.array([[0,0],[0,1]], dtype=complex),
+     np.array([[0,1],[0,0]], dtype=complex), np.array([[0,0],[1,0]], dtype=complex)]
+J = choi([np.eye(2, dtype=complex)])
+Jt = J.reshape(2,2,2,2).transpose(0,3,2,1).reshape(4,4)
+print(is_cp_from_choi(Jt))
+</text></testcode><stdin><text /></stdin><expected><text>False
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C5.Q4 — Trace distance, fidelity and data processing</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C5.Q4 — How far apart are two states?&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;\(D=\tfrac12\|\rho-\sigma\|_1\) is the optimal distinguishing advantage; \(F\) is Uhlmann fidelity. Both are monotone under channels.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;trace_distance(rho, sigma)&lt;/code&gt; and &lt;code&gt;fidelity(rho, sigma)&lt;/code&gt; (\(F=(\operatorname{tr}\sqrt{\sqrt\rho\sigma\sqrt\rho})^{2}\)), each returning a float rounded to 6 decimals, and &lt;code&gt;von_neumann(rho)&lt;/code&gt; returning \(S(\rho)\) in bits, rounded to 6 decimals, with eigenvalues clipped at 0 before taking logs.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;D(|0&amp;gt;,|1&amp;gt;) = 1.0,   F(|0&amp;gt;,|1&amp;gt;) = 0.0
+S(I/2) = 1.0,       S(|0&amp;gt;&amp;lt;0|) = 0.0&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def trace_distance(rho, sigma):
+    ...
+
+def fidelity(rho, sigma):
+    ...
+
+def von_neumann(rho):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def _sqrtm_psd(A):
+    w, v = np.linalg.eigh((A + A.conj().T) / 2)
+    w = np.clip(w, 0, None)
+    return (v * np.sqrt(w)) @ v.conj().T
+
+def trace_distance(rho, sigma):
+    D = np.asarray(rho, dtype=complex) - np.asarray(sigma, dtype=complex)
+    w = np.linalg.eigvalsh((D + D.conj().T) / 2)
+    return round(float(0.5 * np.sum(np.abs(w))), 6)
+
+def fidelity(rho, sigma):
+    r = _sqrtm_psd(np.asarray(rho, dtype=complex))
+    M = r @ np.asarray(sigma, dtype=complex) @ r
+    w = np.linalg.eigvalsh((M + M.conj().T) / 2)
+    w = np.clip(w, 0, None)
+    return round(float(np.sum(np.sqrt(w)) ** 2), 6)
+
+def von_neumann(rho):
+    w = np.linalg.eigvalsh((np.asarray(rho, dtype=complex) + np.asarray(rho, dtype=complex).conj().T) / 2)
+    w = np.clip(w, 0, None)
+    w = w[w &gt; 1e-12]
+    return round(float(abs(-np.sum(w * np.log2(w)))), 6)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+r0 = np.array([[1,0],[0,0]], dtype=complex)
+r1 = np.array([[0,0],[0,1]], dtype=complex)
+print(trace_distance(r0,r1), fidelity(r0,r1))
+</text></testcode><stdin><text /></stdin><expected><text>1.0 0.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+I2 = np.eye(2, dtype=complex)/2
+r0 = np.array([[1,0],[0,0]], dtype=complex)
+print(von_neumann(I2), von_neumann(r0))
+</text></testcode><stdin><text /></stdin><expected><text>1.0 0.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+r0 = np.array([[1,0],[0,0]], dtype=complex)
+plus = np.array([1,1], dtype=complex)/np.sqrt(2)
+rp = np.outer(plus, plus.conj())
+print(trace_distance(r0,rp), fidelity(r0,rp))
+</text></testcode><stdin><text /></stdin><expected><text>0.707107 0.5
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+I2 = np.eye(2, dtype=complex)
+X = np.array([[0,1],[1,0]], dtype=complex)
+Y = np.array([[0,-1j],[1j,0]], dtype=complex)
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+p = 0.4
+Ks = [np.sqrt(1-3*p/4)*I2, np.sqrt(p)/2*X, np.sqrt(p)/2*Y, np.sqrt(p)/2*Z]
+def ap(rho): return sum(K @ rho @ K.conj().T for K in Ks)
+r0 = np.array([[1,0],[0,0]], dtype=complex)
+r1 = np.array([[0,0],[0,1]], dtype=complex)
+print(trace_distance(ap(r0), ap(r1)) &lt;= trace_distance(r0, r1))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+rho = np.diag([0.7, 0.3]).astype(complex)
+print(von_neumann(rho))
+</text></testcode><stdin><text /></stdin><expected><text>0.881291
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

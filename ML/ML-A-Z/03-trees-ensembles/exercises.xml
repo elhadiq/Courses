@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Gini and entropy impurity</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q1 &amp;mdash; IMPURITY CRITERIA&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Section 3.1 explained that Gini and entropy are strictly concave whereas misclassification error is only piecewise linear &amp;mdash; and that concavity is what lets a greedy split see progress.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;gini(labels)&lt;/code&gt;&lt;/strong&gt; and &lt;strong&gt;&lt;code&gt;entropy(labels)&lt;/code&gt;&lt;/strong&gt; for a list of class labels (any hashable values, any number of classes). Entropy is in &lt;strong&gt;bits&lt;/strong&gt; (base 2), and an empty list has impurity 0.0 for both.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;gini([0, 0, 1, 1])     -&amp;gt;  0.5
+entropy([0, 0, 1, 1])  -&amp;gt;  1.0&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; Gini = 1 &amp;minus; &amp;sum;p&lt;sub&gt;k&lt;/sub&gt;&amp;sup2;. For entropy skip any class with p&lt;sub&gt;k&lt;/sub&gt; = 0 (0&amp;middot;log 0 is taken as 0).&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import math
+
+
+def gini(labels):
+    # Completer
+    ...
+
+
+def entropy(labels):
+    # Completer : logarithme en base 2
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import math
+
+
+def _props(labels):
+    counts = {}
+    for lab in labels:
+        counts[lab] = counts.get(lab, 0) + 1
+    n = len(labels)
+    return [c / n for c in counts.values()]
+
+
+def gini(labels):
+    if not labels:
+        return 0.0
+    return 1.0 - sum(p * p for p in _props(labels))
+
+
+def entropy(labels):
+    if not labels:
+        return 0.0
+    return -sum(p * math.log(p, 2) for p in _props(labels) if p &gt; 0)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(gini([0, 0, 1, 1]), entropy([0, 0, 1, 1]))
+</text></testcode><stdin><text /></stdin><expected><text>0.5 1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(gini([1, 1, 1, 1]), entropy([1, 1, 1, 1]))
+</text></testcode><stdin><text /></stdin><expected><text>0.0 -0.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(round(gini(['a', 'a', 'b', 'c']), 6), round(entropy(['a', 'a', 'b', 'c']), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.625 1.5
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(gini([]), entropy([]))
+</text></testcode><stdin><text /></stdin><expected><text>0.0 0.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(round(gini([0, 1, 2]), 6), round(entropy([0, 1, 2]), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.666667 1.584963
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Best split by weighted impurity decrease</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q2 &amp;mdash; GREEDY SPLITTING&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Constructing the optimal tree is NP-complete (Hyafil &amp;amp; Rivest, 1976), so CART picks the locally best split and never reconsiders. This exercise implements that one greedy step.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;best_split(xs, labels)&lt;/code&gt;&lt;/strong&gt; for a single numeric feature. Consider as candidate thresholds the midpoints between consecutive &lt;em&gt;distinct&lt;/em&gt; sorted values; a point goes left if &lt;code&gt;x &amp;lt;= threshold&lt;/code&gt;. Return &lt;code&gt;(threshold, gain)&lt;/code&gt; for the largest weighted Gini decrease, or &lt;code&gt;(None, 0.0)&lt;/code&gt; if no split is possible.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;best_split([1, 2, 3, 4], [0, 0, 1, 1])  -&amp;gt;  (2.5, 0.5)&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; gain = I(parent) &amp;minus; (n&lt;sub&gt;L&lt;/sub&gt;/n)I(left) &amp;minus; (n&lt;sub&gt;R&lt;/sub&gt;/n)I(right), using the &lt;code&gt;gini&lt;/code&gt; of the previous exercise.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def gini(labels):
+    # Completer (ou reutiliser la solution de Q1)
+    ...
+
+
+def best_split(xs, labels):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def gini(labels):
+    if not labels:
+        return 0.0
+    counts = {}
+    for lab in labels:
+        counts[lab] = counts.get(lab, 0) + 1
+    n = len(labels)
+    return 1.0 - sum((c / n) ** 2 for c in counts.values())
+
+
+def best_split(xs, labels):
+    n = len(xs)
+    parent = gini(labels)
+    values = sorted(set(xs))
+    if len(values) &lt; 2:
+        return (None, 0.0)
+    best_thr, best_gain = None, 0.0
+    for a, b in zip(values, values[1:]):
+        thr = (a + b) / 2.0
+        left = [labels[i] for i in range(n) if xs[i] &lt;= thr]
+        right = [labels[i] for i in range(n) if xs[i] &gt; thr]
+        if not left or not right:
+            continue
+        gain = parent - (len(left) / n) * gini(left) - (len(right) / n) * gini(right)
+        if gain &gt; best_gain + 1e-12:
+            best_thr, best_gain = thr, gain
+    return (best_thr, best_gain)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(best_split([1, 2, 3, 4], [0, 0, 1, 1]))
+</text></testcode><stdin><text /></stdin><expected><text>(2.5, 0.5)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>thr, g = best_split([1, 2, 3, 4, 5, 6], [0, 0, 0, 1, 1, 1])
+print(thr, round(g, 6))
+</text></testcode><stdin><text /></stdin><expected><text>3.5 0.5
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(best_split([5, 5, 5], [0, 1, 0]))
+</text></testcode><stdin><text /></stdin><expected><text>(None, 0.0)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>thr, g = best_split([1, 2, 3, 4], [0, 1, 0, 1])
+print(thr, round(g, 6))
+</text></testcode><stdin><text /></stdin><expected><text>1.5 0.166667
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>thr, g = best_split([0, 1, 2, 3, 4], [0, 0, 0, 0, 1])
+print(thr, round(g, 6))
+</text></testcode><stdin><text /></stdin><expected><text>3.5 0.32
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — Ensemble variance and the correlation floor</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q3 &amp;mdash; WHY BAGGING PLATEAUS&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Section 3.2 proved that averaging B predictors of variance &amp;sigma;&amp;sup2; and pairwise correlation &amp;rho; gives Var = &amp;rho;&amp;sigma;&amp;sup2; + (1&amp;minus;&amp;rho;)&amp;sigma;&amp;sup2;/B. The second term vanishes; the first does not.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;ensemble_variance(sigma2, rho, B)&lt;/code&gt;&lt;/strong&gt; returning that variance, and &lt;strong&gt;&lt;code&gt;trees_needed(sigma2, rho, target)&lt;/code&gt;&lt;/strong&gt; returning the smallest B &amp;ge; 1 achieving a variance &amp;le; &lt;code&gt;target&lt;/code&gt;, or &lt;code&gt;None&lt;/code&gt; if the asymptote &amp;rho;&amp;sigma;&amp;sup2; already exceeds the target.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;ensemble_variance(1.0, 0.5, 1)    -&amp;gt;  1.0
+trees_needed(1.0, 0.5, 0.6)       -&amp;gt;  5
+trees_needed(1.0, 0.5, 0.4)       -&amp;gt;  None&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; Check the asymptote &lt;em&gt;first&lt;/em&gt;: no number of trees can beat &amp;rho;&amp;sigma;&amp;sup2;.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def ensemble_variance(sigma2, rho, B):
+    # Completer
+    ...
+
+
+def trees_needed(sigma2, rho, target):
+    # Completer : tester d'abord l'asymptote
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def ensemble_variance(sigma2, rho, B):
+    return rho * sigma2 + (1.0 - rho) * sigma2 / B
+
+
+def trees_needed(sigma2, rho, target):
+    if rho * sigma2 &gt; target:
+        return None
+    B = 1
+    while ensemble_variance(sigma2, rho, B) &gt; target:
+        B += 1
+        if B &gt; 10 ** 7:
+            return None
+    return B
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(ensemble_variance(1.0, 0.5, 1))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(trees_needed(1.0, 0.5, 0.6), trees_needed(1.0, 0.5, 0.4))
+</text></testcode><stdin><text /></stdin><expected><text>5 None
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(round(ensemble_variance(2.0, 0.2, 100), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.416
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(trees_needed(1.0, 0.0, 0.01))
+</text></testcode><stdin><text /></stdin><expected><text>100
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>vals = [round(ensemble_variance(1.0, 0.3, b), 4) for b in [1, 10, 100, 1000]]
+print(vals)
+</text></testcode><stdin><text /></stdin><expected><text>[1.0, 0.37, 0.307, 0.3007]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q4 — Out-of-bag indices</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q4 &amp;mdash; FREE VALIDATION&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Each bootstrap sample omits about (1&amp;minus;1/n)&lt;sup&gt;n&lt;/sup&gt; &amp;rarr; e&lt;sup&gt;&amp;minus;1&lt;/sup&gt; &amp;asymp; 36.8 % of the data. Averaging each point's prediction over only the trees that never saw it gives an unbiased risk estimate at no extra cost.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;oob_indices(n, bootstrap)&lt;/code&gt;&lt;/strong&gt; returning the sorted list of indices in &lt;code&gt;range(n)&lt;/code&gt; that do &lt;em&gt;not&lt;/em&gt; appear in the bootstrap sample, and &lt;strong&gt;&lt;code&gt;oob_fraction(n, bootstrap)&lt;/code&gt;&lt;/strong&gt; returning their proportion.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;oob_indices(5, [0, 0, 2, 3, 3])  -&amp;gt;  [1, 4]
+oob_fraction(5, [0, 0, 2, 3, 3]) -&amp;gt;  0.4&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; A set membership test is enough &amp;mdash; the multiplicities in the bootstrap do not matter.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def oob_indices(n, bootstrap):
+    # Completer
+    ...
+
+
+def oob_fraction(n, bootstrap):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def oob_indices(n, bootstrap):
+    seen = set(bootstrap)
+    return [i for i in range(n) if i not in seen]
+
+
+def oob_fraction(n, bootstrap):
+    return len(oob_indices(n, bootstrap)) / n
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(oob_indices(5, [0, 0, 2, 3, 3]))
+</text></testcode><stdin><text /></stdin><expected><text>[1, 4]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(oob_fraction(5, [0, 0, 2, 3, 3]))
+</text></testcode><stdin><text /></stdin><expected><text>0.4
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(oob_indices(4, [0, 1, 2, 3]), oob_fraction(4, [0, 1, 2, 3]))
+</text></testcode><stdin><text /></stdin><expected><text>[] 0.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(oob_indices(3, [1, 1, 1]))
+</text></testcode><stdin><text /></stdin><expected><text>[0, 2]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text># the classical limit: a deterministic 'bootstrap' hitting only even indices
+n = 10
+bs = [i for i in range(0, n, 2)] * 2
+print(oob_indices(n, bs), oob_fraction(n, bs))
+</text></testcode><stdin><text /></stdin><expected><text>[1, 3, 5, 7, 9] 0.5
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

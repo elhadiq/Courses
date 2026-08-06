@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 7 — Random Walks, PageRank and Node Embeddings</title>
+<link href="../assets/style.css" rel="stylesheet">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+
+/* Use the full width the theme allows: the shared stylesheet caps a lesson at
+   880px, which leaves wide figures and tables boxed into the middle of a large
+   screen. --max-w is the theme's own page width, so this stays consistent with
+   the landing page. */
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) {
+  .lesson-content { padding-left: 16px; padding-right: 16px; }
+}
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule);
+               padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center;
+               padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.lesson-nav { max-width: 880px; margin: 0 auto 40px; padding: 0 24px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav .container { display: flex; gap: 18px; flex-wrap: wrap; width: 100%; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600;
+                font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.keypoints h4 { margin-top: 0; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Machine Learning A&ndash;Z</a> &middot; Course</div><span class="course-code">Graph-based machine learning</span></div></header>
+<section class="lesson-hero"><div class="container"><div class="lesson-label">Part II &middot; Section 7</div><h1>Section 7 — Random Walks, PageRank and Node Embeddings</h1><div class="lesson-sub">Centrality by random surfing, shallow embeddings learned from walk co-occurrence, and the link-prediction task that made them useful.</div></div></section>
+<main class="lesson-content">
+<div class="box method"><div class="box-title">Companion annex</div><p>Every algorithm in this section is also set out <strong><a href="algorithms.html">step by step in the annex</a></strong>: what it is given, what it produces, the steps in order, a small example worked by hand, and why it is correct, why it stops and what it costs &mdash; described in words, with no program code.</p></div><h2>7.1 The random walk as a probe</h2><p>A random walk on a graph is the simplest process that turns structure into numbers. From node u, step to a uniformly chosen neighbour. The state distribution evolves by</p><div class="eq">\[\pi^{(t+1)} = P^{T}\pi^{(t)}, P = D^{-1}A\]</div><p>P is row-stochastic, and note that P = \(I - L_{rw}\) &mdash; the random-walk Laplacian of Section 5 is literally "one minus one step of the walk". Everything spectral we proved there transfers here.</p><div class="box thm"><div class="box-title">Theorem — Stationary distribution of an undirected walk</div>If G is connected, undirected and non-bipartite, the walk has a unique stationary distribution and it is <strong>proportional to degree</strong>:<div class="eq">\[\pi_{u} = d_{u} / 2m\]</div><p style="margin:6px 0 0 0;"><em>Proof.</em> (\(P^{T}\pi )_{v} = \sum_{u}(A_{uv}/d_{u})(d_{u}/2m) = (\sum_{u}A_{uv})/2m = d_{v}/2m\). Uniqueness follows from Perron&ndash;Frobenius <a class="cite" href="#ref-perron1907">[4]</a>. \(\square\)</p><p style="margin:6px 0 0 0;">The consequence is a warning: on an undirected graph, "how often does a long walk visit u" is <em>just the degree</em> and tells you nothing new. The interesting quantities are all about <em>short</em>, <em>restarted</em>, or <em>directed</em> walks.</p></div><h2>7.2 PageRank</h2><p>On the directed Web graph the na&iuml;ve walk breaks in two ways: <em>dangling nodes</em> with no out-links absorb all the probability, and <em>spider traps</em> &mdash; groups of pages linking only to each other &mdash; accumulate rank without ever releasing it. Page, Brin, Motwani and Winograd <a class="cite" href="#ref-page1999">[2]</a> <a class="cite" href="#ref-brin1998">[1]</a> fixed both with a single device: at each step, with probability \(1 - \alpha\), teleport to a uniformly random page.</p><div class="eq">\[\mathbf{r = \alpha P^{T} r + (1 - \alpha ) (1/n) 1}, \alpha \approx 0.85\]</div><div class="box thm"><div class="box-title">Why PageRank is well defined</div>The teleport term makes the modified transition matrix \(\tilde{G} = \alpha P + (1-\alpha )(1/n)11^{T}\) strictly positive, hence irreducible and aperiodic. By Perron&ndash;Frobenius <a class="cite" href="#ref-perron1907">[4]</a> it has a unique positive dominant eigenvector with eigenvalue 1, and power iteration converges to it geometrically at rate \(\alpha\). With \(\alpha = 0.85\), each iteration removes about 15 % of the error, so <strong>50&ndash;100 iterations suffice for any graph size</strong> &mdash; and each iteration costs only O(m), because P is sparse and the rank-one teleport term is handled as a scalar.<p style="margin:8px 0 0 0;">\(\alpha\) is a genuine trade-off: larger \(\alpha\) respects the link structure more but converges more slowly and is more vulnerable to link spam.</p></div><pre><code>def pagerank(out_links, alpha=0.85, tol=1e-10, max_iter=100):
+    """Power iteration. out_links maps node -&gt; list of successors. O(m) per iteration."""
+    nodes = list(out_links)
+    n = len(nodes)
+    r = {u: 1.0 / n for u in nodes}
+    for _ in range(max_iter):
+        new = {u: 0.0 for u in nodes}
+        dangling = 0.0
+        for u in nodes:
+            succ = out_links[u]
+            if not succ:                       # dangling: redistribute uniformly
+                dangling += r[u]
+                continue
+            share = r[u] / len(succ)
+            for v in succ:
+                new[v] += share
+        base = (1.0 - alpha) / n + alpha * dangling / n
+        new = {u: base + alpha * new[u] for u in nodes}
+        if sum(abs(new[u] - r[u]) for u in nodes) &lt; tol:
+            return new
+        r = new
+    return r</code></pre><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Step through the iterations and vary the damping factor \(\alpha\). Note what happens to convergence speed as \(\alpha \to 1\).</p><div id="jxg19" class="viz-board" style="height:520px;"></div><p class="viz-caption"><strong>Figure.</strong> PageRank by power iteration on a small directed graph. Node area is proportional to the current rank; the bars on the right give the exact values. Iteration 0 is the uniform vector. Convergence is visibly geometric, and the final ranking is <em>not</em> the in-degree ranking &mdash; a single link from a high-rank page outweighs many links from obscure ones, which is the whole point of the recursion.</p></div><p>Two variants matter in practice. <strong>Personalised PageRank</strong> <a class="cite" href="#ref-haveliwala2003">[5]</a> replaces the uniform teleport vector by one concentrated on a seed set S; the resulting scores measure proximity <em>to S</em> and are the standard graph-based recommendation and local-community-detection primitive. <strong>HITS</strong> <a class="cite" href="#ref-kleinberg1999">[3]</a> instead computes two mutually reinforcing scores &mdash; hubs point to good authorities, authorities are pointed to by good hubs &mdash; which are the dominant eigenvectors of \(A^{T}A\) and \(AA^{T}\).</p><h2>7.3 Shallow node embeddings</h2><figure class="viz"><div class="viz-title">Encoder&ndash;decoder view of node embeddings</div><svg viewBox="0 0 760 280" role="img" style="width:100%;height:auto;display:block;font-family:inherit;"><text x="360" y="32" text-anchor="middle" style="fill:var(--color-text);font-size:13.5px;font-weight:700;">shallow embedding: a lookup table, one vector per node</text><path d="M 90 110 L 160 78" style="fill:none;stroke:var(--viz-axis);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 90 110 L 156 158" style="fill:none;stroke:var(--viz-axis);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 160 78 L 156 158" style="fill:none;stroke:var(--viz-axis);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 160 78 L 232 118" style="fill:none;stroke:var(--viz-axis);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 156 158 L 232 118" style="fill:none;stroke:var(--viz-axis);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;"/><circle cx="90" cy="110" r="16" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="90" y="114" text-anchor="middle" style="fill:#ffffff;font-size:12px;font-weight:700;">u0</text><circle cx="160" cy="78" r="16" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="160" y="82" text-anchor="middle" style="fill:#ffffff;font-size:12px;font-weight:700;">u1</text><circle cx="156" cy="158" r="16" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="156" y="162" text-anchor="middle" style="fill:#ffffff;font-size:12px;font-weight:700;">u2</text><circle cx="232" cy="118" r="16" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="232" y="122" text-anchor="middle" style="fill:#ffffff;font-size:12px;font-weight:700;">u3</text><path d="M 268 118 L 318 118" style="fill:none;stroke:var(--viz-axis);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 319 118 l -7 -4 l 0 8 z" style="fill:var(--viz-axis);"/><text x="293" y="104" text-anchor="middle" style="fill:var(--primary);font-size:11.5px;font-weight:700;">ENC</text><rect x="336" y="66" width="118" height="22" rx="4" style="fill:var(--primary);opacity:0.14;stroke:var(--primary);stroke-width:1.2;"/><text x="395" y="82" text-anchor="middle" style="fill:var(--color-text);font-size:11.5px;font-weight:400;">z0 = ( &#8226; &#8226; &#8226; &#8226; )</text><rect x="336" y="96" width="118" height="22" rx="4" style="fill:var(--primary);opacity:0.2;stroke:var(--primary);stroke-width:1.2;"/><text x="395" y="112" text-anchor="middle" style="fill:var(--color-text);font-size:11.5px;font-weight:400;">z1 = ( &#8226; &#8226; &#8226; &#8226; )</text><rect x="336" y="126" width="118" height="22" rx="4" style="fill:var(--primary);opacity:0.26;stroke:var(--primary);stroke-width:1.2;"/><text x="395" y="142" text-anchor="middle" style="fill:var(--color-text);font-size:11.5px;font-weight:400;">z2 = ( &#8226; &#8226; &#8226; &#8226; )</text><rect x="336" y="156" width="118" height="22" rx="4" style="fill:var(--primary);opacity:0.32;stroke:var(--primary);stroke-width:1.2;"/><text x="395" y="172" text-anchor="middle" style="fill:var(--color-text);font-size:11.5px;font-weight:400;">z3 = ( &#8226; &#8226; &#8226; &#8226; )</text><text x="395" y="52" text-anchor="middle" style="fill:var(--primary);font-size:12px;font-weight:700;">Z  (n &#215; d)</text><path d="M 462 118 L 512 118" style="fill:none;stroke:var(--viz-axis);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 513 118 l -7 -4 l 0 8 z" style="fill:var(--viz-axis);"/><text x="487" y="104" text-anchor="middle" style="fill:var(--viz-cmp);font-size:11.5px;font-weight:700;">DEC</text><text x="600" y="100" text-anchor="middle" style="fill:var(--viz-cmp);font-size:14px;font-weight:700;">&#10216; z&#7512;, z&#7515; &#10217; &#8776; sim(u, v)</text><text x="600" y="126" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-weight:400;">similarity from random walks</text><text x="360" y="190" text-anchor="middle" style="fill:var(--viz-bad);font-size:12.5px;font-weight:700;">the three limits that force the move to message passing</text><text x="360" y="212" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-weight:400;">&#8226; no parameter sharing &#8212; one free block per node</text><text x="360" y="231" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-weight:400;">&#8226; transductive &#8212; a new node has no row at all</text><text x="360" y="250" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-weight:400;">&#8226; node features are ignored entirely</text></svg><figcaption class="viz-caption"><strong>Figure.</strong> The encoder is only a table: node u is mapped to row u of Z, trained so that the decoder reproduces a walk-based similarity. Powerful, but the table is the whole model &mdash; which is precisely what a graph neural network replaces with a function of the neighbourhood.</figcaption></figure><p>PageRank gives each node one number. Modern pipelines want a <em>vector</em> \(z_{u} \in\) <strong>R</strong>\(^{d}\) per node, so that any downstream classifier from Part I can be applied. The <em>encoder&ndash;decoder</em> framing <a class="cite" href="#ref-hamilton2017b">[14]</a> makes the design space clear:</p><div class="eq">\[\operatorname{ENC}: u \mapsto z_{u} | \operatorname{DEC}(z_{u}, z_{v}) \approx sim_{G}(u, v)\]</div><p>A <em>shallow</em> encoder is just a lookup table \(Z \in\) <strong>R</strong>\(^{n\times d}\) &mdash; one free vector per node, trained directly. The decoder is usually an inner product or a sigmoid of one. What distinguishes the methods is entirely <strong>the definition of \(sim_{G}\)</strong>.</p><h3>DeepWalk</h3><p>Perozzi, Al-Rfou and Skiena <a class="cite" href="#ref-perozzi2014">[7]</a> made the analogy that started the field: <em>a random walk on a graph is a sentence, and a node is a word</em>. Generate many short walks, feed them to word2vec's skip-gram model <a class="cite" href="#ref-mikolov2013">[6]</a>, and read off the learned vectors.</p><div class="eq">\[\max_{Z} \sum_{u\in V} \sum_{v\in Nwalk}(u) \log P(v | z_{u}), P(v|z_{u}) = \exp(z_{u}^{T}z_{v}) / \sum_{w} \exp(z_{u}^{T}z_{w})\]</div><p>The softmax denominator costs O(n) per term, which is fatal at web scale. Two standard approximations: <strong>hierarchical softmax</strong> (a binary tree over nodes, O(log n)) used in the original paper, and <strong>negative sampling</strong> &mdash; contrast each true pair against a few random ones &mdash; which is simpler and now more common.</p><h3>LINE and node2vec</h3><p>LINE <a class="cite" href="#ref-tang2015">[8]</a> dispenses with walks and optimises first-order proximity (observed edges) and second-order proximity (shared neighbourhoods) explicitly, concatenating the two embeddings.</p><p>node2vec <a class="cite" href="#ref-grover2016">[9]</a> keeps DeepWalk's architecture and changes only the walk. It is a <strong>second-order</strong> walk: the probability of the next step depends on where you came from. Having just moved \(t \to v\), the unnormalised weight of moving to x is</p><div class="eq">\[\alpha (t, x) = 1/p if x = t \cdot \cdot \cdot 1 if d(t,x) = 1 \cdot \cdot \cdot 1/q if d(t,x) = 2\]</div><table><thead><tr><th>Parameter</th><th>Effect</th><th>Search behaviour</th><th>What the embedding captures</th></tr></thead><tbody><tr><td>p large</td><td>discourages immediate backtracking</td><td>&mdash;</td><td>less redundancy</td></tr><tr><td>q \(\gt 1\)</td><td>down-weights moving away</td><td><strong>BFS-like</strong>, stays local</td><td><em>structural equivalence</em> &mdash; nodes with similar roles (both hubs, both bridges) get similar vectors even if far apart</td></tr><tr><td>q \(\lt 1\)</td><td>encourages moving outward</td><td><strong>DFS-like</strong>, explores far</td><td><em>homophily</em> &mdash; nodes in the same community get similar vectors</td></tr></tbody></table><p>This is the practically important knob, because the two notions of similarity are genuinely different and different tasks want different ones. Grover and Leskovec tuned (p, q) by cross-validation and showed the gain over fixed-walk DeepWalk is substantial.</p><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Move the p and q sliders and watch the transition probabilities out of v change.</p><div id="jxg20" class="viz-board" style="height:500px;"></div><p class="viz-caption"><strong>Figure.</strong> The node2vec second-order transition. The walk has just moved from t (grey) to v (green). Each candidate next node is labelled with its bias: 1/p to return to t, 1 for a node adjacent to t (staying "at the same distance"), 1/q for a node two hops from t (moving outward). Arrow thickness is the resulting normalised probability. Setting \(q \gt 1\) visibly starves the outward arrows.</p></div><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Node shading is the visit frequency; the readout gives the fraction of visits that stayed in the starting community.</p><div id="jxg21" class="viz-board" style="height:500px;"></div><p class="viz-caption"><strong>Figure.</strong> Expected number of visits within 6 steps of a walk started at the black node, under the (p, q) chosen above-left. With \(q \gt 1\) the mass stays inside the starting community (BFS-like, structural roles); with \(q \lt 1\) it leaks across the bridge into the far community (DFS-like, homophily). This single parameter decides what "similar" will mean in the learned embedding.</p></div><h3>They are all matrix factorisation</h3><div class="box thm"><div class="box-title">Theorem — Qiu et al. (2018) <a class="cite" href="#ref-qiu2018">[10]</a></div>DeepWalk, LINE, PTE and node2vec with negative sampling all implicitly factorise a closed-form matrix built from powers of P = \(D^{-1}A\). For DeepWalk with window T and b negative samples, the implicit target is<div class="eq">\[\log( (vol(G)/(bT)) \sum_{r=1..T} P^{r} D^{-1} )\]</div><p style="margin:6px 0 0 0;">Their NetMF algorithm factorises this matrix directly and matches or beats the sampling-based originals. The lesson generalises: these "neural" embeddings are spectral methods in disguise, close relatives of the Laplacian eigenmaps of Section 6.</p></div><div class="box warn"><div class="box-title">The three structural limits of shallow embeddings</div><strong>(1) No parameter sharing</strong> &mdash; O(nd) free parameters, one block per node, so nothing is learned that transfers between nodes. <strong>(2) Strictly transductive</strong> &mdash; a new node has no row in Z, so it has no embedding, and the whole model must be retrained. <strong>(3) Node features are ignored</strong> &mdash; the encoder sees only the adjacency structure, discarding X entirely. All three are fixed by replacing the lookup table with a <em>function of the neighbourhood</em>. That function is a graph neural network, and it is Section 8.</div><h2>7.4 Link prediction</h2><p>Given a snapshot of a graph, which edges are missing or will appear next? Liben-Nowell and Kleinberg <a class="cite" href="#ref-libennowell2007">[11]</a> framed the problem and benchmarked the classical similarity scores, which remain surprisingly strong baselines.</p><table><thead><tr><th>Score</th><th>Definition</th><th>Idea</th></tr></thead><tbody><tr><td>Common neighbours</td><td>|\(\Gamma (u) \cap \Gamma (v)|\)</td><td>triadic closure</td></tr><tr><td>Jaccard</td><td>|\(\Gamma (u) \cap \Gamma (v)| / |\Gamma (u) \cup \Gamma (v)|\)</td><td>normalised for degree</td></tr><tr><td>Adamic&ndash;Adar <a class="cite" href="#ref-adamic2003">[12]</a></td><td>\(\sum_{z\in \Gamma (u)\cap \Gamma (v)} 1 /logd_{z}\)</td><td>a shared <em>rare</em> neighbour is far more informative than a shared hub</td></tr><tr><td>Preferential attachment</td><td>\(d_{u} \cdot d_{v}\)</td><td>rich get richer <a class="cite" href="#ref-libennowell2007">[11]</a></td></tr><tr><td>Katz</td><td>\(\sum_{l\ge 1} \beta^{l} |paths^{(l)}(u,v)|\)</td><td>all paths, damped by length &mdash; a walk-count, cf. Section 5.2</td></tr><tr><td>Embedding dot product</td><td>\(z_{u}^{T}z_{v}\)</td><td>learned similarity <a class="cite" href="#ref-grover2016">[9]</a></td></tr></tbody></table><div class="box warn"><div class="box-title">Evaluating link prediction correctly</div>Held-out edges must be <em>deleted from the graph</em> before any score is computed, otherwise every method reads the answer off the adjacency matrix. Negatives must be sampled deliberately: with \(n^2\) possible pairs and only \(m \approx n\) real edges, uniformly sampled negatives are trivially easy and accuracy near 100 % means nothing. Report AUC or Hits@k against hard negatives &mdash; typically non-edges at distance 2 &mdash; and be explicit about the sampling scheme.</div><p>For <strong>knowledge graphs</strong>, where edges are typed triples (head, relation, tail), the decoder must involve the relation. TransE <a class="cite" href="#ref-bordes2013">[13]</a> models it as translation, scoring a triple by \(\| z_{h} + r - z_{t}\|\) and training with a margin ranking loss &mdash; simple, scalable, and still a standard baseline despite known limits on symmetric and one-to-many relations.</p><h2>Summary</h2><ul><li>P = \(D^{-1}A = I - L_{rw}\); on undirected graphs the stationary distribution is just degree, so only short, restarted or directed walks are informative.</li><li>PageRank <a class="cite" href="#ref-page1999">[2]</a> adds teleportation, which guarantees a unique solution by Perron&ndash;Frobenius and geometric convergence at rate \(\alpha\).</li><li>DeepWalk <a class="cite" href="#ref-perozzi2014">[7]</a> = random walks + skip-gram; node2vec <a class="cite" href="#ref-grover2016">[9]</a> biases the walk with (p, q) to interpolate between structural equivalence and homophily.</li><li>All of these implicitly factorise a matrix of walk probabilities <a class="cite" href="#ref-qiu2018">[10]</a> &mdash; they are spectral methods in neural clothing.</li><li>Shallow embeddings are transductive, share no parameters and ignore node features &mdash; the three failures that motivate GNNs.</li><li>Adamic&ndash;Adar <a class="cite" href="#ref-adamic2003">[12]</a> and its relatives are strong, training-free link-prediction baselines; evaluate them with deleted edges and hard negatives <a class="cite" href="#ref-libennowell2007">[11]</a>.</li></ul><h2>References</h2><ol class="reflist"><li id="ref-brin1998">Brin, S. &amp; Page, L. (1998). The anatomy of a large-scale hypertextual Web search engine. <em>Computer Networks and ISDN Systems</em>, 30(1&ndash;7), 107&ndash;117. DOI: 10.1016/S0169-7552(98)00110-X <a href="https://doi.org/10.1016/S0169-7552(98)00110-X">https://doi.org/10.1016/S0169-7552(98)00110-X</a></li><li id="ref-page1999">Page, L., Brin, S., Motwani, R. &amp; Winograd, T. (1999). <em>The PageRank citation ranking: bringing order to the Web</em>. Stanford InfoLab Technical Report 1999-66. <a href="http://ilpubs.stanford.edu:8090/422/">http://ilpubs.stanford.edu:8090/422/</a></li><li id="ref-kleinberg1999">Kleinberg, J. M. (1999). Authoritative sources in a hyperlinked environment (HITS). <em>Journal of the ACM</em>, 46(5), 604&ndash;632. DOI: 10.1145/324133.324140 <a href="https://doi.org/10.1145/324133.324140">https://doi.org/10.1145/324133.324140</a></li><li id="ref-perron1907">Perron, O. (1907). Zur Theorie der Matrices. <em>Mathematische Annalen</em>, 64(2), 248&ndash;263. DOI: 10.1007/BF01449896 &mdash; with Frobenius (1912), the basis of the PageRank existence and uniqueness argument. <a href="https://doi.org/10.1007/BF01449896">https://doi.org/10.1007/BF01449896</a></li><li id="ref-haveliwala2003">Haveliwala, T. H. (2003). Topic-sensitive PageRank. <em>IEEE TKDE</em>, 15(4), 784&ndash;796. DOI: 10.1109/TKDE.2003.1208999 <a href="https://doi.org/10.1109/TKDE.2003.1208999">https://doi.org/10.1109/TKDE.2003.1208999</a></li><li id="ref-mikolov2013">Mikolov, T., Sutskever, I., Chen, K., Corrado, G. &amp; Dean, J. (2013). Distributed representations of words and phrases and their compositionality. <em>NeurIPS 26</em>. arXiv:1310.4546 <a href="https://arxiv.org/abs/1310.4546">https://arxiv.org/abs/1310.4546</a></li><li id="ref-perozzi2014">Perozzi, B., Al-Rfou, R. &amp; Skiena, S. (2014). DeepWalk: online learning of social representations. <em>KDD '14</em>, 701&ndash;710. DOI: 10.1145/2623330.2623732 <a href="https://doi.org/10.1145/2623330.2623732">https://doi.org/10.1145/2623330.2623732</a></li><li id="ref-tang2015">Tang, J., Qu, M., Wang, M., Zhang, M., Yan, J. &amp; Mei, Q. (2015). LINE: large-scale information network embedding. <em>WWW '15</em>, 1067&ndash;1077. DOI: 10.1145/2736277.2741093 <a href="https://doi.org/10.1145/2736277.2741093">https://doi.org/10.1145/2736277.2741093</a></li><li id="ref-grover2016">Grover, A. &amp; Leskovec, J. (2016). node2vec: scalable feature learning for networks. <em>KDD '16</em>, 855&ndash;864. DOI: 10.1145/2939672.2939754 <a href="https://doi.org/10.1145/2939672.2939754">https://doi.org/10.1145/2939672.2939754</a></li><li id="ref-qiu2018">Qiu, J., Dong, Y., Ma, H., Li, J., Wang, K. &amp; Tang, J. (2018). Network embedding as matrix factorization: unifying DeepWalk, LINE, PTE and node2vec. <em>WSDM '18</em>, 459&ndash;467. DOI: 10.1145/3159652.3159706 <a href="https://doi.org/10.1145/3159652.3159706">https://doi.org/10.1145/3159652.3159706</a></li><li id="ref-libennowell2007">Liben-Nowell, D. &amp; Kleinberg, J. (2007). The link-prediction problem for social networks. <em>JASIST</em>, 58(7), 1019&ndash;1031. DOI: 10.1002/asi.20591 <a href="https://doi.org/10.1002/asi.20591">https://doi.org/10.1002/asi.20591</a></li><li id="ref-adamic2003">Adamic, L. A. &amp; Adar, E. (2003). Friends and neighbors on the Web. <em>Social Networks</em>, 25(3), 211&ndash;230. DOI: 10.1016/S0378-8733(03)00009-1 <a href="https://doi.org/10.1016/S0378-8733(03)00009-1">https://doi.org/10.1016/S0378-8733(03)00009-1</a></li><li id="ref-bordes2013">Bordes, A., Usunier, N., Garcia-Dur&aacute;n, A., Weston, J. &amp; Yakhnenko, O. (2013). Translating embeddings for modeling multi-relational data (TransE). <em>NeurIPS 26</em>. <a href="https://papers.nips.cc/paper/5071-translating-embeddings-for-modeling-multi-relational-data">https://papers.nips.cc/paper/5071-translating-embeddings-for-modeling-multi-relational-data</a></li><li id="ref-hamilton2017b">Hamilton, W. L., Ying, R. &amp; Leskovec, J. (2017). Representation learning on graphs: methods and applications. <em>IEEE Data Engineering Bulletin</em>, 40(3), 52&ndash;74. arXiv:1709.05584 <a href="https://arxiv.org/abs/1709.05584">https://arxiv.org/abs/1709.05584</a></li></ol><nav class="lesson-nav"><div class="container"><a href="../index.html">Course index</a><a href="../06-spectral-clustering/page.html">\(\leftarrow\) Section 6</a><a href="../08-graph-neural-networks/page.html">Section 8 — Graph Neural Networks \(\to\)</a></div></nav>
+</main>
+<footer class="site-footer"><strong>Machine Learning A&ndash;Z</strong> &middot; From empirical risk minimisation to graph neural networks<span class="footer-meta">Edition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">The interactive figure could not be loaded. Check your network connection.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+// Colours resolved from the stylesheet, so the figures follow the light/dark
+// theme. Each entry is a function: board attributes that are functions are
+// re-evaluated on update, so a theme switch only needs a redraw.
+var BOARDS = [];
+function cssv(name, fallback){
+    try {
+        var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback;
+    } catch (e) { return fallback; }
+}
+var PAL = {
+    text:  function(){ return cssv('--color-text',  '#1f2937'); },
+    muted: function(){ return cssv('--color-muted', '#6b7280'); },
+    axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+    ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+    grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+    cell:  function(){ return cssv('--cell-bg',     '#ffffff'); }
+};
+// Re-render every board when the theme attribute flips.
+if (window.MutationObserver) {
+    new MutationObserver(function(){
+        for (var i = 0; i < BOARDS.length; i++) {
+            try { BOARDS[i].fullUpdate(); } catch (e) {}
+        }
+    }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+
+
+// ---------------------------------------------------------------- Figure 7.1
+var b19 = JXG.JSXGraph.initBoard('jxg19', {
+    boundingbox: [-0.8, 9.6, 17.6, -1.6], axis: false, showCopyright: false,
+    showNavigation: false, keepaspectratio: false
+});
+var PR_N = 7;
+var PR_E = [[0,1],[0,2],[1,2],[2,0],[3,2],[3,1],[4,3],[4,5],[5,4],[5,6],[6,4],[1,4],[6,2]];
+var PR_POS = [[1.4,7.4],[3.6,8.2],[2.6,5.6],[1.0,3.4],[5.6,4.2],[7.4,6.0],[7.0,3.0]];
+var outL = [];
+for (var i=0;i<PR_N;i++) outL.push([]);
+PR_E.forEach(function(e){ outL[e[0]].push(e[1]); });
+
+var alphaS = b19.create('slider', [[0.0, 9.2], [3.4, 9.2], [0.05, 0.85, 0.99]],
+                        {name:'&alpha;', snapWidth:0.01, strokeColor:'#c9a227',
+                         fillColor:'#c9a227', label:{fontSize:15}});
+var iterS  = b19.create('slider', [[4.4, 9.2], [7.8, 9.2], [0, 0, 30]],
+                        {name:'iteration', snapWidth:1, strokeColor:'#026573',
+                         fillColor:'#026573', label:{fontSize:15}});
+function prIter(alpha, T){
+    var r = new Array(PR_N).fill(1/PR_N);
+    for (var t=0;t<T;t++){
+        var nw = new Array(PR_N).fill(0), dang = 0;
+        for (var u=0;u<PR_N;u++){
+            if (outL[u].length === 0){ dang += r[u]; continue; }
+            var share = r[u]/outL[u].length;
+            outL[u].forEach(function(v){ nw[v] += share; });
+        }
+        var base = (1-alpha)/PR_N + alpha*dang/PR_N;
+        for (u=0;u<PR_N;u++) nw[u] = base + alpha*nw[u];
+        r = nw;
+    }
+    return r;
+}
+var prCache = {};
+function pr(){
+    var key = alphaS.Value().toFixed(2) + '|' + Math.round(iterS.Value());
+    if (!prCache[key]) prCache[key] = prIter(alphaS.Value(), Math.round(iterS.Value()));
+    return prCache[key];
+}
+function prFinal(){
+    var key = 'F' + alphaS.Value().toFixed(2);
+    if (!prCache[key]) prCache[key] = prIter(alphaS.Value(), 300);
+    return prCache[key];
+}
+var prNodes = PR_POS.map(function(pos, v){
+    return b19.create('point', pos, {
+        name:String(v), fixed:true, strokeColor:'#013f47', strokeWidth:2, fillColor:'#026573',
+        label:{fontSize:13, offset:[0,20], cssStyle:'font-family:Georgia,serif;font-weight:bold;'},
+        size: function(){ return 4 + 46*Math.sqrt(Math.max(pr()[v], 0)/1.0); }
+    });
+});
+PR_E.forEach(function(e){
+    b19.create('arrow', [prNodes[e[0]], prNodes[e[1]]],
+               {strokeColor:PAL.axis, strokeWidth:2, layer:4, highlight:false,
+                lastArrow:{type:2, size:5}});
+});
+// bar chart of the ranks
+var BX = 10.2, BY = 8.4, BW = 5.6;
+for (var v=0; v<PR_N; v++){
+    (function(vv){
+        var y = BY - vv*1.15;
+        b19.create('polygon', [[BX, y], [function(){ return BX + BW*pr()[vv]/0.35; }, y],
+                               [function(){ return BX + BW*pr()[vv]/0.35; }, y-0.72],
+                               [BX, y-0.72]],
+                   {vertices:{visible:false}, highlight:false, fillColor:'#026573',
+                    fillOpacity:0.85, borders:{strokeColor:'#013f47', strokeWidth:1}});
+        b19.create('text', [BX-0.55, y-0.36, String(vv)], {fontSize:13, anchorY:'middle',
+                   strokeColor:PAL.text, cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+        b19.create('text', [function(){ return BX + BW*pr()[vv]/0.35 + 0.2; }, y-0.36,
+                            function(){ return pr()[vv].toFixed(5); }],
+                   {fontSize:12.5, anchorY:'middle', strokeColor:PAL.text,
+                    cssStyle:'font-family:Courier New,monospace;'});
+    })(v);
+}
+b19.create('text', [BX, 9.2, 'rank vector r'], {fontSize:15, color:'#026573',
+          cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b19.create('text', [-0.7, -0.6, function(){
+    var r = pr(), f = prFinal(), err = 0;
+    for (var t=0;t<PR_N;t++) err += Math.abs(r[t]-f[t]);
+    return 'L&#8321; distance to the fixed point = ' + err.toExponential(3);
+}], {fontSize:14, color:'#b45309', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b19.create('text', [-0.7, -1.2, function(){
+    var r = pr(), idx = [];
+    for (var t=0;t<PR_N;t++) idx.push(t);
+    idx.sort(function(a,b){ return r[b]-r[a]; });
+    var indeg = new Array(PR_N).fill(0);
+    PR_E.forEach(function(e){ indeg[e[1]]++; });
+    var idx2 = [];
+    for (t=0;t<PR_N;t++) idx2.push(t);
+    idx2.sort(function(a,b){ return indeg[b]-indeg[a]; });
+    return 'PageRank order: ' + idx.join(' &gt; ') + '     |     in-degree order: ' + idx2.join(' &gt; ');
+}], {fontSize:13.5, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+b19.create('text', [-0.7, 8.5, 'node area &prop; rank'], {fontSize:13, strokeColor:PAL.muted,
+          cssStyle:'font-family:Georgia,serif;font-style:italic;'});
+
+// ================================================== graph shared by 7.2 and 7.3
+var W_N = 14;
+var W_E = [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3],[2,4],[3,4],[1,4],[0,4],[4,5],[0,5],
+           [7,8],[7,9],[7,10],[8,9],[8,10],[9,10],[9,11],[10,11],[8,11],[7,11],[11,12],[7,12],
+           [5,6],[6,12],[6,13],[13,5]];
+var W_POS = [[1.6,6.8],[3.2,7.8],[3.0,5.4],[1.2,4.6],[4.4,6.4],[2.0,8.6],
+             [6.4,5.2],
+             [11.0,6.8],[9.6,7.8],[9.8,5.4],[11.6,4.6],[8.4,6.4],[10.4,8.6],[7.2,3.4]];
+var W_ADJ = [];
+for (var i=0;i<W_N;i++) W_ADJ.push([]);
+W_E.forEach(function(e){ W_ADJ[e[0]].push(e[1]); W_ADJ[e[1]].push(e[0]); });
+function isAdj(a, b){ return W_ADJ[a].indexOf(b) >= 0; }
+
+// ---------------------------------------------------------------- Figure 7.2
+var b20 = JXG.JSXGraph.initBoard('jxg20', {
+    boundingbox: [-1.0, 6.4, 11.0, -3.4], axis: false, showCopyright: false,
+    showNavigation: false, keepaspectratio: false
+});
+var pS = b20.create('slider', [[0.0, 6.0], [3.4, 6.0], [0.25, 1.0, 4]],
+                    {name:'p (return)', snapWidth:0.05, strokeColor:'#9333ea',
+                     fillColor:'#9333ea', label:{fontSize:15}});
+var qS = b20.create('slider', [[4.6, 6.0], [8.0, 6.0], [0.25, 1.0, 4]],
+                    {name:'q (in&ndash;out)', snapWidth:0.05, strokeColor:'#ea580c',
+                     fillColor:'#ea580c', label:{fontSize:15}});
+// local picture: t -- v, and v's other neighbours at distance 1 or 2 from t
+var LT = [1.6, 2.6], LV = [4.6, 2.6];
+var CAND = [{pos:[7.4, 4.6], d:1, lab:'x&#8321;'},
+            {pos:[7.6, 2.6], d:2, lab:'x&#8322;'},
+            {pos:[7.2, 0.6], d:2, lab:'x&#8323;'},
+            {pos:[4.6, 0.2], d:1, lab:'x&#8324;'}];
+function biasOf(d){ return d === 0 ? 1/pS.Value() : (d === 1 ? 1 : 1/qS.Value()); }
+function totalBias(){
+    var s = biasOf(0);
+    CAND.forEach(function(c){ s += biasOf(c.d); });
+    return s;
+}
+var Tn = b20.create('point', LT, {name:'t', size:9, fixed:true, fillColor:PAL.axis,
+        strokeColor:PAL.muted, strokeWidth:2,
+        label:{fontSize:16, offset:[0,20], cssStyle:'font-family:Georgia,serif;font-weight:bold;'}});
+var Vn = b20.create('point', LV, {name:'v', size:10, fixed:true, fillColor:'#16a34a',
+        strokeColor:'#14532d', strokeWidth:2,
+        label:{fontSize:16, offset:[0,20], cssStyle:'font-family:Georgia,serif;font-weight:bold;'}});
+b20.create('arrow', [Tn, Vn], {strokeColor:PAL.text, strokeWidth:3.5, highlight:false});
+b20.create('text', [2.7, 3.05, 'just walked'], {fontSize:12.5, strokeColor:PAL.muted,
+          cssStyle:'font-family:Georgia,serif;font-style:italic;'});
+// return arrow v -> t
+b20.create('arrow', [[LV[0], LV[1]-0.45], [LT[0], LT[1]-0.45]], {
+    highlight:false, strokeColor:'#9333ea',
+    strokeWidth: function(){ return 1 + 9*(biasOf(0)/totalBias()); }});
+b20.create('text', [2.6, 1.75, function(){
+    return '1/p = ' + (1/pS.Value()).toFixed(2) + '   &rarr;   P = ' +
+           (biasOf(0)/totalBias()).toFixed(3);
+}], {fontSize:13.5, color:'#9333ea', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+CAND.forEach(function(c, idx){
+    var N = b20.create('point', c.pos, {name:c.lab, size:8, fixed:true,
+        fillColor: c.d === 1 ? '#0891b2' : '#ea580c',
+        strokeColor:PAL.text, strokeWidth:1.5,
+        label:{fontSize:14, offset:[16,6], cssStyle:'font-family:Georgia,serif;'}});
+    b20.create('arrow', [Vn, N], {highlight:false,
+        strokeColor: c.d === 1 ? '#0891b2' : '#ea580c',
+        strokeWidth: function(){ return 1 + 9*(biasOf(c.d)/totalBias()); }});
+    if (c.d === 1) b20.create('segment', [Tn, N], {strokeColor:PAL.ref, strokeWidth:1.5,
+                                                   dash:2, highlight:false, layer:3});
+    b20.create('text', [c.pos[0]+0.45, c.pos[1]-0.5, function(){
+        return (c.d === 1 ? '1' : '1/q = ' + (1/qS.Value()).toFixed(2)) +
+               '  &rarr;  P = ' + (biasOf(c.d)/totalBias()).toFixed(3);
+    }], {fontSize:13, color: c.d === 1 ? '#0891b2' : '#ea580c',
+         cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+});
+b20.create('text', [-0.9, -1.6, 'grey dashed = also adjacent to t  (distance 1, bias 1)'],
+          {fontSize:13, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+b20.create('text', [-0.9, -2.3, function(){
+    if (qS.Value() > 1.15) return 'q &gt; 1  &rarr;  BFS-like: the walk stays near t  &rarr;  structural equivalence';
+    if (qS.Value() < 0.85) return 'q &lt; 1  &rarr;  DFS-like: the walk pushes outward  &rarr;  homophily / communities';
+    return 'q = 1  &rarr;  unbiased second-order walk (DeepWalk-like)';
+}], {fontSize:14.5, strokeColor:PAL.text, cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b20.create('text', [-0.9, -3.0, 'arrow thickness = transition probability out of v'],
+          {fontSize:13, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+
+// ---------------------------------------------------------------- Figure 7.3
+var b21 = JXG.JSXGraph.initBoard('jxg21', {
+    boundingbox: [-1.0, 9.8, 13.2, -1.8], axis: false, showCopyright: false,
+    showNavigation: false, keepaspectratio: false
+});
+var START = 0;
+var COMM_A = [0,1,2,3,4,5], COMM_B = [7,8,9,10,11,12];
+function walkVisits(p, q, L){
+    // distribution over directed states (prev, cur), started uniformly over edges out of START
+    var state = {};                       // key "prev|cur" -> mass
+    var visits = new Array(W_N).fill(0);
+    visits[START] += 1;
+    W_ADJ[START].forEach(function(v){
+        state[START + '|' + v] = 1/W_ADJ[START].length;
+    });
+    for (var k in state) visits[parseInt(k.split('|')[1])] += state[k];
+    for (var step=1; step<L; step++){
+        var nxt = {};
+        for (var key in state){
+            var parts = key.split('|'), t = parseInt(parts[0]), v = parseInt(parts[1]);
+            var mass = state[key];
+            var ws = [], tot = 0;
+            W_ADJ[v].forEach(function(x){
+                var w = (x === t) ? 1/p : (isAdj(t, x) ? 1 : 1/q);
+                ws.push({x:x, w:w}); tot += w;
+            });
+            ws.forEach(function(o){
+                var kk = v + '|' + o.x;
+                nxt[kk] = (nxt[kk] || 0) + mass*o.w/tot;
+            });
+        }
+        state = nxt;
+        for (key in state) visits[parseInt(key.split('|')[1])] += state[key];
+    }
+    return visits;
+}
+var visCache = {};
+function visits(){
+    var key = pS.Value().toFixed(2) + '|' + qS.Value().toFixed(2);
+    if (!visCache[key]) visCache[key] = walkVisits(pS.Value(), qS.Value(), 6);
+    return visCache[key];
+}
+function maxVis(){ return Math.max.apply(null, visits()) || 1; }
+var wNodes = W_POS.map(function(pos, v){
+    return b21.create('point', pos, {
+        name:String(v), fixed:true, strokeWidth: v === START ? 3.5 : 1.5,
+        strokeColor: v === START ? PAL.text() : PAL.muted(),
+        size: function(){ return 5 + 16*Math.sqrt(visits()[v]/maxVis()); },
+        label:{fontSize:12, offset:[0,18], cssStyle:'font-family:Georgia,serif;'},
+        fillColor: function(){
+            var t = visits()[v]/maxVis();
+            var r = Math.round(240 - t*(240-2)), g = Math.round(249 - t*(249-101)),
+                b = Math.round(250 - t*(250-115));
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
+        }
+    });
+});
+W_E.forEach(function(e){
+    var bridge = (e[0] === 5 && e[1] === 6) || (e[0] === 6 && e[1] === 12) ||
+                 (e[0] === 6 && e[1] === 13) || (e[0] === 13 && e[1] === 5);
+    b21.create('segment', [wNodes[e[0]], wNodes[e[1]]],
+               {strokeColor: bridge ? '#dc2626' : PAL.ref(),
+                strokeWidth: bridge ? 3 : 2, layer:4, highlight:false});
+});
+b21.create('text', [-0.9, 9.4, function(){
+    var v = visits(), a = 0, b = 0, tot = 0;
+    v.forEach(function(x, i){
+        tot += x;
+        if (COMM_A.indexOf(i) >= 0) a += x;
+        if (COMM_B.indexOf(i) >= 0) b += x;
+    });
+    return 'visits staying in the start community: ' + (100*a/tot).toFixed(1) +
+           ' %      reaching the far community: ' + (100*b/tot).toFixed(1) + ' %';
+}], {fontSize:15, strokeColor:PAL.text, cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b21.create('text', [-0.9, 8.7, function(){
+    return 'using p = ' + pS.Value().toFixed(2) + ',  q = ' + qS.Value().toFixed(2) +
+           '  (set with the sliders in the previous figure),  walk length 6';
+}], {fontSize:13.5, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+b21.create('text', [-0.9, -1.3, 'black outline = start node;  red edges = the bridge between communities'],
+          {fontSize:13, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>C8.Q1 — The Grover iterate and the optimal number of steps</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C8.Q1 — Two reflections make a rotation&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;\(G=D\,O_f\) rotates the state by \(2\theta\) in the good/bad plane, with \(\sin\theta=\sqrt{M/N}\).&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;grover_operator(N, marked)&lt;/code&gt; returning the explicit \(N\times N\) iterate; &lt;code&gt;optimal_iterations(N, M)&lt;/code&gt; returning \(\lfloor\pi/(4\arcsin\sqrt{M/N})\rfloor\) as an &lt;code&gt;int&lt;/code&gt;; and &lt;code&gt;success_probability(N, M, k)&lt;/code&gt; returning \(\sin^{2}((2k+1)\theta)\) rounded to 6 decimals.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;optimal_iterations(1024, 1) -&amp;gt; 25
+success_probability(16, 1, 3) -&amp;gt; 0.961319&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def grover_operator(N, marked):
+    ...
+
+def optimal_iterations(N, M):
+    ...
+
+def success_probability(N, M, k):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def grover_operator(N, marked):
+    O = np.eye(N, dtype=complex)
+    for m in marked:
+        O[m, m] = -1
+    psi = np.full(N, 1 / np.sqrt(N), dtype=complex)
+    D = 2 * np.outer(psi, psi.conj()) - np.eye(N, dtype=complex)
+    return D @ O
+
+def optimal_iterations(N, M):
+    theta = np.arcsin(np.sqrt(M / N))
+    return int(np.floor(np.pi / (4 * theta)))
+
+def success_probability(N, M, k):
+    theta = np.arcsin(np.sqrt(M / N))
+    return round(float(np.sin((2 * k + 1) * theta) ** 2), 6)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(optimal_iterations(1024, 1), optimal_iterations(16, 1))
+</text></testcode><stdin><text /></stdin><expected><text>25 3
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(success_probability(16, 1, 3))
+</text></testcode><stdin><text /></stdin><expected><text>0.961319
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+G = grover_operator(8, [3])
+print(np.allclose(G.conj().T @ G, np.eye(8)))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(success_probability(4, 1, 1))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(optimal_iterations(1000000, 1), success_probability(64, 4, 3))
+</text></testcode><stdin><text /></stdin><expected><text>785 0.961319
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C8.Q2 — Running Grover, and overcooking it</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C8.Q2 — The periodicity of the success probability&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;Because \(G\) is a rotation, iterating past \(k_{\text{opt}}\) &lt;em&gt;decreases&lt;/em&gt; the success probability — a purely quantum failure mode with no classical analogue.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;run_grover(N, marked, k)&lt;/code&gt; returning the state after \(k\) iterations starting from the uniform superposition, and &lt;code&gt;marked_probability(psi, marked)&lt;/code&gt; returning the total probability on the marked indices, rounded to 6 decimals. Then &lt;code&gt;best_k(N, marked, kmax)&lt;/code&gt; returning the \(k\le k_{\max}\) maximising that probability.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;N=16, one marked: probabilities peak at k=3 and fall again by k=6&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def run_grover(N, marked, k):
+    ...
+
+def marked_probability(psi, marked):
+    ...
+
+def best_k(N, marked, kmax):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def _G(N, marked):
+    O = np.eye(N, dtype=complex)
+    for m in marked:
+        O[m, m] = -1
+    psi = np.full(N, 1 / np.sqrt(N), dtype=complex)
+    return (2 * np.outer(psi, psi.conj()) - np.eye(N, dtype=complex)) @ O
+
+def run_grover(N, marked, k):
+    G = _G(N, marked)
+    psi = np.full(N, 1 / np.sqrt(N), dtype=complex)
+    for _ in range(k):
+        psi = G @ psi
+    return psi
+
+def marked_probability(psi, marked):
+    psi = np.asarray(psi, dtype=complex)
+    return round(float(sum(abs(psi[m]) ** 2 for m in marked)), 6)
+
+def best_k(N, marked, kmax):
+    G = _G(N, marked)
+    psi = np.full(N, 1 / np.sqrt(N), dtype=complex)
+    best, bp = 0, marked_probability(psi, marked)
+    for k in range(1, kmax + 1):
+        psi = G @ psi
+        pk = marked_probability(psi, marked)
+        if pk &gt; bp:
+            best, bp = k, pk
+    return best
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(marked_probability(run_grover(16, [5], 3), [5]))
+</text></testcode><stdin><text /></stdin><expected><text>0.961319
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(best_k(16, [5], 5))
+</text></testcode><stdin><text /></stdin><expected><text>3
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(marked_probability(run_grover(16, [5], 6), [5]) &lt; marked_probability(run_grover(16, [5], 3), [5]))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(marked_probability(run_grover(4, [2], 1), [2]))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(best_k(64, [1, 9, 17, 33], 5), marked_probability(run_grover(64, [1,9,17,33], 3), [1,9,17,33]))
+</text></testcode><stdin><text /></stdin><expected><text>3 0.961319
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C8.Q3 — Amplitude amplification with an arbitrary state preparation</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C8.Q3 — Beyond the uniform superposition&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;Replace \(H^{\otimes n}\) by any \(A\) with \(A|0\rangle=|\psi\rangle\). Then \(Q=-A S_0 A^{\dagger} S_f\) amplifies the good component at the same quadratic rate, with \(\sin\theta=\|\Pi_{\text{good}}|\psi\rangle\|\).&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;amplitude_amplification_operator(A, marked)&lt;/code&gt; returning \(Q=-A S_0 A^{\dagger} S_f\) (with \(S_0=I-2|0\rangle\langle0|\) and \(S_f\) the phase oracle), and &lt;code&gt;amplify(A, marked, k)&lt;/code&gt; returning the state after \(k\) applications of \(Q\) to \(A|0\rangle\).&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;With A = H^{tensor n} this reproduces the Grover iterate up to sign.&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def amplitude_amplification_operator(A, marked):
+    ...
+
+def amplify(A, marked, k):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def amplitude_amplification_operator(A, marked):
+    A = np.asarray(A, dtype=complex)
+    N = A.shape[0]
+    S0 = np.eye(N, dtype=complex)
+    S0[0, 0] = -1
+    Sf = np.eye(N, dtype=complex)
+    for m in marked:
+        Sf[m, m] = -1
+    return -A @ S0 @ A.conj().T @ Sf
+
+def amplify(A, marked, k):
+    A = np.asarray(A, dtype=complex)
+    N = A.shape[0]
+    e0 = np.zeros(N, dtype=complex)
+    e0[0] = 1
+    psi = A @ e0
+    Q = amplitude_amplification_operator(A, marked)
+    for _ in range(k):
+        psi = Q @ psi
+    return psi
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+H = np.array([[1,1],[1,-1]], dtype=complex)/np.sqrt(2)
+A = np.array([[1.0+0j]])
+for _ in range(4):
+    A = np.kron(A, H)
+print(round(float(abs(amplify(A, [5], 0)[5])**2), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.0625
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+H = np.array([[1,1],[1,-1]], dtype=complex)/np.sqrt(2)
+A = np.array([[1.0+0j]])
+for _ in range(4):
+    A = np.kron(A, H)
+psi = amplify(A, [5], 3)
+print(round(float(abs(psi[5])**2), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.961319
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+H = np.array([[1,1],[1,-1]], dtype=complex)/np.sqrt(2)
+A = np.array([[1.0+0j]])
+for _ in range(3):
+    A = np.kron(A, H)
+Q = amplitude_amplification_operator(A, [2])
+print(np.allclose(Q.conj().T @ Q, np.eye(8)))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+rng = np.random.default_rng(6)
+M = rng.normal(size=(8,8)) + 1j*rng.normal(size=(8,8))
+A, _ = np.linalg.qr(M)
+psi0 = amplify(A, [3], 0)
+psi1 = amplify(A, [3], 1)
+print(abs(psi1[3])**2 &gt; abs(psi0[3])**2)
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+H = np.array([[1,1],[1,-1]], dtype=complex)/np.sqrt(2)
+A = np.array([[1.0+0j]])
+for _ in range(2):
+    A = np.kron(A, H)
+print(round(float(abs(amplify(A, [1], 1)[1])**2), 6))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C8.Q4 — Quantum counting by amplitude estimation</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C8.Q4 — Estimating M without finding a marked item&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;The Grover iterate has eigenvalues \(e^{\pm2i\theta}\) on the good/bad plane. Phase estimation on \(G\) therefore returns \(\theta\), and \(M=N\sin^{2}\theta\).&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;grover_angle(N, M)&lt;/code&gt; returning \(\theta=\arcsin\sqrt{M/N}\); &lt;code&gt;counting_estimate(N, y, t)&lt;/code&gt; returning the estimate \(N\sin^{2}(\pi y/2^{t})\) rounded to 4 decimals; and &lt;code&gt;counting_error_bound(N, M, t)&lt;/code&gt; returning the worst-case bound \(2\pi\sqrt{M(N-M)}/2^{t}+\pi^{2}N/4^{t}\), rounded to 4 decimals.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;N=256, M=4  -&amp;gt;  theta ~ 0.1253
+counting_estimate(256, 5, 6) -&amp;gt; 15.1141&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def grover_angle(N, M):
+    ...
+
+def counting_estimate(N, y, t):
+    ...
+
+def counting_error_bound(N, M, t):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def grover_angle(N, M):
+    return float(np.arcsin(np.sqrt(M / N)))
+
+def counting_estimate(N, y, t):
+    return round(float(N * np.sin(np.pi * y / 2 ** t) ** 2), 4)
+
+def counting_error_bound(N, M, t):
+    K = 2 ** t
+    return round(float(2 * np.pi * np.sqrt(M * (N - M)) / K + np.pi ** 2 * N / K ** 2), 4)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(round(grover_angle(256, 4), 4))
+</text></testcode><stdin><text /></stdin><expected><text>0.1253
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(counting_estimate(256, 5, 6))
+</text></testcode><stdin><text /></stdin><expected><text>15.1141
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(counting_estimate(1024, 0, 8), round(grover_angle(16, 16), 4))
+</text></testcode><stdin><text /></stdin><expected><text>0.0 1.5708
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(counting_error_bound(1024, 16, 10) &lt; counting_error_bound(1024, 16, 8))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(counting_error_bound(256, 4, 8))
+</text></testcode><stdin><text /></stdin><expected><text>0.8178
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

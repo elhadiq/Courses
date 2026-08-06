@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 3 — Decision Trees and Ensemble Methods</title>
+<link href="../assets/style.css" rel="stylesheet">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+
+/* Use the full width the theme allows: the shared stylesheet caps a lesson at
+   880px, which leaves wide figures and tables boxed into the middle of a large
+   screen. --max-w is the theme's own page width, so this stays consistent with
+   the landing page. */
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) {
+  .lesson-content { padding-left: 16px; padding-right: 16px; }
+}
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule);
+               padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center;
+               padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.lesson-nav { max-width: 880px; margin: 0 auto 40px; padding: 0 24px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav .container { display: flex; gap: 18px; flex-wrap: wrap; width: 100%; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600;
+                font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.keypoints h4 { margin-top: 0; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Machine Learning A&ndash;Z</a> &middot; Course</div><span class="course-code">Graph-based machine learning</span></div></header>
+<section class="lesson-hero"><div class="container"><div class="lesson-label">Part I &middot; Section 3</div><h1>Section 3 — Decision Trees and Ensemble Methods</h1><div class="lesson-sub">Recursive partitioning, impurity criteria, and why averaging many weak, decorrelated models is the most reliable trick in classical machine learning.</div></div></section>
+<main class="lesson-content">
+<div class="box method"><div class="box-title">Companion annex</div><p>Every algorithm in this section is also set out <strong><a href="algorithms.html">step by step in the annex</a></strong>: what it is given, what it produces, the steps in order, a small example worked by hand, and why it is correct, why it stops and what it costs &mdash; described in words, with no program code.</p></div><h2>3.1 Recursive partitioning</h2><p>A decision tree carves the input space into axis-aligned boxes and fits a constant in each. Formally, a tree with leaves \(R_1\), &hellip;, \(R_{M}\) predicts:</p><div class="eq">\[f(x) = \sum_{m=1..M} c_{m} \cdot 1[ x \in R_{m} ]\]</div><p>For squared loss the optimal leaf value \(c_{m}\) is the mean of the targets in \(R_{m}\); for classification it is the majority class, and the leaf's class proportions give a probability estimate. What remains is choosing the boxes &mdash; and that is the hard part.</p><div class="box warn"><div class="box-title">Why the algorithm is greedy</div>Hyafil and Rivest <a class="cite" href="#ref-hyafil1976">[4]</a> proved that constructing the optimal binary decision tree is NP-complete. Every practical algorithm &mdash; CART <a class="cite" href="#ref-cart1984">[1]</a>, ID3 <a class="cite" href="#ref-quinlan1986">[2]</a>, C4.5 <a class="cite" href="#ref-quinlan1993">[3]</a> &mdash; is therefore a <em>greedy top-down heuristic</em>: pick the locally best split, recurse, never reconsider. There is no optimality guarantee, and this is the root cause of a tree's instability.</div><h3>Impurity criteria</h3><p>A split is scored by how much it purifies the child nodes. Writing \(\hat{p}_{mk}\) for the proportion of class k in node m, the three classical impurities are:</p><div class="eq">\[\mathbf{Misclassification}: 1 - \max_{k} \hat{p}_{mk}\]</div><div class="eq">\[\mathbf{Gini} (\operatorname{CART}): \sum_{k} \hat{p}_{mk}(1 - \hat{p}_{mk}) = 1 - \sum_{k} \hat{p}_{mk}^2\]</div><div class="eq">\[\mathbf{Entropy} (ID3/C4.5): -\sum_{k} \hat{p}_{mk} \log_2 \hat{p}_{mk}\]</div><p>The chosen split maximises the impurity decrease, weighted by child sizes:</p><div class="eq">\[\Delta I = I(parent) - (n_{L}/n) I(left) - (n_{R}/n) I(right)\]</div><p>Gini and entropy are strictly concave, misclassification error is only piecewise linear. That difference matters: a split that moves 100 points from a 50/50 node into 75/25 and 25/75 children leaves misclassification error unchanged (\(\Delta I = 0\)) but strictly improves Gini and entropy. Concavity is what makes the greedy search able to see progress <a class="cite" href="#ref-cart1984">[1]</a>.</p><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Drag the vertical marker to read each impurity at a given class proportion.</p><div id="jxg7" class="viz-board" style="height:440px;"></div><p class="viz-caption"><strong>Figure.</strong> The three impurity measures for a two-class node, as a function of the proportion p of class 1. All vanish at p = 0 and p = 1 and peak at p = \(\tfrac{1}{2}\). Entropy is scaled to peak at 1; Gini peaks at 0.5. Only the two concave curves reward a split that shifts the class balance without yet changing the majority.</p></div><h3>Pruning</h3><p>Grown to purity a tree memorises the training set. CART's answer is <strong>cost-complexity pruning</strong> <a class="cite" href="#ref-cart1984">[1]</a>: grow a large tree \(T_0\), then minimise over subtrees</p><div class="eq">\[C_{\alpha}(T) = \sum_{m} n_{m} I(R_{m}) + \alpha |T|\]</div><p>|T| is the number of leaves, so \(\alpha\) buys simplicity exactly as \(\lambda\) did in ridge regression. Breiman et al. proved that as \(\alpha\) increases the optimal subtrees form a <em>nested</em> sequence obtained by weakest-link pruning, so the whole regularisation path can be computed in one pass and \(\alpha\) selected by cross-validation.</p><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Move the max-depth slider. The step function is the tree's prediction; the dashed curve is the true function.</p><div id="jxg8" class="viz-board" style="height:470px;"></div><p class="viz-caption"><strong>Figure.</strong> A regression tree fitted by exhaustive greedy splitting on squared error. Depth 1 is a single stump; each extra level halves the residual but adds discontinuities. At depth 5 the model is chasing noise &mdash; the classic variance explosion. Trees are <em>piecewise constant</em>: they cannot extrapolate and produce staircase artefacts on smooth functions.</p></div><h3>Strengths and the one fatal weakness</h3><table><thead><tr><th>Property</th><th>Assessment</th></tr></thead><tbody><tr><td>Interpretability</td><td>Excellent &mdash; a path from root to leaf <em>is</em> the explanation</td></tr><tr><td>Mixed feature types</td><td>Native; no scaling, no one-hot encoding needed</td></tr><tr><td>Missing values</td><td>Handled by surrogate splits <a class="cite" href="#ref-cart1984">[1]</a> or by sending them to one side</td></tr><tr><td>Non-linear interactions</td><td>Captured automatically by nested splits</td></tr><tr><td>Smooth functions</td><td>Poor &mdash; staircase approximation, no extrapolation</td></tr><tr><td><strong>Stability</strong></td><td><strong>Very poor</strong> &mdash; a small data perturbation changes the root split and hence the whole tree</td></tr></tbody></table><p>That last row is the opening for everything that follows. A single tree is a <em>low-bias, very high-variance</em> learner. Section 1 told us that variance is reduced by averaging.</p><h2>3.2 Bagging: variance reduction by averaging</h2><p>Breiman's bagging <a class="cite" href="#ref-breiman1996">[5]</a> (bootstrap aggregating) fits B trees, each on a bootstrap resample of the training set (n points drawn <em>with</em> replacement), and averages their predictions.</p><div class="box thm"><div class="box-title">Why averaging works &mdash; and where it stops</div>If B predictors each have variance \(\sigma^2\) and pairwise correlation \(\rho\), the variance of their mean is<div class="eq">\[Var( \bar{f} ) = \rho \sigma^2 + (1 - \rho )\sigma^2 / B\]</div><p style="margin:6px 0 0 0;">The second term vanishes as \(B \to \infty\), but the first does not. <strong>The floor of an ensemble is set by the correlation between its members, not by their number.</strong> Adding trees past a few hundred buys nothing; <em>decorrelating</em> them does.</p></div><p>Bagging also gives free validation. Each bootstrap sample omits about (1 \(- 1/n)^{n} \to e^{-1} \approx\) <strong>36.8 %</strong> of the data; averaging each point's prediction over only the trees that did not see it yields the <strong>out-of-bag error</strong>, an unbiased risk estimate at no extra cost <a class="cite" href="#ref-breiman1996">[5]</a>.</p><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Move the \(\rho\) slider and watch the plateau rise or fall.</p><div id="jxg9" class="viz-board" style="height:450px;"></div><p class="viz-caption"><strong>Figure.</strong> Ensemble variance as a function of the number of trees B, for three levels of inter-tree correlation \(\rho\). Every curve flattens at the horizontal asymptote \(\rho \sigma^2 (\)dashed). Random forests exist to push \(\rho\) down, which lowers the asymptote &mdash; bagging alone only rides one curve to its floor.</p></div><h2>3.3 Random forests</h2><p>Random forests <a class="cite" href="#ref-breiman2001">[7]</a> add a second source of randomness on top of bagging, drawing on Ho's random subspace idea <a class="cite" href="#ref-ho1998">[6]</a>: <strong>at every split, only a random subset of m features is considered</strong>.</p><div class="eq">\[m = \lfloor \sqrt{d}\rfloor \text{for classification } | m = \lfloor d/3\rfloor \text{for regression } (\text{defaults from } [7])\]</div><p>The effect is precisely the one the variance formula asks for. Without it, a single dominant feature is chosen at the root of nearly every tree and all trees look alike (\(\rho\) high). Forcing most trees to ignore it at any given split makes them structurally different, lowering \(\rho\) at a small cost in individual accuracy &mdash; a trade that the formula shows is almost always profitable.</p><div class="box thm"><div class="box-title">Theorem — Random forests do not overfit with B <a class="cite" href="#ref-breiman2001">[7]</a></div>Breiman proved that as \(B \to \infty\) the generalisation error converges almost surely to a limit bounded by \(\bar{\rho}(1 - s^2)/s^2\), where s is the average margin (strength) of the individual trees and \(\bar{\rho}\) their mean correlation. Adding trees never hurts; it only fails to help past a point. <em>Depth</em> and <em>m</em> are the parameters that can overfit.</div><p>Two forms of variable importance come out of the fitting process:</p><ul><li><strong>Mean decrease in impurity (MDI)</strong> &mdash; total \(\Delta I\) attributable to each feature, summed over all splits. Free, but Strobl et al. <a class="cite" href="#ref-strobl2007">[12]</a> showed it is <em>biased toward high-cardinality and continuous features</em>, which simply offer more candidate split points.</li><li><strong>Permutation importance</strong> &mdash; the drop in out-of-bag accuracy when a feature's values are shuffled. Model-agnostic and far more trustworthy, though it misattributes among correlated features.</li><li><strong>SHAP values</strong> <a class="cite" href="#ref-lundberg2017">[13]</a> &mdash; the unique additive attribution satisfying the Shapley axioms, with an exact polynomial-time algorithm for trees. Now the standard for per-prediction explanation.</li></ul><h2>3.4 Boosting: fitting the residual</h2><figure class="viz"><div class="viz-title">Bagging against boosting</div><svg viewBox="0 0 720 270" role="img" style="width:100%;height:auto;display:block;font-family:inherit;"><text x="180" y="34" text-anchor="middle" style="fill:var(--primary);font-size:14px;font-weight:700;">Bagging &mdash; parallel, reduces variance</text><text x="545" y="34" text-anchor="middle" style="fill:var(--viz-cmp);font-size:14px;font-weight:700;">Boosting &mdash; sequential, reduces bias</text><rect x="30" y="70" width="70" height="150" rx="8" style="fill:var(--primary);opacity:0.16;stroke:var(--primary);stroke-width:1.6;"/><text x="65" y="150" text-anchor="middle" style="fill:var(--color-text);font-size:12.5px;font-weight:400;">data</text><rect x="140" y="70" width="86" height="40" rx="7" style="fill:var(--color-bg);stroke:var(--primary);stroke-width:1.8;"/><text x="183" y="95" text-anchor="middle" style="fill:var(--primary);font-size:12px;font-weight:400;">tree 1</text><path d="M 102 145 L 138 90" style="fill:none;stroke:var(--viz-ref);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 228 90 L 272 145" style="fill:none;stroke:var(--viz-ref);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;"/><rect x="140" y="125" width="86" height="40" rx="7" style="fill:var(--color-bg);stroke:var(--primary);stroke-width:1.8;"/><text x="183" y="150" text-anchor="middle" style="fill:var(--primary);font-size:12px;font-weight:400;">tree 2</text><path d="M 102 145 L 138 145" style="fill:none;stroke:var(--viz-ref);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 228 145 L 272 145" style="fill:none;stroke:var(--viz-ref);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;"/><rect x="140" y="180" width="86" height="40" rx="7" style="fill:var(--color-bg);stroke:var(--primary);stroke-width:1.8;"/><text x="183" y="205" text-anchor="middle" style="fill:var(--primary);font-size:12px;font-weight:400;">tree 3</text><path d="M 102 145 L 138 200" style="fill:none;stroke:var(--viz-ref);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 228 200 L 272 145" style="fill:none;stroke:var(--viz-ref);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;"/><circle cx="298" cy="145" r="26" style="fill:var(--primary);opacity:0.16;stroke:var(--primary);stroke-width:1.8;"/><text x="298" y="150" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;">avg</text><rect x="420" y="120" width="86" height="46" rx="7" style="fill:var(--color-bg);stroke:var(--viz-cmp);stroke-width:1.8;"/><text x="463" y="141" text-anchor="middle" style="fill:var(--viz-cmp);font-size:11.5px;font-weight:400;">stump 1</text><text x="463" y="157" text-anchor="middle" style="fill:var(--color-muted);font-size:10px;font-weight:400;">fits residual</text><path d="M 508 143 L 523 143" style="fill:none;stroke:var(--viz-cmp);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;"/><rect x="525" y="120" width="86" height="46" rx="7" style="fill:var(--color-bg);stroke:var(--viz-cmp);stroke-width:1.8;"/><text x="568" y="141" text-anchor="middle" style="fill:var(--viz-cmp);font-size:11.5px;font-weight:400;">stump 2</text><text x="568" y="157" text-anchor="middle" style="fill:var(--color-muted);font-size:10px;font-weight:400;">fits residual</text><path d="M 613 143 L 628 143" style="fill:none;stroke:var(--viz-cmp);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;"/><rect x="630" y="120" width="86" height="46" rx="7" style="fill:var(--color-bg);stroke:var(--viz-cmp);stroke-width:1.8;"/><text x="673" y="141" text-anchor="middle" style="fill:var(--viz-cmp);font-size:11.5px;font-weight:400;">stump 3</text><text x="673" y="157" text-anchor="middle" style="fill:var(--color-muted);font-size:10px;font-weight:400;">fits residual</text><path d="M 420 200 L 676 200" style="fill:none;stroke:var(--viz-ref);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:5 4;"/><text x="548" y="218" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-weight:400;">each model corrects what the previous ones got wrong</text><text x="548" y="96" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-weight:400;">residual &#8594; residual &#8594; residual</text><path d="M 360 60 L 360 250" style="fill:none;stroke:var(--color-rule);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:5 5;"/></svg><figcaption class="viz-caption"><strong>Figure.</strong> The two ensembles attack different terms of the error decomposition. Bagging fits independent deep trees on resampled data and averages them, which cuts variance. Boosting fits shallow trees in sequence, each on the previous residual, which cuts bias.</figcaption></figure><p>Bagging builds trees <em>in parallel</em> from independent resamples. Boosting builds them <em>sequentially</em>, each one correcting its predecessors. The two attack different terms of the decomposition: bagging reduces variance, boosting reduces <strong>bias</strong>.</p><h3>AdaBoost</h3><p>Freund and Schapire <a class="cite" href="#ref-freund1997">[8]</a> reweight the training points at each round, up-weighting those the current ensemble gets wrong, and give each weak learner a vote proportional to its accuracy:</p><div class="eq">\[\alpha_{t} = \tfrac{1}{2} \ln[ (1 - \epsilon_{t}) / \epsilon_{t} ], w_{i} \leftarrow w_{i} \exp(-\alpha_{t} y_{i} h_{t}(x_{i}))\]</div><p>Their theorem: if every weak learner beats chance by \(\gamma \gt 0\), the training error drops <em>exponentially</em>, below exp(\(-2T\gamma^2\)) after T rounds. It was later recognised that AdaBoost is exactly forward stagewise additive modelling under the <strong>exponential loss</strong> \(e^{-yf(x)}\) &mdash; another member of the surrogate-loss family from Section 2.5, and the reason AdaBoost is sensitive to label noise (the exponential loss punishes a badly misclassified point without limit).</p><h3>Gradient boosting</h3><p>Friedman <a class="cite" href="#ref-friedman2001">[9]</a> generalised this to any differentiable loss by reading boosting as gradient descent <em>in function space</em>. At stage t, compute the negative gradient of the loss at the current predictions &mdash; the <em>pseudo-residuals</em> &mdash; and fit the next tree to them:</p><div class="eq">\[r_{i}^{(t)} = - \partial L(y_{i}, F(x_{i})) / \partial F(x_{i}) \text{evaluated at } F = F^{(t-1)}\]</div><div class="eq">\[F^{(t)}(x) = F^{(t-1)}(x) + \nu \cdot h_{t}(x), 0 \lt \nu \le 1\]</div><p>For squared loss the pseudo-residuals are the ordinary residuals, which makes the idea transparent: <em>every tree fits what the previous ones got wrong</em>. The shrinkage rate \(\nu (\)typically 0.01&ndash;0.1) trades against the number of trees &mdash; small \(\nu\) needs more rounds but generalises better.</p><pre><code>def gradient_boost_squared(X, y, n_trees=100, nu=0.1, fit_tree=None):
+    """Skeleton of gradient boosting under squared loss.
+    fit_tree(X, r) must return a callable predicting the pseudo-residuals r."""
+    F0 = sum(y) / len(y)                 # the constant that minimises squared loss
+    F = [F0] * len(y)
+    trees = []
+    for _ in range(n_trees):
+        residuals = [yi - Fi for yi, Fi in zip(y, F)]   # = negative gradient / 2
+        h = fit_tree(X, residuals)
+        preds = [h(xi) for xi in X]
+        F = [Fi + nu * pi for Fi, pi in zip(F, preds)]
+        trees.append(h)
+    return F0, trees, nu</code></pre><p>XGBoost <a class="cite" href="#ref-chen2016">[10]</a> sharpened this in three ways that made it dominate tabular competitions: a <strong>second-order</strong> Taylor expansion of the loss (using both gradient and Hessian) rather than first-order; an explicit \(\gamma |T| + \tfrac{1}{2} \lambda \| w\|^2\) regularisation term inside the split criterion; and systems work &mdash; sparsity-aware splitting, cache-aware column blocks, approximate quantile sketching. LightGBM <a class="cite" href="#ref-ke2017">[11]</a> added histogram binning and leaf-wise growth for a further order of magnitude on large data.</p><h2>3.5 Choosing between them</h2><table><thead><tr><th></th><th>Random Forest</th><th>Gradient Boosting</th></tr></thead><tbody><tr><td>Attacks</td><td>variance</td><td>bias</td></tr><tr><td>Trees are</td><td>deep, independent, parallel</td><td>shallow (depth 3&ndash;6), sequential</td></tr><tr><td>Overfits with more trees</td><td>no <a class="cite" href="#ref-breiman2001">[7]</a></td><td>yes &mdash; needs early stopping</td></tr><tr><td>Tuning burden</td><td>low (m, depth)</td><td>high (\(\nu\), depth, subsample, \(\lambda , \gamma\))</td></tr><tr><td>Parallelism</td><td>trivial across trees</td><td>only within a tree</td></tr><tr><td>Noise robustness</td><td>good</td><td>sensitive, especially AdaBoost</td></tr><tr><td>Typical accuracy on tabular data</td><td>strong baseline</td><td>usually the winner when tuned</td></tr></tbody></table><p>A pragmatic rule: fit a random forest first because it works out of the box and its out-of-bag error is free; move to gradient boosting when the last few points of accuracy justify the tuning budget.</p><h2>Summary</h2><ul><li>Optimal trees are NP-complete <a class="cite" href="#ref-hyafil1976">[4]</a>; all real algorithms are greedy, which is why single trees are unstable.</li><li>Gini and entropy are concave, misclassification error is not &mdash; concavity is what makes greedy splitting see progress <a class="cite" href="#ref-cart1984">[1]</a>.</li><li>Var(\(\bar{f}) = \rho \sigma^2 + (1-\rho )\sigma^2/B\): ensemble quality is capped by member correlation <a class="cite" href="#ref-breiman1996">[5]</a>.</li><li>Random forests decorrelate by sampling features at each split; OOB error is free validation <a class="cite" href="#ref-breiman2001">[7]</a>.</li><li>Boosting is gradient descent in function space, fitting each tree to the pseudo-residuals <a class="cite" href="#ref-friedman2001">[9]</a>; XGBoost adds second-order information and explicit regularisation <a class="cite" href="#ref-chen2016">[10]</a>.</li><li>Prefer permutation importance or SHAP <a class="cite" href="#ref-lundberg2017">[13]</a> over impurity importance, which is biased <a class="cite" href="#ref-strobl2007">[12]</a>.</li></ul><h2>References</h2><ol class="reflist"><li id="ref-cart1984">Breiman, L., Friedman, J., Olshen, R. &amp; Stone, C. (1984). <em>Classification and Regression Trees</em>. Wadsworth. DOI: 10.1201/9781315139470 <a href="https://doi.org/10.1201/9781315139470">https://doi.org/10.1201/9781315139470</a></li><li id="ref-quinlan1986">Quinlan, J. R. (1986). Induction of decision trees. <em>Machine Learning</em>, 1(1), 81&ndash;106. DOI: 10.1007/BF00116251 <a href="https://doi.org/10.1007/BF00116251">https://doi.org/10.1007/BF00116251</a></li><li id="ref-quinlan1993">Quinlan, J. R. (1993). <em>C4.5: Programs for Machine Learning</em>. Morgan Kaufmann. <a href="https://dl.acm.org/doi/10.5555/152181">https://dl.acm.org/doi/10.5555/152181</a></li><li id="ref-hyafil1976">Hyafil, L. &amp; Rivest, R. L. (1976). Constructing optimal binary decision trees is NP-complete. <em>Information Processing Letters</em>, 5(1), 15&ndash;17. DOI: 10.1016/0020-0190(76)90095-8 <a href="https://doi.org/10.1016/0020-0190(76)90095-8">https://doi.org/10.1016/0020-0190(76)90095-8</a></li><li id="ref-breiman1996">Breiman, L. (1996). Bagging predictors. <em>Machine Learning</em>, 24(2), 123&ndash;140. DOI: 10.1007/BF00058655 <a href="https://doi.org/10.1007/BF00058655">https://doi.org/10.1007/BF00058655</a></li><li id="ref-ho1998">Ho, T. K. (1998). The random subspace method for constructing decision forests. <em>IEEE TPAMI</em>, 20(8), 832&ndash;844. DOI: 10.1109/34.709601 <a href="https://doi.org/10.1109/34.709601">https://doi.org/10.1109/34.709601</a></li><li id="ref-breiman2001">Breiman, L. (2001). Random forests. <em>Machine Learning</em>, 45(1), 5&ndash;32. DOI: 10.1023/A:1010933404324 <a href="https://doi.org/10.1023/A:1010933404324">https://doi.org/10.1023/A:1010933404324</a></li><li id="ref-freund1997">Freund, Y. &amp; Schapire, R. E. (1997). A decision-theoretic generalization of on-line learning and an application to boosting. <em>JCSS</em>, 55(1), 119&ndash;139. DOI: 10.1006/jcss.1997.1504 <a href="https://doi.org/10.1006/jcss.1997.1504">https://doi.org/10.1006/jcss.1997.1504</a></li><li id="ref-friedman2001">Friedman, J. H. (2001). Greedy function approximation: a gradient boosting machine. <em>Annals of Statistics</em>, 29(5), 1189&ndash;1232. DOI: 10.1214/aos/1013203451 <a href="https://doi.org/10.1214/aos/1013203451">https://doi.org/10.1214/aos/1013203451</a></li><li id="ref-chen2016">Chen, T. &amp; Guestrin, C. (2016). XGBoost: a scalable tree boosting system. <em>KDD '16</em>, 785&ndash;794. DOI: 10.1145/2939672.2939785 <a href="https://doi.org/10.1145/2939672.2939785">https://doi.org/10.1145/2939672.2939785</a></li><li id="ref-ke2017">Ke, G. et al. (2017). LightGBM: a highly efficient gradient boosting decision tree. <em>NeurIPS 30</em>. <a href="https://papers.nips.cc/paper/6907-lightgbm-a-highly-efficient-gradient-boosting-decision-tree">https://papers.nips.cc/paper/6907-lightgbm-a-highly-efficient-gradient-boosting-decision-tree</a></li><li id="ref-strobl2007">Strobl, C., Boulesteix, A.-L., Zeileis, A. &amp; Hothorn, T. (2007). Bias in random forest variable importance measures. <em>BMC Bioinformatics</em>, 8, 25. DOI: 10.1186/1471-2105-8-25 <a href="https://doi.org/10.1186/1471-2105-8-25">https://doi.org/10.1186/1471-2105-8-25</a></li><li id="ref-lundberg2017">Lundberg, S. M. &amp; Lee, S.-I. (2017). A unified approach to interpreting model predictions. <em>NeurIPS 30</em>. arXiv:1705.07874 <a href="https://arxiv.org/abs/1705.07874">https://arxiv.org/abs/1705.07874</a></li></ol><nav class="lesson-nav"><div class="container"><a href="../index.html">Course index</a><a href="../02-classification/page.html">\(\leftarrow\) Section 2</a><a href="../04-unsupervised/page.html">Section 4 — Unsupervised Learning \(\to\)</a></div></nav>
+</main>
+<footer class="site-footer"><strong>Machine Learning A&ndash;Z</strong> &middot; From empirical risk minimisation to graph neural networks<span class="footer-meta">Edition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">The interactive figure could not be loaded. Check your network connection.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+// Colours resolved from the stylesheet, so the figures follow the light/dark
+// theme. Each entry is a function: board attributes that are functions are
+// re-evaluated on update, so a theme switch only needs a redraw.
+var BOARDS = [];
+function cssv(name, fallback){
+    try {
+        var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback;
+    } catch (e) { return fallback; }
+}
+var PAL = {
+    text:  function(){ return cssv('--color-text',  '#1f2937'); },
+    muted: function(){ return cssv('--color-muted', '#6b7280'); },
+    axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+    ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+    grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+    cell:  function(){ return cssv('--cell-bg',     '#ffffff'); }
+};
+// Re-render every board when the theme attribute flips.
+if (window.MutationObserver) {
+    new MutationObserver(function(){
+        for (var i = 0; i < BOARDS.length; i++) {
+            try { BOARDS[i].fullUpdate(); } catch (e) {}
+        }
+    }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+
+
+// ---------------------------------------------------------------- Figure 3.1
+var b7 = JXG.JSXGraph.initBoard('jxg7', {
+    boundingbox: [-0.12, 1.28, 1.12, -0.22], axis: true, showCopyright: false,
+    showNavigation: false, keepaspectratio: false
+});
+function gini(p){ return 2*p*(1-p); }
+function ent(p){ if (p<=0 || p>=1) return 0;
+                 return -(p*Math.log(p) + (1-p)*Math.log(1-p))/Math.log(2); }
+function mis(p){ return Math.min(p, 1-p); }
+b7.create('functiongraph', [ent,  0.0001, 0.9999], {strokeColor:'#026573', strokeWidth:3.5});
+b7.create('functiongraph', [gini, 0, 1],           {strokeColor:'#dc2626', strokeWidth:3.5});
+b7.create('functiongraph', [mis,  0, 1],           {strokeColor:PAL.text, strokeWidth:3, dash:2});
+var pS = b7.create('glider', [0.3, 0, b7.defaultAxes.x],
+                   {size:6, name:'p', fillColor:'#c9a227', strokeColor:'#92400e',
+                    label:{fontSize:15}});
+['#026573','#dc2626',PAL.text()].forEach(function(col, i){
+    var f = [ent, gini, mis][i];
+    var P = b7.create('point', [function(){ return Math.min(0.9999, Math.max(0.0001, pS.X())); },
+                                function(){ return f(Math.min(0.9999, Math.max(0.0001, pS.X()))); }],
+                      {size:3.5, name:'', fillColor:col, strokeColor:col, fixed:true});
+});
+b7.create('line', [[function(){return pS.X();}, -0.2],
+                   [function(){return pS.X();}, 1.25]],
+          {strokeColor:PAL.ref, dash:3, strokeWidth:1.5, highlight:false});
+b7.create('text', [0.60, 1.20, function(){
+    var p = Math.min(0.9999, Math.max(0.0001, pS.X()));
+    return 'p = ' + p.toFixed(3);
+}], {fontSize:15, color:'#92400e', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b7.create('text', [0.60, 1.10, function(){
+    var p = Math.min(0.9999, Math.max(0.0001, pS.X()));
+    return 'entropy = ' + ent(p).toFixed(3);
+}], {fontSize:14, color:'#026573', cssStyle:'font-family:Georgia,serif;'});
+b7.create('text', [0.60, 1.02, function(){
+    var p = Math.min(0.9999, Math.max(0.0001, pS.X()));
+    return 'Gini = ' + gini(p).toFixed(3);
+}], {fontSize:14, color:'#dc2626', cssStyle:'font-family:Georgia,serif;'});
+b7.create('text', [0.60, 0.94, function(){
+    var p = Math.min(0.9999, Math.max(0.0001, pS.X()));
+    return 'misclass. = ' + mis(p).toFixed(3);
+}], {fontSize:14, strokeColor:PAL.text, cssStyle:'font-family:Georgia,serif;'});
+b7.create('text', [0.02, -0.16, 'proportion of class 1 in the node'],
+          {fontSize:13, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+
+// ---------------------------------------------------------------- Figure 3.2
+var b8 = JXG.JSXGraph.initBoard('jxg8', {
+    boundingbox: [-0.35, 3.5, 6.35, -2.1], axis: true, showCopyright: false,
+    showNavigation: false, keepaspectratio: false
+});
+var TD = [];
+(function(){                        // deterministic pseudo-random sample
+    var s = 12345;
+    function rnd(){ s = (1103515245*s + 12345) % 2147483648; return s/2147483648; }
+    for (var i=0;i<40;i++){
+        var x = 6*i/39;
+        var y = 1.6*Math.sin(1.15*x) + 0.18*x + 0.55*(rnd()-0.5)*2;
+        TD.push([x, y]);
+    }
+})();
+TD.forEach(function(d){ b8.create('point', d, {size:3, name:'', fillColor:'#dc2626',
+                                               strokeColor:'#7f1d1d', fixed:true}); });
+b8.create('functiongraph', [function(x){ return 1.6*Math.sin(1.15*x) + 0.18*x; }, 0, 6],
+          {strokeColor:PAL.axis, strokeWidth:2, dash:2});
+var depthS = b8.create('slider', [[0.1, 3.2], [2.6, 3.2], [1, 3, 6]],
+                       {name:'max depth', snapWidth:1, strokeColor:'#026573',
+                        fillColor:'#026573', label:{fontSize:15}});
+function mean(a){ return a.reduce(function(u,v){return u+v;},0)/a.length; }
+function sse(a){ var m = mean(a); return a.reduce(function(u,v){ return u+(v-m)*(v-m); },0); }
+function grow(pts, depth){                 // returns list of {lo, hi, val}
+    if (depth === 0 || pts.length < 3) {
+        return [{lo:null, hi:null, val:mean(pts.map(function(d){return d[1];})), pts:pts}];
+    }
+    var best = null;
+    for (var k=1;k<pts.length;k++){
+        var L = pts.slice(0,k), R = pts.slice(k);
+        var s = sse(L.map(function(d){return d[1];})) + sse(R.map(function(d){return d[1];}));
+        if (best === null || s < best.s) best = {s:s, k:k, thr:(pts[k-1][0]+pts[k][0])/2};
+    }
+    if (!best) return [{val:mean(pts.map(function(d){return d[1];})), pts:pts}];
+    return grow(pts.slice(0,best.k), depth-1).concat(grow(pts.slice(best.k), depth-1));
+}
+var treeCache = {};
+function tree(depth){
+    if (!treeCache[depth]) treeCache[depth] = grow(TD, depth);
+    return treeCache[depth];
+}
+function predict(x, depth){
+    var leaves = tree(depth), acc = 0;
+    for (var i=0;i<leaves.length;i++){
+        var seg = leaves[i].pts;
+        var lo = (i===0) ? -1 : (seg[0][0] + leaves[i-1].pts[leaves[i-1].pts.length-1][0])/2;
+        var hi = (i===leaves.length-1) ? 99
+                 : (seg[seg.length-1][0] + leaves[i+1].pts[0][0])/2;
+        if (x >= lo && x < hi) return leaves[i].val;
+    }
+    return leaves[leaves.length-1].val;
+}
+b8.create('functiongraph', [function(x){ return predict(x, Math.round(depthS.Value())); }, 0, 6],
+          {strokeColor:'#026573', strokeWidth:3.5});
+b8.create('text', [3.2, 3.2, function(){
+    var d = Math.round(depthS.Value());
+    var leaves = tree(d).length, s = 0;
+    TD.forEach(function(p){ s += Math.pow(p[1] - predict(p[0], d), 2); });
+    return 'leaves = ' + leaves + '   |   train RMSE = ' + Math.sqrt(s/TD.length).toFixed(4);
+}], {fontSize:15, strokeColor:PAL.text, cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+
+// ---------------------------------------------------------------- Figure 3.3
+var b9 = JXG.JSXGraph.initBoard('jxg9', {
+    boundingbox: [-9, 1.18, 105, -0.18], axis: true, showCopyright: false,
+    showNavigation: false, keepaspectratio: false
+});
+var rhoS = b9.create('slider', [[6, 1.08], [46, 1.08], [0, 0.45, 0.95]],
+                     {name:'&rho;', snapWidth:0.01, strokeColor:'#c9a227',
+                      fillColor:'#c9a227', label:{fontSize:15}});
+function vv(B, r){ return r + (1-r)/Math.max(B, 1); }
+[[0.10,'#16a34a'], [0.45,'#026573'], [0.85,'#dc2626']].forEach(function(pair){
+    b9.create('functiongraph', [function(B){ return vv(B, pair[0]); }, 1, 100],
+              {strokeColor:pair[1], strokeWidth:2, dash:2, highlight:false});
+});
+b9.create('functiongraph', [function(B){ return vv(B, rhoS.Value()); }, 1, 100],
+          {strokeColor:'#9333ea', strokeWidth:4});
+b9.create('line', [[0, function(){ return rhoS.Value(); }],
+                   [100, function(){ return rhoS.Value(); }]],
+          {strokeColor:'#9333ea', dash:3, strokeWidth:1.5, highlight:false});
+b9.create('text', [56, 1.08, function(){
+    return 'asymptote = &rho;&sigma;&sup2; = ' + rhoS.Value().toFixed(2);
+}], {fontSize:15, color:'#9333ea', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b9.create('text', [56, 0.98, function(){
+    return 'B = 100  &rarr;  Var = ' + vv(100, rhoS.Value()).toFixed(3);
+}], {fontSize:14, strokeColor:PAL.text, cssStyle:'font-family:Georgia,serif;'});
+b9.create('text', [56, 0.88, '(fixed curves: &rho; = 0.10, 0.45, 0.85)'],
+          {fontSize:13, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+b9.create('text', [30, -0.13, 'number of trees B   (variance in units of &sigma;&sup2;)'],
+          {fontSize:13, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — The GCN normalised adjacency</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q1 &amp;mdash; THE RENORMALISATION TRICK&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Kipf and Welling replace I + D&lt;sup&gt;&amp;minus;1/2&lt;/sup&gt;AD&lt;sup&gt;&amp;minus;1/2&lt;/sup&gt; (spectrum in [0,2], explosive when stacked) by D&amp;#771;&lt;sup&gt;&amp;minus;1/2&lt;/sup&gt;A&amp;#771;D&amp;#771;&lt;sup&gt;&amp;minus;1/2&lt;/sup&gt; with A&amp;#771; = A + I. Adding self-loops is what makes deep stacking numerically possible.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;gcn_norm(n, edges)&lt;/code&gt;&lt;/strong&gt; returning A&amp;#770; = D&amp;#771;&lt;sup&gt;&amp;minus;1/2&lt;/sup&gt;(A+I)D&amp;#771;&lt;sup&gt;&amp;minus;1/2&lt;/sup&gt; as a list of lists of floats.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;n = 2, edges = [(0,1)]
+-&amp;gt;  [[0.5, 0.5], [0.5, 0.5]]&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; d&amp;#771;&lt;sub&gt;u&lt;/sub&gt; is the degree &lt;em&gt;including&lt;/em&gt; the self-loop, i.e. d&lt;sub&gt;u&lt;/sub&gt; + 1.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import math
+
+
+def gcn_norm(n, edges):
+    # Completer : ajouter les boucles, puis normaliser symetriquement
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import math
+
+
+def gcn_norm(n, edges):
+    A = [[0.0] * n for _ in range(n)]
+    for u, v in edges:
+        A[u][v] = 1.0
+        A[v][u] = 1.0
+    for i in range(n):
+        A[i][i] = 1.0
+    d = [sum(row) for row in A]
+    out = [[0.0] * n for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            if A[i][j] != 0.0:
+                out[i][j] = A[i][j] / math.sqrt(d[i] * d[j])
+    return out
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>for row in gcn_norm(2, [(0, 1)]):
+    print([round(x, 4) for x in row])
+</text></testcode><stdin><text /></stdin><expected><text>[0.5, 0.5]
+[0.5, 0.5]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>for row in gcn_norm(3, [(0, 1), (1, 2)]):
+    print([round(x, 4) for x in row])
+</text></testcode><stdin><text /></stdin><expected><text>[0.5, 0.4082, 0.0]
+[0.4082, 0.3333, 0.4082]
+[0.0, 0.4082, 0.5]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text># D~^{1/2} 1 is an eigenvector with eigenvalue exactly 1
+n, e = 4, [(0, 1), (1, 2), (2, 3), (3, 0), (0, 2)]
+Ah = gcn_norm(n, e)
+deg = [1] * n
+for u, v in e:
+    deg[u] += 1
+    deg[v] += 1
+x = [math.sqrt(d) for d in deg]
+y = [sum(Ah[i][j] * x[j] for j in range(n)) for i in range(n)]
+print([round(a - b, 10) for a, b in zip(y, x)])
+</text></testcode><stdin><text /></stdin><expected><text>[0.0, 0.0, 0.0, 0.0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>for row in gcn_norm(2, []):
+    print([round(x, 4) for x in row])
+</text></testcode><stdin><text /></stdin><expected><text>[1.0, 0.0]
+[0.0, 1.0]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>Ah = gcn_norm(3, [(0, 1), (1, 2), (0, 2)])
+print(all(abs(Ah[i][j] - Ah[j][i]) &lt; 1e-12 for i in range(3) for j in range(3)))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — One message-passing layer</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q2 &amp;mdash; AGGREGATE AND UPDATE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Gilmer et al. showed that every GNN fits one template. This exercise implements a single round of it, with mean aggregation over the neighbourhood including the node itself.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;propagate(n, edges, h)&lt;/code&gt;&lt;/strong&gt; performing one round of mean aggregation over N(u) &amp;cup; {u} on a list of &lt;em&gt;scalar&lt;/em&gt; features, and &lt;strong&gt;&lt;code&gt;propagate_k(n, edges, h, k)&lt;/code&gt;&lt;/strong&gt; applying it k times.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;n = 3, edges = [(0,1),(1,2)], h = [1.0, 0.0, 0.0]
+propagate -&amp;gt; [0.5, 0.333..., 0.0]&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; Node u averages over its neighbours &lt;em&gt;and&lt;/em&gt; itself &amp;mdash; the self-loop again.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def propagate(n, edges, h):
+    # Completer : moyenne sur N(u) union {u}
+    ...
+
+
+def propagate_k(n, edges, h, k):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def propagate(n, edges, h):
+    adj = [[] for _ in range(n)]
+    for u, v in edges:
+        adj[u].append(v)
+        adj[v].append(u)
+    out = []
+    for u in range(n):
+        group = adj[u] + [u]
+        out.append(sum(h[w] for w in group) / len(group))
+    return out
+
+
+def propagate_k(n, edges, h, k):
+    cur = list(h)
+    for _ in range(k):
+        cur = propagate(n, edges, cur)
+    return cur
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print([round(x, 4) for x in propagate(3, [(0, 1), (1, 2)], [1.0, 0.0, 0.0])])
+</text></testcode><stdin><text /></stdin><expected><text>[0.5, 0.3333, 0.0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2), (2, 3)]
+print([round(x, 4) for x in propagate_k(4, e, [1.0, 0.0, 0.0, 0.0], 2)])
+</text></testcode><stdin><text /></stdin><expected><text>[0.4167, 0.2778, 0.1111, 0.0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text># a constant signal is a fixed point
+e = [(0, 1), (1, 2), (2, 0)]
+print([round(x, 6) for x in propagate_k(3, e, [5.0, 5.0, 5.0], 10)])
+</text></testcode><stdin><text /></stdin><expected><text>[5.0, 5.0, 5.0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text># over-smoothing: after many rounds everything collapses
+e = [(0, 1), (1, 2), (2, 0), (0, 3), (1, 3), (2, 3)]
+r = propagate_k(4, e, [1.0, -1.0, 1.0, -1.0], 40)
+print(round(max(r) - min(r), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print([round(x, 4) for x in propagate(2, [], [3.0, 7.0])])
+</text></testcode><stdin><text /></stdin><expected><text>[3.0, 7.0]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — Receptive field of an L-layer GNN</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q3 &amp;mdash; L ROUNDS SEE L HOPS&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Because multiplying by A is one hop, an L-layer message-passing network sees exactly the L-hop neighbourhood. Small-world graphs have diameter ~log n, so the receptive field saturates after very few layers &amp;mdash; the reason GNNs are shallow where CNNs are deep.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;receptive_field(n, edges, source, L)&lt;/code&gt;&lt;/strong&gt; returning the sorted list of nodes within L hops of &lt;code&gt;source&lt;/code&gt; (including the source itself), and &lt;strong&gt;&lt;code&gt;saturation_depth(n, edges, source)&lt;/code&gt;&lt;/strong&gt; returning the smallest L at which the receptive field stops growing.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;path 0-1-2-3, source = 0
+receptive_field(..., 1) -&amp;gt; [0, 1]
+saturation_depth(...)  -&amp;gt; 3&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; A breadth-first search with a depth limit. For the saturation depth, increase L until the size no longer changes.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def receptive_field(n, edges, source, L):
+    # Completer : BFS limite a L niveaux
+    ...
+
+
+def saturation_depth(n, edges, source):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def receptive_field(n, edges, source, L):
+    adj = [[] for _ in range(n)]
+    for u, v in edges:
+        adj[u].append(v)
+        adj[v].append(u)
+    dist = {source: 0}
+    queue = [source]
+    while queue:
+        u = queue.pop(0)
+        if dist[u] &gt;= L:
+            continue
+        for w in adj[u]:
+            if w not in dist:
+                dist[w] = dist[u] + 1
+                queue.append(w)
+    return sorted(dist)
+
+
+def saturation_depth(n, edges, source):
+    L = 0
+    prev = len(receptive_field(n, edges, source, 0))
+    while True:
+        L += 1
+        cur = len(receptive_field(n, edges, source, L))
+        if cur == prev:
+            return L - 1
+        prev = cur
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2), (2, 3)]
+print(receptive_field(4, e, 0, 1), receptive_field(4, e, 0, 2))
+</text></testcode><stdin><text /></stdin><expected><text>[0, 1] [0, 1, 2]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2), (2, 3)]
+print(saturation_depth(4, e, 0))
+</text></testcode><stdin><text /></stdin><expected><text>3
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text># a star: every node is 2 hops from every other
+e = [(0, i) for i in range(1, 6)]
+print(saturation_depth(6, e, 1), receptive_field(6, e, 1, 2))
+</text></testcode><stdin><text /></stdin><expected><text>2 [0, 1, 2, 3, 4, 5]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1)]
+print(receptive_field(4, e, 0, 10))
+</text></testcode><stdin><text /></stdin><expected><text>[0, 1]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2), (2, 0)]
+print(receptive_field(3, e, 0, 0), saturation_depth(3, e, 0))
+</text></testcode><stdin><text /></stdin><expected><text>[0] 1
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q4 — Weisfeiler–Leman colour refinement</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q4 &amp;mdash; THE EXPRESSIVENESS CEILING&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Xu et al. proved that message-passing GNNs are at most as powerful as the 1-WL test, and attain that bound only with injective aggregation &amp;mdash; which sum has and mean and max do not. This exercise implements 1-WL itself.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;wl_colours(n, edges, rounds)&lt;/code&gt;&lt;/strong&gt;: start with every node coloured 0, and at each round recolour by the pair (own colour, sorted multiset of neighbour colours). Canonicalise by sorting the distinct signatures and using their index, so colours are 0, 1, 2, ... Then write &lt;strong&gt;&lt;code&gt;wl_distinguishes(n1, e1, n2, e2, rounds)&lt;/code&gt;&lt;/strong&gt; returning &lt;code&gt;True&lt;/code&gt; only if the two sorted colour multisets differ.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;two triangles  vs  one 6-cycle
+wl_distinguishes(...)  -&amp;gt;  False   (WL cannot tell them apart)&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; Sorting the neighbour colours is what makes the signature order-independent &amp;mdash; the permutation invariance requirement.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def wl_colours(n, edges, rounds):
+    # Completer : signature = (couleur, multiensemble trie des couleurs voisines)
+    ...
+
+
+def wl_distinguishes(n1, e1, n2, e2, rounds):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def wl_colours(n, edges, rounds):
+    adj = [[] for _ in range(n)]
+    for u, v in edges:
+        adj[u].append(v)
+        adj[v].append(u)
+    col = [0] * n
+    for _ in range(rounds):
+        sig = [(col[u], tuple(sorted(col[w] for w in adj[u]))) for u in range(n)]
+        order = sorted(set(sig))
+        col = [order.index(s) for s in sig]
+    return col
+
+
+def wl_distinguishes(n1, e1, n2, e2, rounds):
+    a = sorted(wl_colours(n1, e1, rounds))
+    b = sorted(wl_colours(n2, e2, rounds))
+    return a != b
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>tri2 = [(0, 1), (1, 2), (2, 0), (3, 4), (4, 5), (5, 3)]
+cyc6 = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 0)]
+print(wl_distinguishes(6, tri2, 6, cyc6, 3))
+</text></testcode><stdin><text /></stdin><expected><text>False
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>path = [(0, 1), (1, 2), (2, 3)]
+print(wl_colours(4, path, 0), wl_colours(4, path, 1), wl_colours(4, path, 2))
+</text></testcode><stdin><text /></stdin><expected><text>[0, 0, 0, 0] [0, 1, 1, 0] [0, 1, 1, 0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text># a path and a star on 4 nodes ARE distinguished (their degrees differ)
+path = [(0, 1), (1, 2), (2, 3)]
+star = [(0, 1), (0, 2), (0, 3)]
+print(wl_distinguishes(4, path, 4, star, 2))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>tri = [(0, 1), (1, 2), (2, 0)]
+print(wl_colours(3, tri, 5))
+</text></testcode><stdin><text /></stdin><expected><text>[0, 0, 0]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>tri2 = [(0, 1), (1, 2), (2, 0), (3, 4), (4, 5), (5, 3)]
+cyc6 = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 0)]
+print([wl_distinguishes(6, tri2, 6, cyc6, r) for r in range(6)])
+</text></testcode><stdin><text /></stdin><expected><text>[False, False, False, False, False, False]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q5 — Why sum aggregation is strictly more expressive</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q5 &amp;mdash; SUM vs MEAN vs MAX&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Section 8.4: mean cannot distinguish the multiset {a, a} from {a}, and max cannot distinguish {a, b} from {a, a, b}. Sum distinguishes both. That single observation is the entire argument for GIN.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;agg(multiset, kind)&lt;/code&gt;&lt;/strong&gt; for &lt;code&gt;kind&lt;/code&gt; in &lt;code&gt;'sum'&lt;/code&gt;, &lt;code&gt;'mean'&lt;/code&gt;, &lt;code&gt;'max'&lt;/code&gt; (an empty multiset gives &lt;code&gt;0.0&lt;/code&gt; for all three), and &lt;strong&gt;&lt;code&gt;separates(ms1, ms2, kind)&lt;/code&gt;&lt;/strong&gt; returning whether that aggregator gives different values on the two multisets.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;separates([1, 1], [1], 'mean')  -&amp;gt;  False
+separates([1, 1], [1], 'sum')   -&amp;gt;  True&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; Compare with a small tolerance (1e-12) rather than exact float equality.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def agg(multiset, kind):
+    # Completer
+    ...
+
+
+def separates(ms1, ms2, kind):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def agg(multiset, kind):
+    if not multiset:
+        return 0.0
+    if kind == 'sum':
+        return float(sum(multiset))
+    if kind == 'mean':
+        return sum(multiset) / len(multiset)
+    if kind == 'max':
+        return float(max(multiset))
+    raise ValueError(kind)
+
+
+def separates(ms1, ms2, kind):
+    return abs(agg(ms1, kind) - agg(ms2, kind)) &gt; 1e-12
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(separates([1, 1], [1], 'mean'), separates([1, 1], [1], 'sum'))
+</text></testcode><stdin><text /></stdin><expected><text>False True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(separates([1, 2], [1, 1, 2], 'max'), separates([1, 2], [1, 1, 2], 'sum'))
+</text></testcode><stdin><text /></stdin><expected><text>False True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>for k in ['sum', 'mean', 'max']:
+    print(k, separates([2, 2, 2], [2], k))
+</text></testcode><stdin><text /></stdin><expected><text>sum True
+mean False
+max False
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(agg([], 'sum'), agg([], 'mean'), agg([], 'max'))
+</text></testcode><stdin><text /></stdin><expected><text>0.0 0.0 0.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(round(agg([1, 2, 3], 'sum'), 4), round(agg([1, 2, 3], 'mean'), 4), round(agg([1, 2, 3], 'max'), 4))
+</text></testcode><stdin><text /></stdin><expected><text>6.0 2.0 3.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

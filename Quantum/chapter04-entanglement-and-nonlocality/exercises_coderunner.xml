@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>C4.Q1 — Schmidt decomposition and entropy of entanglement</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C4.Q1 — Quantifying bipartite entanglement&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;The Schmidt coefficients of a bipartite pure state are the singular values of its coefficient matrix; the entropy of entanglement is the Shannon entropy of their squares.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;schmidt(psi, dA, dB)&lt;/code&gt; returning the singular values in descending order (as a NumPy array), &lt;code&gt;schmidt_rank(psi, dA, dB, tol=1e-10)&lt;/code&gt; returning an &lt;code&gt;int&lt;/code&gt;, and &lt;code&gt;entanglement_entropy(psi, dA, dB)&lt;/code&gt; returning a &lt;code&gt;float&lt;/code&gt; in bits, rounded to 6 decimals.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;Bell state    -&amp;gt; rank 2, entropy 1.0
+|00&amp;gt;          -&amp;gt; rank 1, entropy 0.0&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def schmidt(psi, dA, dB):
+    # reshape to dA x dB and take singular values
+    ...
+
+def schmidt_rank(psi, dA, dB, tol=1e-10):
+    ...
+
+def entanglement_entropy(psi, dA, dB):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def schmidt(psi, dA, dB):
+    C = np.asarray(psi, dtype=complex).reshape(dA, dB)
+    s = np.linalg.svd(C, compute_uv=False)
+    return np.sort(s)[::-1]
+
+def schmidt_rank(psi, dA, dB, tol=1e-10):
+    return int(np.sum(schmidt(psi, dA, dB) &gt; tol))
+
+def entanglement_entropy(psi, dA, dB):
+    s = schmidt(psi, dA, dB) ** 2
+    s = s[s &gt; 1e-15]
+    return round(float(abs(-np.sum(s * np.log2(s)))), 6)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+bell = np.array([1,0,0,1], dtype=complex)/np.sqrt(2)
+print(schmidt_rank(bell,2,2), entanglement_entropy(bell,2,2))
+</text></testcode><stdin><text /></stdin><expected><text>2 1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+prod = np.array([1,0,0,0], dtype=complex)
+print(schmidt_rank(prod,2,2), entanglement_entropy(prod,2,2))
+</text></testcode><stdin><text /></stdin><expected><text>1 0.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+th = np.pi/6
+psi = np.array([np.cos(th),0,0,np.sin(th)], dtype=complex)
+c2, s2 = np.cos(th)**2, np.sin(th)**2
+ref = round(float(-c2*np.log2(c2)-s2*np.log2(s2)), 6)
+print(entanglement_entropy(psi,2,2) == ref)
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+ghz = np.zeros(8, dtype=complex); ghz[0]=1/np.sqrt(2); ghz[7]=1/np.sqrt(2)
+print(schmidt_rank(ghz,2,4), entanglement_entropy(ghz,2,4))
+</text></testcode><stdin><text /></stdin><expected><text>2 1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+w = np.zeros(8, dtype=complex)
+w[1]=w[2]=w[4]=1/np.sqrt(3)
+print(schmidt_rank(w,2,4), entanglement_entropy(w,2,4))
+</text></testcode><stdin><text /></stdin><expected><text>2 0.918296
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C4.Q2 — Bell basis and Bell measurement</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C4.Q2 — The entangling circuit and its inverse&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;\(\mathrm{CNOT}_{01}(H\otimes I)\) maps \(|xy\rangle\) to the Bell state indexed by \((x,y)\); its adjoint implements a Bell measurement in the computational basis.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;bell_state(x, y)&lt;/code&gt; returning the 4-vector \(\mathrm{CNOT}(H\otimes I)|xy\rangle\), and &lt;code&gt;bell_probs(psi)&lt;/code&gt; returning the array of four probabilities of the Bell outcomes \(\Phi^{+},\Phi^{-},\Psi^{+},\Psi^{-}\) in the order produced by &lt;code&gt;bell_state(0,0), (1,0), (0,1), (1,1)&lt;/code&gt;, rounded to 8 decimals.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;bell_state(0,0) -&amp;gt; (|00&amp;gt; + |11&amp;gt;)/sqrt(2)
+bell_probs(bell_state(1,1)) -&amp;gt; [0, 0, 0, 1]&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def bell_state(x, y):
+    ...
+
+def bell_probs(psi):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+H = np.array([[1, 1], [1, -1]], dtype=complex) / np.sqrt(2)
+CNOT = np.array([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]], dtype=complex)
+
+def bell_state(x, y):
+    v = np.zeros(4, dtype=complex)
+    v[2 * x + y] = 1
+    return CNOT @ np.kron(H, np.eye(2, dtype=complex)) @ v
+
+ORDER = [(0, 0), (1, 0), (0, 1), (1, 1)]
+
+def bell_probs(psi):
+    psi = np.asarray(psi, dtype=complex).ravel()
+    psi = psi / np.linalg.norm(psi)
+    return np.round([abs(np.vdot(bell_state(x, y), psi)) ** 2 for x, y in ORDER], 8)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+print(np.round(bell_state(0,0).real, 6).tolist())
+</text></testcode><stdin><text /></stdin><expected><text>[0.707107, 0.0, 0.0, 0.707107]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+print(bell_probs(bell_state(1,1)).tolist())
+</text></testcode><stdin><text /></stdin><expected><text>[0.0, 0.0, 0.0, 1.0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+print(bell_probs(np.array([1,0,0,0], dtype=complex)).tolist())
+</text></testcode><stdin><text /></stdin><expected><text>[0.5, 0.5, 0.0, 0.0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+B = np.column_stack([bell_state(x,y) for x,y in [(0,0),(1,0),(0,1),(1,1)]])
+print(np.allclose(B.conj().T @ B, np.eye(4)))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+v = np.kron(np.eye(2, dtype=complex), X) @ bell_state(0,0)
+print(bell_probs(v).tolist())
+</text></testcode><stdin><text /></stdin><expected><text>[0.0, 0.0, 1.0, 0.0]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C4.Q3 — Teleportation, end to end</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C4.Q3 — One ebit + two cbits = one qubit&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;Alice holds an unknown \(|\psi\rangle\) and half of \(|\Phi^{+}\rangle\). She Bell-measures her two qubits, sends the two classical bits, and Bob corrects.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;teleport(psi, outcome)&lt;/code&gt; returning Bob's corrected state for a Bell outcome in &lt;code&gt;{0,1,2,3}&lt;/code&gt; (order \(\Phi^{+},\Phi^{-},\Psi^{+},\Psi^{-}\)), and &lt;code&gt;fidelity(a, b)&lt;/code&gt; returning \(|\langle a|b\rangle|^{2}\) rounded to 6 decimals. Correct output: fidelity 1.0 for every outcome, for every input state.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;corrections: Phi+ -&amp;gt; I,  Phi- -&amp;gt; Z,  Psi+ -&amp;gt; X,  Psi- -&amp;gt; XZ&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def teleport(psi, outcome):
+    # apply the byproduct Pauli, then the correction
+    ...
+
+def fidelity(a, b):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+I2 = np.eye(2, dtype=complex)
+X = np.array([[0, 1], [1, 0]], dtype=complex)
+Z = np.array([[1, 0], [0, -1]], dtype=complex)
+
+# byproduct operator applied to Bob's qubit, per Bell outcome
+BYPRODUCT = [I2, Z, X, X @ Z]
+CORRECTION = [I2, Z, X, Z @ X]
+
+def teleport(psi, outcome):
+    psi = np.asarray(psi, dtype=complex).reshape(2)
+    psi = psi / np.linalg.norm(psi)
+    bob = BYPRODUCT[outcome] @ psi
+    return CORRECTION[outcome] @ bob
+
+def fidelity(a, b):
+    a = np.asarray(a, dtype=complex).ravel(); a = a / np.linalg.norm(a)
+    b = np.asarray(b, dtype=complex).ravel(); b = b / np.linalg.norm(b)
+    return round(float(abs(np.vdot(a, b)) ** 2), 6)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+psi = np.array([0.6, 0.8], dtype=complex)
+print([fidelity(teleport(psi, k), psi) for k in range(4)])
+</text></testcode><stdin><text /></stdin><expected><text>[1.0, 1.0, 1.0, 1.0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+psi = np.array([1, 1j], dtype=complex)/np.sqrt(2)
+print(fidelity(teleport(psi, 2), psi))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+print(fidelity([1,0],[0,1]), fidelity([1,0],[1,0]))
+</text></testcode><stdin><text /></stdin><expected><text>0.0 1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+rng = np.random.default_rng(17)
+ok = True
+for _ in range(30):
+    v = rng.normal(size=2) + 1j*rng.normal(size=2)
+    ok = ok and all(fidelity(teleport(v,k), v) == 1.0 for k in range(4))
+print(ok)
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+psi = np.array([1, 1], dtype=complex)/np.sqrt(2)
+print(fidelity(np.array([[0,1],[1,0]], dtype=complex) @ psi, psi))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C4.Q4 — CHSH: computing S and hitting the Tsirelson bound</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C4.Q4 — Certifying non-locality numerically&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;For observables \(A_x,B_y\) with \(\pm1\) spectrum, \(S=\langle A_0B_0\rangle+\langle A_0B_1\rangle+\langle A_1B_0\rangle-\langle A_1B_1\rangle\). Locality forces \(|S|\le2\); quantum mechanics reaches \(2\sqrt2\).&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;correlator(psi, A, B)&lt;/code&gt; returning \(\langle\psi|A\otimes B|\psi\rangle\) as a float rounded to 6 decimals, and &lt;code&gt;chsh(psi, A0, A1, B0, B1)&lt;/code&gt; returning \(S\) rounded to 6 decimals. Do &lt;em&gt;not&lt;/em&gt; round the intermediate correlators inside &lt;code&gt;chsh&lt;/code&gt; — round only the final sum.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;Phi+, A0=Z, A1=X, B0=(Z+X)/sqrt2, B1=(Z-X)/sqrt2  -&amp;gt;  S = 2.828427&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def correlator(psi, A, B):
+    ...
+
+def chsh(psi, A0, A1, B0, B1):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def _corr(psi, A, B):
+    psi = np.asarray(psi, dtype=complex).ravel()
+    psi = psi / np.linalg.norm(psi)
+    M = np.kron(np.asarray(A, dtype=complex), np.asarray(B, dtype=complex))
+    return float(np.real(np.vdot(psi, M @ psi)))
+
+def correlator(psi, A, B):
+    return round(_corr(psi, A, B), 6)
+
+def chsh(psi, A0, A1, B0, B1):
+    s = (_corr(psi, A0, B0) + _corr(psi, A0, B1)
+         + _corr(psi, A1, B0) - _corr(psi, A1, B1))
+    return round(float(s), 6)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+phi = np.array([1,0,0,1], dtype=complex)/np.sqrt(2)
+B0 = (Z + X)/np.sqrt(2); B1 = (Z - X)/np.sqrt(2)
+print(chsh(phi, Z, X, B0, B1))
+</text></testcode><stdin><text /></stdin><expected><text>2.828427
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+phi = np.array([1,0,0,1], dtype=complex)/np.sqrt(2)
+print(correlator(phi, Z, Z), correlator(phi, X, X))
+</text></testcode><stdin><text /></stdin><expected><text>1.0 1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+prod = np.array([1,0,0,0], dtype=complex)
+B0 = (Z + X)/np.sqrt(2); B1 = (Z - X)/np.sqrt(2)
+print(chsh(prod, Z, X, B0, B1))
+</text></testcode><stdin><text /></stdin><expected><text>1.414214
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+psi = np.array([0,1,-1,0], dtype=complex)/np.sqrt(2)   # singlet
+B0 = (Z + X)/np.sqrt(2); B1 = (Z - X)/np.sqrt(2)
+print(round(abs(chsh(psi, Z, X, B0, B1)), 6))
+</text></testcode><stdin><text /></stdin><expected><text>2.828427
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+I = np.eye(2, dtype=complex)
+phi = np.array([1,0,0,1], dtype=complex)/np.sqrt(2)
+print(correlator(phi, Z, I), correlator(phi, I, Z))
+</text></testcode><stdin><text /></stdin><expected><text>0.0 0.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

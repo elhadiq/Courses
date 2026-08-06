@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 5 — Graph Foundations for Machine Learning</title>
+<link href="../assets/style.css" rel="stylesheet">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+
+/* Use the full width the theme allows: the shared stylesheet caps a lesson at
+   880px, which leaves wide figures and tables boxed into the middle of a large
+   screen. --max-w is the theme's own page width, so this stays consistent with
+   the landing page. */
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) {
+  .lesson-content { padding-left: 16px; padding-right: 16px; }
+}
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule);
+               padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center;
+               padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.lesson-nav { max-width: 880px; margin: 0 auto 40px; padding: 0 24px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav .container { display: flex; gap: 18px; flex-wrap: wrap; width: 100%; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600;
+                font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.keypoints h4 { margin-top: 0; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Machine Learning A&ndash;Z</a> &middot; Course</div><span class="course-code">Graph-based machine learning</span></div></header>
+<section class="lesson-hero"><div class="container"><div class="lesson-label">Part II &middot; Section 5</div><h1>Section 5 — Graph Foundations for Machine Learning</h1><div class="lesson-sub">Adjacency, degree and Laplacian matrices; walks and powers; graph signals and smoothness; the three learning tasks that only exist on graphs.</div></div></section>
+<main class="lesson-content">
+<div class="box method"><div class="box-title">Companion annex</div><p>Every algorithm in this section is also set out <strong><a href="algorithms.html">step by step in the annex</a></strong>: what it is given, what it produces, the steps in order, a small example worked by hand, and why it is correct, why it stops and what it costs &mdash; described in words, with no program code.</p></div><p><span style="background:#026573;color:#ffffff;font-family:Georgia,serif;font-size:12px;letter-spacing:2px;padding:5px 12px;border-radius:4px;font-weight:bold;">PART II &mdash; GRAPH-BASED MACHINE LEARNING</span></p><h2>5.1 Why graphs need their own machine learning</h2><p>Every method in Part I assumed the same thing: the data are n independent points in <strong>R</strong>\(^{d}\), arranged in a rectangular table. Enormously important datasets violate both halves of that assumption. Social networks, molecules, citation corpora, road systems, knowledge bases, protein interaction maps and recommendation logs are all <em>relational</em>: the samples are connected, and those connections carry most of the signal <a class="cite" href="#ref-hamilton2020">[4]</a>.</p><p>Two properties break the classical toolbox outright:</p><ul><li><strong>The samples are not i.i.d.</strong> A user's label depends on their neighbours' labels. Cross-validation by random splitting leaks information across the edges.</li><li><strong>There is no canonical ordering of the nodes.</strong> A graph on n nodes has up to n! equivalent adjacency-matrix representations. Any function we learn must be <em>permutation-equivariant</em>, which rules out feeding the adjacency matrix to an MLP as if it were an image.</li></ul><div class="box def"><div class="box-title">Definition — Graph</div>A graph G = (V, E) consists of a vertex set V with |V| = n and an edge set \(E \subseteq V \times V\) with |E| = m. G is <em>undirected</em> if (u,v) \(\in E \Leftrightarrow (v,u) \in E\), and <em>weighted</em> if each edge carries \(w_{uv} \gt 0\). In machine learning each node usually also carries a feature vector, collected in a matrix \(X \in\) <strong>R</strong>\(^{n\times d}\). The pair (A, X) &mdash; structure plus attributes &mdash; is the input to every algorithm in Part II.</div><h2>5.2 Matrix representations</h2><figure class="viz"><div class="viz-title">Anatomy of the Laplacian</div><svg viewBox="0 0 830 260" role="img" style="width:100%;height:auto;display:block;font-family:inherit;"><text x="200" y="34" text-anchor="middle" style="fill:var(--primary);font-size:13.5px;font-weight:700;">a graph</text><path d="M 110 90 L 200 62" style="fill:none;stroke:var(--viz-axis);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 110 90 L 196 158" style="fill:none;stroke:var(--viz-axis);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 200 62 L 196 158" style="fill:none;stroke:var(--viz-axis);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 200 62 L 290 112" style="fill:none;stroke:var(--viz-axis);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round;"/><path d="M 196 158 L 290 112" style="fill:none;stroke:var(--viz-axis);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round;"/><circle cx="110" cy="90" r="17" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="110" y="94.5" text-anchor="middle" style="fill:#ffffff;font-size:13px;font-weight:700;">0</text><circle cx="200" cy="62" r="17" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="200" y="66.5" text-anchor="middle" style="fill:#ffffff;font-size:13px;font-weight:700;">1</text><circle cx="196" cy="158" r="17" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="196" y="162.5" text-anchor="middle" style="fill:#ffffff;font-size:13px;font-weight:700;">2</text><circle cx="290" cy="112" r="17" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="290" y="116.5" text-anchor="middle" style="fill:#ffffff;font-size:13px;font-weight:700;">3</text><text x="200" y="210" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-weight:400;">degrees  d0=2  d1=3  d2=3  d3=2</text><text x="432" y="56" text-anchor="middle" style="fill:var(--viz-cmp);font-size:13px;font-weight:700;">D</text><rect x="378" y="68" width="25" height="25" rx="3" style="fill:var(--viz-cmp);opacity:0.42;stroke:var(--color-rule);stroke-width:1;"/><text x="390.5" y="85.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">2</text><rect x="405" y="68" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="432" y="68" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="459" y="68" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="378" y="95" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="405" y="95" width="25" height="25" rx="3" style="fill:var(--viz-cmp);opacity:0.58;stroke:var(--color-rule);stroke-width:1;"/><text x="417.5" y="112.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">3</text><rect x="432" y="95" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="459" y="95" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="378" y="122" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="405" y="122" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="432" y="122" width="25" height="25" rx="3" style="fill:var(--viz-cmp);opacity:0.58;stroke:var(--color-rule);stroke-width:1;"/><text x="444.5" y="139.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">3</text><rect x="459" y="122" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="378" y="149" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="405" y="149" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="432" y="149" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="459" y="149" width="25" height="25" rx="3" style="fill:var(--viz-cmp);opacity:0.42;stroke:var(--color-rule);stroke-width:1;"/><text x="471.5" y="166.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">2</text><text x="508" y="126" text-anchor="middle" style="fill:var(--color-muted);font-size:20px;font-weight:400;">&#8722;</text><text x="590" y="56" text-anchor="middle" style="fill:var(--viz-blue);font-size:13px;font-weight:700;">A</text><rect x="536" y="68" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="563" y="68" width="25" height="25" rx="3" style="fill:var(--viz-blue);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="575.5" y="85.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">1</text><rect x="590" y="68" width="25" height="25" rx="3" style="fill:var(--viz-blue);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="602.5" y="85.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">1</text><rect x="617" y="68" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="536" y="95" width="25" height="25" rx="3" style="fill:var(--viz-blue);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="548.5" y="112.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">1</text><rect x="563" y="95" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="590" y="95" width="25" height="25" rx="3" style="fill:var(--viz-blue);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="602.5" y="112.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">1</text><rect x="617" y="95" width="25" height="25" rx="3" style="fill:var(--viz-blue);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="629.5" y="112.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">1</text><rect x="536" y="122" width="25" height="25" rx="3" style="fill:var(--viz-blue);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="548.5" y="139.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">1</text><rect x="563" y="122" width="25" height="25" rx="3" style="fill:var(--viz-blue);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="575.5" y="139.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">1</text><rect x="590" y="122" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="617" y="122" width="25" height="25" rx="3" style="fill:var(--viz-blue);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="629.5" y="139.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">1</text><rect x="536" y="149" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="563" y="149" width="25" height="25" rx="3" style="fill:var(--viz-blue);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="575.5" y="166.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">1</text><rect x="590" y="149" width="25" height="25" rx="3" style="fill:var(--viz-blue);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="602.5" y="166.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">1</text><rect x="617" y="149" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><text x="666" y="126" text-anchor="middle" style="fill:var(--color-muted);font-size:18px;font-weight:400;">=</text><text x="744" y="56" text-anchor="middle" style="fill:var(--primary);font-size:13px;font-weight:700;">L</text><rect x="690" y="68" width="25" height="25" rx="3" style="fill:var(--primary);opacity:0.42;stroke:var(--color-rule);stroke-width:1;"/><text x="702.5" y="85.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">2</text><rect x="717" y="68" width="25" height="25" rx="3" style="fill:var(--primary);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="729.5" y="85.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">-1</text><rect x="744" y="68" width="25" height="25" rx="3" style="fill:var(--primary);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="756.5" y="85.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">-1</text><rect x="771" y="68" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="690" y="95" width="25" height="25" rx="3" style="fill:var(--primary);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="702.5" y="112.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">-1</text><rect x="717" y="95" width="25" height="25" rx="3" style="fill:var(--primary);opacity:0.58;stroke:var(--color-rule);stroke-width:1;"/><text x="729.5" y="112.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">3</text><rect x="744" y="95" width="25" height="25" rx="3" style="fill:var(--primary);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="756.5" y="112.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">-1</text><rect x="771" y="95" width="25" height="25" rx="3" style="fill:var(--primary);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="783.5" y="112.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">-1</text><rect x="690" y="122" width="25" height="25" rx="3" style="fill:var(--primary);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="702.5" y="139.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">-1</text><rect x="717" y="122" width="25" height="25" rx="3" style="fill:var(--primary);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="729.5" y="139.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">-1</text><rect x="744" y="122" width="25" height="25" rx="3" style="fill:var(--primary);opacity:0.58;stroke:var(--color-rule);stroke-width:1;"/><text x="756.5" y="139.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">3</text><rect x="771" y="122" width="25" height="25" rx="3" style="fill:var(--primary);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="783.5" y="139.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">-1</text><rect x="690" y="149" width="25" height="25" rx="3" style="fill:var(--viz-grid);opacity:1;stroke:var(--color-rule);stroke-width:1;"/><rect x="717" y="149" width="25" height="25" rx="3" style="fill:var(--primary);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="729.5" y="166.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">-1</text><rect x="744" y="149" width="25" height="25" rx="3" style="fill:var(--primary);opacity:0.26;stroke:var(--color-rule);stroke-width:1;"/><text x="756.5" y="166.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">-1</text><rect x="771" y="149" width="25" height="25" rx="3" style="fill:var(--primary);opacity:0.42;stroke:var(--color-rule);stroke-width:1;"/><text x="783.5" y="166.5" text-anchor="middle" style="fill:var(--color-text);font-size:12px;font-weight:700;">2</text><text x="555" y="232" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-weight:400;">L = D &#8722; A : the diagonal holds the degrees, the off-diagonal the negated edges</text></svg><figcaption class="viz-caption"><strong>Figure.</strong> The Laplacian is assembled from nothing more than degrees and edges. Row sums are zero, which is why the constant vector lies in its kernel &mdash; the algebraic fact behind every spectral method that follows.</figcaption></figure><h3>Adjacency matrix</h3><div class="eq">\[A_{uv} = w_{uv} if (u,v) \in E, 0 otherwise\]</div><p>For an undirected graph A is symmetric, so all its eigenvalues are real. Real graphs are extremely sparse &mdash; m = O(n) rather than O(\(n^2\)) &mdash; so A is never stored densely; adjacency lists or CSR format are standard, and every algorithm below is designed to touch only the m non-zeros.</p><div class="box thm"><div class="box-title">Theorem — Powers of A count walks</div>For any \(k \ge 1\), the entry (\(A^{k})_{uv}\) equals the number of walks of length exactly k from u to v. <em>Proof by induction:</em> the case k = 1 is the definition; and (\(A^{k+1})_{uv} = \sum_{z} (A^{k})_{uz}A_{zv}\) sums, over every intermediate node z, the walks of length k reaching z times the edges from z to v &mdash; which enumerates each walk of length k+1 exactly once. \(\square\)<p style="margin:8px 0 0 0;">This single fact underlies almost everything that follows: multiplying by A is <em>one hop of propagation</em>. PageRank iterates it (Section 7), and a k-layer graph neural network applies it k times (Section 8), which is why such a network sees exactly the k-hop neighbourhood of each node.</p></div><p>The <strong>degree</strong> of node u is \(d_{u} = \sum_{v}A_{uv}\), and D = diag(\(d_1\), &hellip;, \(d_{n}\)) is the degree matrix. Note \(\sum_{u}d_{u} = 2m\) for an unweighted undirected graph &mdash; the handshaking lemma.</p><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Drag the nodes to rearrange the layout &mdash; the matrix does not change, because position carries no information. Move the k slider to count walks of length k.</p><div id="jxg13" class="viz-board" style="height:520px;"></div><p class="viz-caption"><strong>Figure.</strong> Left: the graph, with node radius proportional to degree. Right: the entries of \(A^{k}\) rendered as a heat map, where k is set by the slider. At k = 1 you see the adjacency structure; at k = 2 the entry (u,v) counts common neighbours; as k grows the matrix fills in and converges (after normalisation) towards the dominant eigenvector &mdash; the phenomenon that Section 7 turns into PageRank and Section 8 into over-smoothing.</p></div><h3>The graph Laplacian</h3><p>Kirchhoff introduced this matrix in 1847 <a class="cite" href="#ref-kirchhoff1847">[1]</a> to analyse currents in electrical networks. It is the single most important object in graph-based learning.</p><div class="eq">\[\mathbf{L = D - A} (combinatorial / \text{unnormalised Laplacian })\]</div><p>Its power comes from one identity. For any vector \(f \in\) <strong>R</strong>\(^{n}\), interpreted as a <em>signal on the nodes</em>:</p><div class="box thm"><div class="box-title">Theorem — The Laplacian quadratic form</div>\(f^{T}Lf =\tfrac{1}{2} \sum_{u,v} w_{uv}(f_{u} - f_{v})^2 = \sum_{(u,v)\in E} w_{uv}(f_{u} - f_{v})^2\).<p style="margin:8px 0 0 0;"><em>Proof.</em> \(f^{T}Lf =f^{T}Df- f^{T}Af =\sum_{u}d_{u}f_{u}^2 - \sum_{u,v}w_{uv}f_{u}f_{v}\). Writing \(\sum_{u}d_{u}f_{u}^2 = \tfrac{1}{2} (\sum_{u,v}w_{uv}f_{u}^2 + \sum_{u,v}w_{uv}f_{v}^2)\) and completing the square gives the result. \(\square\)</p><p style="margin:8px 0 0 0;">In words: <strong>\(f^{T}\)Lf measures how much f disagrees across edges</strong>. It is a smoothness penalty, computed in O(m) time, and it is the graph analogue of \(\int |\nabla f|^2\) on a continuous domain.</p></div><p>Three consequences follow immediately and are used constantly:</p><ol><li><strong>L is positive semi-definite</strong> (the quadratic form is a sum of squares), so its eigenvalues are real and satisfy 0 = \(\lambda_1 \le \lambda_2 \le\) &hellip; \(\le \lambda_{n}\).</li><li><strong>The all-ones vector 1 is an eigenvector with eigenvalue 0</strong>, since L1 = D1 &minus; A1 = d &minus; d = 0. A constant signal has no disagreement anywhere.</li><li><strong>The multiplicity of eigenvalue 0 equals the number of connected components</strong> <a class="cite" href="#ref-mohar1991">[13]</a>. Indeed \(f^{T}\)Lf = 0 forces \(f_{u} = f_{v}\) on every edge, i.e. f constant on each component; the indicator vectors of the components form a basis of the null space. <em>This is the entire theoretical basis of spectral clustering, and Section 6 is essentially the perturbation theory of this statement.</em></li></ol><div class="box def"><div class="box-title">Definition — Algebraic connectivity</div>\(\lambda_2\), the second-smallest eigenvalue, is called the <strong>Fiedler value</strong> <a class="cite" href="#ref-fiedler1973">[2]</a>. It is \(\gt 0\) if and only if the graph is connected, and its magnitude quantifies how hard the graph is to cut in two: small \(\lambda_2\) means a bottleneck. Its eigenvector, the <strong>Fiedler vector</strong>, is the smoothest non-constant signal on the graph, and its sign pattern gives a bipartition &mdash; the subject of Section 6.</div><h3>Normalised Laplacians</h3><p>On graphs with heterogeneous degrees, L is dominated by the hubs: a node of degree 1000 contributes a thousand times more to the quadratic form than a node of degree 1. Two normalisations correct this <a class="cite" href="#ref-chung1997">[3]</a>:</p><div class="eq">\[\mathbf{Symmetric}: L_{sym} = D^{-1/2}LD^{-1/2} = I - D^{-1/2}AD^{-1/2}\]</div><div class="eq">\[\mathbf{Random-walk}: L_{rw} = D^{-1}L = I - D^{-1}A\]</div><table><thead><tr><th></th><th>L = D &minus; A</th><th>\(L_{sym}\)</th><th>\(L_{rw}\)</th></tr></thead><tbody><tr><td>Symmetric</td><td>yes</td><td>yes</td><td>no (but similar to \(L_{sym}\))</td></tr><tr><td>Spectrum</td><td>[0, 2max \(d_{u}]\)</td><td>[0, 2]</td><td>[0, 2]</td></tr><tr><td>Null-space vector</td><td>1</td><td>\(D^{1/2}1\)</td><td>1</td></tr><tr><td>\(\lambda = 2\) attained iff</td><td>&mdash;</td><td>graph is bipartite</td><td>graph is bipartite</td></tr><tr><td>Cut objective it relaxes</td><td>RatioCut</td><td>NCut</td><td>NCut</td></tr><tr><td>Where you meet it</td><td>Section 6, Fiedler</td><td><strong>the GCN propagation rule</strong>, Section 8</td><td>random walks, PageRank, Section 7</td></tr></tbody></table><div class="box warn"><div class="box-title">The bounded spectrum is not a detail</div>\(\lambda_{\max}(L_{sym}) \le 2\) is what makes repeated multiplication by \(I - L_{sym} = D^{-1/2}AD^{-1/2}\) numerically stable. Kipf and Welling's graph convolution (Section 8) is exactly this operator with self-loops added, and the renormalisation trick they introduce exists precisely to keep the spectrum in range so that deep stacks do not explode.</div><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Move the six sliders and watch the smoothness penalty \(f^{T}\)Lf.</p><div id="jxg14" class="viz-board" style="height:520px;"></div><p class="viz-caption"><strong>Figure.</strong> A signal f on the nodes of a two-community graph. The sliders set each \(f_{u}\); node colour encodes the value (blue negative, red positive) and each edge is drawn thicker and darker in proportion to its disagreement (\(f_{u} - f_{v})^2\). Try to make \(f^{T}\)Lf small with f non-constant: the only way is to assign one value to the left community and another to the right, cutting only the two bridging edges. That signal <em>is</em> (approximately) the Fiedler vector.</p></div><h2>5.3 Graph signals and smoothness</h2><p>Once L is in hand, a whole signal-processing vocabulary transfers to graphs <a class="cite" href="#ref-shuman2013">[10]</a>. Write L = \(U\Lambda U^{T}\) for its eigendecomposition. The eigenvectors \(u_{i}\) play the role of Fourier modes: \(u_1\) is constant (\(\lambda = 0\), zero frequency), and eigenvectors with large \(\lambda\) oscillate rapidly across edges. The <strong>graph Fourier transform</strong> of a signal is \(\hat{f} = U^{T}f\), and \(\lambda_{i}\) is the frequency of mode i.</p><p>Filtering means reweighting the modes: \(f_{out} =Ug(\Lambda )U^{T}f. A\) low-pass filter g (large at small \(\lambda\), small at large \(\lambda\)) smooths the signal over the graph. Two remarks that matter practically:</p><ul><li>Computing U costs O(\(n^3\)) &mdash; hopeless beyond a few thousand nodes. Practical filters are therefore written as <em>polynomials</em> in L, which need only sparse matrix&ndash;vector products (O(m) each) and are automatically localised: a degree-k polynomial in L touches only the k-hop neighbourhood.</li><li>That observation is the entire derivation of the GCN in Section 8: it is a first-order polynomial filter, applied repeatedly.</li></ul><div class="box def"><div class="box-title">Definition — Homophily</div>A graph is <em>homophilous</em> when connected nodes tend to share labels &mdash; "birds of a feather flock together" <a class="cite" href="#ref-mcpherson2001">[9]</a>. Formally, the edge homophily ratio is h = |{(u,v) \(\in E:y_{u} = y_{v}\}| / |E|\). Homophily is the assumption that justifies smoothing a label signal over the graph; on <em>heterophilous</em> graphs (h low &mdash; dating networks, predator&ndash;prey webs, fraud rings) naive smoothing actively destroys the signal, and standard GCNs underperform a plain MLP. Always measure h before choosing a model.</div><p>The oldest graph-based learner exploits homophily directly. <strong>Label propagation</strong> <a class="cite" href="#ref-zhu2003">[11]</a> fixes the labelled nodes and solves for the <em>harmonic</em> extension minimising \(f^{T}\)Lf on the unlabelled ones &mdash; each unknown value ends up the weighted average of its neighbours. It is a closed-form, training-free baseline that graph neural networks are surprisingly often unable to beat.</p><pre><code>def laplacian_quadratic(edges, f):
+    """f^T L f = sum over edges of (f_u - f_v)^2, in O(m). edges is a list of (u, v, w)."""
+    return sum(w * (f[u] - f[v]) ** 2 for u, v, w in edges)
+
+
+def label_propagation(adj, labels, unlabeled, n_iter=100):
+    """Iterative harmonic solution: each unlabelled node averages its neighbours.
+    adj maps node -&gt; list of neighbours; labels maps node -&gt; float (fixed for labelled)."""
+    f = dict(labels)
+    for u in unlabeled:
+        f.setdefault(u, 0.0)
+    for _ in range(n_iter):
+        for u in unlabeled:
+            nb = adj[u]
+            if nb:
+                f[u] = sum(f[v] for v in nb) / len(nb)
+    return f</code></pre><h2>5.4 Structural properties that shape the algorithms</h2><table><thead><tr><th>Property</th><th>Definition</th><th>Why it matters for learning</th></tr></thead><tbody><tr><td>Sparsity</td><td>m = O(n) in most real graphs</td><td>makes O(m) propagation feasible; forbids dense \(n\times n\) operations</td></tr><tr><td>Degree distribution</td><td>P(d) \(\propto d^{-\gamma}, \gamma \in [2,3]\) in scale-free networks <a class="cite" href="#ref-barabasi1999">[7]</a></td><td>hubs dominate unnormalised aggregation &mdash; hence \(D^{-1/2}\) and neighbour sampling</td></tr><tr><td>Small-world</td><td>average path length ~ log n <a class="cite" href="#ref-watts1998">[6]</a></td><td>a 3&ndash;4 layer GNN already reaches most of the graph; depth buys little</td></tr><tr><td>Clustering coefficient</td><td>fraction of closed triangles</td><td>high values mean redundant messages and accelerate over-smoothing</td></tr><tr><td>Homophily h</td><td>fraction of edges joining same-label nodes <a class="cite" href="#ref-mcpherson2001">[9]</a></td><td>decides whether smoothing helps or hurts</td></tr><tr><td>Communities</td><td>dense subgraphs, sparse between</td><td>the structure spectral clustering recovers (Section 6)</td></tr></tbody></table><p>The Erd&#337;s&ndash;R&eacute;nyi model <a class="cite" href="#ref-erdos1959">[8]</a>, in which each edge appears independently with probability p, is the standard null model. Its degree distribution is Binomial(n&minus;1, p) &mdash; sharply concentrated, with no hubs &mdash; which is exactly why real networks, with their heavy tails, are so obviously not random <a class="cite" href="#ref-newman2010">[5]</a>.</p><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Move \(\gamma\) and the mean degree; note that only one of the two curves is straight on a log&ndash;log plot.</p><div id="jxg15" class="viz-board" style="height:460px;"></div><p class="viz-caption"><strong>Figure.</strong> Degree distributions on log&ndash;log axes. The Erd&#337;s&ndash;R&eacute;nyi curve falls off faster than exponentially &mdash; a node of degree 100 is effectively impossible. The power law P(d) \(\propto d^{-\gamma}\) is a straight line on these axes and assigns non-negligible probability to hubs two orders of magnitude above the mean. Any aggregation scheme that sums over neighbours without normalising will be dominated by those hubs.</p></div><h2>5.5 The three learning tasks on graphs</h2><table><thead><tr><th>Task</th><th>Predict</th><th>Examples</th><th>Covered in</th></tr></thead><tbody><tr><td><strong>Node-level</strong></td><td>a label or value per node</td><td>document category in a citation network, fraud accounts, protein function</td><td>Sections 6, 7, 8</td></tr><tr><td><strong>Edge-level</strong></td><td>existence or type of a link</td><td>recommendation, knowledge-graph completion, drug&ndash;target interaction</td><td>Section 7</td></tr><tr><td><strong>Graph-level</strong></td><td>one label for the whole graph</td><td>molecular toxicity, solubility, program classification</td><td>Section 8</td></tr></tbody></table><div class="box def"><div class="box-title">Transductive vs inductive</div>In the <strong>transductive</strong> setting the whole graph, including the test nodes and all edges, is available at training time; only the test <em>labels</em> are hidden. Spectral methods and the original GCN are transductive &mdash; adding a new node requires refitting. In the <strong>inductive</strong> setting the model must generalise to nodes or entire graphs never seen during training, which requires a function of the local neighbourhood rather than a per-node parameter. GraphSAGE (Section 8) was designed exactly for this <a class="cite" href="#ref-hamilton2020">[4]</a>.</div><div class="box warn"><div class="box-title">Evaluation on graphs is easy to get wrong</div>A random train/test split of the <em>nodes</em> leaves test nodes connected to training nodes, so message passing legitimately propagates label information across the split &mdash; that is the point of the method, but it means your split is not independent and accuracy is not comparable to the i.i.d. case. For link prediction, edges held out for testing must be <em>removed from the graph</em> before training, or the model simply reads the answer off the adjacency matrix. Report results on the standard public splits whenever they exist <a class="cite" href="#ref-zhou2020">[12]</a>.</div><h2>Summary</h2><ul><li>Graph data breaks the i.i.d. assumption and demands permutation-equivariant models.</li><li>(\(A^{k})_{uv}\) counts walks of length k: multiplying by A is one hop of propagation.</li><li>L = D &minus; A is PSD and \(f^{T}Lf =\sum_{edges}(f_{u} - f_{v})^2\) is a smoothness penalty computable in O(m).</li><li>dim ker L = number of connected components <a class="cite" href="#ref-mohar1991">[13]</a>; \(\lambda_2\) is the algebraic connectivity <a class="cite" href="#ref-fiedler1973">[2]</a>.</li><li>Normalising by degree (\(L_{sym}, L_{rw}\)) bounds the spectrum by 2 and tames hubs <a class="cite" href="#ref-chung1997">[3]</a>.</li><li>Homophily <a class="cite" href="#ref-mcpherson2001">[9]</a> is the assumption behind every smoothing method &mdash; measure it before trusting one.</li><li>Node-, edge- and graph-level tasks, in transductive or inductive settings, organise the rest of this course.</li></ul><h2>References</h2><ol class="reflist"><li id="ref-kirchhoff1847">Kirchhoff, G. (1847). &Uuml;ber die Aufl&ouml;sung der Gleichungen, auf welche man bei der Untersuchung der linearen Vertheilung galvanischer Str&ouml;me gef&uuml;hrt wird. <em>Annalen der Physik</em>, 148(12), 497&ndash;508. DOI: 10.1002/andp.18471481202 (origin of the Laplacian and the matrix-tree theorem). <a href="https://doi.org/10.1002/andp.18471481202">https://doi.org/10.1002/andp.18471481202</a></li><li id="ref-fiedler1973">Fiedler, M. (1973). Algebraic connectivity of graphs. <em>Czechoslovak Mathematical Journal</em>, 23(2), 298&ndash;305. DOI: 10.21136/CMJ.1973.101168 <a href="https://doi.org/10.21136/CMJ.1973.101168">https://doi.org/10.21136/CMJ.1973.101168</a></li><li id="ref-chung1997">Chung, F. R. K. (1997). <em>Spectral Graph Theory</em>. CBMS Regional Conference Series in Mathematics 92, AMS. ISBN 978-0-8218-0315-8. <a href="https://bookstore.ams.org/cbms-92">https://bookstore.ams.org/cbms-92</a></li><li id="ref-hamilton2020">Hamilton, W. L. (2020). <em>Graph Representation Learning</em>. Synthesis Lectures on AI and ML, Morgan &amp; Claypool. DOI: 10.2200/S01045ED1V01Y202009AIM046 <a href="https://www.cs.mcgill.ca/~wlh/grl_book/">https://www.cs.mcgill.ca/~wlh/grl_book/</a></li><li id="ref-newman2010">Newman, M. E. J. (2010). <em>Networks: An Introduction</em>. Oxford University Press. DOI: 10.1093/acprof:oso/9780199206650.001.0001 <a href="https://doi.org/10.1093/acprof:oso/9780199206650.001.0001">https://doi.org/10.1093/acprof:oso/9780199206650.001.0001</a></li><li id="ref-watts1998">Watts, D. J. &amp; Strogatz, S. H. (1998). Collective dynamics of 'small-world' networks. <em>Nature</em>, 393, 440&ndash;442. DOI: 10.1038/30918 <a href="https://doi.org/10.1038/30918">https://doi.org/10.1038/30918</a></li><li id="ref-barabasi1999">Barab&aacute;si, A.-L. &amp; Albert, R. (1999). Emergence of scaling in random networks. <em>Science</em>, 286(5439), 509&ndash;512. DOI: 10.1126/science.286.5439.509 <a href="https://doi.org/10.1126/science.286.5439.509">https://doi.org/10.1126/science.286.5439.509</a></li><li id="ref-erdos1959">Erd&#337;s, P. &amp; R&eacute;nyi, A. (1959). On random graphs I. <em>Publicationes Mathematicae Debrecen</em>, 6, 290&ndash;297. <a href="https://users.renyi.hu/~p_erdos/1959-11.pdf">https://users.renyi.hu/~p_erdos/1959-11.pdf</a></li><li id="ref-mcpherson2001">McPherson, M., Smith-Lovin, L. &amp; Cook, J. M. (2001). Birds of a feather: homophily in social networks. <em>Annual Review of Sociology</em>, 27, 415&ndash;444. DOI: 10.1146/annurev.soc.27.1.415 <a href="https://doi.org/10.1146/annurev.soc.27.1.415">https://doi.org/10.1146/annurev.soc.27.1.415</a></li><li id="ref-shuman2013">Shuman, D. I., Narang, S. K., Frossard, P., Ortega, A. &amp; Vandergheynst, P. (2013). The emerging field of signal processing on graphs. <em>IEEE Signal Processing Magazine</em>, 30(3), 83&ndash;98. DOI: 10.1109/MSP.2012.2235192 <a href="https://doi.org/10.1109/MSP.2012.2235192">https://doi.org/10.1109/MSP.2012.2235192</a></li><li id="ref-zhu2003">Zhu, X., Ghahramani, Z. &amp; Lafferty, J. (2003). Semi-supervised learning using Gaussian fields and harmonic functions. <em>ICML '03</em>, 912&ndash;919. <a href="https://www.aaai.org/Papers/ICML/2003/ICML03-118.pdf">https://www.aaai.org/Papers/ICML/2003/ICML03-118.pdf</a></li><li id="ref-zhou2020">Zhou, J. et al. (2020). Graph neural networks: a review of methods and applications. <em>AI Open</em>, 1, 57&ndash;81. DOI: 10.1016/j.aiopen.2021.01.001 <a href="https://doi.org/10.1016/j.aiopen.2021.01.001">https://doi.org/10.1016/j.aiopen.2021.01.001</a></li><li id="ref-mohar1991">Mohar, B. (1991). The Laplacian spectrum of graphs. In <em>Graph Theory, Combinatorics, and Applications</em>, Wiley, 871&ndash;898. <a href="https://www.fmf.uni-lj.si/~mohar/Papers/Spec.pdf">https://www.fmf.uni-lj.si/~mohar/Papers/Spec.pdf</a></li></ol><nav class="lesson-nav"><div class="container"><a href="../index.html">Course index</a><a href="../04-unsupervised/page.html">\(\leftarrow\) Section 4</a><a href="../06-spectral-clustering/page.html">Section 6 — Spectral Clustering \(\to\)</a></div></nav>
+</main>
+<footer class="site-footer"><strong>Machine Learning A&ndash;Z</strong> &middot; From empirical risk minimisation to graph neural networks<span class="footer-meta">Edition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">The interactive figure could not be loaded. Check your network connection.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+// Colours resolved from the stylesheet, so the figures follow the light/dark
+// theme. Each entry is a function: board attributes that are functions are
+// re-evaluated on update, so a theme switch only needs a redraw.
+var BOARDS = [];
+function cssv(name, fallback){
+    try {
+        var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback;
+    } catch (e) { return fallback; }
+}
+var PAL = {
+    text:  function(){ return cssv('--color-text',  '#1f2937'); },
+    muted: function(){ return cssv('--color-muted', '#6b7280'); },
+    axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+    ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+    grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+    cell:  function(){ return cssv('--cell-bg',     '#ffffff'); }
+};
+// Re-render every board when the theme attribute flips.
+if (window.MutationObserver) {
+    new MutationObserver(function(){
+        for (var i = 0; i < BOARDS.length; i++) {
+            try { BOARDS[i].fullUpdate(); } catch (e) {}
+        }
+    }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+
+
+// ================================================== shared 8-node demo graph
+var G_N = 8;
+var G_E = [[0,1],[0,2],[1,2],[1,3],[2,3],[3,4],[4,5],[4,6],[5,6],[5,7],[6,7]];
+var G_POS = [[1.2,6.4],[2.6,7.6],[2.4,5.0],[3.9,6.3],[6.0,6.3],[7.5,7.5],[7.3,5.0],[8.6,6.3]];
+
+function adjMatrix(n, edges){
+    var A = [];
+    for (var i=0;i<n;i++) A.push(new Array(n).fill(0));
+    edges.forEach(function(e){ A[e[0]][e[1]] = 1; A[e[1]][e[0]] = 1; });
+    return A;
+}
+function matMul(A, B){
+    var n = A.length, C = [];
+    for (var i=0;i<n;i++){
+        C.push(new Array(n).fill(0));
+        for (var k=0;k<n;k++){
+            if (A[i][k] === 0) continue;
+            for (var j=0;j<n;j++) C[i][j] += A[i][k]*B[k][j];
+        }
+    }
+    return C;
+}
+function matPow(A, k){
+    var R = A;
+    for (var t=1;t<k;t++) R = matMul(R, A);
+    return R;
+}
+
+// ---------------------------------------------------------------- Figure 5.1
+var b13 = JXG.JSXGraph.initBoard('jxg13', {
+    boundingbox: [-0.4, 9.6, 19.8, -1.4], axis: false, showCopyright: false,
+    showNavigation: false, keepaspectratio: true
+});
+var A0 = adjMatrix(G_N, G_E);
+var deg = A0.map(function(r){ return r.reduce(function(u,v){return u+v;},0); });
+var kS = b13.create('slider', [[0.2, 9.1], [4.4, 9.1], [1, 1, 5]],
+                    {name:'k', snapWidth:1, strokeColor:'#026573', fillColor:'#026573',
+                     label:{fontSize:16}});
+var nodes = G_POS.map(function(pos, i){
+    return b13.create('point', pos, {
+        name: String(i), size: 4 + 1.6*deg[i], fillColor:'#026573', strokeColor:'#013f47',
+        strokeWidth:2, label:{fontSize:14, offset:[0,16], cssStyle:'font-family:Georgia,serif;font-weight:bold;color:var(--color-text);'}
+    });
+});
+G_E.forEach(function(e){
+    b13.create('segment', [nodes[e[0]], nodes[e[1]]],
+               {strokeColor:PAL.axis, strokeWidth:2.5, highlight:false, layer:5});
+});
+b13.create('text', [0.2, 8.4, 'graph (drag the nodes)'], {fontSize:15, strokeColor:PAL.muted,
+          cssStyle:'font-family:Georgia,serif;font-style:italic;'});
+// heat-map of A^k on the right
+var powCache = {};
+function Ak(k){ if (!powCache[k]) powCache[k] = matPow(A0, k); return powCache[k]; }
+function maxAk(k){
+    var M = Ak(k), mx = 0;
+    for (var i=0;i<G_N;i++) for (var j=0;j<G_N;j++) mx = Math.max(mx, M[i][j]);
+    return mx || 1;
+}
+var X0 = 11.0, Y0 = 8.2, CELL = 1.0;
+for (var i=0;i<G_N;i++){
+    for (var j=0;j<G_N;j++){
+        (function(ii, jj){
+            var x = X0 + jj*CELL, y = Y0 - ii*CELL;
+            b13.create('polygon', [[x, y], [x+CELL, y], [x+CELL, y-CELL], [x, y-CELL]], {
+                borders:{strokeColor:PAL.grid, strokeWidth:1, highlight:false},
+                vertices:{visible:false}, highlight:false, layer:2,
+                fillColor:'#026573',
+                fillOpacity: function(){
+                    var k = Math.round(kS.Value());
+                    return Math.min(0.92, Ak(k)[ii][jj]/maxAk(k));
+                }
+            });
+            b13.create('text', [x + CELL/2, y - CELL/2, function(){
+                var v = Ak(Math.round(kS.Value()))[ii][jj];
+                return v === 0 ? '' : String(v);
+            }], {fontSize:12, anchorX:'middle', anchorY:'middle', layer:8,
+                 cssStyle:'font-family:Courier New,monospace;font-weight:bold;color:var(--color-text);'});
+        })(i, j);
+    }
+}
+b13.create('text', [X0, 8.9, function(){
+    var k = Math.round(kS.Value());
+    return (k === 1) ? 'A  —  who is adjacent to whom'
+         : 'A<sup>' + k + '</sup>  —  number of walks of length ' + k;
+}], {fontSize:15, color:'#026573', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b13.create('text', [X0, -0.9, function(){
+    var k = Math.round(kS.Value()), M = Ak(k), tr = 0;
+    for (var t=0;t<G_N;t++) tr += M[t][t];
+    return 'trace(A<sup>' + k + '</sup>) = ' + tr + '   (closed walks of length ' + k +
+           (k === 3 ? ';  = 6 &times; number of triangles)' : ')');
+}], {fontSize:13.5, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+b13.create('text', [0.2, -0.9, function(){
+    return 'degrees: [' + deg.join(', ') + ']   —   sum = ' +
+           deg.reduce(function(u,v){return u+v;},0) + ' = 2m,  m = ' + G_E.length;
+}], {fontSize:13.5, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+
+// ---------------------------------------------------------------- Figure 5.2
+var b14 = JXG.JSXGraph.initBoard('jxg14', {
+    boundingbox: [-0.6, 8.4, 11.4, -4.6], axis: false, showCopyright: false,
+    showNavigation: false, keepaspectratio: false
+});
+var H_N = 6;
+var H_E = [[0,1],[0,2],[1,2],[3,4],[3,5],[4,5],[2,3],[1,4]];   // two triangles + 2 bridges
+var H_POS = [[1.4,6.6],[1.0,4.2],[3.0,5.4],[7.6,5.4],[9.6,6.6],[9.9,4.2]];
+var fS = [];
+for (var v=0; v<H_N; v++){
+    var col = (v % 3);
+    var row = Math.floor(v/3);
+    fS.push(b14.create('slider',
+        [[0.4 + col*3.7, -1.6 - row*1.3], [3.1 + col*3.7, -1.6 - row*1.3],
+         [-1, (v<3 ? 0.6 : -0.4), 1]],
+        {name:'f<sub>'+v+'</sub>', snapWidth:0.05, strokeColor:'#026573',
+         fillColor:'#026573', label:{fontSize:14}}));
+}
+function fval(v){ return fS[v].Value(); }
+var hNodes = H_POS.map(function(pos, v){
+    return b14.create('point', pos, {
+        name:String(v), size:10, strokeColor:PAL.text, strokeWidth:2, fixed:true,
+        label:{fontSize:14, offset:[0,20], cssStyle:'font-family:Georgia,serif;font-weight:bold;'},
+        fillColor: function(){
+            var t = (fval(v)+1)/2;                    // 0 -> blue, 1 -> red
+            var r = Math.round(37 + t*(220-37)), g = Math.round(99 - t*(99-38)),
+                bl = Math.round(235 - t*(235-38));
+            return 'rgb(' + r + ',' + g + ',' + bl + ')';
+        }
+    });
+});
+H_E.forEach(function(e){
+    b14.create('segment', [hNodes[e[0]], hNodes[e[1]]], {
+        highlight:false, layer:5,
+        strokeColor: function(){
+            var d = Math.abs(fval(e[0]) - fval(e[1]));
+            return d > 1.0 ? '#dc2626' : (d > 0.4 ? '#f59e0b' : '#22c55e');
+        },
+        strokeWidth: function(){
+            return 1.5 + 5*Math.abs(fval(e[0]) - fval(e[1]));
+        }
+    });
+});
+function quadForm(){
+    var s = 0;
+    H_E.forEach(function(e){ s += Math.pow(fval(e[0]) - fval(e[1]), 2); });
+    return s;
+}
+function norm2(){
+    var s = 0;
+    for (var v=0;v<H_N;v++) s += fval(v)*fval(v);
+    return s;
+}
+function meanF(){
+    var s = 0;
+    for (var v=0;v<H_N;v++) s += fval(v);
+    return s/H_N;
+}
+b14.create('text', [-0.4, 8.0, function(){
+    return 'f<sup>T</sup>L f  =  &sum;<sub>(u,v)&isin;E</sub> (f<sub>u</sub> &minus; f<sub>v</sub>)&sup2;  =  '
+           + quadForm().toFixed(4);
+}], {fontSize:17, color:'#026573', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b14.create('text', [-0.4, 7.3, function(){
+    var r = norm2() < 1e-9 ? 0 : quadForm()/norm2();
+    var msg = (Math.abs(meanF()) < 0.02 && norm2() > 0.5 && r < 0.45)
+              ? '   &larr; smooth AND non-constant: close to the Fiedler vector'
+              : '';
+    return 'Rayleigh quotient f<sup>T</sup>Lf / f<sup>T</sup>f = ' + r.toFixed(4) + msg;
+}], {fontSize:14, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+b14.create('text', [-0.4, 6.7, function(){
+    var mx = 0, arg = null;
+    H_E.forEach(function(e){
+        var d = Math.pow(fval(e[0]) - fval(e[1]), 2);
+        if (d > mx){ mx = d; arg = e; }
+    });
+    return arg ? ('most violated edge: (' + arg[0] + ',' + arg[1] + ') contributing '
+                  + mx.toFixed(3)) : '';
+}], {fontSize:14, color:'#b91c1c', cssStyle:'font-family:Georgia,serif;'});
+b14.create('text', [4.6, 3.0, 'bridges'], {fontSize:13, strokeColor:PAL.muted,
+          cssStyle:'font-family:Georgia,serif;font-style:italic;'});
+b14.create('text', [-0.4, -0.6, 'signal values  (edge thickness &amp; colour = disagreement)'],
+          {fontSize:13.5, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+
+// ---------------------------------------------------------------- Figure 5.3
+var b15 = JXG.JSXGraph.initBoard('jxg15', {
+    boundingbox: [-0.35, 0.6, 2.5, -7.2], axis: true, showCopyright: false,
+    showNavigation: false, keepaspectratio: false
+});
+var gamS = b15.create('slider', [[0.05, 0.35], [0.95, 0.35], [2.0, 2.5, 3.5]],
+                      {name:'&gamma;', snapWidth:0.1, strokeColor:'#dc2626',
+                       fillColor:'#dc2626', label:{fontSize:15}});
+var mdS  = b15.create('slider', [[1.25, 0.35], [2.35, 0.35], [2, 6, 20]],
+                      {name:'mean deg', snapWidth:1, strokeColor:'#026573',
+                       fillColor:'#026573', label:{fontSize:15}});
+function lgamma(z){                     // Lanczos approximation
+    var g = [676.5203681218851, -1259.1392167224028, 771.32342877765313,
+             -176.61502916214059, 12.507343278686905, -0.13857109526572012,
+             9.9843695780195716e-6, 1.5056327351493116e-7];
+    if (z < 0.5) return Math.log(Math.PI/Math.sin(Math.PI*z)) - lgamma(1-z);
+    z -= 1;
+    var x = 0.99999999999980993;
+    for (var i=0;i<8;i++) x += g[i]/(z+i+1);
+    var t = z + 7.5;
+    return 0.5*Math.log(2*Math.PI) + (z+0.5)*Math.log(t) - t + Math.log(x);
+}
+// Poisson(lambda) pmf in log10, a good approximation to ER degrees for large n
+b15.create('functiongraph', [function(logd){
+    var d = Math.pow(10, logd);
+    var lam = mdS.Value();
+    var lp = -lam + d*Math.log(lam) - lgamma(d+1);
+    return lp/Math.LN10;
+}, 0.02, 2.45], {strokeColor:'#026573', strokeWidth:3.5});
+// power law, normalised so that P(d=1) matches roughly
+b15.create('functiongraph', [function(logd){
+    return -gamS.Value()*logd - 0.35;
+}, 0.0, 2.45], {strokeColor:'#dc2626', strokeWidth:3.5});
+b15.create('text', [1.30, 0.05, 'Erd&#337;s&ndash;R&eacute;nyi (Poisson)'],
+          {fontSize:14, color:'#026573', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b15.create('text', [1.30, -0.45, function(){
+    return 'power law  P(d) &prop; d<sup>&minus;' + gamS.Value().toFixed(1) + '</sup>';
+}], {fontSize:14, color:'#dc2626', cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b15.create('text', [1.30, -1.05, function(){
+    var lam = mdS.Value(), d = 100;
+    var lp = (-lam + d*Math.log(lam) - lgamma(d+1))/Math.LN10;
+    var pl = -gamS.Value()*2 - 0.35;
+    return 'at d = 100:  ER &asymp; 10<sup>' + lp.toFixed(0) + '</sup>,  power law &asymp; 10<sup>'
+           + pl.toFixed(1) + '</sup>';
+}], {fontSize:13.5, strokeColor:PAL.text, cssStyle:'font-family:Georgia,serif;'});
+b15.create('text', [0.75, -6.9, 'log&#8321;&#8320; degree'], {fontSize:13, strokeColor:PAL.muted,
+          cssStyle:'font-family:Georgia,serif;'});
+b15.create('text', [-0.32, 0.45, 'log&#8321;&#8320; P(d)'], {fontSize:13, strokeColor:PAL.muted,
+          cssStyle:'font-family:Georgia,serif;'});
+
+})();
+</script>
+</body>
+</html>

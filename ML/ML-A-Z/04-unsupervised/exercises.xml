@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Assignment and inertia in k-means</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q1 &amp;mdash; LLOYD'S ASSIGN STEP&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Lloyd's algorithm alternates two steps, each optimal given the other. This is the first: assign every point to its nearest centroid.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;assign(points, centroids)&lt;/code&gt;&lt;/strong&gt; returning the list of centroid indices (ties go to the &lt;em&gt;lowest&lt;/em&gt; index), and &lt;strong&gt;&lt;code&gt;inertia(points, centroids, labels)&lt;/code&gt;&lt;/strong&gt; returning the total within-cluster sum of squared distances J.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;points = [[0,0],[10,10]], centroids = [[0,0],[10,10]]
+assign  -&amp;gt; [0, 1]
+inertia -&amp;gt; 0.0&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; Compare &lt;em&gt;squared&lt;/em&gt; distances &amp;mdash; the square root is a monotone function and computing it only wastes time.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def assign(points, centroids):
+    # Completer : en cas d'egalite, prendre le plus petit indice
+    ...
+
+
+def inertia(points, centroids, labels):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def _d2(a, b):
+    return sum((x - y) ** 2 for x, y in zip(a, b))
+
+
+def assign(points, centroids):
+    labels = []
+    for p in points:
+        best, bd = 0, None
+        for j, c in enumerate(centroids):
+            d = _d2(p, c)
+            if bd is None or d &lt; bd:
+                bd, best = d, j
+        labels.append(best)
+    return labels
+
+
+def inertia(points, centroids, labels):
+    return sum(_d2(p, centroids[l]) for p, l in zip(points, labels))
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0, 0], [10, 10]]
+cs = [[0, 0], [10, 10]]
+lab = assign(pts, cs)
+print(lab, inertia(pts, cs, lab))
+</text></testcode><stdin><text /></stdin><expected><text>[0, 1] 0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0, 0], [1, 0], [9, 0], [10, 0]]
+cs = [[0.5, 0], [9.5, 0]]
+lab = assign(pts, cs)
+print(lab, inertia(pts, cs, lab))
+</text></testcode><stdin><text /></stdin><expected><text>[0, 0, 1, 1] 1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[5, 0]]
+cs = [[0, 0], [10, 0]]
+print(assign(pts, cs))
+</text></testcode><stdin><text /></stdin><expected><text>[0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[1, 1], [2, 2], [3, 3]]
+cs = [[2, 2]]
+lab = assign(pts, cs)
+print(lab, round(inertia(pts, cs, lab), 6))
+</text></testcode><stdin><text /></stdin><expected><text>[0, 0, 0] 4
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0, 0], [0, 4]]
+cs = [[0, 1], [0, 3]]
+lab = assign(pts, cs)
+print(lab, inertia(pts, cs, lab))
+</text></testcode><stdin><text /></stdin><expected><text>[0, 1] 2
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — The update step and one full Lloyd iteration</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q2 &amp;mdash; LLOYD'S UPDATE STEP&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;The second step moves each centroid to the mean of its cluster &amp;mdash; the point minimising the sum of squared distances. Because each step weakly decreases J and there are finitely many partitions, the algorithm terminates.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;update(points, labels, k)&lt;/code&gt;&lt;/strong&gt; returning the k new centroids. &lt;strong&gt;An empty cluster keeps its coordinates at the origin&lt;/strong&gt; (a list of zeros of the right dimension). Then write &lt;strong&gt;&lt;code&gt;lloyd(points, centroids, n_iter)&lt;/code&gt;&lt;/strong&gt; running &lt;code&gt;n_iter&lt;/code&gt; full assign-then-update rounds and returning the final centroids.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;points = [[0,0],[2,0],[10,0],[12,0]], labels = [0,0,1,1], k = 2
+update -&amp;gt; [[1.0, 0.0], [11.0, 0.0]]&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; Verify on the tests that the inertia never increases &amp;mdash; that is the whole convergence argument.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def assign(points, centroids):
+    # Completer (ou reutiliser Q1)
+    ...
+
+
+def update(points, labels, k):
+    # Completer : un cluster vide devient l'origine
+    ...
+
+
+def lloyd(points, centroids, n_iter):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def _d2(a, b):
+    return sum((x - y) ** 2 for x, y in zip(a, b))
+
+
+def assign(points, centroids):
+    labels = []
+    for p in points:
+        best, bd = 0, None
+        for j, c in enumerate(centroids):
+            d = _d2(p, c)
+            if bd is None or d &lt; bd:
+                bd, best = d, j
+        labels.append(best)
+    return labels
+
+
+def update(points, labels, k):
+    dim = len(points[0])
+    sums = [[0.0] * dim for _ in range(k)]
+    counts = [0] * k
+    for p, l in zip(points, labels):
+        counts[l] += 1
+        for j in range(dim):
+            sums[l][j] += p[j]
+    out = []
+    for j in range(k):
+        if counts[j] == 0:
+            out.append([0.0] * dim)
+        else:
+            out.append([s / counts[j] for s in sums[j]])
+    return out
+
+
+def lloyd(points, centroids, n_iter):
+    cs = [list(c) for c in centroids]
+    for _ in range(n_iter):
+        labels = assign(points, cs)
+        cs = update(points, labels, len(cs))
+    return cs
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0, 0], [2, 0], [10, 0], [12, 0]]
+print(update(pts, [0, 0, 1, 1], 2))
+</text></testcode><stdin><text /></stdin><expected><text>[[1.0, 0.0], [11.0, 0.0]]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0, 0], [1, 0], [10, 0], [11, 0]]
+print(lloyd(pts, [[0, 0], [1, 0]], 10))
+</text></testcode><stdin><text /></stdin><expected><text>[[0.5, 0.0], [10.5, 0.0]]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0, 0], [1, 1]]
+print(update(pts, [0, 0], 2))
+</text></testcode><stdin><text /></stdin><expected><text>[[0.5, 0.5], [0.0, 0.0]]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0, 0], [2, 0], [10, 0], [12, 0]]
+cs = [[0, 0], [12, 0]]
+for it in range(3):
+    lab = assign(pts, cs)
+    j = sum(sum((a - b) ** 2 for a, b in zip(p, cs[l])) for p, l in zip(pts, lab))
+    print(it, round(j, 4))
+    cs = update(pts, lab, 2)
+</text></testcode><stdin><text /></stdin><expected><text>0 8
+1 4.0
+2 4.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[1, 2, 3], [3, 2, 1]]
+print(update(pts, [0, 0], 1))
+</text></testcode><stdin><text /></stdin><expected><text>[[2.0, 2.0, 2.0]]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — Farthest-point (D squared) seeding</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q3 &amp;mdash; K-MEANS++ SEEDING&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Arthur and Vassilvitskii proved that D&amp;sup2; seeding gives &lt;strong&gt;E&lt;/strong&gt;[J] &amp;le; 8(ln k + 2)J&lt;sub&gt;OPT&lt;/sub&gt; before a single Lloyd iteration is run. Here we implement its deterministic cousin, farthest-point seeding.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;farthest_seed(points, k)&lt;/code&gt;&lt;/strong&gt;: start from &lt;code&gt;points[0]&lt;/code&gt;, then repeatedly append the point whose squared distance to the &lt;em&gt;nearest already-chosen&lt;/em&gt; centre is largest. Ties go to the lowest index. Return the list of chosen points (not their indices).&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;points = [[0,0],[1,0],[10,0]], k = 2  -&amp;gt;  [[0, 0], [10, 0]]&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; The quantity to maximise is min&lt;sub&gt;c chosen&lt;/sub&gt; d&amp;sup2;(p, c) &amp;mdash; a max of a min.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def farthest_seed(points, k):
+    # Completer : maximiser la distance au centre choisi le plus proche
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def _d2(a, b):
+    return sum((x - y) ** 2 for x, y in zip(a, b))
+
+
+def farthest_seed(points, k):
+    chosen = [list(points[0])]
+    while len(chosen) &lt; k:
+        best_i, best_d = 0, -1.0
+        for i, p in enumerate(points):
+            d = min(_d2(p, c) for c in chosen)
+            if d &gt; best_d:
+                best_d, best_i = d, i
+        chosen.append(list(points[best_i]))
+    return chosen
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(farthest_seed([[0, 0], [1, 0], [10, 0]], 2))
+</text></testcode><stdin><text /></stdin><expected><text>[[0, 0], [10, 0]]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0, 0], [1, 1], [9, 9], [10, 10], [5, 5]]
+print(farthest_seed(pts, 3))
+</text></testcode><stdin><text /></stdin><expected><text>[[0, 0], [10, 10], [5, 5]]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(farthest_seed([[3, 4]], 1))
+</text></testcode><stdin><text /></stdin><expected><text>[[3, 4]]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0, 0], [0, 1], [0, 2], [0, 3]]
+print(farthest_seed(pts, 2))
+</text></testcode><stdin><text /></stdin><expected><text>[[0, 0], [0, 3]]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0, 0], [10, 0], [0, 10], [10, 10]]
+print(farthest_seed(pts, 4))
+</text></testcode><stdin><text /></stdin><expected><text>[[0, 0], [10, 10], [10, 0], [0, 10]]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q4 — PCA in two dimensions</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q4 &amp;mdash; PRINCIPAL COMPONENT ANALYSIS&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;PCA finds the direction of greatest projected variance; by the Rayleigh quotient that is the leading eigenvector of the covariance matrix. In two dimensions the eigenproblem has a closed form.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;center(points)&lt;/code&gt;&lt;/strong&gt; subtracting the mean, and &lt;strong&gt;&lt;code&gt;projected_variance(points, direction)&lt;/code&gt;&lt;/strong&gt; returning the variance of the centred data projected onto &lt;code&gt;direction&lt;/code&gt; (which you must normalise to unit length yourself). Finally write &lt;strong&gt;&lt;code&gt;pc1_angle(points)&lt;/code&gt;&lt;/strong&gt; returning the angle of the first principal component using &amp;frac12;&amp;middot;atan2(2s&lt;sub&gt;xy&lt;/sub&gt;, s&lt;sub&gt;xx&lt;/sub&gt;&amp;minus;s&lt;sub&gt;yy&lt;/sub&gt;).&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;points = [[-2,0],[-1,0],[1,0],[2,0]]
+pc1_angle -&amp;gt; 0.0   (the spread is entirely along x)&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; Always centre before computing a covariance &amp;mdash; uncentred 'PCA' just returns the mean vector.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import math
+
+
+def center(points):
+    # Completer
+    ...
+
+
+def projected_variance(points, direction):
+    # Completer : normaliser direction
+    ...
+
+
+def pc1_angle(points):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import math
+
+
+def center(points):
+    n = len(points)
+    dim = len(points[0])
+    means = [sum(p[j] for p in points) / n for j in range(dim)]
+    return [[p[j] - means[j] for j in range(dim)] for p in points]
+
+
+def projected_variance(points, direction):
+    c = center(points)
+    norm = math.sqrt(sum(v * v for v in direction))
+    if norm == 0:
+        return 0.0
+    u = [v / norm for v in direction]
+    return sum(sum(a * b for a, b in zip(p, u)) ** 2 for p in c) / len(c)
+
+
+def pc1_angle(points):
+    c = center(points)
+    n = len(c)
+    sxx = sum(p[0] * p[0] for p in c) / n
+    syy = sum(p[1] * p[1] for p in c) / n
+    sxy = sum(p[0] * p[1] for p in c) / n
+    return 0.5 * math.atan2(2 * sxy, sxx - syy)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(center([[1, 1], [3, 3]]))
+</text></testcode><stdin><text /></stdin><expected><text>[[-1.0, -1.0], [1.0, 1.0]]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[-2, 0], [-1, 0], [1, 0], [2, 0]]
+print(round(pc1_angle(pts), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[-2, -2], [-1, -1], [1, 1], [2, 2]]
+print(round(pc1_angle(pts), 6), round(math.pi / 4, 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.785398 0.785398
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[-2, 0], [-1, 0], [1, 0], [2, 0]]
+print(round(projected_variance(pts, [1, 0]), 6), round(projected_variance(pts, [0, 1]), 6))
+</text></testcode><stdin><text /></stdin><expected><text>2.5 0.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[-2, 0], [-1, 0], [1, 0], [2, 0]]
+a = projected_variance(pts, [3, 0])
+b = projected_variance(pts, [1, 0])
+print(round(a - b, 12))
+</text></testcode><stdin><text /></stdin><expected><text>0.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q5 — Silhouette score</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q5 &amp;mdash; CHOOSING K HONESTLY&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Inertia falls monotonically with k and so cannot select it. The silhouette (Rousseeuw, 1987) does have an optimum: s = (b &amp;minus; a)/max(a, b), where a is the mean distance to one's own cluster and b the mean distance to the nearest other cluster.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;silhouette(points, labels)&lt;/code&gt;&lt;/strong&gt; returning the mean silhouette over all points. A point alone in its cluster contributes 0.0, and if there is only one cluster the function returns 0.0.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;points = [[0,0],[0,1],[10,0],[10,1]], labels = [0,0,1,1]
+-&amp;gt; about 0.90 (two tight, well-separated clusters)&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; a excludes the point itself; b is a &lt;em&gt;minimum&lt;/em&gt; over the other clusters.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import math
+
+
+def silhouette(points, labels):
+    # Completer : a exclut le point lui-meme, b est un minimum sur les autres clusters
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import math
+
+
+def _dist(a, b):
+    return math.sqrt(sum((x - y) ** 2 for x, y in zip(a, b)))
+
+
+def silhouette(points, labels):
+    clusters = sorted(set(labels))
+    if len(clusters) &lt; 2:
+        return 0.0
+    total = 0.0
+    for i, p in enumerate(points):
+        own = [j for j, l in enumerate(labels) if l == labels[i] and j != i]
+        if not own:
+            continue
+        a = sum(_dist(p, points[j]) for j in own) / len(own)
+        b = None
+        for c in clusters:
+            if c == labels[i]:
+                continue
+            other = [j for j, l in enumerate(labels) if l == c]
+            if not other:
+                continue
+            m = sum(_dist(p, points[j]) for j in other) / len(other)
+            if b is None or m &lt; b:
+                b = m
+        if b is None or max(a, b) == 0:
+            continue
+        total += (b - a) / max(a, b)
+    return total / len(points)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0, 0], [0, 1], [10, 0], [10, 1]]
+print(round(silhouette(pts, [0, 0, 1, 1]), 4))
+</text></testcode><stdin><text /></stdin><expected><text>0.9002
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0, 0], [0, 1], [10, 0], [10, 1]]
+print(round(silhouette(pts, [0, 1, 0, 1]), 4))
+</text></testcode><stdin><text /></stdin><expected><text>-0.4475
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0, 0], [1, 1]]
+print(silhouette(pts, [0, 0]))
+</text></testcode><stdin><text /></stdin><expected><text>0.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0, 0], [0, 1], [0, 2], [10, 0], [10, 1], [10, 2]]
+good = silhouette(pts, [0, 0, 0, 1, 1, 1])
+bad = silhouette(pts, [0, 1, 0, 1, 0, 1])
+print(good &gt; bad)
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0, 0], [5, 5]]
+print(round(silhouette(pts, [0, 1]), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

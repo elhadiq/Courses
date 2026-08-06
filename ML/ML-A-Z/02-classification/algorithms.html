@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algorithms of Section 2</title>
+<link href="../assets/style.css" rel="stylesheet">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+
+/* Use the full width the theme allows: the shared stylesheet caps a lesson at
+   880px, which leaves wide figures and tables boxed into the middle of a large
+   screen. --max-w is the theme's own page width, so this stays consistent with
+   the landing page. */
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) {
+  .lesson-content { padding-left: 16px; padding-right: 16px; }
+}
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule);
+               padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center;
+               padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.lesson-nav { max-width: 880px; margin: 0 auto 40px; padding: 0 24px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav .container { display: flex; gap: 18px; flex-wrap: wrap; width: 100%; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600;
+                font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.keypoints h4 { margin-top: 0; }
+
+.algo-tag { color: var(--color-muted); font-size: 0.86rem; font-style: italic;
+            margin: -0.4em 0 1em; }
+.algo-steps { border: 1px solid var(--color-rule); border-radius: var(--radius);
+              background: var(--proof-bg); padding: 4px 22px 14px;
+              margin: 1.2em 0; }
+.algo-steps-title { color: var(--primary); font-weight: 700; font-size: 0.8rem;
+                    letter-spacing: 0.09em; text-transform: uppercase;
+                    margin: 14px 0 4px; }
+.algo-steps ol { padding-left: 1.4em; }
+.algo-steps li { margin: 0.55em 0; line-height: 1.75; }
+.annex-toc { background: var(--primary-soft); border-radius: var(--radius);
+             padding: 16px 24px; margin: 1.4em 0; }
+.annex-toc ul { margin: 0.4em 0; }
+.annex-toc a { color: var(--primary-dark); font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Machine Learning A&ndash;Z</a> &middot; Course</div><span class="course-code">Graph-based machine learning</span></div></header>
+<section class="lesson-hero"><div class="container"><div class="lesson-label">Part I &middot; Section 2 &middot; Annex</div><h1>Algorithms of Section 2</h1><div class="lesson-sub">Nearest neighbours, logistic fitting, the maximum-margin separator and the ROC curve, set out step by step.</div></div></section>
+<main class="lesson-content">
+<h2>Annex &mdash; the algorithms of Section 2</h2><div class="box tip"><div class="box-title">How to read this annex</div><p>Each algorithm is set out the same way: what it is handed, what it must hand back, then the steps in the order you would carry them out. A small example is worked through by hand so you can check your understanding against real numbers, and the closing boxes say why the method is correct, why it stops, and what it costs. Nothing here assumes you can read a program &mdash; the point is the reasoning.</p></div><div class="annex-toc"><strong>Algorithms in this annex</strong><ul><li><a href="#algo1">k-nearest-neighbour classification</a></li><li><a href="#algo2">Fitting a logistic model by gradient descent</a></li><li><a href="#algo3">The maximum-margin separator</a></li><li><a href="#algo4">Building the ROC curve</a></li></ul></div><span id="algo1"></span><h3>k-nearest-neighbour classification</h3><p class="algo-tag">Lazy method \(\cdot\) no training phase at all</p><p>Label a new observation by looking at the labelled observations closest to it and taking a vote.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A labelled dataset, a new point to classify, and an odd number \(k\).</p><p><strong>Produce.</strong> One class label for the new point.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Measure every distance.</strong> Compute the distance from the new point to every labelled observation. Compare squared distances and skip the square root &mdash; it changes no ordering and saves time.</li><li><strong>Take the k closest.</strong> Sort by distance and keep the first \(k\) observations.</li><li><strong>Vote.</strong> Count the labels among those \(k\). The label appearing most often wins.</li><li><strong>Break ties by a stated rule.</strong> With an even split, fall back on the single nearest neighbour, or on the more frequent class overall. The rule must be fixed in advance, otherwise results are not reproducible.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Five labelled points on a line, classifying \(x = 4.2\) with \(k = 3\).</p><table><thead><tr><th>Point</th><th>Position</th><th>Label</th><th>Distance to 4.2</th><th>Among 3 closest?</th></tr></thead><tbody><tr><td>A</td><td>1.0</td><td>red</td><td>3.2</td><td>no</td></tr><tr><td>B</td><td>3.0</td><td>red</td><td>1.2</td><td>yes</td></tr><tr><td>C</td><td>4.0</td><td>blue</td><td>0.2</td><td>yes</td></tr><tr><td>D</td><td>5.0</td><td>blue</td><td>0.8</td><td>yes</td></tr><tr><td>E</td><td>9.0</td><td>blue</td><td>4.8</td><td>no</td></tr></tbody></table><p>The three closest are B (red), C (blue) and D (blue), so the vote is 2&ndash;1 for blue. With \(k = 1\) it would also be blue; with \(k = 5\) it would be blue 3&ndash;2. The answer can change with \(k\), which is exactly why \(k\) must be chosen on held-out data.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>No model is fitted, so there is nothing to be correct about beyond the vote itself. The guarantee is asymptotic: with unlimited data, the single-nearest-neighbour error is at most twice the best error any method could achieve.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>One pass over the data plus a sort. Always finishes.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>Nothing to train, but every prediction costs a full pass: \(nd\) operations. Predictions get slower as you collect more data &mdash; the opposite of most methods.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>In more than a handful of dimensions, all points become roughly equidistant and 'nearest' stops meaning anything. Reduce dimensions first.</li><li>Inputs on different scales let the widest-ranging one dominate the distance. Standardise before measuring.</li><li>With imbalanced classes the majority swamps every vote. Weight votes by inverse distance, or rebalance.</li></ul></div><span id="algo2"></span><h3>Fitting a logistic model by gradient descent</h3><p class="algo-tag">Iterative method \(\cdot\) convex, so no local traps</p><p>Find coefficients that make the model's predicted probability high for the positives and low for the negatives.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A table of inputs with labels 0 or 1, a step size, and a number of rounds.</p><p><strong>Produce.</strong> Coefficients defining a probability for any new input.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Score each observation.</strong> Combine its inputs with the current coefficients into a single number. Large positive means confidently class 1.</li><li><strong>Squash the score into a probability.</strong> Pass it through the S-shaped logistic curve, which maps any number into the range 0 to 1. Compute it in the numerically safe way for large negative scores, or it will overflow.</li><li><strong>Compare with the truth.</strong> Subtract the true label from the predicted probability. The result lies between &minus;1 and 1 and says how wrong, and in which direction.</li><li><strong>Attribute the error to each input.</strong> For each input column, multiply these differences by the column entry by entry and average.</li><li><strong>Step and repeat.</strong> Move each coefficient against that quantity, scaled by the step size, and go round again.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Notice how the update is identical in form to the one for straight-line fitting &mdash; only the meaning of the prediction has changed.</p><table><thead><tr><th>Method</th><th>Prediction is</th><th>Correction term</th></tr></thead><tbody><tr><td>Straight-line fitting</td><td>a raw number</td><td>true &minus; predicted</td></tr><tr><td>Logistic fitting</td><td>a probability</td><td>true &minus; predicted</td></tr></tbody></table><p>That is not a coincidence. Both losses come from the same family, and in both the derivative reduces to the same simple difference.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>The objective is convex: it has a single lowest point and no other flat spots. Any downhill method therefore reaches the global best, unlike the tree and clustering methods later on.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Stops when you stop it. In one special case it never converges &mdash; see the pitfalls.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>One pass over the table per round, \(nd\) operations.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li><strong>If the two classes can be separated perfectly</strong> by a straight boundary, there is no best answer: making the coefficients larger always improves the fit, so they grow without limit and the probabilities saturate at exactly 0 and 1. Adding a penalty on the coefficients removes the pathology, which is why most implementations penalise by default.</li><li>Computing the logistic curve the naive way overflows for scores around &minus;750 and below.</li></ul></div><span id="algo3"></span><h3>The maximum-margin separator</h3><p class="algo-tag">Optimisation \(\cdot\) solved by a specialised routine</p><p>Among all the straight boundaries that separate two classes, choose the one that leaves the widest empty corridor.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A labelled dataset with labels &minus;1 and +1, and a tolerance \(C\) for points on the wrong side.</p><p><strong>Produce.</strong> A boundary, and the short list of observations that determine it.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>State the goal.</strong> Every candidate boundary has a margin: the distance from it to the closest observation. Among separating boundaries, we want the largest margin.</li><li><strong>Normalise the description.</strong> Fix the scale so that the closest points sit at a signed distance of exactly 1. Maximising the margin then becomes minimising the length of the coefficient vector &mdash; a smooth, convex objective.</li><li><strong>Allow violations at a price.</strong> Real data are rarely separable. Give each observation permission to sit inside the corridor, or on the wrong side, and charge \(C\) per unit of violation.</li><li><strong>Hand it to a solver.</strong> The result is a quadratic programme with linear constraints. It is solved by working on two observations at a time, each pair having a closed-form answer, cycling until no pair can be improved.</li><li><strong>Keep only what matters.</strong> When the solver finishes, most observations turn out to have no influence. Only those on or inside the corridor &mdash; the support vectors &mdash; define the boundary. Every other observation could be deleted without changing the answer.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Which points hold the boundary in place?</p><table><thead><tr><th>Observation</th><th>Signed distance</th><th>Inside the corridor?</th><th>Influences the boundary?</th></tr></thead><tbody><tr><td>far away, correct side</td><td>4.8</td><td>no</td><td>no</td></tr><tr><td>exactly on the corridor edge</td><td>1.0</td><td>on the edge</td><td><strong>yes</strong></td></tr><tr><td>inside the corridor</td><td>0.4</td><td>yes</td><td><strong>yes</strong></td></tr><tr><td>on the wrong side</td><td>&minus;0.7</td><td>yes</td><td><strong>yes</strong></td></tr></tbody></table><p>Typically only a small fraction of the data are support vectors, which is what makes the fitted model compact.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>Maximum margin is not an aesthetic preference. A wide corridor means the boundary can be shifted a long way before any observation changes side, which is what generalisation to new data requires.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>The solver stops when every pair satisfies the optimality conditions to within a tolerance.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>Between quadratic and cubic in the number of observations, because the solver reasons about pairs. This is the reason kernel methods do not scale to millions of rows.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>Small \(C\) gives a wide, forgiving corridor that underfits; large \(C\) forces the corridor to shrink until it fits the noise. Choose it on held-out data.</li><li>Inputs must be standardised: the corridor is measured in ordinary distance, so an input with a wide range dominates it.</li></ul></div><div class="box tip"><div class="box-title">Worth knowing</div><p>Because the solver only ever needs inner products between pairs of observations, any function measuring similarity between two points can be substituted for the inner product. The boundary then becomes curved in the original space at no extra cost &mdash; the kernel trick.</p></div><span id="algo4"></span><h3>Building the ROC curve</h3><p class="algo-tag">Evaluation procedure \(\cdot\) sweeps a threshold</p><p>Show how a classifier's hit rate and false-alarm rate trade off as you become more or less willing to declare a positive.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A set of observations with true labels and predicted scores.</p><p><strong>Produce.</strong> A curve, and the single number underneath it.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Sort by score, highest first.</strong> The most confidently positive observation goes at the top.</li><li><strong>Start at the origin.</strong> With the threshold above every score, nothing is flagged: no hits, no false alarms.</li><li><strong>Walk down the list.</strong> Lower the threshold past one observation at a time. If it was truly positive, step upwards; if truly negative, step to the right.</li><li><strong>Normalise the axes.</strong> Divide the vertical steps by the total number of positives and the horizontal ones by the total number of negatives, so both axes run 0 to 1.</li><li><strong>Measure the area.</strong> The area under the resulting staircase is the summary number. It equals the probability that a randomly chosen positive is scored above a randomly chosen negative.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Six observations. P marks a true positive, N a true negative.</p><table><thead><tr><th>Rank</th><th>Score</th><th>Truth</th><th>Step</th><th>Position (right, up)</th></tr></thead><tbody><tr><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>start</td><td>(0, 0)</td></tr><tr><td>1</td><td>0.95</td><td>P</td><td>up</td><td>(0, 1/3)</td></tr><tr><td>2</td><td>0.80</td><td>P</td><td>up</td><td>(0, 2/3)</td></tr><tr><td>3</td><td>0.60</td><td>N</td><td>right</td><td>(1/3, 2/3)</td></tr><tr><td>4</td><td>0.55</td><td>P</td><td>up</td><td>(1/3, 1)</td></tr><tr><td>5</td><td>0.30</td><td>N</td><td>right</td><td>(2/3, 1)</td></tr><tr><td>6</td><td>0.10</td><td>N</td><td>right</td><td>(1, 1)</td></tr></tbody></table><p>The area under this staircase is 8/9. A perfect ranking would go straight up then straight across, giving 1; random ranking would follow the diagonal, giving 1/2.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>The curve depends only on the <em>order</em> of the scores, not their values. Any monotone rescaling of the scores leaves it unchanged.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>One pass down a sorted list.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>Dominated by the sort.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li><strong>Under heavy imbalance the curve flatters.</strong> With 1 % positives, the false-alarm rate is divided by a very large number, so it stays low even when most flagged items are wrong. Plot precision against recall instead.</li><li>The area summarises every threshold at once, including thresholds you would never use. If you deploy at one operating point, report the numbers at that point too.</li></ul></div><nav class="lesson-nav"><div class="container"><a href="../index.html">Course index</a><a href="page.html">&#8592; Back to the section</a></div></nav>
+</main>
+<footer class="site-footer"><strong>Machine Learning A&ndash;Z</strong> &middot; From empirical risk minimisation to graph neural networks<span class="footer-meta">Edition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">The interactive figure could not be loaded. Check your network connection.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+// Colours resolved from the stylesheet, so the figures follow the light/dark
+// theme. Each entry is a function: board attributes that are functions are
+// re-evaluated on update, so a theme switch only needs a redraw.
+var BOARDS = [];
+function cssv(name, fallback){
+    try {
+        var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback;
+    } catch (e) { return fallback; }
+}
+var PAL = {
+    text:  function(){ return cssv('--color-text',  '#1f2937'); },
+    muted: function(){ return cssv('--color-muted', '#6b7280'); },
+    axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+    ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+    grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+    cell:  function(){ return cssv('--cell-bg',     '#ffffff'); }
+};
+// Re-render every board when the theme attribute flips.
+if (window.MutationObserver) {
+    new MutationObserver(function(){
+        for (var i = 0; i < BOARDS.length; i++) {
+            try { BOARDS[i].fullUpdate(); } catch (e) {}
+        }
+    }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+
+
+})();
+</script>
+</body>
+</html>

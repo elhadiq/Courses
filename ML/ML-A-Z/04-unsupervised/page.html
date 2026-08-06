@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 4 — Unsupervised Learning: Clustering and Dimensionality Reduction</title>
+<link href="../assets/style.css" rel="stylesheet">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+
+/* Use the full width the theme allows: the shared stylesheet caps a lesson at
+   880px, which leaves wide figures and tables boxed into the middle of a large
+   screen. --max-w is the theme's own page width, so this stays consistent with
+   the landing page. */
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) {
+  .lesson-content { padding-left: 16px; padding-right: 16px; }
+}
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule);
+               padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center;
+               padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.lesson-nav { max-width: 880px; margin: 0 auto 40px; padding: 0 24px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav .container { display: flex; gap: 18px; flex-wrap: wrap; width: 100%; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600;
+                font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.keypoints h4 { margin-top: 0; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Machine Learning A&ndash;Z</a> &middot; Course</div><span class="course-code">Graph-based machine learning</span></div></header>
+<section class="lesson-hero"><div class="container"><div class="lesson-label">Part I &middot; Section 4</div><h1>Section 4 — Unsupervised Learning: Clustering and Dimensionality Reduction</h1><div class="lesson-sub">k-means and its geometric blind spot, PCA as a variance-maximising rotation, and the manifold methods that motivate the graph-based turn of Part II.</div></div></section>
+<main class="lesson-content">
+<div class="box method"><div class="box-title">Companion annex</div><p>Every algorithm in this section is also set out <strong><a href="algorithms.html">step by step in the annex</a></strong>: what it is given, what it produces, the steps in order, a small example worked by hand, and why it is correct, why it stops and what it costs &mdash; described in words, with no program code.</p></div><h2>4.1 Learning without labels</h2><p>Unsupervised learning has no target y and therefore no risk to minimise in the sense of Section 1. The objective is instead <em>structural</em>: find a compressed description of the data that loses as little as possible. Two families dominate.</p><ul><li><strong>Clustering</strong> &mdash; compress the <em>rows</em>: replace each point by a group label.</li><li><strong>Dimensionality reduction</strong> &mdash; compress the <em>columns</em>: replace each point by a shorter vector.</li></ul><div class="box warn"><div class="box-title">There is no ground truth to appeal to</div>Because no label exists, no clustering can be declared correct in the way a classifier can. Evaluation is either <em>internal</em> (silhouette <a class="cite" href="#ref-rousseeuw1987">[5]</a>, within-cluster inertia), <em>external</em> (compare against labels you happen to have but did not use), or <em>extrinsic</em> (does the clustering help a downstream task?). Internal indices measure whether the data match the algorithm's own assumptions &mdash; they cannot tell you the assumptions were right.</div><h2>4.2 k-means and Lloyd's algorithm</h2><figure class="viz"><div class="viz-title">The geometric assumption behind k-means</div><svg viewBox="0 0 720 290" role="img" style="width:100%;height:auto;display:block;font-family:inherit;"><text x="120" y="34" text-anchor="middle" style="fill:var(--viz-ok);font-size:13px;font-weight:700;">k-means succeeds</text><rect x="20" y="48" width="200" height="200" rx="10" style="fill:var(--viz-plot-bg);stroke:var(--color-rule);stroke-width:1.5;"/><circle cx="62.753" cy="94.3474" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="64.1145" cy="129.64" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="88.8851" cy="104.506" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="111.159" cy="100.307" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="78.7782" cy="124.606" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="61.6246" cy="130.032" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="102.909" cy="87.9025" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="81.3407" cy="105.484" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="51.6413" cy="116.82" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="64.0068" cy="96.7919" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="103.494" cy="106.235" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="96.1798" cy="131.754" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="56.4514" cy="97.8179" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="102.799" cy="99.5511" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="86.2213" cy="83.4247" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="58.8987" cy="114.518" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="83.2471" cy="93.5591" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="92.7722" cy="79.8833" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="70.6416" cy="96.8187" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="66.8192" cy="135.498" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="61.3055" cy="90.8213" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="109.455" cy="110.037" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="92.0942" cy="123.872" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="64.6791" cy="113.555" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="83.5546" cy="114.575" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="73.3932" cy="135.355" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="162.092" cy="215.982" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="134.726" cy="170.637" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="148.169" cy="174.435" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="184.351" cy="191.967" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="155.605" cy="223.234" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="132.625" cy="191.484" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="141.01" cy="176.514" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="139.103" cy="184.969" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="159.187" cy="178.143" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="158.153" cy="218.916" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="160.183" cy="188.654" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="136.751" cy="182.339" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="157.413" cy="219.322" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="187.26" cy="174.587" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="153.191" cy="204.49" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="183.496" cy="202.719" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="192.863" cy="187.274" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="175.097" cy="178.612" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="138.104" cy="211.855" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="160.948" cy="181.177" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="153.016" cy="202.821" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="190.148" cy="196.515" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="181.158" cy="189.456" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="133.159" cy="182.223" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="172.11" cy="203.039" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="175.736" cy="181.984" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><path d="M 25 205 L 215 70" style="fill:none;stroke:var(--viz-ok);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:6 4;"/><text x="120" y="268" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-weight:400;">spherical, balanced &#10003;</text><text x="370" y="34" text-anchor="middle" style="fill:var(--viz-bad);font-size:13px;font-weight:700;">k-means fails</text><rect x="270" y="48" width="200" height="200" rx="10" style="fill:var(--viz-plot-bg);stroke:var(--color-rule);stroke-width:1.5;"/><circle cx="408.874" cy="156.193" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="406.122" cy="164.755" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="410.986" cy="164.42" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="409.053" cy="177.079" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="399.963" cy="176.022" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="397.705" cy="184.439" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="398.996" cy="188.747" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="386.718" cy="185.567" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="385.534" cy="195.438" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="381.553" cy="194.037" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="370.611" cy="199.655" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="365.844" cy="204.843" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="363.048" cy="202.322" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="360.221" cy="204.406" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="352.128" cy="204.082" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="341.981" cy="203.478" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="338.835" cy="200.621" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="332.425" cy="204.915" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="324.252" cy="197.64" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="315.212" cy="202.798" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="312.215" cy="195.723" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="301.589" cy="196.841" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="297.819" cy="189.797" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="295.825" cy="183.592" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="289.872" cy="178.427" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="287.696" cy="180.364" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="284.88" cy="173.637" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="286.386" cy="171.388" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="285.682" cy="161.503" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="279.615" cy="158.147" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="327.938" cy="116.249" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="330.286" cy="108.324" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="332.334" cy="101.727" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="333.584" cy="96.2494" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="337.882" cy="89.0748" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="336.716" cy="90.0628" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="345.086" cy="79.3738" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="347.444" cy="80.1873" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="349.738" cy="78.8052" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="360.969" cy="76.6474" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="361.338" cy="68.4122" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="365.262" cy="69.8603" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="379.795" cy="71.1611" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="385.544" cy="64.3967" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="387.52" cy="68.5196" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="397.76" cy="61.6812" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="400.495" cy="63.272" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="404.392" cy="70.1018" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="419.412" cy="67.79" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="421.445" cy="72.4965" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="423.471" cy="71.4778" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="435.963" cy="74.4874" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="436.942" cy="81.6111" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="442.897" cy="82.6288" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="442.061" cy="84.2876" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="449.691" cy="90.8393" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="447.378" cy="100.708" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="449.405" cy="104.086" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="458.132" cy="104.503" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="457.743" cy="115.789" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><path d="M 275 200 L 465 105" style="fill:none;stroke:var(--viz-bad);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:6 4;"/><text x="370" y="268" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-weight:400;">cut goes through a cluster</text><text x="610" y="34" text-anchor="middle" style="fill:var(--viz-bad);font-size:13px;font-weight:700;">k-means fails</text><rect x="510" y="48" width="200" height="200" rx="10" style="fill:var(--viz-plot-bg);stroke:var(--color-rule);stroke-width:1.5;"/><circle cx="688.776" cy="146.394" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="685.325" cy="158.422" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="686.675" cy="162.291" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="680.138" cy="177.22" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="665.592" cy="179.244" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="655.743" cy="188.784" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="648.001" cy="193.607" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="627.528" cy="190.593" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="616.66" cy="197.929" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="603.478" cy="193.975" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="584.716" cy="195.022" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="572.472" cy="194.531" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="563.404" cy="186.162" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="556.082" cy="181.041" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="546.146" cy="173.147" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="536.678" cy="164.621" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="535.875" cy="153.982" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="534.677" cy="149.876" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="534.396" cy="135.951" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="535.715" cy="133.832" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="544.58" cy="121.861" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="548.56" cy="118.443" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="560.178" cy="109.247" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="574.506" cy="102.444" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="585.986" cy="98.3339" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="600.996" cy="102.37" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="615.096" cy="100.548" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="632.179" cy="104.501" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="645.941" cy="103.355" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="653.109" cy="109.539" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="665.811" cy="119.198" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="676.249" cy="123.744" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="683.519" cy="130.285" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="686.973" cy="138.312" r="3" style="fill:var(--viz-bad);opacity:0.85;"/><circle cx="645.913" cy="144.977" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="641.502" cy="153.683" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="643.876" cy="151.628" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="639.313" cy="159.244" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="633.238" cy="164.198" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="633.834" cy="167.609" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="623.714" cy="164.644" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="615.936" cy="169.216" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="617.032" cy="172.516" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="610.04" cy="167.465" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="599.696" cy="170.899" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="596.981" cy="163.415" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="588.145" cy="162.297" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="581.145" cy="164.785" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="585.06" cy="158.197" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="578.655" cy="157.019" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="573.626" cy="150.065" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="579.4" cy="146.158" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="576.517" cy="145.539" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="579.665" cy="139.291" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="578.369" cy="133.579" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="586.137" cy="132.344" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="586.51" cy="134.338" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="592.05" cy="130.981" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="604.691" cy="125.53" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="610.19" cy="130.378" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="610.57" cy="129.06" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="619.527" cy="127.646" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="623.653" cy="129.677" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="630.161" cy="132.663" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="634.442" cy="133.415" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="635.343" cy="139.054" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="641.493" cy="141.566" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><circle cx="647.253" cy="141.097" r="3" style="fill:var(--viz-blue);opacity:0.85;"/><path d="M 610 55 L 610 242" style="fill:none;stroke:var(--viz-bad);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:6 4;"/><text x="610" y="268" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-weight:400;">no straight cut separates them</text></svg><figcaption class="viz-caption"><strong>Figure.</strong> Minimising Euclidean sum of squares assumes clusters are round blobs of similar size. The dashed line is the boundary k-means is forced to draw &mdash; always straight and always equidistant between two centroids. On crescents and nested rings that is hopeless, which is exactly why connectivity-based methods exist.</figcaption></figure><p>k-means seeks k centroids \(\mu_1\), &hellip;, \(\mu_{k}\) and an assignment minimising the total within-cluster sum of squares (inertia):</p><div class="eq">\[J(C, \mu ) = \sum_{j=1..k} \sum_{x\in Cj} \| x - \mu_{j} \|^2_2\]</div><p>Aloise et al. <a class="cite" href="#ref-aloise2009">[3]</a> proved this is NP-hard even for k = 2 in the plane, so again (as with trees) we settle for a heuristic. Lloyd's algorithm <a class="cite" href="#ref-lloyd1982">[1]</a> alternates two steps, each of which is optimal given the other:</p><ol><li><strong>Assign</strong> &mdash; each point to its nearest centroid. (Optimal C for fixed \(\mu .\))</li><li><strong>Update</strong> &mdash; each centroid to the mean of its cluster. (Optimal \(\mu\) for fixed C, since the mean minimises the sum of squared distances.)</li></ol><div class="box thm"><div class="box-title">Convergence</div>Each step weakly decreases J, and there are finitely many partitions, so Lloyd's algorithm terminates in a finite number of iterations. It converges to a <strong>local</strong> minimum only, and the local minimum reached depends entirely on the initialisation &mdash; which is why the algorithm is restarted many times.</div><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">Move the <em>iteration</em> slider one step at a time to watch assignment and update alternate.</p><div id="jxg10" class="viz-board" style="height:480px;"></div><p class="viz-caption"><strong>Figure.</strong> Lloyd's algorithm on a fixed dataset. Step 0 shows a deliberately poor initialisation; each subsequent step alternates assignment and update. Colours are the current assignment, crosses the centroids, and the readout gives the inertia J, which decreases monotonically. Push the slider to the end and then drag a centroid: the algorithm has no memory, it will simply re-converge.</p></div><h3>k-means++</h3><p>Uniform random initialisation frequently places two centroids inside the same true cluster, which Lloyd's algorithm cannot repair. Arthur and Vassilvitskii <a class="cite" href="#ref-arthur2007">[4]</a> proposed seeding proportional to squared distance from the already-chosen centres:</p><pre><code>import random
+
+def kmeans_pp_init(points, k, seed=0):
+    """D^2 seeding: the further a point is from existing centres, the likelier it is chosen."""
+    rng = random.Random(seed)
+    centres = [list(points[rng.randrange(len(points))])]
+    for _ in range(k - 1):
+        d2 = [min(sum((p[i] - c[i]) ** 2 for i in range(len(p))) for c in centres)
+              for p in points]
+        total = sum(d2)
+        r, acc = rng.random() * total, 0.0
+        for p, w in zip(points, d2):
+            acc += w
+            if acc &gt;= r:
+                centres.append(list(p))
+                break
+    return centres</code></pre><div class="box thm"><div class="box-title">Theorem — k-means++ guarantee <a class="cite" href="#ref-arthur2007">[4]</a></div>With \(D^2\) seeding, the expected inertia satisfies <strong>E</strong>[J] \(\le 8(ln k + 2)J_{\operatorname{OPT}}\). This is an O(log k) approximation obtained <em>before</em> a single Lloyd iteration is run &mdash; and in practice it also makes the subsequent iterations converge faster. It is the default initialisation in every serious implementation.</div><h3>Choosing k</h3><p>Inertia decreases monotonically with k (k = n gives J = 0), so it cannot be minimised to select k. Two standard diagnostics:</p><ul><li><strong>The elbow</strong> &mdash; plot J against k and look for the kink where the marginal gain flattens. Informal and often ambiguous.</li><li><strong>Silhouette</strong> <a class="cite" href="#ref-rousseeuw1987">[5]</a> &mdash; for each point, s = (b &minus; a)/max(a, b), where a is the mean distance to its own cluster and b the mean distance to the nearest other cluster. \(s \in [-1, 1]\); the average over all points is maximised at a plausible k. Negative s flags points assigned to the wrong cluster.</li></ul><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">The elbow is where the blue curve stops falling steeply; the orange curve gives a criterion with an actual optimum.</p><div id="jxg11" class="viz-board" style="height:450px;"></div><p class="viz-caption"><strong>Figure.</strong> Inertia (blue) and mean silhouette (orange) as k varies, computed live on the same dataset as the previous figure. Inertia falls forever; the silhouette peaks at the number of clusters actually present. When the two disagree, trust the silhouette &mdash; and then look at the data.</p></div><h3>The assumptions hidden in the objective</h3><div class="box warn"><div class="box-title">k-means can only find spherical, comparably sized, linearly separable blobs</div>Minimising Euclidean sum of squares implicitly assumes isotropic clusters of similar radius and comparable population. It fails &mdash; predictably and badly &mdash; on elongated clusters, on nested rings, on two crescents, and whenever one cluster has far more points than another (the objective will split the large one and merge the small ones). <strong>This failure is the direct motivation for spectral clustering in Section 6</strong>, which replaces Euclidean geometry with connectivity on a graph.</div><p>Two escapes are available before we get to graphs. <strong>Gaussian mixture models</strong> fitted by EM replace hard assignment with posterior responsibilities and allow each cluster a full covariance matrix, so ellipsoids become expressible. <strong>DBSCAN</strong> <a class="cite" href="#ref-ester1996">[6]</a> abandons centroids entirely, defining clusters as maximal sets of density-connected points; it discovers arbitrary shapes, infers the number of clusters itself, and labels low-density points as noise &mdash; at the cost of two parameters (\(\epsilon\), minPts) that are hard to set in high dimension.</p><h2>4.3 Principal Component Analysis</h2><p>PCA, introduced by Pearson <a class="cite" href="#ref-pearson1901">[7]</a> as the line of closest fit and recast in its modern algebraic form by Hotelling <a class="cite" href="#ref-hotelling1933">[8]</a>, finds the orthogonal directions along which centred data vary most.</p><div class="eq">\[w_1 = \operatorname{argmax}_{\| w\| =1} Var(Xw) = \operatorname{argmax}_{\| w\| =1} w^{T}\Sigma w, \Sigma = (1/n) X^{T}X\]</div><div class="box thm"><div class="box-title">Theorem — PCA is an eigenproblem</div>By the Rayleigh quotient, the maximiser of \(w^{T}\Sigma w\) subject to &#8214;w&#8214; = 1 is the eigenvector of \(\Sigma\) with the largest eigenvalue, and the maximum value is that eigenvalue. Successive components are the remaining eigenvectors in decreasing order of \(\lambda\). Since \(\Sigma\) is real symmetric positive semi-definite, the spectral theorem guarantees an orthonormal eigenbasis with \(\lambda_{i} \ge 0\), and \(\lambda_{i}\) is exactly the variance captured by component i. <em>This eigen-decomposition-of-a-symmetric-matrix pattern returns verbatim in Section 6 with the graph Laplacian.</em></div><p>Two equivalent readings, which is what makes PCA so central:</p><table><thead><tr><th>Reading</th><th>Statement</th></tr></thead><tbody><tr><td>Maximum variance</td><td>the first p components span the p-dimensional subspace of greatest projected variance</td></tr><tr><td>Minimum reconstruction error</td><td>that same subspace minimises \(\sum_{i}\| x_{i} - \hat{x}_{i}\|^2\) among all p-dimensional linear approximations &mdash; the Eckart&ndash;Young theorem <a class="cite" href="#ref-eckart1936">[9]</a>.</td></tr></tbody></table><p>In practice PCA is computed by the singular value decomposition X = \(U\Sigma V^{T}\) rather than by forming \(X^{T}X\), whose condition number is the square of X's. The columns of V are the components and \(\lambda_{i} = s_{i}^2/n\).</p><div class="viz"><div class="viz-title">Interactive figure</div><p class="viz-intro">PCA seen as a rotation: which direction spreads the cloud out the most?</p><div id="jxg12" class="viz-board" style="height:480px;"></div><p class="viz-caption"><strong>Figure.</strong> Drag the green direction handle around the unit circle. The grey segments are the projections of each point onto that direction; the readout is the variance they carry. The dashed red line is the true first principal component &mdash; the orientation at which the projected variance is maximal, and equivalently at which the sum of squared <em>perpendicular</em> distances (Pearson's original formulation) is minimal.</p></div><div class="box warn"><div class="box-title">Scaling is not optional</div>\(\Sigma\) is not invariant under rescaling of the features. A variable measured in metres and one measured in millimetres contribute variances differing by a factor of \(10^6\), and PCA will simply return the second one. Standardise every feature to zero mean and unit variance first, unless the features are already in comparable units <a class="cite" href="#ref-jolliffe2002">[10]</a>. Centring, by contrast, is mandatory: uncentred "PCA" returns the mean vector as its first component.</div><h2>4.4 When linear is not enough: from manifolds to graphs</h2><p>PCA can only rotate. If the data lie on a curved low-dimensional manifold &mdash; the "Swiss roll" is the canonical example &mdash; no linear projection unrolls it, and PCA will report a spuriously high dimension. The methods that solve this all share one move, and it is the move that Part II of this course is built on:</p><div class="box def"><div class="box-title">The key idea — replace global geometry by a local neighbourhood graph</div>Build a graph whose vertices are the data points and whose edges join each point to its k nearest neighbours (or to all points within radius \(\epsilon\)). Distances along this graph approximate distances along the manifold, and <em>only local Euclidean distances are trusted</em> &mdash; which is exactly the regime in which they are reliable.</div><table><thead><tr><th>Method</th><th>What it preserves</th><th>Machinery</th></tr></thead><tbody><tr><td>Isomap <a class="cite" href="#ref-tenenbaum2000">[11]</a></td><td>geodesic distances on the neighbourhood graph</td><td>shortest paths (Dijkstra), then classical MDS</td></tr><tr><td>LLE <a class="cite" href="#ref-roweis2000">[12]</a></td><td>local linear reconstruction weights</td><td>sparse eigenproblem</td></tr><tr><td>Laplacian eigenmaps</td><td>local proximity &mdash; neighbours stay near</td><td>eigenvectors of the graph Laplacian (<strong>Section 6</strong>)</td></tr><tr><td>t-SNE <a class="cite" href="#ref-maaten2008">[13]</a></td><td>neighbourhood <em>probabilities</em>, via a heavy-tailed target</td><td>gradient descent on a KL divergence</td></tr><tr><td>UMAP <a class="cite" href="#ref-mcinnes2018">[14]</a></td><td>fuzzy simplicial-set topology of the k-NN graph</td><td>stochastic gradient descent on a cross-entropy</td></tr></tbody></table><div class="box warn"><div class="box-title">Reading t-SNE and UMAP plots responsibly</div>Both are visualisation tools, not distance-preserving embeddings. Cluster <em>sizes</em> in a t-SNE plot are meaningless (the algorithm equalises density), inter-cluster <em>distances</em> are largely meaningless, and apparent clusters can appear in pure noise at low perplexity. Never feed t-SNE output into a downstream model; use it to look, then verify what you saw by another means <a class="cite" href="#ref-maaten2008">[13]</a>.</div><p>Notice what just happened. Isomap, LLE, Laplacian eigenmaps, t-SNE and UMAP all begin by throwing away the ambient coordinates and keeping only a <strong>graph</strong>. Once that step is taken, the natural next question is what one can do with data that <em>arrives</em> as a graph, with no coordinates to discard. That is Part II.</p><h2>Summary</h2><ul><li>k-means minimises within-cluster inertia; the problem is NP-hard <a class="cite" href="#ref-aloise2009">[3]</a> and Lloyd's algorithm <a class="cite" href="#ref-lloyd1982">[1]</a> finds only a local optimum.</li><li>k-means++ seeding gives an O(log k) approximation guarantee before any iteration <a class="cite" href="#ref-arthur2007">[4]</a>.</li><li>Inertia cannot select k; use the silhouette <a class="cite" href="#ref-rousseeuw1987">[5]</a> and domain knowledge.</li><li>k-means assumes spherical, balanced clusters &mdash; the failure that spectral methods fix.</li><li>PCA = eigenvectors of the covariance matrix = best low-rank approximation <a class="cite" href="#ref-eckart1936">[9]</a>; always centre, usually standardise.</li><li>Every non-linear embedding method starts by building a neighbourhood <em>graph</em> &mdash; the bridge into Part II.</li></ul><h2>References</h2><ol class="reflist"><li id="ref-lloyd1982">Lloyd, S. P. (1982). Least squares quantization in PCM. <em>IEEE Transactions on Information Theory</em>, 28(2), 129&ndash;137. (Bell Labs technical memorandum, 1957.) DOI: 10.1109/TIT.1982.1056489 <a href="https://doi.org/10.1109/TIT.1982.1056489">https://doi.org/10.1109/TIT.1982.1056489</a></li><li id="ref-macqueen1967">MacQueen, J. (1967). Some methods for classification and analysis of multivariate observations. <em>Proc. 5th Berkeley Symposium on Mathematical Statistics and Probability</em>, 1, 281&ndash;297. (Coins the name "k-means".) <a href="https://projecteuclid.org/euclid.bsmsp/1200512992">https://projecteuclid.org/euclid.bsmsp/1200512992</a></li><li id="ref-aloise2009">Aloise, D., Deshpande, A., Hansen, P. &amp; Popat, P. (2009). NP-hardness of Euclidean sum-of-squares clustering. <em>Machine Learning</em>, 75(2), 245&ndash;248. DOI: 10.1007/s10994-009-5103-0 <a href="https://doi.org/10.1007/s10994-009-5103-0">https://doi.org/10.1007/s10994-009-5103-0</a></li><li id="ref-arthur2007">Arthur, D. &amp; Vassilvitskii, S. (2007). k-means++: the advantages of careful seeding. <em>SODA '07</em>, 1027&ndash;1035. DOI: 10.5555/1283383.1283494 <a href="https://dl.acm.org/doi/10.5555/1283383.1283494">https://dl.acm.org/doi/10.5555/1283383.1283494</a></li><li id="ref-rousseeuw1987">Rousseeuw, P. J. (1987). Silhouettes: a graphical aid to the interpretation and validation of cluster analysis. <em>Journal of Computational and Applied Mathematics</em>, 20, 53&ndash;65. DOI: 10.1016/0377-0427(87)90125-7 <a href="https://doi.org/10.1016/0377-0427(87)90125-7">https://doi.org/10.1016/0377-0427(87)90125-7</a></li><li id="ref-ester1996">Ester, M., Kriegel, H.-P., Sander, J. &amp; Xu, X. (1996). A density-based algorithm for discovering clusters in large spatial databases with noise (DBSCAN). <em>KDD '96</em>, 226&ndash;231. <a href="https://cdn.aaai.org/KDD/1996/KDD96-037.pdf">https://cdn.aaai.org/KDD/1996/KDD96-037.pdf</a></li><li id="ref-pearson1901">Pearson, K. (1901). On lines and planes of closest fit to systems of points in space. <em>Philosophical Magazine</em>, 2(11), 559&ndash;572. DOI: 10.1080/14786440109462720 <a href="https://doi.org/10.1080/14786440109462720">https://doi.org/10.1080/14786440109462720</a></li><li id="ref-hotelling1933">Hotelling, H. (1933). Analysis of a complex of statistical variables into principal components. <em>Journal of Educational Psychology</em>, 24(6), 417&ndash;441. DOI: 10.1037/h0071325 <a href="https://doi.org/10.1037/h0071325">https://doi.org/10.1037/h0071325</a></li><li id="ref-eckart1936">Eckart, C. &amp; Young, G. (1936). The approximation of one matrix by another of lower rank. <em>Psychometrika</em>, 1(3), 211&ndash;218. DOI: 10.1007/BF02288367 <a href="https://doi.org/10.1007/BF02288367">https://doi.org/10.1007/BF02288367</a></li><li id="ref-jolliffe2002">Jolliffe, I. T. (2002). <em>Principal Component Analysis</em> (2nd ed.). Springer. DOI: 10.1007/b98835 <a href="https://doi.org/10.1007/b98835">https://doi.org/10.1007/b98835</a></li><li id="ref-tenenbaum2000">Tenenbaum, J. B., de Silva, V. &amp; Langford, J. C. (2000). A global geometric framework for nonlinear dimensionality reduction (Isomap). <em>Science</em>, 290(5500), 2319&ndash;2323. DOI: 10.1126/science.290.5500.2319 <a href="https://doi.org/10.1126/science.290.5500.2319">https://doi.org/10.1126/science.290.5500.2319</a></li><li id="ref-roweis2000">Roweis, S. T. &amp; Saul, L. K. (2000). Nonlinear dimensionality reduction by locally linear embedding. <em>Science</em>, 290(5500), 2323&ndash;2326. DOI: 10.1126/science.290.5500.2323 <a href="https://doi.org/10.1126/science.290.5500.2323">https://doi.org/10.1126/science.290.5500.2323</a></li><li id="ref-maaten2008">van der Maaten, L. &amp; Hinton, G. (2008). Visualizing data using t-SNE. <em>Journal of Machine Learning Research</em>, 9, 2579&ndash;2605. <a href="https://www.jmlr.org/papers/v9/vandermaaten08a.html">https://www.jmlr.org/papers/v9/vandermaaten08a.html</a></li><li id="ref-mcinnes2018">McInnes, L., Healy, J. &amp; Melville, J. (2018). UMAP: Uniform Manifold Approximation and Projection for dimension reduction. arXiv:1802.03426 <a href="https://arxiv.org/abs/1802.03426">https://arxiv.org/abs/1802.03426</a></li></ol><nav class="lesson-nav"><div class="container"><a href="../index.html">Course index</a><a href="../03-trees-ensembles/page.html">\(\leftarrow\) Section 3</a><a href="../05-graph-foundations/page.html">Section 5 — Graph Foundations \(\to\)</a></div></nav>
+</main>
+<footer class="site-footer"><strong>Machine Learning A&ndash;Z</strong> &middot; From empirical risk minimisation to graph neural networks<span class="footer-meta">Edition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">The interactive figure could not be loaded. Check your network connection.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+// Colours resolved from the stylesheet, so the figures follow the light/dark
+// theme. Each entry is a function: board attributes that are functions are
+// re-evaluated on update, so a theme switch only needs a redraw.
+var BOARDS = [];
+function cssv(name, fallback){
+    try {
+        var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback;
+    } catch (e) { return fallback; }
+}
+var PAL = {
+    text:  function(){ return cssv('--color-text',  '#1f2937'); },
+    muted: function(){ return cssv('--color-muted', '#6b7280'); },
+    axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+    ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+    grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+    cell:  function(){ return cssv('--cell-bg',     '#ffffff'); }
+};
+// Re-render every board when the theme attribute flips.
+if (window.MutationObserver) {
+    new MutationObserver(function(){
+        for (var i = 0; i < BOARDS.length; i++) {
+            try { BOARDS[i].fullUpdate(); } catch (e) {}
+        }
+    }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+
+
+// shared two-moons-ish / three-blob dataset used by figures 4.1 and 4.2
+var PTS = [];
+(function(){
+    var s = 987654;
+    function rnd(){ s = (1103515245*s + 12345) % 2147483648; return s/2147483648; }
+    var centres = [[2.2, 6.6], [7.4, 6.9], [4.6, 2.2]];
+    centres.forEach(function(c){
+        for (var i=0;i<14;i++){
+            PTS.push([c[0] + 1.25*(rnd()-0.5)*2, c[1] + 1.15*(rnd()-0.5)*2]);
+        }
+    });
+})();
+var PALETTE = ['#dc2626', '#1d4ed8', '#16a34a', '#9333ea', '#ea580c', '#0891b2'];
+
+function assign(cs){
+    return PTS.map(function(p){
+        var best = 0, bd = Infinity;
+        cs.forEach(function(c, j){
+            var d = Math.pow(p[0]-c[0],2) + Math.pow(p[1]-c[1],2);
+            if (d < bd){ bd = d; best = j; }
+        });
+        return best;
+    });
+}
+function update(lab, k){
+    var out = [], cnt = [];
+    for (var j=0;j<k;j++){ out.push([0,0]); cnt.push(0); }
+    PTS.forEach(function(p, i){ out[lab[i]][0] += p[0]; out[lab[i]][1] += p[1]; cnt[lab[i]]++; });
+    for (j=0;j<k;j++){ if (cnt[j] > 0){ out[j][0] /= cnt[j]; out[j][1] /= cnt[j]; } }
+    return out;
+}
+function inertia(cs, lab){
+    var s = 0;
+    PTS.forEach(function(p, i){
+        s += Math.pow(p[0]-cs[lab[i]][0],2) + Math.pow(p[1]-cs[lab[i]][1],2);
+    });
+    return s;
+}
+function lloyd(init, steps){
+    var cs = init.map(function(c){ return c.slice(); });
+    var lab = assign(cs);
+    for (var t=0;t<steps;t++){ cs = update(lab, cs.length); lab = assign(cs); }
+    return {cs:cs, lab:lab};
+}
+
+// ---------------------------------------------------------------- Figure 4.1
+var b10 = JXG.JSXGraph.initBoard('jxg10', {
+    boundingbox: [-0.6, 10.0, 10.6, -1.0], axis: true, showCopyright: false,
+    showNavigation: false, keepaspectratio: true
+});
+var INIT = [[1.2, 3.0], [2.0, 3.6], [3.0, 8.4]];   // deliberately bad seeding
+var itS = b10.create('slider', [[0.0, 9.5], [4.2, 9.5], [0, 0, 8]],
+                     {name:'iteration', snapWidth:1, strokeColor:'#026573',
+                      fillColor:'#026573', label:{fontSize:15}});
+var runCache = {};
+function run(t){
+    if (!runCache[t]) runCache[t] = lloyd(INIT, t);
+    return runCache[t];
+}
+PTS.forEach(function(p, i){
+    b10.create('point', p, {size:4, name:'', fixed:true, strokeWidth:1,
+        fillColor: function(){ return PALETTE[run(Math.round(itS.Value())).lab[i]]; },
+        strokeColor:PAL.muted});
+});
+for (var j=0;j<3;j++){
+    (function(jj){
+        b10.create('point', [function(){ return run(Math.round(itS.Value())).cs[jj][0]; },
+                             function(){ return run(Math.round(itS.Value())).cs[jj][1]; }],
+                   {size:8, name:'', face:'[]', fixed:true, strokeWidth:3,
+                    fillColor:'#ffffff', strokeColor:PALETTE[jj]});
+        b10.create('point', [function(){ return run(Math.round(itS.Value())).cs[jj][0]; },
+                             function(){ return run(Math.round(itS.Value())).cs[jj][1]; }],
+                   {size:4, name:'', face:'x', fixed:true, strokeWidth:3,
+                    strokeColor:PALETTE[jj]});
+    })(j);
+}
+b10.create('text', [5.2, 9.5, function(){
+    var t = Math.round(itS.Value()), r = run(t);
+    return 'J = ' + inertia(r.cs, r.lab).toFixed(2);
+}], {fontSize:16, strokeColor:PAL.text, cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b10.create('text', [5.2, 8.9, function(){
+    var t = Math.round(itS.Value());
+    if (t === 0) return 'initial (poor) seeding &mdash; two centres in one blob';
+    var a = inertia(run(t-1).cs, run(t-1).lab), b = inertia(run(t).cs, run(t).lab);
+    return (Math.abs(a-b) < 1e-9) ? 'converged &mdash; assignment no longer changes'
+                                  : 'J decreased by ' + (a-b).toFixed(3);
+}], {fontSize:14, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+
+// ---------------------------------------------------------------- Figure 4.2
+var b11 = JXG.JSXGraph.initBoard('jxg11', {
+    boundingbox: [0.3, 1.22, 8.7, -0.28], axis: true, showCopyright: false,
+    showNavigation: false, keepaspectratio: false
+});
+function kmeansK(k){
+    var init = [];                              // deterministic D^2-flavoured seeding
+    init.push(PTS[0].slice());
+    while (init.length < k){
+        var bestP = null, bestD = -1;
+        PTS.forEach(function(p){
+            var d = Infinity;
+            init.forEach(function(c){ d = Math.min(d, Math.pow(p[0]-c[0],2)+Math.pow(p[1]-c[1],2)); });
+            if (d > bestD){ bestD = d; bestP = p; }
+        });
+        init.push(bestP.slice());
+    }
+    return lloyd(init, 25);
+}
+function silhouette(lab, k){
+    var s = 0;
+    PTS.forEach(function(p, i){
+        var sums = new Array(k).fill(0), cnts = new Array(k).fill(0);
+        PTS.forEach(function(q, m){
+            if (m === i) return;
+            sums[lab[m]] += Math.hypot(p[0]-q[0], p[1]-q[1]);
+            cnts[lab[m]]++;
+        });
+        var a = cnts[lab[i]] ? sums[lab[i]]/cnts[lab[i]] : 0, b = Infinity;
+        for (var j=0;j<k;j++){ if (j !== lab[i] && cnts[j] > 0) b = Math.min(b, sums[j]/cnts[j]); }
+        if (b === Infinity || Math.max(a,b) === 0) return;
+        s += (b - a)/Math.max(a, b);
+    });
+    return s/PTS.length;
+}
+var kCache = {};
+function kstat(k){
+    if (!kCache[k]){
+        var r = kmeansK(k);
+        var J = inertia(r.cs, r.lab);
+        kCache[k] = {J:J, sil: (k > 1 ? silhouette(r.lab, k) : 0)};
+    }
+    return kCache[k];
+}
+var J1 = kstat(1).J;
+for (var k=1;k<=8;k++){
+    (function(kk){
+        b11.create('point', [kk, kstat(kk).J/J1], {size:4.5, name:'', fixed:true,
+            fillColor:'#1d4ed8', strokeColor:'#1e3a8a'});
+        if (kk > 1) b11.create('segment', [[kk-1, kstat(kk-1).J/J1], [kk, kstat(kk).J/J1]],
+            {strokeColor:'#1d4ed8', strokeWidth:3, highlight:false});
+        b11.create('point', [kk, kstat(kk).sil], {size:4.5, name:'', fixed:true,
+            fillColor:'#ea580c', strokeColor:'#9a3412'});
+        if (kk > 1) b11.create('segment', [[kk-1, kstat(kk-1).sil], [kk, kstat(kk).sil]],
+            {strokeColor:'#ea580c', strokeWidth:3, highlight:false});
+    })(k);
+}
+b11.create('line', [[3, -0.28],[3, 1.22]], {strokeColor:'#16a34a', dash:3, strokeWidth:2,
+          highlight:false});
+b11.create('text', [3.12, 1.14, 'true k = 3'], {fontSize:14, color:'#16a34a',
+          cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b11.create('text', [5.0, 1.14, 'inertia J(k) / J(1)'], {fontSize:14, color:'#1d4ed8',
+          cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b11.create('text', [5.0, 1.04, 'mean silhouette'], {fontSize:14, color:'#ea580c',
+          cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b11.create('text', [3.6, -0.22, 'number of clusters k'], {fontSize:13, strokeColor:PAL.muted,
+          cssStyle:'font-family:Georgia,serif;'});
+
+// ---------------------------------------------------------------- Figure 4.3
+var b12 = JXG.JSXGraph.initBoard('jxg12', {
+    boundingbox: [-5.2, 4.6, 5.2, -4.6], axis: true, showCopyright: false,
+    showNavigation: false, keepaspectratio: true
+});
+var CLOUD = [];
+(function(){
+    var s = 24680;
+    function rnd(){ s = (1103515245*s + 12345) % 2147483648; return s/2147483648; }
+    for (var i=0;i<45;i++){
+        var u = 2.7*(rnd()-0.5)*2, v = 0.75*(rnd()-0.5)*2;
+        var th = 0.55;                                  // true principal direction angle
+        CLOUD.push([u*Math.cos(th) - v*Math.sin(th), u*Math.sin(th) + v*Math.cos(th)]);
+    }
+})();
+// data are already centred by construction (symmetric draws); centre exactly anyway
+(function(){
+    var mx = 0, my = 0;
+    CLOUD.forEach(function(p){ mx += p[0]; my += p[1]; });
+    mx /= CLOUD.length; my /= CLOUD.length;
+    CLOUD = CLOUD.map(function(p){ return [p[0]-mx, p[1]-my]; });
+})();
+CLOUD.forEach(function(p){
+    b12.create('point', p, {size:3.2, name:'', fixed:true, fillColor:'#dc2626',
+                            strokeColor:'#7f1d1d'});
+});
+var O  = b12.create('point', [0, 0], {size:3, name:'', fixed:true, fillColor:PAL.text,
+                                      strokeColor:PAL.text});
+var Hc = b12.create('circle', [O, 3.6], {strokeColor:PAL.grid, strokeWidth:1.5,
+                                         fillOpacity:0, highlight:false});
+var H  = b12.create('glider', [3.1, 1.8, Hc], {size:7, name:'w', fillColor:'#16a34a',
+                                               strokeColor:'#14532d', strokeWidth:2,
+                                               label:{fontSize:16}});
+function dirn(){ var n = Math.hypot(H.X(), H.Y()) || 1; return [H.X()/n, H.Y()/n]; }
+b12.create('line', [O, H], {strokeColor:'#16a34a', strokeWidth:3});
+CLOUD.forEach(function(p){
+    var Pp = b12.create('point', p, {visible:false});
+    var Pr = b12.create('point', [function(){ var w = dirn(); var t = p[0]*w[0] + p[1]*w[1];
+                                              return t*w[0]; },
+                                  function(){ var w = dirn(); var t = p[0]*w[0] + p[1]*w[1];
+                                              return t*w[1]; }],
+                        {size:2, name:'', fillColor:'#16a34a', strokeColor:'#14532d',
+                         fixed:true, highlight:false});
+    b12.create('segment', [Pp, Pr], {strokeColor:PAL.axis, strokeWidth:1, dash:1,
+                                     highlight:false});
+});
+// true PC1 from the closed-form 2x2 eigenvector
+function pc1(){
+    var sxx=0, sxy=0, syy=0;
+    CLOUD.forEach(function(p){ sxx += p[0]*p[0]; sxy += p[0]*p[1]; syy += p[1]*p[1]; });
+    var n = CLOUD.length; sxx/=n; sxy/=n; syy/=n;
+    var th = 0.5*Math.atan2(2*sxy, sxx - syy);
+    return {th:th, l1: (sxx+syy)/2 + Math.hypot((sxx-syy)/2, sxy),
+                   l2: (sxx+syy)/2 - Math.hypot((sxx-syy)/2, sxy)};
+}
+var PC = pc1();
+b12.create('line', [[-5*Math.cos(PC.th), -5*Math.sin(PC.th)],
+                    [ 5*Math.cos(PC.th),  5*Math.sin(PC.th)]],
+           {strokeColor:'#dc2626', strokeWidth:2, dash:3, highlight:false});
+b12.create('text', [-5.05, 4.3, function(){
+    var w = dirn(), v = 0;
+    CLOUD.forEach(function(p){ v += Math.pow(p[0]*w[0] + p[1]*w[1], 2); });
+    v /= CLOUD.length;
+    return 'projected variance = ' + v.toFixed(4) + '   (max = ' + PC.l1.toFixed(4) + ')';
+}], {fontSize:15, strokeColor:PAL.text, cssStyle:'font-family:Georgia,serif;font-weight:bold;'});
+b12.create('text', [-5.05, 3.8, function(){
+    var w = dirn(), v = 0;
+    CLOUD.forEach(function(p){ v += Math.pow(p[0]*w[0] + p[1]*w[1], 2); });
+    v /= CLOUD.length;
+    return 'fraction of total variance captured = ' + (100*v/(PC.l1+PC.l2)).toFixed(1) + ' %';
+}], {fontSize:14, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+b12.create('text', [-5.05, -4.2, 'dashed red = true PC&#8321;;  grey = perpendicular offsets'],
+          {fontSize:13, strokeColor:PAL.muted, cssStyle:'font-family:Georgia,serif;'});
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quantum Computing — Theory and Practice</title>
+<meta name="description" content="A graduate course in quantum computing: 10 chapters, 40 programming exercises, 30 symbolic problems and 57 figures, from Hilbert spaces to fault tolerance.">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<script src="assets/theme.js"></script>
+<script>window.MathJax = {tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]}, svg:{fontCache:"global"}};</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="index.html">Quantum Computing</a> · Manual</div><span class="course-code">Table of contents</span></div></header>
+<section class="hero"><div class="container">
+  <h1>Quantum Computing</h1>
+  <p class="subtitle">Foundations · Entanglement · Algorithms · Error correction · Near-term methods</p>
+  <div class="instructors"><div class="instructor">
+    <strong>Graduate course</strong>
+    <span>Assumes linear algebra over ℂ, elementary probability and working Python</span>
+  </div></div>
+  <a class="cta" href="#contents">See the full table of contents</a>
+</div></section>
+<section class="section"><div class="container">
+  <div class="quick-access">
+    <a class="qa-card" href="#contents"><span class="qa-label">Contents</span>
+      <span class="qa-title">10 chapters</span>
+      <span class="qa-sub">Grouped into four parts, each building on the last</span></a>
+    <a class="qa-card" href="#exercise-sheets"><span class="qa-label">Practice</span>
+      <span class="qa-title">70 exercises</span>
+      <span class="qa-sub">40 programming · 30 symbolic · all with worked solutions</span></a>
+    <a class="qa-card" href="#contents"><span class="qa-label">Illustrations</span>
+      <span class="qa-title">57 figures</span>
+      <span class="qa-sub">8 of them interactive · 79 cited references</span></a>
+  </div>
+</div></section>
+<section class="section"><div class="container"><h2 class="section-title">Quick access</h2><p class="section-subtitle">Three recommended entry points</p><div class="quick-access">
+<a class="qa-card" href="chapter01-mathematical-foundations/course.html"><span class="qa-label">Start here</span><span class="qa-title">Mathematical foundations</span><span class="qa-sub">Hilbert spaces · spectral theorem · tensor products</span></a>
+<a class="qa-card" href="chapter07-shor-and-hidden-subgroup/course.html"><span class="qa-label">Flagship algorithm</span><span class="qa-title">Shor and factoring</span><span class="qa-sub">Order finding · continued fractions · consequences for cryptography</span></a>
+<a class="qa-card" href="chapter09-error-correction-fault-tolerance/course.html"><span class="qa-label">Hardware reality</span><span class="qa-title">Quantum error correction</span><span class="qa-sub">Stabilizer codes · surface code · the threshold theorem</span></a>
+</div></div></section><div id="contents"></div>
+<section class="section"><div class="container"><h2 class="section-title">Part I — Foundations</h2><p class="section-subtitle">The algebraic and physical language the rest of the course assumes</p><div class="sequences">
+<div class="seq-card">
+  <div class="seq-meta">Chapter 1</div>
+  <h3>Mathematical Foundations of Quantum Computation</h3>
+  <p class="seq-topics">6 sections · 7 figures ·
+     4 programming exercises · 3 symbolic problems ·
+     6 references</p>
+  <div class="seq-actions">
+    <a class="btn primary" href="chapter01-mathematical-foundations/course.html">Open the chapter</a>
+    <a class="btn" href="chapter01-mathematical-foundations/exercises.html">Exercises</a>
+  </div>
+</div>
+<div class="seq-card">
+  <div class="seq-meta">Chapter 2</div>
+  <h3>Qubits, the Bloch Sphere and Quantum Measurement</h3>
+  <p class="seq-topics">6 sections · 7 figures ·
+     4 programming exercises · 3 symbolic problems ·
+     7 references</p>
+  <div class="seq-actions">
+    <a class="btn primary" href="chapter02-qubits-and-measurement/course.html">Open the chapter</a>
+    <a class="btn" href="chapter02-qubits-and-measurement/exercises.html">Exercises</a>
+  </div>
+</div>
+<div class="seq-card">
+  <div class="seq-meta">Chapter 3</div>
+  <h3>Quantum Gates, Circuits and Universality</h3>
+  <p class="seq-topics">6 sections · 6 figures ·
+     4 programming exercises · 3 symbolic problems ·
+     7 references</p>
+  <div class="seq-actions">
+    <a class="btn primary" href="chapter03-gates-circuits-universality/course.html">Open the chapter</a>
+    <a class="btn" href="chapter03-gates-circuits-universality/exercises.html">Exercises</a>
+  </div>
+</div>
+</div></div></section>
+<section class="section"><div class="container"><h2 class="section-title">Part II — Entanglement and open systems</h2><p class="section-subtitle">Correlations no classical model reproduces, and what noise does to them</p><div class="sequences">
+<div class="seq-card">
+  <div class="seq-meta">Chapter 4</div>
+  <h3>Entanglement, Non-locality and Communication Protocols</h3>
+  <p class="seq-topics">6 sections · 7 figures ·
+     4 programming exercises · 3 symbolic problems ·
+     8 references</p>
+  <div class="seq-actions">
+    <a class="btn primary" href="chapter04-entanglement-and-nonlocality/course.html">Open the chapter</a>
+    <a class="btn" href="chapter04-entanglement-and-nonlocality/exercises.html">Exercises</a>
+  </div>
+</div>
+<div class="seq-card">
+  <div class="seq-meta">Chapter 5</div>
+  <h3>Density Operators, Open Systems and Quantum Channels</h3>
+  <p class="seq-topics">6 sections · 5 figures ·
+     4 programming exercises · 3 symbolic problems ·
+     7 references</p>
+  <div class="seq-actions">
+    <a class="btn primary" href="chapter05-density-matrices-and-channels/course.html">Open the chapter</a>
+    <a class="btn" href="chapter05-density-matrices-and-channels/exercises.html">Exercises</a>
+  </div>
+</div>
+</div></div></section>
+<section class="section"><div class="container"><h2 class="section-title">Part III — Quantum algorithms</h2><p class="section-subtitle">Where the speed-ups come from, and how far they actually reach</p><div class="sequences">
+<div class="seq-card">
+  <div class="seq-meta">Chapter 6</div>
+  <h3>The Quantum Fourier Transform and Phase Estimation</h3>
+  <p class="seq-topics">6 sections · 6 figures ·
+     4 programming exercises · 3 symbolic problems ·
+     7 references</p>
+  <div class="seq-actions">
+    <a class="btn primary" href="chapter06-qft-and-phase-estimation/course.html">Open the chapter</a>
+    <a class="btn" href="chapter06-qft-and-phase-estimation/exercises.html">Exercises</a>
+  </div>
+</div>
+<div class="seq-card">
+  <div class="seq-meta">Chapter 7</div>
+  <h3>Shor&#x27;s Algorithm, Order Finding and the Hidden Subgroup Problem</h3>
+  <p class="seq-topics">5 sections · 5 figures ·
+     4 programming exercises · 3 symbolic problems ·
+     8 references</p>
+  <div class="seq-actions">
+    <a class="btn primary" href="chapter07-shor-and-hidden-subgroup/course.html">Open the chapter</a>
+    <a class="btn" href="chapter07-shor-and-hidden-subgroup/exercises.html">Exercises</a>
+  </div>
+</div>
+<div class="seq-card">
+  <div class="seq-meta">Chapter 8</div>
+  <h3>Grover Search, Amplitude Amplification and Query Lower Bounds</h3>
+  <p class="seq-topics">6 sections · 5 figures ·
+     4 programming exercises · 3 symbolic problems ·
+     8 references</p>
+  <div class="seq-actions">
+    <a class="btn primary" href="chapter08-grover-and-amplitude-amplification/course.html">Open the chapter</a>
+    <a class="btn" href="chapter08-grover-and-amplitude-amplification/exercises.html">Exercises</a>
+  </div>
+</div>
+</div></div></section>
+<section class="section"><div class="container"><h2 class="section-title">Part IV — Fault tolerance and the near term</h2><p class="section-subtitle">Making the machine reliable, and what can be attempted before it is</p><div class="sequences">
+<div class="seq-card">
+  <div class="seq-meta">Chapter 9</div>
+  <h3>Quantum Error Correction and Fault Tolerance</h3>
+  <p class="seq-topics">5 sections · 4 figures ·
+     4 programming exercises · 3 symbolic problems ·
+     10 references</p>
+  <div class="seq-actions">
+    <a class="btn primary" href="chapter09-error-correction-fault-tolerance/course.html">Open the chapter</a>
+    <a class="btn" href="chapter09-error-correction-fault-tolerance/exercises.html">Exercises</a>
+  </div>
+</div>
+<div class="seq-card">
+  <div class="seq-meta">Chapter 10</div>
+  <h3>Quantum Complexity, NISQ Algorithms and Qiskit in Practice</h3>
+  <p class="seq-topics">6 sections · 5 figures ·
+     4 programming exercises · 3 symbolic problems ·
+     11 references</p>
+  <div class="seq-actions">
+    <a class="btn primary" href="chapter10-complexity-nisq-and-qiskit/course.html">Open the chapter</a>
+    <a class="btn" href="chapter10-complexity-nisq-and-qiskit/exercises.html">Exercises</a>
+  </div>
+</div>
+</div></div></section>
+<section class="section" id="exercise-sheets"><div class="container"><h2 class="section-title">Exercise sheets</h2><p class="section-subtitle">40 programming exercises graded against hidden test cases and 30 problems with symbolic answers, each accompanied by a worked solution</p><div class="quick-access">
+<a class="qa-card" href="chapter01-mathematical-foundations/exercises.html"><span class="qa-label">Chapter 1</span><span class="qa-title">Mathematical Foundations of Quantum Computation</span><span class="qa-sub">4 programming · 3 symbolic</span></a>
+<a class="qa-card" href="chapter02-qubits-and-measurement/exercises.html"><span class="qa-label">Chapter 2</span><span class="qa-title">Qubits, the Bloch Sphere and Quantum Measurement</span><span class="qa-sub">4 programming · 3 symbolic</span></a>
+<a class="qa-card" href="chapter03-gates-circuits-universality/exercises.html"><span class="qa-label">Chapter 3</span><span class="qa-title">Quantum Gates, Circuits and Universality</span><span class="qa-sub">4 programming · 3 symbolic</span></a>
+<a class="qa-card" href="chapter04-entanglement-and-nonlocality/exercises.html"><span class="qa-label">Chapter 4</span><span class="qa-title">Entanglement, Non-locality and Communication Protocols</span><span class="qa-sub">4 programming · 3 symbolic</span></a>
+<a class="qa-card" href="chapter05-density-matrices-and-channels/exercises.html"><span class="qa-label">Chapter 5</span><span class="qa-title">Density Operators, Open Systems and Quantum Channels</span><span class="qa-sub">4 programming · 3 symbolic</span></a>
+<a class="qa-card" href="chapter06-qft-and-phase-estimation/exercises.html"><span class="qa-label">Chapter 6</span><span class="qa-title">The Quantum Fourier Transform and Phase Estimation</span><span class="qa-sub">4 programming · 3 symbolic</span></a>
+<a class="qa-card" href="chapter07-shor-and-hidden-subgroup/exercises.html"><span class="qa-label">Chapter 7</span><span class="qa-title">Shor&#x27;s Algorithm, Order Finding and the Hidden Subgroup Problem</span><span class="qa-sub">4 programming · 3 symbolic</span></a>
+<a class="qa-card" href="chapter08-grover-and-amplitude-amplification/exercises.html"><span class="qa-label">Chapter 8</span><span class="qa-title">Grover Search, Amplitude Amplification and Query Lower Bounds</span><span class="qa-sub">4 programming · 3 symbolic</span></a>
+<a class="qa-card" href="chapter09-error-correction-fault-tolerance/exercises.html"><span class="qa-label">Chapter 9</span><span class="qa-title">Quantum Error Correction and Fault Tolerance</span><span class="qa-sub">4 programming · 3 symbolic</span></a>
+<a class="qa-card" href="chapter10-complexity-nisq-and-qiskit/exercises.html"><span class="qa-label">Chapter 10</span><span class="qa-title">Quantum Complexity, NISQ Algorithms and Qiskit in Practice</span><span class="qa-sub">4 programming · 3 symbolic</span></a>
+</div></div></section>
+<footer class="site-footer"><div class="container"><strong>Quantum Computing — Theory and Practice</strong> · ten chapters · forty programming exercises · thirty symbolic problems<span class="footer-meta">Edition 2026</span></div></footer></body></html>

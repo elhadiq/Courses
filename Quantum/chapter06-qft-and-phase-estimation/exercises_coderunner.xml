@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>C6.Q1 — The QFT matrix</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C6.Q1 — Definition and basic properties&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;\((F_N)_{kj}=\omega_N^{jk}/\sqrt N\) with \(\omega_N=e^{2\pi i/N}\). It is unitary, symmetric, and satisfies \(F_N^{4}=I\).&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;qft_matrix(n)&lt;/code&gt; returning the \(2^{n}\times2^{n}\) QFT matrix, and &lt;code&gt;qft_apply(psi)&lt;/code&gt; applying it to a state vector whose length is a power of two.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;qft_matrix(1)  ==  H
+qft_apply(|0&amp;gt;^n)  -&amp;gt;  uniform superposition&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def qft_matrix(n):
+    ...
+
+def qft_apply(psi):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def qft_matrix(n):
+    N = 2 ** n
+    j = np.arange(N).reshape(-1, 1)
+    k = np.arange(N).reshape(1, -1)
+    return np.exp(2j * np.pi * j * k / N) / np.sqrt(N)
+
+def qft_apply(psi):
+    psi = np.asarray(psi, dtype=complex).ravel()
+    n = int(round(np.log2(len(psi))))
+    return qft_matrix(n) @ psi
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+H = np.array([[1,1],[1,-1]], dtype=complex)/np.sqrt(2)
+print(np.allclose(qft_matrix(1), H))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+v = np.zeros(8, dtype=complex); v[0]=1
+print(np.allclose(qft_apply(v), np.full(8, 1/np.sqrt(8))))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+F = qft_matrix(3)
+print(np.allclose(F.conj().T @ F, np.eye(8)), np.allclose(F, F.T))
+</text></testcode><stdin><text /></stdin><expected><text>True True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+F = qft_matrix(2)
+print(np.allclose(np.linalg.matrix_power(F, 4), np.eye(4)))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+rng = np.random.default_rng(1)
+v = rng.normal(size=16)+1j*rng.normal(size=16)
+ref = np.fft.ifft(v) * np.sqrt(16)
+print(np.allclose(qft_apply(v), ref))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C6.Q2 — The QFT circuit: Hadamards, controlled phases, SWAPs</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C6.Q2 — Building the O(n^2) circuit&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;The product form of §1 becomes a circuit with \(n\) Hadamards, \(\binom{n}{2}\) controlled rotations \(R_m=\mathrm{diag}(1,e^{2\pi i/2^{m}})\), and a final qubit reversal.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;qft_circuit_matrix(n)&lt;/code&gt; that &lt;em&gt;constructs&lt;/em&gt; the QFT as a product of these elementary gates (do not return &lt;code&gt;qft_matrix(n)&lt;/code&gt; directly) and returns the resulting \(2^{n}\times2^{n}\) matrix. Also write &lt;code&gt;gate_count(n)&lt;/code&gt; returning the tuple &lt;code&gt;(hadamards, controlled_rotations)&lt;/code&gt;.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;gate_count(4) -&amp;gt; (4, 6)
+qft_circuit_matrix(3)  ==  qft_matrix(3)&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def qft_circuit_matrix(n):
+    # H on qubit l, then controlled-R_m from qubit l+m-1, then reverse the qubit order
+    ...
+
+def gate_count(n):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+H = np.array([[1, 1], [1, -1]], dtype=complex) / np.sqrt(2)
+
+def _embed1(U, q, n):
+    ops = [np.eye(2, dtype=complex)] * n
+    ops[q] = U
+    out = np.array([[1.0 + 0j]])
+    for o in ops:
+        out = np.kron(out, o)
+    return out
+
+def _cphase(theta, c, t, n):
+    N = 2 ** n
+    diag = np.ones(N, dtype=complex)
+    for x in range(N):
+        bits = [(x &gt;&gt; (n - 1 - k)) &amp; 1 for k in range(n)]
+        if bits[c] == 1 and bits[t] == 1:
+            diag[x] = np.exp(1j * theta)
+    return np.diag(diag)
+
+def _swap(a, b, n):
+    N = 2 ** n
+    P = np.zeros((N, N), dtype=complex)
+    for x in range(N):
+        bits = [(x &gt;&gt; (n - 1 - k)) &amp; 1 for k in range(n)]
+        bits[a], bits[b] = bits[b], bits[a]
+        y = 0
+        for k in range(n):
+            y = (y &lt;&lt; 1) | bits[k]
+        P[y, x] = 1
+    return P
+
+def qft_circuit_matrix(n):
+    N = 2 ** n
+    U = np.eye(N, dtype=complex)
+    for l in range(n):
+        U = _embed1(H, l, n) @ U
+        for m in range(2, n - l + 1):
+            U = _cphase(2 * np.pi / 2 ** m, l + m - 1, l, n) @ U
+    for a in range(n // 2):
+        U = _swap(a, n - 1 - a, n) @ U
+    return U
+
+def gate_count(n):
+    return (n, n * (n - 1) // 2)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(gate_count(4))
+</text></testcode><stdin><text /></stdin><expected><text>(4, 6)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+def qft_matrix(n):
+    N = 2 ** n
+    j = np.arange(N).reshape(-1,1); k = np.arange(N).reshape(1,-1)
+    return np.exp(2j*np.pi*j*k/N)/np.sqrt(N)
+print(np.allclose(qft_circuit_matrix(3), qft_matrix(3)))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+U = qft_circuit_matrix(4)
+print(np.allclose(U.conj().T @ U, np.eye(16)))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+def qft_matrix(n):
+    N = 2 ** n
+    j = np.arange(N).reshape(-1,1); k = np.arange(N).reshape(1,-1)
+    return np.exp(2j*np.pi*j*k/N)/np.sqrt(N)
+print(all(np.allclose(qft_circuit_matrix(n), qft_matrix(n)) for n in (1,2,3,4)))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(gate_count(10))
+</text></testcode><stdin><text /></stdin><expected><text>(10, 45)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C6.Q3 — Phase estimation, simulated</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C6.Q3 — Reading an eigenphase&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;With \(t\) ancillas, controlled powers of \(U\) followed by \(F^{\dagger}\) concentrate the ancilla register on the best \(t\)-bit approximation of \(\varphi\).&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;qpe_state(phi, t)&lt;/code&gt; returning the ancilla state \(\tfrac1{\sqrt{2^{t}}}\sum_y e^{2\pi i\varphi y}|y\rangle\) &lt;em&gt;after&lt;/em&gt; applying the inverse QFT; &lt;code&gt;qpe_probs(phi, t)&lt;/code&gt; returning the measurement distribution (rounded to 10 decimals); and &lt;code&gt;qpe_estimate(phi, t)&lt;/code&gt; returning the most likely \(y/2^{t}\) as a float.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;qpe_estimate(0.25, 3)  -&amp;gt;  0.25   (exact, 3 bits suffice)
+qpe_estimate(0.3, 5)   -&amp;gt;  0.3125 (= 10/32, nearest 5-bit value)&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def qpe_state(phi, t):
+    ...
+
+def qpe_probs(phi, t):
+    ...
+
+def qpe_estimate(phi, t):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def _qft(n):
+    N = 2 ** n
+    j = np.arange(N).reshape(-1, 1)
+    k = np.arange(N).reshape(1, -1)
+    return np.exp(2j * np.pi * j * k / N) / np.sqrt(N)
+
+def qpe_state(phi, t):
+    N = 2 ** t
+    y = np.arange(N)
+    pre = np.exp(2j * np.pi * phi * y) / np.sqrt(N)
+    return _qft(t).conj().T @ pre
+
+def qpe_probs(phi, t):
+    return np.round(np.abs(qpe_state(phi, t)) ** 2, 10)
+
+def qpe_estimate(phi, t):
+    return float(int(np.argmax(qpe_probs(phi, t))) / 2 ** t)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(qpe_estimate(0.25, 3), qpe_estimate(0.5, 3))
+</text></testcode><stdin><text /></stdin><expected><text>0.25 0.5
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(qpe_estimate(0.3, 5))
+</text></testcode><stdin><text /></stdin><expected><text>0.3125
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+print(round(float(qpe_probs(0.25, 3).max()), 6))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+print(round(float(qpe_probs(0.3, 6).max()), 4) &gt;= 0.405)
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+print(round(float(qpe_probs(0.123456, 8).sum()), 6))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C6.Q4 — The Hadamard test and the 4/pi^2 bound</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C6.Q4 — One bit of phase per shot, and how many bits you really need&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;The Hadamard test measures \(\mathrm{Re}\langle u|U|u\rangle\); the accuracy theorem of §4 fixes the number of ancillas needed for \(n\)-bit precision at confidence \(1-\varepsilon\).&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;hadamard_test_p0(phi)&lt;/code&gt; returning \(\cos^{2}(\pi\varphi)\) rounded to 6 decimals; &lt;code&gt;qpe_ancillas(n, eps)&lt;/code&gt; returning \(t=n+\lceil\log_2(2+\tfrac1{2\varepsilon})\rceil\) as an &lt;code&gt;int&lt;/code&gt;; and &lt;code&gt;success_prob(phi, t)&lt;/code&gt; returning the total probability that the measured \(y\) satisfies \(|y/2^{t}-\varphi|\le2^{-t}\) (taking the difference modulo 1), rounded to 6 decimals.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;qpe_ancillas(4, 0.01) -&amp;gt; 4 + ceil(log2(52)) = 4 + 6 = 10&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def hadamard_test_p0(phi):
+    ...
+
+def qpe_ancillas(n, eps):
+    ...
+
+def success_prob(phi, t):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def hadamard_test_p0(phi):
+    return round(float(np.cos(np.pi * phi) ** 2), 6)
+
+def qpe_ancillas(n, eps):
+    return int(n + int(np.ceil(np.log2(2 + 1 / (2 * eps)))))
+
+def _probs(phi, t):
+    N = 2 ** t
+    y = np.arange(N)
+    d = phi - y / N
+    with np.errstate(divide='ignore', invalid='ignore'):
+        amp = np.where(np.abs(np.sin(np.pi * d)) &lt; 1e-14, 1.0,
+                       np.sin(np.pi * N * d) / (N * np.sin(np.pi * d)))
+    return amp ** 2
+
+def success_prob(phi, t):
+    N = 2 ** t
+    y = np.arange(N)
+    d = np.abs((y / N - phi + 0.5) % 1.0 - 0.5)
+    pr = _probs(phi, t)
+    return round(float(pr[d &lt;= 1 / N + 1e-12].sum()), 6)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(hadamard_test_p0(0.0), hadamard_test_p0(0.5))
+</text></testcode><stdin><text /></stdin><expected><text>1.0 0.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(qpe_ancillas(4, 0.01))
+</text></testcode><stdin><text /></stdin><expected><text>10
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(success_prob(0.25, 3))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+print(success_prob(0.3, 5) &gt;= 4/np.pi**2)
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(hadamard_test_p0(0.25), qpe_ancillas(8, 0.05))
+</text></testcode><stdin><text /></stdin><expected><text>0.5 12
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

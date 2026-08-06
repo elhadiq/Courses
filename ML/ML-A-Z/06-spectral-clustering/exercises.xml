@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Cut, RatioCut and NCut</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q1 &amp;mdash; GRAPH CUT OBJECTIVES&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Section 6.1 explained that the plain minimum cut is useless for clustering because its optimum isolates a single node. The denominators in RatioCut and NCut are what force balance &amp;mdash; and what make the problem NP-hard.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Given &lt;code&gt;n&lt;/code&gt;, an edge list and a set &lt;code&gt;A&lt;/code&gt; of node indices, write &lt;strong&gt;&lt;code&gt;cut(edges, A)&lt;/code&gt;&lt;/strong&gt; (number of edges with exactly one endpoint in A), &lt;strong&gt;&lt;code&gt;ratio_cut(n, edges, A)&lt;/code&gt;&lt;/strong&gt; and &lt;strong&gt;&lt;code&gt;ncut(n, edges, A)&lt;/code&gt;&lt;/strong&gt;. Return &lt;code&gt;float('inf')&lt;/code&gt; if A or its complement is empty.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;edges = [(0,1),(1,2),(2,3)], A = {0, 1}
+cut -&amp;gt; 1     ratio_cut -&amp;gt; 1.0     ncut -&amp;gt; 0.75&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; vol(A) = &amp;sum;&lt;sub&gt;u&amp;isin;A&lt;/sub&gt;d&lt;sub&gt;u&lt;/sub&gt;, counting degrees in the whole graph.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def cut(edges, A):
+    # Completer
+    ...
+
+
+def ratio_cut(n, edges, A):
+    # Completer
+    ...
+
+
+def ncut(n, edges, A):
+    # Completer
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def cut(edges, A):
+    return sum(1 for u, v in edges if (u in A) != (v in A))
+
+
+def _degrees(n, edges):
+    d = [0] * n
+    for u, v in edges:
+        d[u] += 1
+        d[v] += 1
+    return d
+
+
+def ratio_cut(n, edges, A):
+    a = len(A)
+    b = n - a
+    if a == 0 or b == 0:
+        return float('inf')
+    c = cut(edges, A)
+    return c / a + c / b
+
+
+def ncut(n, edges, A):
+    a = len(A)
+    if a == 0 or a == n:
+        return float('inf')
+    d = _degrees(n, edges)
+    vol_a = sum(d[u] for u in A)
+    vol_b = sum(d) - vol_a
+    if vol_a == 0 or vol_b == 0:
+        return float('inf')
+    c = cut(edges, A)
+    return c / vol_a + c / vol_b
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2), (2, 3)]
+print(cut(e, {0, 1}), ratio_cut(4, e, {0, 1}), ncut(4, e, {0, 1}))
+</text></testcode><stdin><text /></stdin><expected><text>1 1.0 0.6666666666666666
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text># two triangles joined by a bridge, plus a pendant node 6 hanging off node 0.
+# Isolating the pendant and taking the balanced community cut BOTH cost 1 edge,
+# so plain min-cut cannot choose between them -- but RatioCut can.
+e = [(0, 1), (1, 2), (2, 0), (3, 4), (4, 5), (5, 3), (2, 3), (0, 6)]
+print('cut  :', cut(e, {6}), cut(e, {0, 1, 2, 6}))
+print('ratio:', round(ratio_cut(7, e, {6}), 4), round(ratio_cut(7, e, {0, 1, 2, 6}), 4))
+</text></testcode><stdin><text /></stdin><expected><text>cut  : 1 1
+ratio: 1.1667 0.5833
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1)]
+print(ratio_cut(2, e, set()), ncut(2, e, {0, 1}))
+</text></testcode><stdin><text /></stdin><expected><text>inf inf
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (2, 3)]
+print(cut(e, {0, 1}), ratio_cut(4, e, {0, 1}))
+</text></testcode><stdin><text /></stdin><expected><text>0 0.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2), (2, 0), (3, 4), (4, 5), (5, 3), (2, 3)]
+print(cut(e, {0, 1, 2}), round(ncut(6, e, {0, 1, 2}), 6))
+</text></testcode><stdin><text /></stdin><expected><text>1 0.285714
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Conductance and the sweep cut</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q2 &amp;mdash; THE CHEEGER SWEEP&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Cheeger's inequality guarantees that the sweep cut over the Fiedler ordering is within &amp;radic;(2/&amp;lambda;&amp;#8322;) of the optimal conductance. The rounding step is therefore not arbitrary &amp;mdash; it comes with a proof.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;conductance(n, edges, A)&lt;/code&gt;&lt;/strong&gt; = cut(A) / min(vol A, vol A&amp;#772;), and &lt;strong&gt;&lt;code&gt;sweep_cut(n, edges, fiedler)&lt;/code&gt;&lt;/strong&gt; which sorts the nodes by their Fiedler value and returns &lt;code&gt;(best_prefix_size, best_conductance)&lt;/code&gt; over all n&amp;minus;1 non-trivial prefixes.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;edges of two triangles joined by one bridge, fiedler = [-1,-1,-1, 1,1,1]
+sweep_cut -&amp;gt; (3, ...)   the bridge is cut&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; Sort once, then grow the prefix one node at a time.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def conductance(n, edges, A):
+    # Completer
+    ...
+
+
+def sweep_cut(n, edges, fiedler):
+    # Completer : trier par valeur de Fiedler puis balayer les prefixes
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def _degrees(n, edges):
+    d = [0] * n
+    for u, v in edges:
+        d[u] += 1
+        d[v] += 1
+    return d
+
+
+def conductance(n, edges, A):
+    d = _degrees(n, edges)
+    vol_a = sum(d[u] for u in A)
+    vol_b = sum(d) - vol_a
+    denom = min(vol_a, vol_b)
+    if denom == 0:
+        return float('inf')
+    c = sum(1 for u, v in edges if (u in A) != (v in A))
+    return c / denom
+
+
+def sweep_cut(n, edges, fiedler):
+    order = sorted(range(n), key=lambda i: fiedler[i])
+    best_k, best_phi = None, float('inf')
+    A = set()
+    for k in range(n - 1):
+        A.add(order[k])
+        phi = conductance(n, edges, A)
+        if phi &lt; best_phi:
+            best_phi, best_k = phi, k + 1
+    return (best_k, best_phi)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2), (2, 0), (3, 4), (4, 5), (5, 3), (2, 3)]
+print(round(conductance(6, e, {0, 1, 2}), 6))
+</text></testcode><stdin><text /></stdin><expected><text>0.142857
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2), (2, 0), (3, 4), (4, 5), (5, 3), (2, 3)]
+f = [-1.0, -0.9, -0.5, 0.5, 0.9, 1.0]
+k, phi = sweep_cut(6, e, f)
+print(k, round(phi, 6))
+</text></testcode><stdin><text /></stdin><expected><text>3 0.142857
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2), (2, 3)]
+print(round(conductance(4, e, {0}), 6))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2), (2, 0), (3, 4), (4, 5), (5, 3), (2, 3)]
+print(conductance(6, e, set()))
+</text></testcode><stdin><text /></stdin><expected><text>inf
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>e = [(0, 1), (1, 2), (2, 3), (3, 0)]
+f = [-1.0, -0.5, 0.5, 1.0]
+print(sweep_cut(4, e, f)[0])
+</text></testcode><stdin><text /></stdin><expected><text>2
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — The eigengap heuristic</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q3 &amp;mdash; CHOOSING THE NUMBER OF CLUSTERS&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;If a graph had exactly k components, L would have eigenvalue 0 with multiplicity k. Real graphs are perturbations of that ideal, so the first k eigenvalues stay near zero and a visible gap opens before &amp;lambda;&lt;sub&gt;k+1&lt;/sub&gt;.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Given a list of eigenvalues sorted in increasing order, write &lt;strong&gt;&lt;code&gt;choose_k(eigenvalues, max_k)&lt;/code&gt;&lt;/strong&gt; returning the k in &lt;code&gt;1..max_k&lt;/code&gt; that maximises the gap &amp;lambda;&lt;sub&gt;k+1&lt;/sub&gt; &amp;minus; &amp;lambda;&lt;sub&gt;k&lt;/sub&gt;. On ties return the smallest k.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;choose_k([0.0, 0.0, 0.0, 2.1, 2.3], 4)  -&amp;gt;  3&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; Watch the indexing: &amp;lambda;&lt;sub&gt;k&lt;/sub&gt; is &lt;code&gt;eigenvalues[k-1]&lt;/code&gt; in 0-based Python.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def choose_k(eigenvalues, max_k):
+    # Completer : maximiser lambda_{k+1} - lambda_k
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def choose_k(eigenvalues, max_k):
+    best_k, best_gap = 1, -1.0
+    limit = min(max_k, len(eigenvalues) - 1)
+    for k in range(1, limit + 1):
+        gap = eigenvalues[k] - eigenvalues[k - 1]
+        if gap &gt; best_gap + 1e-12:
+            best_gap, best_k = gap, k
+    return best_k
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(choose_k([0.0, 0.0, 0.0, 2.1, 2.3], 4))
+</text></testcode><stdin><text /></stdin><expected><text>3
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(choose_k([0.0, 0.05, 0.07, 1.9, 2.0, 2.1], 5))
+</text></testcode><stdin><text /></stdin><expected><text>3
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(choose_k([0.0, 1.0, 2.0, 3.0], 3))
+</text></testcode><stdin><text /></stdin><expected><text>1
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(choose_k([0.0, 0.0, 1.5, 1.6, 1.7], 4))
+</text></testcode><stdin><text /></stdin><expected><text>2
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(choose_k([0.0, 0.9, 1.0], 2))
+</text></testcode><stdin><text /></stdin><expected><text>1
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q4 — Building a k-nearest-neighbour similarity graph</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q4 &amp;mdash; THE SIMILARITY GRAPH IS THE REAL HYPERPARAMETER&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Section 6.1 warned that spectral clustering is far more sensitive to how the graph is built than to anything downstream. Before you can cluster, you must construct.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;knn_graph(points, k)&lt;/code&gt;&lt;/strong&gt; returning the sorted list of undirected edges &lt;code&gt;(u, v)&lt;/code&gt; with &lt;code&gt;u &amp;lt; v&lt;/code&gt;, where u and v are joined if &lt;em&gt;either&lt;/em&gt; is among the other's k nearest neighbours (the symmetrising OR variant). Never join a point to itself.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;points = [[0],[1],[5]], k = 1
+-&amp;gt;  [(0, 1), (1, 2)]&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; Build the directed k-NN lists first, then symmetrise into a set of ordered pairs.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import math
+
+
+def knn_graph(points, k):
+    # Completer : variante OR (u-v si l'un est dans les k plus proches de l'autre)
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import math
+
+
+def knn_graph(points, k):
+    n = len(points)
+    edges = set()
+    for i in range(n):
+        d = []
+        for j in range(n):
+            if i == j:
+                continue
+            dist = math.sqrt(sum((a - b) ** 2 for a, b in zip(points[i], points[j])))
+            d.append((dist, j))
+        d.sort()
+        for _, j in d[:k]:
+            edges.add((min(i, j), max(i, j)))
+    return sorted(edges)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(knn_graph([[0], [1], [5]], 1))
+</text></testcode><stdin><text /></stdin><expected><text>[(0, 1), (1, 2)]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0, 0], [0, 1], [10, 0], [10, 1]]
+print(knn_graph(pts, 1))
+</text></testcode><stdin><text /></stdin><expected><text>[(0, 1), (2, 3)]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0], [1], [2], [3]]
+print(knn_graph(pts, 2))
+</text></testcode><stdin><text /></stdin><expected><text>[(0, 1), (0, 2), (1, 2), (1, 3), (2, 3)]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0], [1], [2]]
+e = knn_graph(pts, 2)
+print(e, all(u &lt; v for u, v in e))
+</text></testcode><stdin><text /></stdin><expected><text>[(0, 1), (0, 2), (1, 2)] True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pts = [[0, 0], [3, 4]]
+print(knn_graph(pts, 1))
+</text></testcode><stdin><text /></stdin><expected><text>[(0, 1)]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

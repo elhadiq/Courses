@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algorithms of Section 6</title>
+<link href="../assets/style.css" rel="stylesheet">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+
+/* Use the full width the theme allows: the shared stylesheet caps a lesson at
+   880px, which leaves wide figures and tables boxed into the middle of a large
+   screen. --max-w is the theme's own page width, so this stays consistent with
+   the landing page. */
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) {
+  .lesson-content { padding-left: 16px; padding-right: 16px; }
+}
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule);
+               padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center;
+               padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.lesson-nav { max-width: 880px; margin: 0 auto 40px; padding: 0 24px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav .container { display: flex; gap: 18px; flex-wrap: wrap; width: 100%; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600;
+                font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.keypoints h4 { margin-top: 0; }
+
+.algo-tag { color: var(--color-muted); font-size: 0.86rem; font-style: italic;
+            margin: -0.4em 0 1em; }
+.algo-steps { border: 1px solid var(--color-rule); border-radius: var(--radius);
+              background: var(--proof-bg); padding: 4px 22px 14px;
+              margin: 1.2em 0; }
+.algo-steps-title { color: var(--primary); font-weight: 700; font-size: 0.8rem;
+                    letter-spacing: 0.09em; text-transform: uppercase;
+                    margin: 14px 0 4px; }
+.algo-steps ol { padding-left: 1.4em; }
+.algo-steps li { margin: 0.55em 0; line-height: 1.75; }
+.annex-toc { background: var(--primary-soft); border-radius: var(--radius);
+             padding: 16px 24px; margin: 1.4em 0; }
+.annex-toc ul { margin: 0.4em 0; }
+.annex-toc a { color: var(--primary-dark); font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Machine Learning A&ndash;Z</a> &middot; Course</div><span class="course-code">Graph-based machine learning</span></div></header>
+<section class="lesson-hero"><div class="container"><div class="lesson-label">Part II &middot; Section 6 &middot; Annex</div><h1>Algorithms of Section 6</h1><div class="lesson-sub">Building the similarity graph, spectral clustering, the sweep cut and the eigengap, set out step by step.</div></div></section>
+<main class="lesson-content">
+<h2>Annex &mdash; the algorithms of Section 6</h2><div class="box tip"><div class="box-title">How to read this annex</div><p>Each algorithm is set out the same way: what it is handed, what it must hand back, then the steps in the order you would carry them out. A small example is worked through by hand so you can check your understanding against real numbers, and the closing boxes say why the method is correct, why it stops, and what it costs. Nothing here assumes you can read a program &mdash; the point is the reasoning.</p></div><div class="annex-toc"><strong>Algorithms in this annex</strong><ul><li><a href="#algo1">Building the similarity graph</a></li><li><a href="#algo2">Spectral clustering</a></li><li><a href="#algo3">The sweep cut</a></li><li><a href="#algo4">Choosing the number of clusters by the eigengap</a></li></ul></div><span id="algo1"></span><h3>Building the similarity graph</h3><p class="algo-tag">Preprocessing \(\cdot\) the step that decides everything</p><p>Turn a cloud of points into a graph whose edges express closeness.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> The observations and a neighbourhood size \(k\).</p><p><strong>Produce.</strong> A graph on the observations.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Compute the distances.</strong> For each observation, its distance to every other.</li><li><strong>Keep each point's k nearest.</strong> Join each observation to its \(k\) closest neighbours. This gives a one-way relation, since being someone's nearest neighbour is not mutual.</li><li><strong>Make it symmetric.</strong> Join two observations if <em>either</em> chose the other. The stricter variant, joining only when both chose, gives tighter but more fragmented groups.</li><li><strong>Weight the edges if you wish.</strong> Give each edge a weight falling off with distance. Use a scale that adapts to each point &mdash; for instance its distance to its seventh neighbour &mdash; so that dense and sparse regions are treated even-handedly.</li><li><strong>Check the graph is connected.</strong> If it has fallen into pieces, the method will simply return those pieces. Raise \(k\) until it is connected.</li></ol></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>Only <em>local</em> distances are used. That is the whole point: on curved data, near distances are trustworthy and far ones are not.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Direct.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>Quadratic in the number of observations if done naively; a spatial index reduces this substantially in low dimensions.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li><strong>This is the real hyperparameter.</strong> Results are far more sensitive to how the graph is built than to anything done afterwards. A scale too large connects everything into one blob; too small shatters it into dust.</li><li>A single global scale fails when some regions are dense and others sparse. Use a per-point scale.</li></ul></div><span id="algo2"></span><h3>Spectral clustering</h3><p class="algo-tag">Spectral method \(\cdot\) clustering by connectivity</p><p>Divide a graph into well-connected groups, cutting as few edges as possible while keeping the groups balanced.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A similarity graph and a number of groups \(k\).</p><p><strong>Produce.</strong> A group label for every node.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Build the Laplacian.</strong> Degrees on the diagonal, negated edges off it, as in the previous section. Divide through by degrees to obtain the normalised version, which prevents high-degree nodes from dominating.</li><li><strong>Find the directions of least disagreement.</strong> Compute the \(k\) directions along which values assigned to nodes disagree least across edges. The very first is the constant one and carries no information; the interesting ones are those immediately after it.</li><li><strong>Give each node new coordinates.</strong> Stack those \(k\) directions side by side. Each node now has \(k\) numbers &mdash; its position in a new space where <em>closeness means well-connected</em> rather than geometrically near.</li><li><strong>Normalise the rows if using the symmetric form.</strong> Rescale each node's new coordinates to unit length, which places them on a sphere and makes the groups easier to separate.</li><li><strong>Run ordinary clustering in the new space.</strong> Apply the alternating method of Section 4 to these new coordinates.</li><li><strong>Carry the labels back.</strong> Each node's group in the new space is its group in the original data.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Why the last step is not circular. The same data, judged two ways:</p><table><thead><tr><th>Space</th><th>Are two crescents separable by a straight boundary?</th></tr></thead><tbody><tr><td>original coordinates</td><td>no &mdash; ordinary clustering fails</td></tr><tr><td>spectral coordinates</td><td><strong>yes</strong> &mdash; they become two compact blobs</td></tr></tbody></table><p>Ordinary clustering failed because of the <em>geometry</em>, not because the method was wrong. Once the coordinates are changed so that connectivity becomes distance, it is exactly the right tool.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>Splitting a graph into balanced, weakly connected pieces is computationally intractable. Dropping the requirement that the answer be a clean yes/no per node turns it into finding these directions, which is a standard computation. The relaxation provably costs at most a squared factor, so the answer cannot be arbitrarily bad.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Direct computation followed by the alternating method.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>Cubic in the number of nodes for a full decomposition. Only \(k\) directions are actually needed, so iterative solvers on the sparse graph are used instead in practice.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>Nothing can be added afterwards: a new observation has no coordinates without redoing the computation. This is what makes the method unsuitable for data that keeps arriving.</li><li>It quietly prefers groups of comparable size, because of how the balance is enforced.</li></ul></div><span id="algo3"></span><h3>The sweep cut</h3><p class="algo-tag">Rounding \(\cdot\) turns numbers into a decision</p><p>Convert the continuous values produced by the previous method into an actual split of the graph, and do so with a guarantee.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> The graph and one value per node &mdash; the direction of least disagreement after the constant one.</p><p><strong>Produce.</strong> A split of the nodes into two groups.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Sort the nodes by their value.</strong> Lowest first. The ordering is what matters, not the values.</li><li><strong>Consider every prefix.</strong> Take the first node alone, then the first two, then the first three, and so on. Each prefix is a candidate group.</li><li><strong>Score each candidate.</strong> Count the edges leaving the candidate group, divided by the smaller of the two sides' total degree. Low is good: few edges cut, and neither side trivially small.</li><li><strong>Keep the best prefix.</strong> The candidate with the lowest score is the answer.</li><li><strong>Do not simply split at zero.</strong> Splitting at value zero is quicker and often close, but the sweep is what carries the guarantee.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Two triangles joined by a single bridge; nodes sorted by their value.</p><table><thead><tr><th>Prefix size</th><th>Edges cut</th><th>Score</th><th></th></tr></thead><tbody><tr><td>1</td><td>2</td><td>1.00</td><td></td></tr><tr><td>2</td><td>2</td><td>0.50</td><td></td></tr><tr><td><strong>3</strong></td><td><strong>1</strong></td><td><strong>0.17</strong></td><td><strong>best &mdash; cuts the bridge</strong></td></tr><tr><td>4</td><td>2</td><td>0.33</td><td></td></tr><tr><td>5</td><td>2</td><td>0.50</td><td></td></tr></tbody></table><p>The minimum falls exactly where the two triangles meet, cutting the single bridging edge.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>The best prefix in this ordering is provably within a square-root factor of the best split of the entire graph &mdash; a guarantee that no amount of arbitrary thresholding would give.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>\(n-1\) candidates.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>One sort, then one pass maintaining the counts incrementally.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>Recomputing the cut from scratch for every prefix makes this needlessly slow. Update the counts as each node moves across.</li></ul></div><span id="algo4"></span><h3>Choosing the number of clusters by the eigengap</h3><p class="algo-tag">Model selection \(\cdot\) reads the spectrum</p><p>Decide how many groups the data actually contain.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> The disagreement values, sorted from smallest.</p><p><strong>Produce.</strong> A number of groups.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Recall the ideal case.</strong> If the graph fell into \(k\) genuinely separate pieces, exactly \(k\) of these values would be zero and the next would be clearly positive.</li><li><strong>Accept that real graphs are perturbed.</strong> Weak connections between groups lift the zeros slightly, but they stay small.</li><li><strong>List the gaps.</strong> Take the differences between consecutive values.</li><li><strong>Choose the largest gap.</strong> The number of values before the biggest jump is the number of groups.</li><li><strong>Be willing to conclude nothing.</strong> If no gap stands out, the graph has no clear group structure. That is a legitimate finding, not a failure.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Twelve nodes forming three triangles, with bridges added between them.</p><table><thead><tr><th>Bridges added</th><th>First five values</th><th>Largest gap after</th><th>Verdict</th></tr></thead><tbody><tr><td>none</td><td>0, 0, 0, 2.0, 2.0</td><td>the third</td><td>three groups, unmistakable</td></tr><tr><td>two</td><td>0, 0.15, 0.31, 1.8, 2.1</td><td>the third</td><td>three groups, still clear</td></tr><tr><td>six</td><td>0, 1.1, 1.4, 1.9, 2.2</td><td>the first</td><td>no structure left</td></tr></tbody></table><p>The method degrades honestly: as the groups genuinely merge, the gap disappears rather than producing a confident wrong answer.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>Rests on the fact that the number of zero values equals the number of separate pieces, together with the principle that a small change to the graph makes only a small change to these values.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Direct.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>Negligible once the values are known.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>On graphs with groups at several scales there are several gaps and the choice is genuinely ambiguous.</li><li>Always inspect the values themselves rather than trusting the automatic choice.</li></ul></div><nav class="lesson-nav"><div class="container"><a href="../index.html">Course index</a><a href="page.html">&#8592; Back to the section</a></div></nav>
+</main>
+<footer class="site-footer"><strong>Machine Learning A&ndash;Z</strong> &middot; From empirical risk minimisation to graph neural networks<span class="footer-meta">Edition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">The interactive figure could not be loaded. Check your network connection.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+// Colours resolved from the stylesheet, so the figures follow the light/dark
+// theme. Each entry is a function: board attributes that are functions are
+// re-evaluated on update, so a theme switch only needs a redraw.
+var BOARDS = [];
+function cssv(name, fallback){
+    try {
+        var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback;
+    } catch (e) { return fallback; }
+}
+var PAL = {
+    text:  function(){ return cssv('--color-text',  '#1f2937'); },
+    muted: function(){ return cssv('--color-muted', '#6b7280'); },
+    axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+    ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+    grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+    cell:  function(){ return cssv('--cell-bg',     '#ffffff'); }
+};
+// Re-render every board when the theme attribute flips.
+if (window.MutationObserver) {
+    new MutationObserver(function(){
+        for (var i = 0; i < BOARDS.length; i++) {
+            try { BOARDS[i].fullUpdate(); } catch (e) {}
+        }
+    }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+
+
+})();
+</script>
+</body>
+</html>

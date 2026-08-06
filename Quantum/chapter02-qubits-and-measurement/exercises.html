@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 2 exercises — Qubits, the Bloch Sphere and Quantum Measurement</title>
+<meta name="description" content="Exercises for chapter 2: Qubits, the Bloch Sphere and Quantum Measurement">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = {tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]}, svg:{fontCache:"global"}};</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Quantum Computing</a> · <a href="course.html">Chapter 2</a> · Exercises</div><span class="course-code">Exercise sheet</span></div></header>
+<section class="lesson-hero"><div class="container">
+  <div class="lesson-label">Chapter 2 · exercise sheet</div>
+  <h1>Qubits, the Bloch Sphere and Quantum Measurement</h1>
+  <p class="lesson-sub">4 programming exercises ·
+     3 problems with symbolic answers. Every solution is hidden behind a
+     toggle — attempt each one before opening it.</p>
+</div></section>
+<div class="lesson-content">
+<h2>Programming exercises</h2>
+<p>Each exercise is checked automatically against hidden test cases. Only NumPy is required, and the function names in the statement must be used exactly as written.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 2.1</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C2.Q1 — From amplitudes to the Bloch sphere</p><p>The Bloch vector \(\vec r=(\langle X\rangle,\langle Y\rangle,\langle Z\rangle)\) is the coordinate system in which single-qubit gates become rotations.</p></div><p>Write <code>bloch_vector(psi)</code> returning a tuple of three <code>float</code>s (each rounded to 6 decimals) for a normalised 2-component state vector, and <code>state_from_angles(theta, phi)</code> returning the NumPy array \((\cos\tfrac\theta2,\ e^{i\varphi}\sin\tfrac\theta2)\).</p><div class="stmt"><pre>bloch_vector([1, 0])             -&gt; (0.0, 0.0, 1.0)
+bloch_vector([1, 1]/sqrt(2))     -&gt; (1.0, 0.0, 0.0)
+bloch_vector([1, 1j]/sqrt(2))    -&gt; (0.0, 1.0, 0.0)</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def bloch_vector(psi):
+    # &lt;X&gt;, &lt;Y&gt;, &lt;Z&gt; rounded to 6 decimals
+    ...
+
+def state_from_angles(theta, phi):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+print(bloch_vector([1, 0]))
+→ (0.0, 0.0, 1.0)</code></pre><pre><code>import numpy as np
+print(bloch_vector(np.array([1, 1])/np.sqrt(2)))
+→ (1.0, 0.0, 0.0)</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+X = np.array([[0, 1], [1, 0]], dtype=complex)
+Y = np.array([[0, -1j], [1j, 0]], dtype=complex)
+Z = np.array([[1, 0], [0, -1]], dtype=complex)
+
+def bloch_vector(psi):
+    psi = np.asarray(psi, dtype=complex).reshape(2)
+    psi = psi / np.linalg.norm(psi)
+    return tuple(round(float(np.real(psi.conj() @ (S @ psi))), 6) for S in (X, Y, Z))
+
+def state_from_angles(theta, phi):
+    return np.array([np.cos(theta / 2), np.exp(1j * phi) * np.sin(theta / 2)], dtype=complex)
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 2.2</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C2.Q2 — Verifying the SU(2) → SO(3) homomorphism</p><p>\(R_{\hat n}(\theta)=\cos\tfrac\theta2 I-i\sin\tfrac\theta2(\hat n\cdot\vec\sigma)\) rotates the Bloch vector by \(\theta\) about \(\hat n\). This exercise checks that claim numerically.</p></div><p>Write <code>rot(n, theta)</code> returning the \(2\times2\) unitary for a unit axis <code>n = (nx, ny, nz)</code>, and <code>rotate_bloch(n, theta, r)</code> returning the classical Rodrigues rotation of the 3-vector <code>r</code>. Both must agree.</p><div class="stmt"><pre>rot((0,0,1), pi)  ==  -1j * Z
+rotate_bloch((0,0,1), pi, (1,0,0))  -&gt;  (-1, 0, 0)</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def rot(n, theta):
+    # cos(theta/2) I - i sin(theta/2) (n . sigma)
+    ...
+
+def rotate_bloch(n, theta, r):
+    # Rodrigues formula
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+print(np.allclose(rot((0,0,1), np.pi), -1j*Z))
+→ True</code></pre><pre><code>import numpy as np
+print(np.round(rotate_bloch((0,0,1), np.pi, (1,0,0)), 6).tolist())
+→ [-1.0, 0.0, 0.0]</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+X = np.array([[0, 1], [1, 0]], dtype=complex)
+Y = np.array([[0, -1j], [1j, 0]], dtype=complex)
+Z = np.array([[1, 0], [0, -1]], dtype=complex)
+I2 = np.eye(2, dtype=complex)
+
+def rot(n, theta):
+    n = np.asarray(n, dtype=float)
+    n = n / np.linalg.norm(n)
+    ns = n[0] * X + n[1] * Y + n[2] * Z
+    return np.cos(theta / 2) * I2 - 1j * np.sin(theta / 2) * ns
+
+def rotate_bloch(n, theta, r):
+    n = np.asarray(n, dtype=float); n = n / np.linalg.norm(n)
+    r = np.asarray(r, dtype=float)
+    return (r * np.cos(theta) + np.cross(n, r) * np.sin(theta)
+            + n * np.dot(n, r) * (1 - np.cos(theta)))
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 2.3</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C2.Q3 — Born rule and state collapse</p><p>Given an orthonormal basis \(\{|b_k\rangle\}\), outcome \(k\) occurs with probability \(|\langle b_k|\psi\rangle|^{2}\) and the state collapses to \(|b_k\rangle\).</p></div><p>Write <code>born_probs(psi, basis)</code> where <code>basis</code> is a matrix whose <em>columns</em> are the basis vectors, returning a NumPy array of probabilities (rounded to 8 decimals, summing to 1); and <code>post_measurement(psi, basis, k)</code> returning the normalised collapsed state.</p><div class="stmt"><pre>psi = |0&gt;, basis = columns [|+&gt;, |-&gt;]  -&gt;  [0.5, 0.5]</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def born_probs(psi, basis):
+    # amplitudes = basis^dagger @ psi
+    ...
+
+def post_measurement(psi, basis, k):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+H = np.array([[1,1],[1,-1]], dtype=complex)/np.sqrt(2)
+print(born_probs([1,0], H).tolist())
+→ [0.5, 0.5]</code></pre><pre><code>import numpy as np
+print(born_probs([1,0], np.eye(2, dtype=complex)).tolist())
+→ [1.0, 0.0]</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def born_probs(psi, basis):
+    psi = np.asarray(psi, dtype=complex).ravel()
+    psi = psi / np.linalg.norm(psi)
+    B = np.asarray(basis, dtype=complex)
+    amps = B.conj().T @ psi
+    return np.round(np.abs(amps) ** 2, 8)
+
+def post_measurement(psi, basis, k):
+    B = np.asarray(basis, dtype=complex)
+    v = B[:, k]
+    return v / np.linalg.norm(v)
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 2.4</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C2.Q4 — What a quantum computer actually outputs</p><p>A device returns samples, not amplitudes. Estimating \(\langle Z\rangle\) from \(N\) shots incurs an error \(\Theta(1/\sqrt N)\); distinguishing non-orthogonal states is capped by the Helstrom bound.</p></div><p>Write <code>sample_counts(psi, shots, seed)</code> returning a dict mapping bit-strings (MSB = qubit 0, zero-padded to \(n\) characters) to counts, sorted by key, using <code>numpy.random.default_rng(seed).choice</code>; and <code>helstrom(psi, phi)</code> returning the optimal success probability \(\tfrac12(1+\sqrt{1-|\langle\psi|\phi\rangle|^{2}})\), rounded to 6 decimals.</p><div class="stmt"><pre>helstrom(|0&gt;, |0&gt;)  -&gt;  0.5      (indistinguishable)
+helstrom(|0&gt;, |1&gt;)  -&gt;  1.0      (orthogonal)
+helstrom(|0&gt;, |+&gt;)  -&gt;  0.853553</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def sample_counts(psi, shots, seed):
+    ...
+
+def helstrom(psi, phi):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+print(helstrom([1,0], [0,1]), helstrom([1,0], [1,0]))
+→ 1.0 0.5</code></pre><pre><code>import numpy as np
+print(helstrom([1,0], np.array([1,1])/np.sqrt(2)))
+→ 0.853553</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def sample_counts(psi, shots, seed):
+    psi = np.asarray(psi, dtype=complex).ravel()
+    probs = np.abs(psi) ** 2
+    probs = probs / probs.sum()
+    n = int(round(np.log2(len(probs))))
+    rng = np.random.default_rng(seed)
+    idx = rng.choice(len(probs), size=shots, p=probs)
+    counts = {}
+    for i in idx:
+        key = format(int(i), &#x27;0{}b&#x27;.format(n))
+        counts[key] = counts.get(key, 0) + 1
+    return dict(sorted(counts.items()))
+
+def helstrom(psi, phi):
+    a = np.asarray(psi, dtype=complex).ravel(); a = a / np.linalg.norm(a)
+    b = np.asarray(phi, dtype=complex).ravel(); b = b / np.linalg.norm(b)
+    ov = abs(np.vdot(a, b)) ** 2
+    return round(0.5 * (1 + np.sqrt(max(0.0, 1 - ov))), 6)
+</code></pre></details>
+</div>
+<h2>Problems with symbolic answers</h2>
+<p>Answers here are expressions rather than numbers, and any algebraically equivalent form is accepted. Give fractions and radicals exactly; decimal approximations are not accepted.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 2.1</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C2.S1 — Born rule on the Bloch sphere</p></div><p>A qubit is prepared in \(|\psi\rangle=\cos(\theta/2)|0\rangle+e^{i\varphi}\sin(\theta/2)|1\rangle\).</p><p>Give the probability of obtaining the outcome \(+1\) when the observable \(X\) is measured, as a simplified function of <code>theta</code> and <code>phi</code>.</p><p>\(p_{+}=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>The \(+1\) eigenvector of \(X\) is \(|+\rangle=(|0\rangle+|1\rangle)/\sqrt2\), so</p>\[ p_{+}=|\langle +|\psi\rangle|^{2}=\tfrac12\left|\cos\tfrac\theta2+e^{i\varphi}\sin\tfrac\theta2\right|^{2}. \]<p>Expanding, \(p_+=\tfrac12\big(1+2\cos\tfrac\theta2\sin\tfrac\theta2\cos\varphi\big)=\tfrac12(1+\sin\theta\cos\varphi)\).</p><p>Geometrically this is \(p_\pm=\tfrac12(1\pm\hat n\cdot\vec r)\) with \(\hat n=\hat x\): the probability is an affine function of the projection of the Bloch vector onto the measurement axis.</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 2.2</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C2.S2 — Uncertainty</p></div><p>For the state \(|0\rangle\):</p><p>(a) Give \(\Delta X=\sqrt{\langle X^2\rangle-\langle X\rangle^2}\).</p><p>\(\Delta X=\) <span>your answer</span> </p><p>(b) Give the Robertson lower bound \(\tfrac12|\langle[X,Y]\rangle|\) for this state.</p><p>bound \(=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) \(X^2=I\) so \(\langle X^2\rangle=1\); and \(\langle 0|X|0\rangle=0\). Hence \(\Delta X=1\). By symmetry \(\Delta Y=1\) as well.</p><p>(b) \([X,Y]=2iZ\) and \(\langle 0|Z|0\rangle=1\), so the bound is \(\tfrac12|2i\cdot 1|=1\).</p><p>Since \(\Delta X\Delta Y=1\) equals the bound, \(|0\rangle\) is a minimum-uncertainty state for the pair \((X,Y)\) — the qubit analogue of a coherent state.</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 2.3</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C2.S3 — Optimal state discrimination</p></div><p>Two equally likely pure states satisfy \(\langle\psi_0|\psi_1\rangle=\cos\alpha\) with \(\alpha\in[0,\pi/2]\).</p><p>(a) Give the maximal probability of correctly identifying the prepared state, as a simplified function of <code>alpha</code>.</p><p>\(p_{\max}=\) <span>your answer</span> </p><p>(b) Evaluate it for \(\alpha=\pi/4\) (exact expression, no decimals).</p><p>\(p_{\max}(\pi/4)=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) The Helstrom bound for equal priors and pure states is \(p_{\max}=\tfrac12\big(1+\sqrt{1-|\langle\psi_0|\psi_1\rangle|^{2}}\big)\). With overlap \(\cos\alpha\) and \(\alpha\in[0,\pi/2]\), \(\sqrt{1-\cos^2\alpha}=\sin\alpha\), so \(p_{\max}=\tfrac12(1+\sin\alpha)\).</p><p>(b) At \(\alpha=\pi/4\): \(p_{\max}=\tfrac12\left(1+\tfrac{\sqrt2}{2}\right)=\tfrac{2+\sqrt2}{4}\approx0.8536\).</p><p>Only orthogonal states (\(\alpha=\pi/2\)) give \(p_{\max}=1\); identical states give \(1/2\), i.e. a coin flip. This is the quantitative form of the statement that non-orthogonal states cannot be reliably distinguished, and it underpins BB84.</p></details>
+</div>
+<div class="exo-banner"><div><strong>Back to the theory</strong><span>Every exercise above is worked from a result proved in the chapter</span></div><a href="course.html">Open chapter 2</a></div>
+</div>
+<nav class="lesson-nav"><a class="prev" href="../chapter01-mathematical-foundations/exercises.html"><span class="dir">Previous chapter</span><span class="ttl">1. Mathematical Foundations of Quantum Computation</span></a><a class="next" href="../chapter03-gates-circuits-universality/exercises.html"><span class="dir">Next chapter</span><span class="ttl">3. Quantum Gates, Circuits and Universality</span></a></nav>
+<footer class="site-footer"><div class="container"><strong>Quantum Computing — Theory and Practice</strong> · ten chapters · forty programming exercises · thirty symbolic problems<span class="footer-meta">Edition 2026</span></div></footer></body></html>

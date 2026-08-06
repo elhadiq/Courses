@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>C1.Q1 — Adjoint, unitarity and hermiticity</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C1.Q1 — Operator predicates&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;Numerical linear algebra is the substrate of every simulation in this course. Before anything else we need reliable predicates for the operator classes of \S2.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write three functions using &lt;strong&gt;NumPy only&lt;/strong&gt;: &lt;code&gt;dagger(A)&lt;/code&gt; returning the conjugate transpose; &lt;code&gt;is_unitary(A, tol=1e-9)&lt;/code&gt; returning a Python &lt;code&gt;bool&lt;/code&gt;; and &lt;code&gt;is_hermitian(A, tol=1e-9)&lt;/code&gt; returning a Python &lt;code&gt;bool&lt;/code&gt;. Use &lt;code&gt;numpy.allclose&lt;/code&gt; with &lt;code&gt;atol=tol&lt;/code&gt;; do not test exact equality.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;dagger([[0,1j],[0,0]])  -&amp;gt;  [[0, 0], [-1j, 0]]
+is_unitary(X)           -&amp;gt;  True
+is_hermitian(X @ Y)     -&amp;gt;  False&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def dagger(A):
+    # TODO: conjugate transpose
+    ...
+
+def is_unitary(A, tol=1e-9):
+    # TODO
+    ...
+
+def is_hermitian(A, tol=1e-9):
+    # TODO
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def dagger(A):
+    return np.asarray(A, dtype=complex).conj().T
+
+def is_unitary(A, tol=1e-9):
+    A = np.asarray(A, dtype=complex)
+    n = A.shape[0]
+    return bool(np.allclose(dagger(A) @ A, np.eye(n), atol=tol))
+
+def is_hermitian(A, tol=1e-9):
+    A = np.asarray(A, dtype=complex)
+    return bool(np.allclose(A, dagger(A), atol=tol))
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+print(is_unitary(X), is_hermitian(X))
+</text></testcode><stdin><text /></stdin><expected><text>True True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+A = np.array([[0,1j],[0,0]], dtype=complex)
+print(np.allclose(dagger(A), np.array([[0,0],[-1j,0]])))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+Y = np.array([[0,-1j],[1j,0]], dtype=complex)
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+print(is_hermitian(Y @ Z), is_unitary(Y @ Z))
+</text></testcode><stdin><text /></stdin><expected><text>False True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+H = np.array([[1,1],[1,-1]], dtype=complex)/np.sqrt(2)
+print(is_unitary(H), is_hermitian(H))
+</text></testcode><stdin><text /></stdin><expected><text>True True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+D = np.diag([1, 2.0]).astype(complex)
+print(is_unitary(D), is_hermitian(D))
+</text></testcode><stdin><text /></stdin><expected><text>False True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C1.Q2 — Kronecker products and multi-qubit operators</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C1.Q2 — Building the n-qubit algebra&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;Multi-qubit gates are built from single-qubit ones by tensoring with identities. Getting the factor ordering right is the most common source of simulator bugs.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;kron_all(ops)&lt;/code&gt; returning the Kronecker product of a list of matrices (returning the \(1\times1\) identity for an empty list), and &lt;code&gt;embed(op, target, n)&lt;/code&gt; returning the \(2^{n}\times2^{n}\) operator that applies the single-qubit &lt;code&gt;op&lt;/code&gt; to qubit index &lt;code&gt;target&lt;/code&gt; (0 = leftmost/most significant factor) and the identity elsewhere.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;embed(X, 0, 2)  ==  kron(X, I)
+embed(Z, 1, 3)  ==  kron(I, kron(Z, I))&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def kron_all(ops):
+    # TODO: iterate with np.kron starting from [[1]]
+    ...
+
+def embed(op, target, n):
+    # TODO
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def kron_all(ops):
+    out = np.array([[1.0 + 0j]])
+    for op in ops:
+        out = np.kron(out, np.asarray(op, dtype=complex))
+    return out
+
+def embed(op, target, n):
+    I2 = np.eye(2, dtype=complex)
+    factors = [np.asarray(op, dtype=complex) if k == target else I2 for k in range(n)]
+    return kron_all(factors)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+print(embed(X, 0, 2).shape)
+</text></testcode><stdin><text /></stdin><expected><text>(4, 4)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+I = np.eye(2, dtype=complex)
+print(np.allclose(embed(X, 1, 2), np.kron(I, X)))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+I = np.eye(2, dtype=complex)
+print(np.allclose(embed(Z, 1, 3), np.kron(I, np.kron(Z, I))))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+print(kron_all([]).shape, np.round(kron_all([]).real[0,0], 6))
+</text></testcode><stdin><text /></stdin><expected><text>(1, 1) 1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+M = kron_all([X, Z, X])
+print(M.shape, int(round(np.trace(M @ M).real)))
+</text></testcode><stdin><text /></stdin><expected><text>(8, 8) 8
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C1.Q3 — Spectral decomposition and operator functions</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C1.Q3 — Exponentiating a Hamiltonian&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;By the spectral theorem, \(f(A)=\sum_k f(\lambda_k)P_k\). Implementing \(e^{-iHt}\) this way — rather than by truncating the power series — is both exact and numerically stable.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;spectral_projectors(H)&lt;/code&gt; returning &lt;code&gt;(eigenvalues, projectors)&lt;/code&gt; where eigenvalues is a sorted 1-D real array and projectors[k] is the rank-one projector onto the \(k\)-th eigenvector; and &lt;code&gt;evolve(H, t)&lt;/code&gt; returning \(e^{-iHt}\) built from that decomposition. Use &lt;code&gt;numpy.linalg.eigh&lt;/code&gt; (never &lt;code&gt;scipy&lt;/code&gt;).&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;evolve(Z, pi/2)  -&amp;gt;  diag(exp(-i*pi/2), exp(+i*pi/2))&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def spectral_projectors(H):
+    # TODO: use np.linalg.eigh and np.outer
+    ...
+
+def evolve(H, t):
+    # TODO: sum exp(-i*lambda*t) * P
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def spectral_projectors(H):
+    H = np.asarray(H, dtype=complex)
+    vals, vecs = np.linalg.eigh(H)
+    projs = [np.outer(vecs[:, k], vecs[:, k].conj()) for k in range(len(vals))]
+    return vals, projs
+
+def evolve(H, t):
+    vals, projs = spectral_projectors(H)
+    n = np.asarray(H).shape[0]
+    U = np.zeros((n, n), dtype=complex)
+    for lam, P in zip(vals, projs):
+        U = U + np.exp(-1j * lam * t) * P
+    return U
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+vals, projs = spectral_projectors(Z)
+print(np.round(vals, 6).tolist())
+</text></testcode><stdin><text /></stdin><expected><text>[-1.0, 1.0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+U = evolve(Z, np.pi/2)
+print(np.allclose(U, np.diag([np.exp(-1j*np.pi/2), np.exp(1j*np.pi/2)])))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+th = 0.7
+U = evolve(X, th/2)
+R = np.cos(th/2)*np.eye(2) - 1j*np.sin(th/2)*X
+print(np.allclose(U, R))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+rng = np.random.default_rng(7)
+A = rng.normal(size=(4,4)) + 1j*rng.normal(size=(4,4))
+H = A + A.conj().T
+U = evolve(H, 1.3)
+print(np.allclose(U.conj().T @ U, np.eye(4)))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+vals, projs = spectral_projectors(Z)
+print(np.allclose(sum(projs), np.eye(2)))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>C1.Q4 — Pauli decomposition of an operator</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;C1.Q4 — Coordinates in the Pauli basis&lt;/p&gt;&lt;p style="color:#0f172a;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.8;margin:0;"&gt;Variational algorithms (Chapter 10) and the stabilizer formalism (Chapter 9) both express Hamiltonians as real linear combinations of Pauli strings. The coefficients come from the Hilbert–Schmidt inner product \(a_{\mu}=\tfrac{1}{2^{n}}\operatorname{tr}(\sigma_{\mu}A)\).&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#0f172a;line-height:1.8;"&gt;Write &lt;code&gt;pauli_coeffs(A)&lt;/code&gt; for a single qubit, returning the list &lt;code&gt;[a_i, a_x, a_y, a_z]&lt;/code&gt; of coefficients such that \(A=a_I I + a_x X + a_y Y + a_z Z\). Round each coefficient to 6 decimals and return them as Python &lt;code&gt;complex&lt;/code&gt; numbers is not required — return floats when the imaginary part is negligible by taking &lt;code&gt;numpy.real_if_close&lt;/code&gt;, then convert with &lt;code&gt;float&lt;/code&gt; if real.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',Consolas,monospace;font-size:13.5px;margin:0;background:none;border:none;"&gt;pauli_coeffs(Z)          -&amp;gt;  [0.0, 0.0, 0.0, 1.0]
+pauli_coeffs(eye(2))     -&amp;gt;  [1.0, 0.0, 0.0, 0.0]&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def pauli_coeffs(A):
+    # coefficient a_mu = trace(sigma_mu^dagger @ A) / 2
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def pauli_coeffs(A):
+    A = np.asarray(A, dtype=complex)
+    I2 = np.eye(2, dtype=complex)
+    X = np.array([[0, 1], [1, 0]], dtype=complex)
+    Y = np.array([[0, -1j], [1j, 0]], dtype=complex)
+    Z = np.array([[1, 0], [0, -1]], dtype=complex)
+    out = []
+    for S in (I2, X, Y, Z):
+        c = np.trace(S.conj().T @ A) / 2
+        c = np.real_if_close(c, tol=1000)
+        out.append(round(float(c.real), 6) if np.abs(np.imag(c)) &lt; 1e-9 else complex(round(c.real, 6), round(c.imag, 6)))
+    return out
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+Z = np.array([[1,0],[0,-1]], dtype=complex)
+print(pauli_coeffs(Z))
+</text></testcode><stdin><text /></stdin><expected><text>[0.0, 0.0, 0.0, 1.0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+print(pauli_coeffs(np.eye(2, dtype=complex)))
+</text></testcode><stdin><text /></stdin><expected><text>[1.0, 0.0, 0.0, 0.0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+H = np.array([[1,1],[1,-1]], dtype=complex)/np.sqrt(2)
+print([round(c, 4) for c in pauli_coeffs(H)])
+</text></testcode><stdin><text /></stdin><expected><text>[0.0, 0.7071, 0.0, 0.7071]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+Y = np.array([[0,-1j],[1j,0]], dtype=complex)
+print(pauli_coeffs(Y))
+</text></testcode><stdin><text /></stdin><expected><text>[0.0, 0.0, 1.0, 0.0]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+P0 = np.array([[1,0],[0,0]], dtype=complex)
+print(pauli_coeffs(P0))
+</text></testcode><stdin><text /></stdin><expected><text>[0.5, 0.0, 0.0, 0.5]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

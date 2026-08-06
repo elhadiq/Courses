@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algorithms of Section 3</title>
+<link href="../assets/style.css" rel="stylesheet">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+
+/* Use the full width the theme allows: the shared stylesheet caps a lesson at
+   880px, which leaves wide figures and tables boxed into the middle of a large
+   screen. --max-w is the theme's own page width, so this stays consistent with
+   the landing page. */
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) {
+  .lesson-content { padding-left: 16px; padding-right: 16px; }
+}
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule);
+               padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center;
+               padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.lesson-nav { max-width: 880px; margin: 0 auto 40px; padding: 0 24px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav .container { display: flex; gap: 18px; flex-wrap: wrap; width: 100%; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600;
+                font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.keypoints h4 { margin-top: 0; }
+
+.algo-tag { color: var(--color-muted); font-size: 0.86rem; font-style: italic;
+            margin: -0.4em 0 1em; }
+.algo-steps { border: 1px solid var(--color-rule); border-radius: var(--radius);
+              background: var(--proof-bg); padding: 4px 22px 14px;
+              margin: 1.2em 0; }
+.algo-steps-title { color: var(--primary); font-weight: 700; font-size: 0.8rem;
+                    letter-spacing: 0.09em; text-transform: uppercase;
+                    margin: 14px 0 4px; }
+.algo-steps ol { padding-left: 1.4em; }
+.algo-steps li { margin: 0.55em 0; line-height: 1.75; }
+.annex-toc { background: var(--primary-soft); border-radius: var(--radius);
+             padding: 16px 24px; margin: 1.4em 0; }
+.annex-toc ul { margin: 0.4em 0; }
+.annex-toc a { color: var(--primary-dark); font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Machine Learning A&ndash;Z</a> &middot; Course</div><span class="course-code">Graph-based machine learning</span></div></header>
+<section class="lesson-hero"><div class="container"><div class="lesson-label">Part I &middot; Section 3 &middot; Annex</div><h1>Algorithms of Section 3</h1><div class="lesson-sub">Growing and pruning a tree, random forests and gradient boosting, set out step by step.</div></div></section>
+<main class="lesson-content">
+<h2>Annex &mdash; the algorithms of Section 3</h2><div class="box tip"><div class="box-title">How to read this annex</div><p>Each algorithm is set out the same way: what it is handed, what it must hand back, then the steps in the order you would carry them out. A small example is worked through by hand so you can check your understanding against real numbers, and the closing boxes say why the method is correct, why it stops, and what it costs. Nothing here assumes you can read a program &mdash; the point is the reasoning.</p></div><div class="annex-toc"><strong>Algorithms in this annex</strong><ul><li><a href="#algo1">Growing a decision tree</a></li><li><a href="#algo2">Cost-complexity pruning</a></li><li><a href="#algo3">Random forest</a></li><li><a href="#algo4">Gradient boosting</a></li></ul></div><span id="algo1"></span><h3>Growing a decision tree</h3><p class="algo-tag">Greedy recursive method \(\cdot\) never reconsiders a choice</p><p>Split the data repeatedly on one input at a time, so that each final group is as pure as possible in its labels.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A labelled table and stopping rules (a maximum depth, a minimum group size).</p><p><strong>Produce.</strong> A tree of yes/no questions ending in groups, each predicting one label.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Measure the impurity of the current group.</strong> A group where every label is the same has impurity zero. A group split evenly between two labels is at its worst. Add up, over the labels, the proportion times one minus that proportion.</li><li><strong>Propose every possible split.</strong> For each input, sort the distinct values and consider a cut halfway between each neighbouring pair. Each cut sends part of the group left and part right.</li><li><strong>Score each split by the impurity it removes.</strong> Compute the impurity of the two sides, weight each by the fraction of observations it received, and subtract the total from the parent's impurity. The weighting matters: a split that isolates one observation cannot score well however pure that observation is.</li><li><strong>Take the best and commit.</strong> Apply the highest-scoring split. It is never revisited, whatever happens further down.</li><li><strong>Recurse.</strong> Repeat on each side. Stop when the group is pure, too small, or at the depth limit; that group becomes a leaf predicting its majority label.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Six observations, one input. Impurity here is the even-split measure.</p><table><thead><tr><th>Cut at</th><th>Left labels</th><th>Right labels</th><th>Weighted impurity</th><th>Removed</th></tr></thead><tbody><tr><td>1.5</td><td>R</td><td>R R B B B</td><td>0.40</td><td>0.10</td></tr><tr><td>2.5</td><td>R R</td><td>R B B B</td><td>0.25</td><td>0.25</td></tr><tr><td><strong>3.5</strong></td><td><strong>R R R</strong></td><td><strong>B B B</strong></td><td><strong>0.00</strong></td><td><strong>0.50</strong></td></tr><tr><td>4.5</td><td>R R R B</td><td>B B</td><td>0.19</td><td>0.31</td></tr></tbody></table><p>The cut at 3.5 separates the classes perfectly and is chosen. Had no cut been perfect, the greedy rule would still have taken the best available and moved on &mdash; which is why a single tree is unstable.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>There is no optimality guarantee. Finding the best possible tree is computationally intractable, so every practical method is this greedy heuristic. What the impurity measure does guarantee is that the chosen split never increases impurity.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Each split strictly reduces the number of observations in a group, and groups cannot shrink below one. The recursion therefore bottoms out.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>At each node, sorting each input dominates. Overall about \(n\,d \log n\) per level.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>Grown without limit, a tree isolates every observation, scores perfectly on the data it was built from, and is useless on anything else.</li><li>The impurity-based importance of an input is biased towards inputs with many distinct values, simply because they offer more cuts to choose from. Do not read it as a measure of relevance.</li></ul></div><span id="algo2"></span><h3>Cost-complexity pruning</h3><p class="algo-tag">Post-processing \(\cdot\) trades accuracy for simplicity</p><p>Cut a fully grown tree back to the size that actually helps on new data.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A fully grown tree and a penalty per leaf, \(\alpha\).</p><p><strong>Produce.</strong> A pruned subtree.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Score the whole tree.</strong> Total impurity across the leaves, plus \(\alpha\) times the number of leaves. Larger \(\alpha\) buys simplicity at the cost of fit.</li><li><strong>Find the weakest link.</strong> For each internal node, ask how much the score would worsen per leaf removed if everything below it were collapsed into a single leaf. Find the node where that ratio is smallest.</li><li><strong>Collapse it.</strong> Turn that node into a leaf predicting the majority of what it holds.</li><li><strong>Repeat, recording as you go.</strong> Continue until only the root remains, keeping every intermediate tree. These trees are nested, each obtained from the last, so the whole family is produced in one sweep.</li><li><strong>Choose among them by cross-validation.</strong> Score each candidate on held-out data and keep the best.</li></ol></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>As the penalty grows, the optimal subtrees form a nested sequence: each is contained in the previous one. That is why the whole regularisation path can be computed once rather than re-solved for every penalty value.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Each round removes at least one internal node.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>Cheap compared with growing the tree.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>Choosing the penalty on the data used to grow the tree always picks zero &mdash; the unpruned tree fits it best by construction.</li></ul></div><span id="algo3"></span><h3>Random forest</h3><p class="algo-tag">Ensemble \(\cdot\) parallel, attacks variance</p><p>Average many deliberately different trees so that their individual instabilities cancel.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A labelled table, a number of trees \(B\), and a count \(m\) of inputs to offer at each split.</p><p><strong>Produce.</strong> A committee of trees that vote.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Draw a bootstrap sample.</strong> Sample \(n\) observations <em>with replacement</em>. Some appear several times, and about 37 % do not appear at all.</li><li><strong>Grow a tree, but restrict each split.</strong> Grow as usual with one change: at every node, choose at random a subset of \(m\) inputs and consider splits on those only. A different subset is drawn at each node.</li><li><strong>Grow it deep and leave it unpruned.</strong> Individual overfitting is acceptable here; averaging will deal with it.</li><li><strong>Repeat B times.</strong> The trees are independent of one another, so this can be done in any order or all at once.</li><li><strong>Combine.</strong> For classification take the majority vote; for numeric outputs take the average.</li><li><strong>Score for free.</strong> Each observation was left out of about a third of the trees. Predict it using only those trees and you get an honest error estimate without holding any data back.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Why restricting the inputs matters. Averaging \(B\) predictors of the same variance leaves a residue that depends on how alike they are.</p><table><thead><tr><th>How alike the trees are</th><th>Variance after averaging 100</th><th>Floor as B grows</th></tr></thead><tbody><tr><td>identical</td><td>1.00</td><td>1.00</td></tr><tr><td>strongly alike</td><td>0.85</td><td>0.85</td></tr><tr><td>mildly alike</td><td>0.46</td><td>0.45</td></tr><tr><td>unrelated</td><td>0.01</td><td>0.00</td></tr></tbody></table><p>Adding trees drives the second part of the variance to zero but cannot touch the first. Restricting the inputs at each split is what lowers the floor, by preventing one dominant input from appearing at the top of every tree.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>Averaging never increases variance and leaves bias unchanged. Since a deep tree has low bias and high variance, averaging is exactly the right correction.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>\(B\) rounds, fixed in advance.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>\(B\) times the cost of one tree, but perfectly parallel.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>Adding more trees never hurts accuracy, so a forest cannot be overfitted by \(B\). It can be overfitted by growing trees too deep on noisy data, or by setting \(m\) too large.</li><li>With many irrelevant inputs, a small \(m\) means most splits see nothing useful. Raise it.</li></ul></div><span id="algo4"></span><h3>Gradient boosting</h3><p class="algo-tag">Ensemble \(\cdot\) sequential, attacks bias</p><p>Build a model in small stages, each stage fitted to what the previous stages still get wrong.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A labelled table, a small shrinkage factor \(\nu\), a tree depth (3 to 6), and a number of rounds.</p><p><strong>Produce.</strong> A sum of many small trees.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Start with the simplest possible answer.</strong> Predict the same constant everywhere &mdash; the overall average for numeric outputs.</li><li><strong>Compute what is still wrong.</strong> For every observation, take the difference between the truth and the current prediction. For squared error these are just the leftovers; for other losses they are the direction in which the prediction should move.</li><li><strong>Fit a small tree to those leftovers.</strong> The tree is not predicting the outcome; it is predicting the current mistakes. Keep it shallow &mdash; it only needs to capture a little structure.</li><li><strong>Add a fraction of it.</strong> Add the new tree's predictions to the running total, multiplied by \(\nu\) (typically 0.01 to 0.1). Taking only a fraction of each step is what keeps the procedure stable.</li><li><strong>Repeat, and watch a held-out set.</strong> Recompute what is wrong and go again. Unlike a forest, this <em>will</em> eventually overfit, so stop when the held-out error stops improving.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Squared error, shrinkage 0.5, one observation whose true value is 10.</p><table><thead><tr><th>Round</th><th>Prediction before</th><th>Still wrong by</th><th>Tree predicts</th><th>Prediction after</th></tr></thead><tbody><tr><td>1</td><td>6.0</td><td>4.0</td><td>4.0</td><td>8.0</td></tr><tr><td>2</td><td>8.0</td><td>2.0</td><td>2.0</td><td>9.0</td></tr><tr><td>3</td><td>9.0</td><td>1.0</td><td>1.0</td><td>9.5</td></tr><tr><td>4</td><td>9.5</td><td>0.5</td><td>0.5</td><td>9.75</td></tr></tbody></table><p>Each round removes half the remaining error. With a smaller shrinkage the steps are smaller and more rounds are needed, but the final answer generalises better.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>Each stage moves the predictions in the direction that most reduces the loss &mdash; the same principle as gradient descent, carried out in the space of functions rather than of coefficients.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>A fixed number of rounds, or early stopping on held-out error.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>One shallow tree per round, and the rounds cannot be parallelised because each depends on the last.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>Shrinkage and the number of rounds trade off directly. Halving the shrinkage roughly doubles the rounds needed.</li><li>Sensitive to mislabelled observations: a wrong label is a permanent large error that every subsequent round chases.</li><li>Many interacting settings. Tune the shrinkage and the number of rounds together, not separately.</li></ul></div><nav class="lesson-nav"><div class="container"><a href="../index.html">Course index</a><a href="page.html">&#8592; Back to the section</a></div></nav>
+</main>
+<footer class="site-footer"><strong>Machine Learning A&ndash;Z</strong> &middot; From empirical risk minimisation to graph neural networks<span class="footer-meta">Edition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">The interactive figure could not be loaded. Check your network connection.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+// Colours resolved from the stylesheet, so the figures follow the light/dark
+// theme. Each entry is a function: board attributes that are functions are
+// re-evaluated on update, so a theme switch only needs a redraw.
+var BOARDS = [];
+function cssv(name, fallback){
+    try {
+        var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback;
+    } catch (e) { return fallback; }
+}
+var PAL = {
+    text:  function(){ return cssv('--color-text',  '#1f2937'); },
+    muted: function(){ return cssv('--color-muted', '#6b7280'); },
+    axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+    ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+    grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+    cell:  function(){ return cssv('--cell-bg',     '#ffffff'); }
+};
+// Re-render every board when the theme attribute flips.
+if (window.MutationObserver) {
+    new MutationObserver(function(){
+        for (var i = 0; i < BOARDS.length; i++) {
+            try { BOARDS[i].fullUpdate(); } catch (e) {}
+        }
+    }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+
+
+})();
+</script>
+</body>
+</html>

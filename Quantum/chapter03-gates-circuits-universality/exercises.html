@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 3 exercises — Quantum Gates, Circuits and Universality</title>
+<meta name="description" content="Exercises for chapter 3: Quantum Gates, Circuits and Universality">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = {tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]}, svg:{fontCache:"global"}};</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Quantum Computing</a> · <a href="course.html">Chapter 3</a> · Exercises</div><span class="course-code">Exercise sheet</span></div></header>
+<section class="lesson-hero"><div class="container">
+  <div class="lesson-label">Chapter 3 · exercise sheet</div>
+  <h1>Quantum Gates, Circuits and Universality</h1>
+  <p class="lesson-sub">4 programming exercises ·
+     3 problems with symbolic answers. Every solution is hidden behind a
+     toggle — attempt each one before opening it.</p>
+</div></section>
+<div class="lesson-content">
+<h2>Programming exercises</h2>
+<p>Each exercise is checked automatically against hidden test cases. Only NumPy is required, and the function names in the statement must be used exactly as written.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 3.1</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C3.Q1 — Applying gates without building 2^n x 2^n matrices</p><p>Building the full \(2^{n}\times2^{n}\) matrix of a gate wastes exponential memory. Reshaping the state to a rank-\(n\) tensor and contracting only the relevant axes costs \(O(2^{n})\) per gate.</p></div><p>Write <code>apply_1q(state, U, q, n)</code> and <code>apply_2q(state, U, q0, q1, n)</code> as described in §5, using <code>numpy.tensordot</code> and <code>numpy.moveaxis</code>. Convention: qubit 0 is the <strong>most significant</strong> factor. Both return a flat length-\(2^{n}\) array.</p><div class="stmt"><pre>H on qubit 0 of |00&gt;, then CNOT(0,1)  -&gt;  (|00&gt; + |11&gt;)/sqrt(2)</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def apply_1q(state, U, q, n):
+    # reshape -&gt; tensordot -&gt; moveaxis -&gt; reshape
+    ...
+
+def apply_2q(state, U, q0, q1, n):
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+H = np.array([[1,1],[1,-1]], dtype=complex)/np.sqrt(2)
+CNOT = np.array([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]], dtype=complex)
+psi = np.zeros(4, dtype=complex); psi[0] = 1
+psi = apply_1q(psi, H, 0, 2)
+psi = apply_2q(psi, CNOT, 0, 1, 2)
+print(np.round(psi.real, 6).tolist())
+→ [0.707107, 0.0, 0.0, 0.707107]</code></pre><pre><code>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+psi = np.zeros(8, dtype=complex); psi[0] = 1
+psi = apply_1q(psi, X, 2, 3)
+print(int(np.argmax(np.abs(psi))))
+→ 1</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def apply_1q(state, U, q, n):
+    psi = np.asarray(state, dtype=complex).reshape([2] * n)
+    psi = np.tensordot(np.asarray(U, dtype=complex), psi, axes=([1], [q]))
+    psi = np.moveaxis(psi, 0, q)
+    return psi.reshape(2 ** n)
+
+def apply_2q(state, U, q0, q1, n):
+    psi = np.asarray(state, dtype=complex).reshape([2] * n)
+    U4 = np.asarray(U, dtype=complex).reshape(2, 2, 2, 2)
+    psi = np.tensordot(U4, psi, axes=([2, 3], [q0, q1]))
+    psi = np.moveaxis(psi, [0, 1], [q0, q1])
+    return psi.reshape(2 ** n)
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 3.2</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C3.Q2 — Building two-qubit gates</p><p>\(C\text{-}U=|0\rangle\langle0|\otimes I+|1\rangle\langle1|\otimes U\) in the ordering where the control is the first factor.</p></div><p>Write <code>controlled(U)</code> returning the \(4\times4\) controlled-\(U\); and <code>cnot_from_cz()</code> returning the CNOT matrix built <em>only</em> as \((I\otimes H)\,\mathrm{CZ}\,(I\otimes H)\), where CZ is constructed with <code>controlled</code>.</p><div class="stmt"><pre>controlled(X)  ==  CNOT
+cnot_from_cz() ==  CNOT</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def controlled(U):
+    # |0&gt;&lt;0| (x) I  +  |1&gt;&lt;1| (x) U
+    ...
+
+def cnot_from_cz():
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+X = np.array([[0,1],[1,0]], dtype=complex)
+CNOT = np.array([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]], dtype=complex)
+print(np.allclose(controlled(X), CNOT))
+→ True</code></pre><pre><code>import numpy as np
+CNOT = np.array([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]], dtype=complex)
+print(np.allclose(cnot_from_cz(), CNOT))
+→ True</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def controlled(U):
+    U = np.asarray(U, dtype=complex)
+    P0 = np.array([[1, 0], [0, 0]], dtype=complex)
+    P1 = np.array([[0, 0], [0, 1]], dtype=complex)
+    return np.kron(P0, np.eye(2, dtype=complex)) + np.kron(P1, U)
+
+def cnot_from_cz():
+    H = np.array([[1, 1], [1, -1]], dtype=complex) / np.sqrt(2)
+    Z = np.array([[1, 0], [0, -1]], dtype=complex)
+    CZ = controlled(Z)
+    IH = np.kron(np.eye(2, dtype=complex), H)
+    return IH @ CZ @ IH
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 3.3</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C3.Q3 — Compiling an arbitrary gate</p><p>Every \(U\in U(2)\) factorises as \(e^{i\alpha}R_z(\beta)R_y(\gamma)R_z(\delta)\). Extracting the angles is the first step of every quantum compiler.</p></div><p>Write <code>zyz(U)</code> returning the tuple <code>(alpha, beta, gamma, delta)</code> of floats, and <code>from_zyz(alpha, beta, gamma, delta)</code> rebuilding the matrix, with \(R_z(\lambda)=\mathrm{diag}(e^{-i\lambda/2},e^{i\lambda/2})\) and \(R_y(\gamma)=\begin{pmatrix}\cos\frac\gamma2&-\sin\frac\gamma2\\\sin\frac\gamma2&\cos\frac\gamma2\end{pmatrix}\). Grading only checks that <code>from_zyz(*zyz(U))</code> reproduces <code>U</code>.</p><div class="stmt"><pre>from_zyz(*zyz(H))  ==  H     (up to numerical tolerance)</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def rz(l):
+    ...
+
+def ry(g):
+    ...
+
+def from_zyz(alpha, beta, gamma, delta):
+    ...
+
+def zyz(U):
+    # hint: remove the global phase via det(U), then read the angles off the SU(2) matrix
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+H = np.array([[1,1],[1,-1]], dtype=complex)/np.sqrt(2)
+print(np.allclose(from_zyz(*zyz(H)), H, atol=1e-8))
+→ True</code></pre><pre><code>import numpy as np
+T = np.diag([1, np.exp(1j*np.pi/4)]).astype(complex)
+print(np.allclose(from_zyz(*zyz(T)), T, atol=1e-8))
+→ True</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+def rz(l):
+    return np.diag([np.exp(-1j * l / 2), np.exp(1j * l / 2)])
+
+def ry(g):
+    c, s = np.cos(g / 2), np.sin(g / 2)
+    return np.array([[c, -s], [s, c]], dtype=complex)
+
+def from_zyz(alpha, beta, gamma, delta):
+    return np.exp(1j * alpha) * (rz(beta) @ ry(gamma) @ rz(delta))
+
+def zyz(U):
+    U = np.asarray(U, dtype=complex)
+    det = np.linalg.det(U)
+    alpha = float(np.angle(det) / 2)
+    V = U * np.exp(-1j * alpha)                 # V in SU(2)
+    gamma = float(2 * np.arctan2(abs(V[1, 0]), abs(V[0, 0])))
+    # V = [[e^{-i(b+d)/2} cos(g/2), -e^{-i(b-d)/2} sin(g/2)],
+    #      [ e^{i(b-d)/2} sin(g/2),  e^{i(b+d)/2} cos(g/2)]]
+    half_sum = np.angle(V[1, 1]) if abs(V[1, 1]) &gt; 1e-12 else 0.0   # (b+d)/2
+    half_dif = np.angle(V[1, 0]) if abs(V[1, 0]) &gt; 1e-12 else 0.0   # (b-d)/2
+    beta = float(half_sum + half_dif)
+    delta = float(half_sum - half_dif)
+    return (alpha, beta, gamma, delta)
+</code></pre></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Exercise 3.4</span>
+    <span class="diff d2">Programming</span></div>
+  <div class="stmt"><p>C3.Q4 — A minimal circuit runner</p><p>A circuit is a list of instructions. This exercise assembles the primitives of Q1–Q2 into a runner and verifies three standard constructions.</p></div><p>Write <code>run(n, circuit)</code> where <code>circuit</code> is a list of tuples <code>(gate_name, qubits)</code> with <code>gate_name</code> in <code>{'H','X','Z','S','T','CNOT','CZ','SWAP'}</code> and <code>qubits</code> a tuple of indices (control first for CNOT/CZ). Start from \(|0\rangle^{\otimes n}\) and return the final state vector. Implement SWAP as three CNOTs.</p><div class="stmt"><pre>run(2, [('H',(0,)), ('CNOT',(0,1))])  -&gt;  Bell state
+run(3, [('H',(0,)), ('CNOT',(0,1)), ('CNOT',(1,2))])  -&gt;  GHZ</pre></div>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Starting point</p>
+  <pre><code>import numpy as np
+
+def run(n, circuit):
+    # start from |0...0&gt;, apply each instruction in order
+    ...
+</code></pre>
+  <p style="color:var(--color-muted);font-size:0.85rem;letter-spacing:0.06em;
+     text-transform:uppercase;margin-bottom:0;">Worked examples</p>
+  <pre><code>import numpy as np
+psi = run(2, [(&#x27;H&#x27;,(0,)), (&#x27;CNOT&#x27;,(0,1))])
+print(np.round(psi.real, 6).tolist())
+→ [0.707107, 0.0, 0.0, 0.707107]</code></pre><pre><code>import numpy as np
+psi = run(3, [(&#x27;H&#x27;,(0,)), (&#x27;CNOT&#x27;,(0,1)), (&#x27;CNOT&#x27;,(1,2))])
+print(np.round(np.abs(psi)**2, 6).tolist())
+→ [0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5]</code></pre>
+  <details class="sol"><summary>Show the reference solution</summary>
+    <pre><code>import numpy as np
+
+H = np.array([[1, 1], [1, -1]], dtype=complex) / np.sqrt(2)
+X = np.array([[0, 1], [1, 0]], dtype=complex)
+Z = np.array([[1, 0], [0, -1]], dtype=complex)
+S = np.diag([1, 1j]).astype(complex)
+T = np.diag([1, np.exp(1j * np.pi / 4)]).astype(complex)
+CNOT = np.array([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]], dtype=complex)
+CZ = np.diag([1, 1, 1, -1]).astype(complex)
+ONE_Q = {&#x27;H&#x27;: H, &#x27;X&#x27;: X, &#x27;Z&#x27;: Z, &#x27;S&#x27;: S, &#x27;T&#x27;: T}
+TWO_Q = {&#x27;CNOT&#x27;: CNOT, &#x27;CZ&#x27;: CZ}
+
+def _apply1(state, U, q, n):
+    psi = state.reshape([2] * n)
+    psi = np.tensordot(U, psi, axes=([1], [q]))
+    return np.moveaxis(psi, 0, q).reshape(2 ** n)
+
+def _apply2(state, U, q0, q1, n):
+    psi = state.reshape([2] * n)
+    psi = np.tensordot(U.reshape(2, 2, 2, 2), psi, axes=([2, 3], [q0, q1]))
+    return np.moveaxis(psi, [0, 1], [q0, q1]).reshape(2 ** n)
+
+def run(n, circuit):
+    psi = np.zeros(2 ** n, dtype=complex)
+    psi[0] = 1
+    for name, qs in circuit:
+        if name in ONE_Q:
+            psi = _apply1(psi, ONE_Q[name], qs[0], n)
+        elif name in TWO_Q:
+            psi = _apply2(psi, TWO_Q[name], qs[0], qs[1], n)
+        elif name == &#x27;SWAP&#x27;:
+            a, b = qs
+            psi = _apply2(psi, CNOT, a, b, n)
+            psi = _apply2(psi, CNOT, b, a, n)
+            psi = _apply2(psi, CNOT, a, b, n)
+        else:
+            raise ValueError(&#x27;unknown gate &#x27; + name)
+    return psi
+</code></pre></details>
+</div>
+<h2>Problems with symbolic answers</h2>
+<p>Answers here are expressions rather than numbers, and any algebraically equivalent form is accepted. Give fractions and radicals exactly; decimal approximations are not accepted.</p>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 3.1</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C3.S1 — Clifford hierarchy by hand</p></div><p>Let \(T=\mathrm{diag}(1,e^{i\pi/4})\).</p><p>(a) Give the smallest positive integer \(k\) with \(T^{k}=Z\).</p><p>\(k=\) <span>your answer</span> </p><p>(b) Give the phase \(\lambda\) (a complex number) such that \(T^{ {@m@} }=\mathrm{diag}(1,\lambda)\).</p><p>\(\lambda=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) \(T^{k}=\mathrm{diag}(1,e^{ik\pi/4})\). We need \(e^{ik\pi/4}=-1=e^{i\pi}\), i.e. \(k\pi/4\equiv\pi \pmod{2\pi}\), whose smallest positive solution is \(k=4\).</p><p>So \(T^2=S\), \(T^4=Z\), \(T^8=I\): \(T\) generates a cyclic group of order 8, and \(S,Z\) are Clifford while \(T\) is not — \(T\) sits at level 3 of the Clifford hierarchy. This is exactly why fault-tolerant cost is measured in T-count.</p><p>(b) \(T^{ {@m@} }=\mathrm{diag}(1,e^{i {@m@} \pi/4})={@ta2@}\) in the second entry.</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 3.2</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C3.S2 — Why almost every unitary is hard</p></div><p>Consider unitaries on \(n={@n@}\) qubits.</p><p>(a) Give the number of real parameters of \(SU(2^{n})\), i.e. of an \(n\)-qubit unitary modulo global phase, as a function of <code>n</code> in general.</p><p>parameters \(=\) <span>your answer</span> </p><p>(b) Evaluate that expression for \(n={@n@}\).</p><p>value \(=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) \(U(d)\) is a real Lie group of dimension \(d^{2}\); quotienting the global phase \(U(1)\) leaves \(d^{2}-1\). With \(d=2^{n}\) this is \(4^{n}-1\).</p><p>(b) For \(n={@n@}\): \(4^{ {@n@} }-1={@ta2@}\).</p><p>A circuit of \(g\) gates from a fixed finite set is specified by \(O(g\log g)\) bits, so reaching all of \(SU(2^n)\) to constant accuracy requires \(g=\Omega(4^{n}/n)\). Universality therefore never implies efficiency: quantum speed-ups exist only for structured problems.</p></details>
+</div>
+<div class="exo">
+  <div class="exo-head"><span class="exo-num">Problem 3.3</span>
+    <span class="diff d4">Symbolic</span></div>
+  <div class="stmt"><p>C3.S3 — Heisenberg picture for Clifford gates</p></div><p>Recall \(H=\frac{1}{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix}\), \(Y=\begin{pmatrix}0&-i\\i&0\end{pmatrix}\).</p><p>(a) Give the matrix \(HYH\).</p><p>\(HYH=\) <span>your answer</span> </p><p>Enter it in the form <code>matrix([a,b],[c,d])</code>.</p><p>(b) Give the matrix \(SXS^{\dagger}\) where \(S=\mathrm{diag}(1,i)\).</p><p>\(SXS^{\dagger}=\) <span>your answer</span> </p>
+  <details class="sol"><summary>Show the worked solution</summary>
+    <p>(a) \(HXH=Z\), \(HZH=X\) and, since \(Y=iXZ\), \(HYH=iHXH\cdot HZH=iZX=-Y\). Explicitly \(HYH=\begin{pmatrix}0&i\\-i&0\end{pmatrix}\).</p><p>(b) \(SXS^{\dagger}=\begin{pmatrix}0&-i\\i&0\end{pmatrix}=Y\).</p><p>Both results illustrate the defining property of the Clifford group: conjugation maps the Pauli group to itself. Tracking Paulis instead of state vectors is the Heisenberg picture behind the Gottesman–Knill theorem and the stabilizer codes of Chapter 9 — and it is why Clifford circuits are classically simulable.</p></details>
+</div>
+<div class="exo-banner"><div><strong>Back to the theory</strong><span>Every exercise above is worked from a result proved in the chapter</span></div><a href="course.html">Open chapter 3</a></div>
+</div>
+<nav class="lesson-nav"><a class="prev" href="../chapter02-qubits-and-measurement/exercises.html"><span class="dir">Previous chapter</span><span class="ttl">2. Qubits, the Bloch Sphere and Quantum Measurement</span></a><a class="next" href="../chapter04-entanglement-and-nonlocality/exercises.html"><span class="dir">Next chapter</span><span class="ttl">4. Entanglement, Non-locality and Communication Protocols</span></a></nav>
+<footer class="site-footer"><div class="container"><strong>Quantum Computing — Theory and Practice</strong> · ten chapters · forty programming exercises · thirty symbolic problems<span class="footer-meta">Edition 2026</span></div></footer></body></html>

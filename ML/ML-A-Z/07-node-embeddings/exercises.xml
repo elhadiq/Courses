@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — The random-walk transition matrix</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q1 &amp;mdash; P = D INVERSE TIMES A&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Section 7.1 noted that P = D&lt;sup&gt;&amp;minus;1&lt;/sup&gt;A = I &amp;minus; L&lt;sub&gt;rw&lt;/sub&gt;: the random-walk Laplacian is literally 'one minus one step of the walk'.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;transition(n, edges)&lt;/code&gt;&lt;/strong&gt; for an undirected graph, returning the row-stochastic matrix P with P[u][v] = 1/d&lt;sub&gt;u&lt;/sub&gt; if u&amp;ndash;v is an edge. An isolated node gets an all-zero row. Then write &lt;strong&gt;&lt;code&gt;stationary(n, edges)&lt;/code&gt;&lt;/strong&gt; returning the theoretical stationary distribution d&lt;sub&gt;u&lt;/sub&gt;/2m.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;edges = [(0,1),(1,2)]
+stationary -&amp;gt; [0.25, 0.5, 0.25]&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; On an undirected graph the stationary distribution is &lt;em&gt;just the degree&lt;/em&gt; &amp;mdash; which is exactly why long walks are uninformative and short ones are not.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def transition(n, edges):
+    # Completer
+    ...
+
+
+def stationary(n, edges):
+    # Completer : proportionnel au degre
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def transition(n, edges):
+    A = [[0.0] * n for _ in range(n)]
+    for u, v in edges:
+        A[u][v] = 1.0
+        A[v][u] = 1.0
+    P = []
+    for u in range(n):
+        d = sum(A[u])
+        if d == 0:
+            P.append([0.0] * n)
+        else:
+            P.append([a / d for a in A[u]])
+    return P
+
+
+def stationary(n, edges):
+    d = [0] * n
+    for u, v in edges:
+        d[u] += 1
+        d[v] += 1
+    total = sum(d)
+    if total == 0:
+        return [0.0] * n
+    return [x / total for x in d]
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(stationary(3, [(0, 1), (1, 2)]))
+</text></testcode><stdin><text /></stdin><expected><text>[0.25, 0.5, 0.25]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>P = transition(3, [(0, 1), (1, 2)])
+for row in P:
+    print([round(x, 4) for x in row])
+</text></testcode><stdin><text /></stdin><expected><text>[0.0, 1.0, 0.0]
+[0.5, 0.0, 0.5]
+[0.0, 1.0, 0.0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>P = transition(4, [(0, 1), (1, 2), (2, 3), (3, 0)])
+print([round(sum(r), 6) for r in P])
+</text></testcode><stdin><text /></stdin><expected><text>[1.0, 1.0, 1.0, 1.0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>P = transition(2, [])
+print(P, stationary(2, []))
+</text></testcode><stdin><text /></stdin><expected><text>[[0.0, 0.0], [0.0, 0.0]] [0.0, 0.0]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text># one step from the stationary distribution returns it unchanged
+n, e = 4, [(0, 1), (1, 2), (2, 3), (3, 0), (0, 2)]
+P = transition(n, e)
+pi = stationary(n, e)
+nxt = [sum(pi[u] * P[u][v] for u in range(n)) for v in range(n)]
+print([round(x, 8) for x in nxt] == [round(x, 8) for x in pi])
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — PageRank by power iteration</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q2 &amp;mdash; PAGERANK&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Teleportation makes the modified transition matrix strictly positive, hence irreducible and aperiodic; Perron&amp;ndash;Frobenius then gives a unique positive fixed point reached geometrically at rate &amp;alpha;. Dangling nodes must be handled explicitly or all the probability leaks away.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;pagerank(n, out_links, alpha, n_iter)&lt;/code&gt;&lt;/strong&gt;, where &lt;code&gt;out_links[u]&lt;/code&gt; is the list of successors of u. Start from the uniform vector and perform exactly &lt;code&gt;n_iter&lt;/code&gt; iterations, redistributing the mass of dangling nodes uniformly over all n nodes. Return the rank list.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;n = 2, out_links = [[1], [0]], alpha = 0.85
+-&amp;gt;  [0.5, 0.5]  (by symmetry)&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; r'&lt;sub&gt;v&lt;/sub&gt; = (1&amp;minus;&amp;alpha;)/n + &amp;alpha;(dangling mass)/n + &amp;alpha;&amp;sum;&lt;sub&gt;u&amp;rarr;v&lt;/sub&gt; r&lt;sub&gt;u&lt;/sub&gt;/|out(u)|&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def pagerank(n, out_links, alpha, n_iter):
+    # Completer : ne pas oublier les noeuds sans lien sortant (dangling)
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def pagerank(n, out_links, alpha, n_iter):
+    r = [1.0 / n] * n
+    for _ in range(n_iter):
+        new = [0.0] * n
+        dangling = 0.0
+        for u in range(n):
+            succ = out_links[u]
+            if not succ:
+                dangling += r[u]
+                continue
+            share = r[u] / len(succ)
+            for v in succ:
+                new[v] += share
+        base = (1.0 - alpha) / n + alpha * dangling / n
+        r = [base + alpha * x for x in new]
+    return r
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print([round(x, 6) for x in pagerank(2, [[1], [0]], 0.85, 50)])
+</text></testcode><stdin><text /></stdin><expected><text>[0.5, 0.5]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>out = [[1, 2], [2], [0], [2]]
+print([round(x, 5) for x in pagerank(4, out, 0.85, 100)])
+</text></testcode><stdin><text /></stdin><expected><text>[0.37253, 0.19582, 0.39415, 0.0375]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text># probability must be conserved, even with a dangling node
+out = [[1], [], [0]]
+r = pagerank(3, out, 0.85, 100)
+print(round(sum(r), 8))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text># alpha = 0 gives the uniform distribution
+out = [[1, 2], [2], [0]]
+print([round(x, 6) for x in pagerank(3, out, 0.0, 20)])
+</text></testcode><stdin><text /></stdin><expected><text>[0.333333, 0.333333, 0.333333]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text># a node everyone points to should rank highest
+out = [[3], [3], [3], [0]]
+r = pagerank(4, out, 0.85, 200)
+print(r.index(max(r)))
+</text></testcode><stdin><text /></stdin><expected><text>3
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — node2vec biased transition weights</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q3 &amp;mdash; THE (p, q) SEARCH BIAS&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;node2vec is a &lt;em&gt;second-order&lt;/em&gt; walk: the next step depends on where you came from. q &amp;gt; 1 keeps the walk local (BFS-like, structural equivalence); q &amp;lt; 1 pushes it outward (DFS-like, homophily). This one parameter decides what 'similar' will mean.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Write &lt;strong&gt;&lt;code&gt;node2vec_probs(adj, t, v, p, q)&lt;/code&gt;&lt;/strong&gt; returning a dict mapping each neighbour x of v to its normalised transition probability, using the unnormalised weight 1/p if x == t, 1 if x is adjacent to t, and 1/q otherwise.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;adj = {0:[1], 1:[0,2,3], 2:[1,3], 3:[1,2]}
+node2vec_probs(adj, 0, 1, 1.0, 1.0)  -&amp;gt;  {0: 0.333, 2: 0.333, 3: 0.333}&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; &lt;code&gt;adj&lt;/code&gt; is a dict node -&gt; list of neighbours. Build the weights first, then divide by their sum.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def node2vec_probs(adj, t, v, p, q):
+    # Completer : poids 1/p si retour, 1 si voisin de t, 1/q sinon
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def node2vec_probs(adj, t, v, p, q):
+    tset = set(adj[t])
+    weights = {}
+    for x in adj[v]:
+        if x == t:
+            w = 1.0 / p
+        elif x in tset:
+            w = 1.0
+        else:
+            w = 1.0 / q
+        weights[x] = w
+    total = sum(weights.values())
+    if total == 0:
+        return {x: 0.0 for x in weights}
+    return {x: w / total for x, w in weights.items()}
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>adj = {0: [1], 1: [0, 2, 3], 2: [1, 3], 3: [1, 2]}
+r = node2vec_probs(adj, 0, 1, 1.0, 1.0)
+print({k: round(v, 4) for k, v in sorted(r.items())})
+</text></testcode><stdin><text /></stdin><expected><text>{0: 0.3333, 2: 0.3333, 3: 0.3333}
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>adj = {0: [1, 2], 1: [0, 2, 3], 2: [0, 1, 3], 3: [1, 2]}
+r = node2vec_probs(adj, 0, 1, 1.0, 4.0)
+print({k: round(v, 4) for k, v in sorted(r.items())})
+</text></testcode><stdin><text /></stdin><expected><text>{0: 0.4444, 2: 0.4444, 3: 0.1111}
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>adj = {0: [1, 2], 1: [0, 2, 3], 2: [0, 1, 3], 3: [1, 2]}
+r = node2vec_probs(adj, 0, 1, 1.0, 0.25)
+print({k: round(v, 4) for k, v in sorted(r.items())})
+</text></testcode><stdin><text /></stdin><expected><text>{0: 0.1667, 2: 0.1667, 3: 0.6667}
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>adj = {0: [1], 1: [0, 2], 2: [1]}
+r = node2vec_probs(adj, 0, 1, 4.0, 1.0)
+print({k: round(v, 4) for k, v in sorted(r.items())})
+</text></testcode><stdin><text /></stdin><expected><text>{0: 0.2, 2: 0.8}
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>adj = {0: [1], 1: [0, 2, 3], 2: [1, 3], 3: [1, 2]}
+r = node2vec_probs(adj, 0, 1, 2.0, 3.0)
+print(round(sum(r.values()), 8))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q4 — Link-prediction heuristics</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #c9a227;border-radius:8px;padding:18px 22px;margin-bottom:16px;"&gt;&lt;p style="color:#92400e;font-family:Georgia,serif;font-size:12.5px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 9px 0;"&gt;Q4 &amp;mdash; COMMON NEIGHBOURS, JACCARD, ADAMIC-ADAR&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Liben-Nowell and Kleinberg's classical scores remain strong, training-free baselines. Adamic&amp;ndash;Adar's insight is that a shared &lt;em&gt;rare&lt;/em&gt; neighbour is far more informative than a shared hub &amp;mdash; hence the 1/log d weighting.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;margin:0 0 12px 0;"&gt;Given &lt;code&gt;adj&lt;/code&gt; (a dict node -&gt; set of neighbours), write &lt;strong&gt;&lt;code&gt;common_neighbors(adj, u, v)&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;jaccard(adj, u, v)&lt;/code&gt;&lt;/strong&gt; (0.0 if the union is empty) and &lt;strong&gt;&lt;code&gt;adamic_adar(adj, u, v)&lt;/code&gt;&lt;/strong&gt;. In Adamic&amp;ndash;Adar skip any shared neighbour of degree &amp;le; 1, whose log is 0 or negative.&lt;/p&gt;&lt;div style="background:#fdf4ff;border:1px solid #e9d5ff;border-left:5px solid #9333ea;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#3b0764;font-family:'Courier New',monospace;font-size:13.5px;margin:0;background:none;border:none;line-height:1.6;"&gt;adj = {0:{2,3}, 1:{2,3}, 2:{0,1}, 3:{0,1}}
+common_neighbors(adj,0,1) -&amp;gt; 2     jaccard -&amp;gt; 1.0&lt;/pre&gt;&lt;/div&gt;&lt;div style="background:#f0f9fa;border:1px solid #b9dde1;border-left:5px solid #026573;border-radius:8px;padding:12px 18px;margin:14px 0;"&gt;&lt;p style="color:#0f3f45;font-family:Georgia,serif;font-size:14px;line-height:1.7;margin:0;"&gt;&lt;strong&gt;Hint.&lt;/strong&gt; Adamic&amp;ndash;Adar = &amp;sum;&lt;sub&gt;z shared&lt;/sub&gt; 1/log(d&lt;sub&gt;z&lt;/sub&gt;), natural logarithm.&lt;/p&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>20</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import math
+
+
+def common_neighbors(adj, u, v):
+    # Completer
+    ...
+
+
+def jaccard(adj, u, v):
+    # Completer
+    ...
+
+
+def adamic_adar(adj, u, v):
+    # Completer : ignorer les voisins de degre &lt;= 1
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import math
+
+
+def common_neighbors(adj, u, v):
+    return len(set(adj[u]) &amp; set(adj[v]))
+
+
+def jaccard(adj, u, v):
+    a, b = set(adj[u]), set(adj[v])
+    union = a | b
+    if not union:
+        return 0.0
+    return len(a &amp; b) / len(union)
+
+
+def adamic_adar(adj, u, v):
+    total = 0.0
+    for z in set(adj[u]) &amp; set(adj[v]):
+        d = len(adj[z])
+        if d &gt; 1:
+            total += 1.0 / math.log(d)
+    return total
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>adj = {0: {2, 3}, 1: {2, 3}, 2: {0, 1}, 3: {0, 1}}
+print(common_neighbors(adj, 0, 1), jaccard(adj, 0, 1))
+</text></testcode><stdin><text /></stdin><expected><text>2 1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>adj = {0: {2, 3}, 1: {2, 3}, 2: {0, 1}, 3: {0, 1}}
+print(round(adamic_adar(adj, 0, 1), 6))
+</text></testcode><stdin><text /></stdin><expected><text>2.88539
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text># a shared hub is worth less than a shared rare node
+adj = {0: {9}, 1: {9}, 9: set(range(2, 200)) | {0, 1}}
+hub = adamic_adar(adj, 0, 1)
+adj2 = {0: {9}, 1: {9}, 9: {0, 1}}
+rare = adamic_adar(adj2, 0, 1)
+print(hub &lt; rare)
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>adj = {0: set(), 1: set()}
+print(common_neighbors(adj, 0, 1), jaccard(adj, 0, 1), adamic_adar(adj, 0, 1))
+</text></testcode><stdin><text /></stdin><expected><text>0 0.0 0.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>adj = {0: {2}, 1: {3}, 2: {0}, 3: {1}}
+print(common_neighbors(adj, 0, 1), jaccard(adj, 0, 1))
+</text></testcode><stdin><text /></stdin><expected><text>0 0.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

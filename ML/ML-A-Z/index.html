@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machine Learning A&ndash;Z</title>
+<link href="assets/style.css" rel="stylesheet">
+<script src="assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<meta name="description" content="A course in machine learning in eight sections, from empirical risk minimisation to graph neural networks, with interactive figures and cited primary sources.">
+<style>
+
+/* Use the full width the theme allows: the shared stylesheet caps a lesson at
+   880px, which leaves wide figures and tables boxed into the middle of a large
+   screen. --max-w is the theme's own page width, so this stays consistent with
+   the landing page. */
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) {
+  .lesson-content { padding-left: 16px; padding-right: 16px; }
+}
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule);
+               padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center;
+               padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.lesson-nav { max-width: 880px; margin: 0 auto 40px; padding: 0 24px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav .container { display: flex; gap: 18px; flex-wrap: wrap; width: 100%; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600;
+                font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.keypoints h4 { margin-top: 0; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="index.html">Machine Learning A&ndash;Z</a> &middot; Course</div><span class="course-code">Graph-based machine learning</span></div></header>
+<section class="hero"><div class="container"><h1>Machine Learning A&ndash;Z</h1><p class="subtitle">Supervised learning &middot; Unsupervised learning &middot; Graph-based machine learning</p><div class="instructors"><div class="instructor"><strong>Eight sections &middot; interactive figures &middot; graded practice</strong></div></div><a class="cta" href="#contents">See the full contents</a></div></section>
+<section class="section"><h2 class="section-title">Quick access</h2><p class="section-subtitle">Recommended entry points</p><div class="quick-access"><a class="qa-card" href="05-graph-foundations/page.html"><span class="qa-label">Start here for graphs</span><span class="qa-title">Graph Foundations</span><span class="qa-sub">Laplacian &middot; walks &middot; smoothness</span></a><a class="qa-card" href="06-spectral-clustering/page.html"><span class="qa-label">Cornerstone</span><span class="qa-title">Spectral Clustering</span><span class="qa-sub">Cuts &middot; Fiedler vector &middot; Cheeger</span></a><a class="qa-card" href="08-graph-neural-networks/page.html"><span class="qa-label">Modern</span><span class="qa-title">Graph Neural Networks</span><span class="qa-sub">Message passing &middot; expressiveness</span></a></div></section>
+<div id="contents"></div>
+<section class="section"><h2 class="section-title">How the course is organised</h2><p class="section-subtitle">One argument, not a list of algorithms</p><p>Part I develops classical machine learning and, at each step, exposes the assumption that will later fail: least squares assumes a linear relationship, k-means assumes spherical clusters, PCA assumes a linear manifold. Part II shows that relaxing those assumptions leads, repeatedly and from several directions, to the same object &mdash; a graph and its Laplacian &mdash; and then builds modern graph learning on top of it.</p><div class="box def"><div class="box-title">The thread running through both parts</div><p>Section 4 ends by observing that every non-linear embedding method begins by discarding coordinates and keeping only a neighbourhood <em>graph</em>. Section 5 formalises the graph and its Laplacian. Section 6 shows that clustering by graph cuts is an eigenproblem on that Laplacian, and that its embedding <em>is</em> the Laplacian eigenmap. Section 7 shows that walk-based node embeddings implicitly factorise a matrix of walk probabilities, so they too are spectral methods. Section 8 derives the graph convolution as a first-order polynomial filter in that same Laplacian, and explains over-smoothing as the spectral gap at work. <strong>One matrix, five sections.</strong></p></div></section>
+<section class="section"><h2 class="section-title">Part I &mdash; Classical machine learning</h2><p class="section-subtitle">Foundations, and the assumptions that eventually break</p><div class="sequences"><div class="seq-card"><div class="seq-meta">Section 1</div><h3>Foundations of Learning and Linear Regression</h3><p class="seq-topics">Empirical risk minimisation, least squares and the normal equations, gradient descent, the bias&ndash;variance decomposition, ridge and lasso, cross-validation.</p><div class="seq-actions"><a class="btn primary" href="01-foundations-regression/page.html">Open the section</a><a class="btn" href="01-foundations-regression/algorithms.html">Algorithms annex</a></div></div><div class="seq-card"><div class="seq-meta">Section 2</div><h3>Classification: Logistic Regression, k-NN and SVM</h3><p class="seq-topics">The Bayes rule, nearest neighbours and the curse of dimensionality, logistic regression and cross-entropy, the perceptron mistake bound, maximum-margin classifiers, kernels, and honest evaluation metrics.</p><div class="seq-actions"><a class="btn primary" href="02-classification/page.html">Open the section</a><a class="btn" href="02-classification/algorithms.html">Algorithms annex</a></div></div><div class="seq-card"><div class="seq-meta">Section 3</div><h3>Decision Trees and Ensemble Methods</h3><p class="seq-topics">Recursive partitioning, Gini and entropy, cost-complexity pruning, bagging and the correlation floor, random forests, AdaBoost and gradient boosting.</p><div class="seq-actions"><a class="btn primary" href="03-trees-ensembles/page.html">Open the section</a><a class="btn" href="03-trees-ensembles/algorithms.html">Algorithms annex</a></div></div><div class="seq-card"><div class="seq-meta">Section 4</div><h3>Unsupervised Learning: Clustering and Dimensionality Reduction</h3><p class="seq-topics">k-means and Lloyd's algorithm, careful seeding, choosing k, PCA as an eigenproblem, and the manifold methods that all begin with a neighbourhood graph.</p><div class="seq-actions"><a class="btn primary" href="04-unsupervised/page.html">Open the section</a><a class="btn" href="04-unsupervised/algorithms.html">Algorithms annex</a></div></div></div></section>
+<section class="section"><h2 class="section-title">Part II &mdash; Graph-based machine learning</h2><p class="section-subtitle">When the data are relational</p><div class="sequences"><div class="seq-card"><div class="seq-meta">Section 5</div><h3>Graph Foundations for Machine Learning</h3><p class="seq-topics">Adjacency and walks, the Laplacian and its quadratic form, normalised Laplacians, graph signals and smoothness, homophily, and the three graph learning tasks.</p><div class="seq-actions"><a class="btn primary" href="05-graph-foundations/page.html">Open the section</a><a class="btn" href="05-graph-foundations/algorithms.html">Algorithms annex</a></div></div><div class="seq-card"><div class="seq-meta">Section 6</div><h3>Graph Cuts and Spectral Clustering</h3><p class="seq-topics">RatioCut and NCut, the Rayleigh&ndash;Ritz relaxation, the Fiedler vector, Cheeger's inequality, the eigengap heuristic, and Laplacian eigenmaps.</p><div class="seq-actions"><a class="btn primary" href="06-spectral-clustering/page.html">Open the section</a><a class="btn" href="06-spectral-clustering/algorithms.html">Algorithms annex</a></div></div><div class="seq-card"><div class="seq-meta">Section 7</div><h3>Random Walks, PageRank and Node Embeddings</h3><p class="seq-topics">Random walks and stationary distributions, PageRank and Perron&ndash;Frobenius, walk-based embeddings, the matrix-factorisation view, and link prediction.</p><div class="seq-actions"><a class="btn primary" href="07-node-embeddings/page.html">Open the section</a><a class="btn" href="07-node-embeddings/algorithms.html">Algorithms annex</a></div></div><div class="seq-card"><div class="seq-meta">Section 8</div><h3>Graph Neural Networks</h3><p class="seq-topics">Message passing, spectral filters and the propagation rule, inductive and attention variants, the Weisfeiler&ndash;Leman expressiveness bound, over-smoothing and over-squashing.</p><div class="seq-actions"><a class="btn primary" href="08-graph-neural-networks/page.html">Open the section</a><a class="btn" href="08-graph-neural-networks/algorithms.html">Algorithms annex</a></div></div></div></section>
+<section class="section"><h2 class="section-title">Prerequisites</h2><p class="section-subtitle">What you need before starting</p><ul><li><strong>Linear algebra</strong> &mdash; matrix multiplication, eigenvalues and eigenvectors of symmetric matrices, the spectral theorem. Sections 6 and 8 lean on this heavily.</li><li><strong>Multivariable calculus</strong> &mdash; gradients, and what it means for a function to be convex.</li><li><strong>Probability</strong> &mdash; expectation, variance, conditional distributions, and the idea of an independent sample.</li><li><strong>Python</strong> &mdash; comfortable with lists, dictionaries and functions. The practice questions use nothing beyond the standard library.</li></ul></section>
+<section class="section"><h2 class="section-title">On the citations</h2><p class="section-subtitle">Roughly 110 primary sources</p><p>Every substantive claim is attributed. Definitions, theorems and empirical findings carry a numbered citation to the paper or book that established them, and each section ends with a full reference list including a DOI or permanent link. The bibliography runs from Kirchhoff (1847) and Legendre (1805) to the geometric deep learning and over-squashing literature of the 2020s. Where a result is commonly misattributed, the course points at the original.</p><div class="box tip"><div class="box-title">What the course does not claim</div><p>Several figures deliberately show a method <em>failing</em>: k-means on non-spherical clusters, the eigengap when no community structure remains, two graphs that colour refinement cannot separate, and a network whose over-smoothing is slow because the graph has a bottleneck. Knowing the boundary of a method matters at least as much as knowing the method, and these boundaries are where most applied mistakes live.</p></div></section>
+<footer class="site-footer"><strong>Machine Learning A&ndash;Z</strong> &middot; From empirical risk minimisation to graph neural networks<span class="footer-meta">Edition 2025-2026</span></footer>
+</body>
+</html>

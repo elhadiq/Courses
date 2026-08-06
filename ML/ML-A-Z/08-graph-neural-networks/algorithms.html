@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algorithms of Section 8</title>
+<link href="../assets/style.css" rel="stylesheet">
+<script src="../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+
+/* Use the full width the theme allows: the shared stylesheet caps a lesson at
+   880px, which leaves wide figures and tables boxed into the middle of a large
+   screen. --max-w is the theme's own page width, so this stays consistent with
+   the landing page. */
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) {
+  .lesson-content { padding-left: 16px; padding-right: 16px; }
+}
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule);
+               padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center;
+               padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.lesson-nav { max-width: 880px; margin: 0 auto 40px; padding: 0 24px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav .container { display: flex; gap: 18px; flex-wrap: wrap; width: 100%; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600;
+                font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.keypoints h4 { margin-top: 0; }
+
+.algo-tag { color: var(--color-muted); font-size: 0.86rem; font-style: italic;
+            margin: -0.4em 0 1em; }
+.algo-steps { border: 1px solid var(--color-rule); border-radius: var(--radius);
+              background: var(--proof-bg); padding: 4px 22px 14px;
+              margin: 1.2em 0; }
+.algo-steps-title { color: var(--primary); font-weight: 700; font-size: 0.8rem;
+                    letter-spacing: 0.09em; text-transform: uppercase;
+                    margin: 14px 0 4px; }
+.algo-steps ol { padding-left: 1.4em; }
+.algo-steps li { margin: 0.55em 0; line-height: 1.75; }
+.annex-toc { background: var(--primary-soft); border-radius: var(--radius);
+             padding: 16px 24px; margin: 1.4em 0; }
+.annex-toc ul { margin: 0.4em 0; }
+.annex-toc a { color: var(--primary-dark); font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../index.html">Machine Learning A&ndash;Z</a> &middot; Course</div><span class="course-code">Graph-based machine learning</span></div></header>
+<section class="lesson-hero"><div class="container"><div class="lesson-label">Part II &middot; Section 8 &middot; Annex</div><h1>Algorithms of Section 8</h1><div class="lesson-sub">Message passing, neighbour sampling, colour refinement and the over-smoothing diagnostic, set out step by step.</div></div></section>
+<main class="lesson-content">
+<h2>Annex &mdash; the algorithms of Section 8</h2><div class="box tip"><div class="box-title">How to read this annex</div><p>Each algorithm is set out the same way: what it is handed, what it must hand back, then the steps in the order you would carry them out. A small example is worked through by hand so you can check your understanding against real numbers, and the closing boxes say why the method is correct, why it stops, and what it costs. Nothing here assumes you can read a program &mdash; the point is the reasoning.</p></div><div class="annex-toc"><strong>Algorithms in this annex</strong><ul><li><a href="#algo1">One round of message passing</a></li><li><a href="#algo2">Neighbour sampling for large graphs</a></li><li><a href="#algo3">Colour refinement and the expressiveness limit</a></li><li><a href="#algo4">Diagnosing over-smoothing</a></li></ul></div><span id="algo1"></span><h3>One round of message passing</h3><p class="algo-tag">Layered method \(\cdot\) one hop per layer</p><p>Give every node a description that reflects both its own attributes and those of the nodes around it.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A graph, a set of attributes per node, and a number of rounds \(L\).</p><p><strong>Produce.</strong> A new description of every node.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Add a self-loop to every node.</strong> Pretend each node is joined to itself. Without this a node would describe its surroundings while forgetting itself entirely.</li><li><strong>Gather from the neighbours.</strong> For each node, collect the current descriptions of the nodes joined to it. Combine them into one, using an operation that does not depend on the order &mdash; adding, averaging or taking the largest. Order-independence is essential, because the nodes have no natural numbering.</li><li><strong>Weight by connectedness.</strong> Divide each contribution by the square root of the product of the two nodes' connection counts. Without this, heavily connected nodes overwhelm everything, and repeated rounds cause the numbers to grow without bound.</li><li><strong>Mix and reshape.</strong> Apply the same linear transformation at every node &mdash; the part that is learned &mdash; and then a simple non-linear function.</li><li><strong>Repeat L times.</strong> After \(L\) rounds, each node's description reflects everything within \(L\) hops of it. Two or three rounds is usual; the diagnosis below explains why more is rarely better.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>A path of five nodes; only the middle node starts with a value of 1, and averaging includes the node itself.</p><table><thead><tr><th>Round</th><th>Node 0</th><th>Node 1</th><th>Node 2</th><th>Node 3</th><th>Node 4</th></tr></thead><tbody><tr><td>0</td><td>0.00</td><td>0.00</td><td>1.00</td><td>0.00</td><td>0.00</td></tr><tr><td>1</td><td>0.00</td><td>0.33</td><td>0.33</td><td>0.33</td><td>0.00</td></tr><tr><td>2</td><td>0.17</td><td>0.22</td><td>0.33</td><td>0.22</td><td>0.17</td></tr><tr><td>3</td><td>0.20</td><td>0.24</td><td>0.26</td><td>0.24</td><td>0.20</td></tr><tr><td>8</td><td>0.24</td><td>0.25</td><td>0.25</td><td>0.25</td><td>0.24</td></tr></tbody></table><p>Information reaches exactly one hop further per round. But look at the later rounds: the values are converging to the same number everywhere. That is over-smoothing, visible in five nodes.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>Relabelling the nodes relabels the output identically and changes nothing else. This is the property that makes the method well defined on a graph, where there is no first node.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>\(L\) rounds, fixed in advance.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>Proportional to the number of edges times the description size, per round.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li><strong>It assumes joined nodes are alike.</strong> Where edges tend to join <em>unlike</em> nodes, this averaging destroys exactly the signal you need, and a method ignoring the graph does better.</li><li>Omitting the self-loop, or the degree weighting, produces a method that either forgets the node or blows up numerically after a few rounds.</li></ul></div><span id="algo2"></span><h3>Neighbour sampling for large graphs</h3><p class="algo-tag">Sampling \(\cdot\) makes the cost predictable</p><p>Apply the same idea to a graph too large to process whole, and to nodes that did not exist at training time.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A large graph and a budget of neighbours per round, for instance 25 then 10.</p><p><strong>Produce.</strong> Descriptions for any requested nodes, computed without touching the whole graph.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Start from the nodes you actually need.</strong> Only those whose descriptions are required, not every node in the graph.</li><li><strong>Sample their neighbours.</strong> For each, choose at random a fixed number of neighbours rather than using all of them. A node with a million connections costs the same as one with twenty.</li><li><strong>Sample again, one level out.</strong> Repeat for the neighbours just chosen, with a smaller budget. The result is a small tree around each target node.</li><li><strong>Combine inwards.</strong> Work from the outside in, combining descriptions level by level until reaching the target.</li><li><strong>Keep the node separate from its neighbourhood.</strong> Rather than averaging the node in with its neighbours, hold the two apart and combine them explicitly. This preserves the distinction between what a node is and what surrounds it.</li></ol></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>What is learned is a rule for combining a neighbourhood, not a separate description for each node. The same rule therefore applies to a node never seen before &mdash; or to an entirely new graph.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Fixed number of rounds and a fixed budget per round.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>The product of the per-round budgets, per target node &mdash; independent of the size of the graph. This is what makes the method deployable.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>Sampling adds noise: two runs give slightly different answers. Average over several samples at prediction time if stability matters.</li><li>Budgets that grow with depth cause the cost to explode. Reduce them at each level.</li></ul></div><span id="algo3"></span><h3>Colour refinement and the expressiveness limit</h3><p class="algo-tag">Test \(\cdot\) establishes what is impossible</p><p>Determine whether two graphs can be told apart by any method that works by passing messages between neighbours.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> Two graphs.</p><p><strong>Produce.</strong> Either a proof that they differ, or the answer 'cannot tell'.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Give every node the same colour.</strong> Start with no distinctions at all.</li><li><strong>Describe each node by itself and its neighbours.</strong> Form, for each node, the pair consisting of its own colour and the collection of its neighbours' colours. The collection is unordered but keeps repetitions &mdash; two neighbours coloured red is different from one.</li><li><strong>Recolour.</strong> Give the same new colour to nodes with identical descriptions, and different colours to nodes with different ones.</li><li><strong>Repeat until nothing changes.</strong> The division of nodes into colours can only get finer, so this settles.</li><li><strong>Compare.</strong> Tally how many nodes have each colour in each graph. Different tallies prove the graphs differ. Identical tallies prove nothing.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>Two triangles against a single six-cycle. Every node has exactly two neighbours in both.</p><table><thead><tr><th>Round</th><th>Two triangles</th><th>One six-cycle</th><th>Distinguished?</th></tr></thead><tbody><tr><td>0</td><td>six nodes, one colour</td><td>six nodes, one colour</td><td>no</td></tr><tr><td>1</td><td>six nodes, one colour</td><td>six nodes, one colour</td><td>no</td></tr><tr><td>2</td><td>six nodes, one colour</td><td>six nodes, one colour</td><td>no</td></tr><tr><td>any</td><td>unchanged</td><td>unchanged</td><td><strong>never</strong></td></tr></tbody></table><p>The graphs are plainly different &mdash; one has triangles, the other does not &mdash; yet this procedure cannot see it. No message-passing method can either, at any depth or width. That is a hard ceiling, not a shortcoming of any particular design.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>Every message-passing method is at most as discerning as this test, and reaches that ceiling only when its combining operation never conflates two different collections. Averaging conflates one item with two identical items; taking the largest conflates repetitions; adding does neither. This is the whole argument for summing.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Each round refines the division or leaves it unchanged; there are at most as many rounds as nodes.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>\(O(m)\) per round.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>Because of this ceiling, such methods cannot count triangles or detect cycle lengths &mdash; properties that decide how a molecule behaves.</li><li>The way round is to give nodes extra distinguishing information: counts of local structures, distances, or positions derived from the graph's own spectrum.</li></ul></div><span id="algo4"></span><h3>Diagnosing over-smoothing</h3><p class="algo-tag">Diagnostic \(\cdot\) decides how deep to go</p><p>Measure whether adding rounds is still helping or has begun to destroy the distinctions you need.</p><div class="box def"><div class="box-title">Input and output</div><p><strong>Given.</strong> A graph and the node descriptions after each round.</p><p><strong>Produce.</strong> A curve that says how many rounds are useful on this graph.</p></div><div class="algo-steps"><p class="algo-steps-title">The procedure, step by step</p><ol><li><strong>Measure how much neighbours differ.</strong> After each round, go over the edges and add up the squared differences between the descriptions at the two ends, each divided by the square root of its node's connection count.</li><li><strong>Divide by the overall size.</strong> So that the number reflects the <em>shape</em> of the descriptions and not their scale.</li><li><strong>Plot it against the number of rounds, on a logarithmic vertical scale.</strong> A straight downward line means the quantity is being multiplied by the same factor every round.</li><li><strong>Read the rate off the slope.</strong> That factor is governed by how well connected the graph is. A graph with a narrow waist has a factor close to one and degrades slowly; a well-connected graph collapses within a handful of rounds.</li><li><strong>Choose the depth.</strong> Deep enough to reach the information you need, shallow enough that the measure has not collapsed. In practice this is almost always two or three.</li></ol></div><div class="box example"><div class="box-title">Worked by hand</div><p>The same measurement on two graphs, showing that the phenomenon is universal but its speed is not.</p><table><thead><tr><th>Rounds</th><th>Well-connected graph</th><th>Graph with a narrow waist</th></tr></thead><tbody><tr><td>1</td><td>20 %</td><td>80 %</td></tr><tr><td>3</td><td>2 %</td><td>62 %</td></tr><tr><td>8</td><td>0.05 %</td><td>35 %</td></tr><tr><td>30</td><td>\(\lt 0.001\) %</td><td>4 %</td></tr></tbody></table><p>Both collapse. Only the timescale differs, and it is set by the same property of the graph that decides how easy it is to cut in two &mdash; the connection to Section 6 is exact, not an analogy.</p></div><div class="box thm"><div class="box-title">Why the answer is correct</div><p>Repeated averaging drives every description towards the same direction, which carries no information distinguishing one node from another. The measure is exactly the disagreement across edges of Section 5, so it reaching zero and the descriptions becoming identical are the same statement.</p></div><div class="box method"><div class="box-title">Why it stops</div><p>Direct.</p></div><div class="box prop"><div class="box-title">What it costs</div><p>\(O(m)\) per round measured.</p></div><div class="box warn"><div class="box-title">Where it goes wrong</div><ul><li>The opposite failure also exists: too few rounds and information from distant but relevant nodes never arrives, having been squeezed through a narrow waist into a fixed-size description. The two failures pull in opposite directions and on some graphs no depth avoids both.</li><li>Skip connections, keeping a share of the original description at every round, and adding edges around the narrow waist are the standard remedies.</li></ul></div><nav class="lesson-nav"><div class="container"><a href="../index.html">Course index</a><a href="page.html">&#8592; Back to the section</a></div></nav>
+</main>
+<footer class="site-footer"><strong>Machine Learning A&ndash;Z</strong> &middot; From empirical risk minimisation to graph neural networks<span class="footer-meta">Edition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">The interactive figure could not be loaded. Check your network connection.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+// Colours resolved from the stylesheet, so the figures follow the light/dark
+// theme. Each entry is a function: board attributes that are functions are
+// re-evaluated on update, so a theme switch only needs a redraw.
+var BOARDS = [];
+function cssv(name, fallback){
+    try {
+        var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback;
+    } catch (e) { return fallback; }
+}
+var PAL = {
+    text:  function(){ return cssv('--color-text',  '#1f2937'); },
+    muted: function(){ return cssv('--color-muted', '#6b7280'); },
+    axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+    ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+    grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+    cell:  function(){ return cssv('--cell-bg',     '#ffffff'); }
+};
+// Re-render every board when the theme attribute flips.
+if (window.MutationObserver) {
+    new MutationObserver(function(){
+        for (var i = 0; i < BOARDS.length; i++) {
+            try { BOARDS[i].fullUpdate(); } catch (e) {}
+        }
+    }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+
+
+})();
+</script>
+</body>
+</html>
