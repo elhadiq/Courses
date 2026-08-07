@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 5 - Wallets (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S5 C1 — Why one backup is enough</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Why does a deterministic (seeded) wallet need only a single backup taken at creation?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Every key is derived from the one seed, so the seed alone regenerates the entire wallet.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 1 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Every key is derived from the single seed, which can regenerate them all]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The wallet only ever holds one key]]></text><feedback format="html"><text>No — it can hold millions.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Backups are stored automatically on the blockchain]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The keys are not really secret]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S5 C2 — Mnemonic vs brainwallet</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A BIP-39 mnemonic is a sequence of words chosen randomly by the wallet, not words invented by the user.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. Randomly generated words avoid the weak randomness of human-chosen brainwallets.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S5 C3 — Reading a path</text></name>
+    <questiontext format="html"><text><![CDATA[<p>In the path <code>m/0/1</code>, what is described?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Read right to left: the second child (index 1) of the first child (m/0) of the master private key.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 4 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[The second grandchild private key of the first child of the master key]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The master public key]]></text><feedback format="html"><text>No — that would start with M and have no indices.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A hardened key]]></text><feedback format="html"><text>No — there is no prime mark.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The first child of the second child]]></text><feedback format="html"><text>Reversed.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S5 C4 — Public-only derivation</text></name>
+    <questiontext format="html"><text><![CDATA[<p>An HD wallet can derive a branch of public keys (and addresses) from a parent public key without holding any private keys.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. This enables safe receive-only servers that can generate addresses but cannot spend.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S5 C5 — Ethereum coin_type</text></name>
+    <questiontext format="html"><text><![CDATA[<p>In a BIP-44 path, which coin_type number identifies Ethereum? (Enter the number without the prime mark.)</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Ethereum is coin_type 60', so the paths live under m/44'/60'.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>60</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S5 C6 — Purpose of hardened derivation</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What problem does hardened derivation prevent?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>It breaks the link a leaked child key + parent chain code would give to the parent and sibling private keys.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 4 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[A leaked child key exposing the parent and sibling private keys]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Running out of index numbers]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Slow key derivation]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Mnemonic transcription errors]]></text><feedback format="html"><text>No — that is what BIP-39 addresses.</text></feedback></answer>
+  </question>
+</quiz>

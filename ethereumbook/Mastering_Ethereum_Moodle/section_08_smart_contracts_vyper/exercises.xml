@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 8 - Smart Contracts and Vyper (Exercises)</text></category>
+  </question>
+
+  <question type="coderunner">
+    <name><text>S8 Q1 — SafeMath addition</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #f7931a;border-radius:8px;padding:18px 22px;margin-bottom:16px;">
+<p style="color:#9a3412;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">S8 Q1 — Overflow protection</p>
+<p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;">Vyper arithmetic throws when a result overflows the integer type.</p>
+</div>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.8;">Write <strong><code>safe_add(a, b, bits)</code></strong> that adds two non-negative integers held in a <code>uint</code> of the given bit-width. If the sum fits (at most <code>2**bits - 1</code>), return the sum. Otherwise return the string <code>"overflow"</code>.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>python3</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>0</allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>16</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload><![CDATA[def safe_add(a, b, bits):
+    # Return the sum if it fits in a uint of 'bits' bits, else "overflow".
+    return ...
+]]></answerpreload>
+    <globalextra></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[def safe_add(a, b, bits):
+    total = a + b
+    if total <= 2**bits - 1:
+        return total
+    return "overflow"
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(safe_add(1, 2, 8))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>3
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(safe_add(200, 100, 8))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>overflow
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(safe_add(255, 0, 8))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>255
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(safe_add(1, 1, 256))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>2
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+    </testcases>
+  </question>
+
+  <question type="coderunner">
+    <name><text>S8 Q2 — Bounds-checked convert</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #f7931a;border-radius:8px;padding:18px 22px;margin-bottom:16px;">
+<p style="color:#9a3412;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">S8 Q2 — Safe conversion</p>
+<p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;">Vyper's <code>convert()</code> reverts if the value does not fit the target type.</p>
+</div>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.8;">Write <strong><code>vyper_convert(value, bits)</code></strong> that converts an integer to an unsigned type of the given bit-width. If <code>value</code> is in range (from 0 to <code>2**bits - 1</code> inclusive) return it unchanged; otherwise return the string <code>"revert"</code>.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>python3</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>0</allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>16</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload><![CDATA[def vyper_convert(value, bits):
+    # In range [0, 2**bits - 1] -> return value; otherwise "revert".
+    return ...
+]]></answerpreload>
+    <globalextra></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[def vyper_convert(value, bits):
+    if 0 <= value <= 2**bits - 1:
+        return value
+    return "revert"
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(vyper_convert(42, 8))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>42
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(vyper_convert(300, 8))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>revert
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(vyper_convert(-1, 8))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>revert
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(vyper_convert(255, 8))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>255
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+    </testcases>
+  </question>
+
+  <question type="coderunner">
+    <name><text>S8 Q3 — Valid decorator set</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #f7931a;border-radius:8px;padding:18px 22px;margin-bottom:16px;">
+<p style="color:#9a3412;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">S8 Q3 — Decorator rules</p>
+<p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;">Vyper enforces two rules: exactly one of @external / @internal, and never both @payable and @view.</p>
+</div>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.8;">Write <strong><code>decorators_valid(decorators)</code></strong> taking a list of decorator names (without the @). Return <code>True</code> only if the list contains exactly one of <code>"external"</code> or <code>"internal"</code> AND does not contain both <code>"payable"</code> and <code>"view"</code>. Otherwise return <code>False</code>.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>python3</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>0</allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>18</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload><![CDATA[def decorators_valid(decorators):
+    # Exactly one of external/internal, and not both payable and view.
+    return ...
+]]></answerpreload>
+    <globalextra></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[def decorators_valid(decorators):
+    has_external = "external" in decorators
+    has_internal = "internal" in decorators
+    if has_external == has_internal:
+        return False
+    if "payable" in decorators and "view" in decorators:
+        return False
+    return True
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(decorators_valid(["external", "view"]))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>True
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(decorators_valid(["payable", "view", "external"]))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>False
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(decorators_valid(["external", "internal"]))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>False
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(decorators_valid(["view"]))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>False
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+    </testcases>
+  </question>
+</quiz>

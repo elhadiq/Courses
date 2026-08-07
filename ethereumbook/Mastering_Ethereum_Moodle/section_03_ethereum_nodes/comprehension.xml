@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 3 - Ethereum Nodes (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S3 C1 — Two clients</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Since The Merge, an Ethereum node is made of which two cooperating clients?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>An execution client (runs the EVM and transactions) and a consensus client (runs proof of stake).</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 1 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[An execution client and a consensus client]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A mining client and a staking client]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A wallet client and a browser client]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A full client and an archive client]]></text><feedback format="html"><text>No — those are node roles, not the two-client split.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S3 C2 — JSON-RPC port</text></name>
+    <questiontext format="html"><text><![CDATA[<p>On which TCP port is the JSON-RPC HTTP service usually offered?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Port 8545, restricted by default to localhost.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>8545</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S3 C3 — Hex conversion</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What decimal integer does the hexadecimal string <code>0x10</code> represent?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>0x10 = 1&times;16 + 0 = 16.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>16</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S3 C4 — Full sync speed</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A full sync from the genesis block validates every block and can take days, which is why clients offer fast-sync options.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. Snap sync (execution) and checkpoint sync (consensus) skip full validation until the tip.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S3 C5 — Consensus fast sync</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which fast-sync option is used by a <em>consensus</em> client?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Checkpoint sync is for consensus clients; snap sync is for execution clients.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 2 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Checkpoint sync]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Snap sync]]></text><feedback format="html"><text>That is for execution clients.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Full sync]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Light sync]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S3 C6 — Running a full node</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Running your own full node lets you verify transactions independently instead of trusting someone else's server.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. That trustless, authoritative view is the main benefit of a full node.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+</quiz>

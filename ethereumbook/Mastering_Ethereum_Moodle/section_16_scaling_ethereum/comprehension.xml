@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 16 - Scaling Ethereum (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S16 C1 — The trilemma</text></name>
+    <questiontext format="html"><text><![CDATA[<p>The scalability trilemma is a trade-off among which three goals?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Decentralization, security, and scalability &mdash; improving one usually costs another.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 1 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Decentralization, security, and scalability]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Speed, cost, and privacy]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Safety, liveness, and finality]]></text><feedback format="html"><text>Those are consensus properties.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Storage, memory, and calldata]]></text><feedback format="html"><text>Those are EVM data areas.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S16 C2 — Where a rollup executes</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Where does a rollup perform the bulk of its transaction execution?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Off-chain on the L2, then it posts compressed data or a proof back to L1 for settlement.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 2 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Off-chain on L2, settling data or proofs on L1]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Entirely on L1, block by block]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[On a centralized company server with no L1 link]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Inside each user's wallet]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S16 C3 — Optimistic rollup proofs</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What kind of proof does an optimistic rollup rely on?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Fraud proofs: state is assumed valid but can be challenged within a window.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 3 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Fraud proofs]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Validity proofs]]></text><feedback format="html"><text>Those are used by ZK rollups.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Proof of work]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Proof of stake]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S16 C4 — ZK withdrawals</text></name>
+    <questiontext format="html"><text><![CDATA[<p>ZK rollups offer near-instant withdrawals because their validity proofs are verified on-chain, with no challenge window.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. Once the on-chain verification passes, the state is known valid immediately.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S16 C5 — Amortized cost</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A rollup batch costs 1000 on L1 and holds 100 transactions. What L1 cost does each transaction bear?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>1000 &divide; 100 = 10.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>10</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S16 C6 — Ethereum's priority</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Ethereum is willing to sacrifice decentralization in order to maximize raw transaction throughput.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>False. Ethereum deliberately protects decentralization, keeping node requirements low, which is exactly why it scales via rollups rather than bigger blocks.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+    <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  </question>
+</quiz>

@@ -1,0 +1,76 @@
+<div style="max-width:900px;margin:0 auto;font-family:Georgia,serif;color:#1e293b;line-height:1.85;font-size:16px;">
+
+  <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:30px 36px;margin-bottom:26px;color:#fff;">
+    <p style="color:#f7931a;font-size:12px;letter-spacing:3px;text-transform:uppercase;margin:0 0 6px;font-weight:bold;">Section 3 &middot; Reading</p>
+    <h1 style="font-size:28px;margin:0 0 8px;color:#fff;">Ethereum Nodes</h1>
+    <p style="margin:0;color:#cbd5e1;font-size:15px;">By the end of this lesson you will know what a node is, why Ethereum needs two clients, when to run a full node, and how to talk to a node through the JSON-RPC interface.</p>
+  </div>
+
+  <div style="background:#fff7ed;border-left:5px solid #f7931a;border-radius:8px;padding:18px 24px;margin-bottom:26px;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#9a3412;">What you will be able to do</p>
+    <ul style="margin:0;">
+      <li>Explain what an Ethereum node does and why the network needs many of them.</li>
+      <li>Describe the split between an <em>execution</em> client and a <em>consensus</em> client.</li>
+      <li>Weigh the trade-offs between a full node, a public testnet, and a local simulation.</li>
+      <li>Read a JSON-RPC request and response, and convert a hex result into a decimal number.</li>
+    </ul>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">1. What is a node?</h2>
+  <p>A <strong>node</strong> is a computer running Ethereum client software that connects to the peer-to-peer network. The health, resilience, and censorship resistance of the whole network depend on having many independently operated, geographically spread nodes. A <strong>full node</strong> downloads the entire blockchain and keeps its data, so it can verify every transaction and contract for itself and help new nodes get started. An <strong>archive node</strong> goes further and keeps every historical state forever.</p>
+  <p>Since The Merge, an Ethereum node is actually made of <strong>two</strong> cooperating clients:</p>
+  <table style="width:100%;border-collapse:collapse;font-size:15px;margin:10px 0;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:8px 14px;">Client</th><th style="text-align:left;padding:8px 14px;">Job</th><th style="text-align:left;padding:8px 14px;">Examples</th></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Execution client</td><td style="padding:8px 14px;">Runs transactions and smart contracts (the EVM), keeps the state.</td><td style="padding:8px 14px;">Geth, Nethermind, Besu, Erigon, Reth</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Consensus client</td><td style="padding:8px 14px;">Runs proof of stake: agreeing on which blocks are canonical.</td><td style="padding:8px 14px;">Lighthouse, Lodestar, Nimbus, Prysm, Teku</td></tr>
+  </table>
+  <p>You can mix and match: the book uses the Geth&ndash;Prysm and Reth&ndash;Lighthouse pairings as examples, but any execution client can pair with any consensus client.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">2. Should I run a full node?</h2>
+  <p>Running your own full node gives you an authoritative, trustless view of the chain &mdash; you verify everything yourself instead of trusting someone else's server. The cost is hardware, bandwidth, and time. There are three broad options depending on what you are doing:</p>
+  <table style="width:100%;border-collapse:collapse;font-size:15px;margin:10px 0;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:8px 14px;">Option</th><th style="text-align:left;padding:8px 14px;">Good for</th><th style="text-align:left;padding:8px 14px;">Cost</th></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Full node (mainnet)</td><td style="padding:8px 14px;">Maximum trust and independence; supporting the network.</td><td style="padding:8px 14px;">High storage and bandwidth.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Public testnet</td><td style="padding:8px 14px;">Testing DApps against a realistic shared network with free test ether.</td><td style="padding:8px 14px;">Moderate.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Local simulation</td><td style="padding:8px 14px;">Fast, private development and unit tests.</td><td style="padding:8px 14px;">Very low; not the real network.</td></tr>
+  </table>
+  <p>The first time a client connects, it must <strong>synchronize</strong>. A full sync validates every block from genesis and can take days. Most clients instead offer a fast sync (<em>snap sync</em> for execution clients, <em>checkpoint sync</em> for consensus clients) that skips full validation until it reaches the tip of the chain, then resumes full validation from there.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">3. Talking to a node: JSON-RPC</h2>
+  <p>Clients expose an API whose commands are encoded as JSON &mdash; the <strong>JSON-RPC</strong> interface. It is your program's gateway into Ethereum. It is normally served over HTTP on port <strong>8545</strong>, restricted by default to connections from your own machine (localhost, 127.0.0.1) for safety.</p>
+  <p>Every request has four fields: <code>jsonrpc</code> (always exactly <code>"2.0"</code>), <code>method</code> (the command name), <code>params</code> (its arguments), and <code>id</code> (a number you choose so you can match the reply). For example, asking a Geth node its version:</p>
+  <div style="background:#0d1117;color:#e6edf3;border-radius:10px;padding:16px 20px;margin:14px 0;font-family:'Courier New',monospace;font-size:13.5px;line-height:1.6;overflow-x:auto;">
+    request&nbsp;&nbsp;{"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":1}<br/>
+    response {"jsonrpc":"2.0","id":1,"result":"Geth/1.14.3-stable/..."}
+  </div>
+  <p>Numbers come back <strong>hex-encoded</strong>. When you ask for the gas price you might get <code>"0x1B1717FC7"</code>. To make sense of that you convert the hexadecimal string to a decimal integer:</p>
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px 24px;margin:16px 0;">
+    <p style="margin:0;font-family:'Courier New',monospace;font-size:15px;color:#0f172a;">0x1B1717FC7 &rarr; 7,271,972,807 wei &rarr; &asymp; 7.27 gwei</p>
+  </div>
+  <p>In real programs you would use a library such as web3.py or ethers.js rather than raw HTTP, but the underlying protocol is exactly this. Converting hex results and reading JSON responses are the skills the exercises drill.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">Glossary for this section</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:15px;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:8px 14px;">Term</th><th style="text-align:left;padding:8px 14px;">Meaning</th></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Node</td><td style="padding:8px 14px;">A computer running Ethereum client software on the P2P network.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Full node</td><td style="padding:8px 14px;">A node that downloads and verifies the whole blockchain.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Execution client</td><td style="padding:8px 14px;">Runs the EVM and processes transactions (e.g., Geth, Reth).</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Consensus client</td><td style="padding:8px 14px;">Handles proof of stake (e.g., Prysm, Lighthouse).</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">JSON-RPC</td><td style="padding:8px 14px;">The JSON-encoded API for talking to a node (HTTP port 8545).</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Snap / checkpoint sync</td><td style="padding:8px 14px;">Fast-sync options for execution and consensus clients.</td></tr>
+  </table>
+
+  <div style="background:#ecfdf5;border-left:5px solid #10b981;border-radius:8px;padding:16px 22px;margin:24px 0;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#065f46;">Check your understanding</p>
+    <ol style="margin:0;">
+      <li>What two clients make up an Ethereum node today? <span style="color:#94a3b8;">(Answer: an execution client and a consensus client.)</span></li>
+      <li>On which port is JSON-RPC usually served? <span style="color:#94a3b8;">(Answer: 8545.)</span></li>
+      <li>What decimal value does <code>0x10</code> represent? <span style="color:#94a3b8;">(Answer: 16.)</span></li>
+      <li>Which fast-sync option belongs to a consensus client? <span style="color:#94a3b8;">(Answer: checkpoint sync.)</span></li>
+    </ol>
+  </div>
+
+  <div style="background:#eef2ff;border-left:5px solid #6366f1;border-radius:8px;padding:16px 22px;margin-top:24px;">
+    <p style="margin:0;"><strong>Practice.</strong> Three Python exercises using only the standard library: (1) convert a hex string like <code>"0x1B1717FC7"</code> to an integer, (2) parse a JSON-RPC response and pull out its <code>result</code> field, and (3) map a client type to its fast-sync option.</p>
+  </div>
+</div>

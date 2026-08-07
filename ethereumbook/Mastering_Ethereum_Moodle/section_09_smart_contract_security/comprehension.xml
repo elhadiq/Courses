@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 9 - Smart Contract Security (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S9 C1 — How reentrancy works</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What makes a contract vulnerable to a reentrancy attack?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>It makes an external call before updating its own state, so an attacker can re-enter while the state is still inconsistent.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 2 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[It sends ether (an external call) before updating its internal state]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It uses too much gas]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It stores data in a mapping]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It is written in Vyper]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S9 C2 — CEI order</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What is the correct order of the checks-effects-interactions pattern?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Checks first, then effects (state updates), then interactions (external calls) last.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 3 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Checks, then effects, then interactions]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Interactions, then checks, then effects]]></text><feedback format="html"><text>No — external calls must be last.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Effects, then interactions, then checks]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Interactions, then effects, then checks]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S9 C3 — DAO hack</text></name>
+    <questiontext format="html"><text><![CDATA[<p>The 2016 DAO hack exploited a reentrancy vulnerability and led to the fork that created Ethereum Classic.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. The community forked to reverse the hack; the original chain continued as Ethereum Classic.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S9 C4 — View functions</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Because view functions do not modify state, they can never be involved in a reentrancy attack.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>False. Read-only reentrancy exploits view functions that other contracts trust while state is stale.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+    <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S9 C5 — Reentrancy lock</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What does a reentrancy lock (such as OpenZeppelin's ReentrancyGuard) do?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>It sets a flag on entry and clears it on exit, so a function cannot be re-entered while it is still running.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 4 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Blocks a function from being re-entered while it is still executing]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Encrypts the contract's storage]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Reduces the gas cost of a call]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Makes the contract upgradeable]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S9 C6 — Overflow defense</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which technique defends against integer overflow?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Safe math (or Solidity 0.8+ built-in checks) reverts on overflow instead of wrapping around.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 4 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Safe math (or Solidity 0.8+ overflow checks)]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A reentrancy lock]]></text><feedback format="html"><text>That is for reentrancy.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Checking call return values]]></text><feedback format="html"><text>That is for unchecked calls.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Using a bigger gas limit]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+</quiz>

@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 3 - Ethereum Nodes (Exercises)</text></category>
+  </question>
+
+  <question type="coderunner">
+    <name><text>S3 Q1 — Hex to integer</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #f7931a;border-radius:8px;padding:18px 22px;margin-bottom:16px;">
+<p style="color:#9a3412;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">S3 Q1 — Reading hex results</p>
+<p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;">JSON-RPC returns numbers hex-encoded, like the gas price <code>"0x1B1717FC7"</code>.</p>
+</div>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.8;">Write <strong><code>hex_to_int(hexstr)</code></strong> that takes a hexadecimal string beginning with <code>"0x"</code> and returns its value as a decimal integer. For example <code>hex_to_int("0x10")</code> returns <code>16</code>.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>python3</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>0</allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>12</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload><![CDATA[def hex_to_int(hexstr):
+    # int() can parse a base-16 string directly.
+    return ...
+]]></answerpreload>
+    <globalextra></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[def hex_to_int(hexstr):
+    return int(hexstr, 16)
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(hex_to_int("0x10"))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>16
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(hex_to_int("0x1B1717FC7"))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>7271972807
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(hex_to_int("0x0"))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>0
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+    </testcases>
+  </question>
+
+  <question type="coderunner">
+    <name><text>S3 Q2 — Parse a JSON-RPC response</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #f7931a;border-radius:8px;padding:18px 22px;margin-bottom:16px;">
+<p style="color:#9a3412;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">S3 Q2 — Parsing the reply</p>
+<p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;">A JSON-RPC response carries the answer in its <code>result</code> field.</p>
+</div>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.8;">Using the standard <code>json</code> module, write <strong><code>extract_result(response)</code></strong> that takes a JSON-RPC response <em>string</em> and returns the value of its <code>"result"</code> field. For example, given <code>'{"jsonrpc":"2.0","id":1,"result":"Geth/1.14.3-stable"}'</code> it returns <code>"Geth/1.14.3-stable"</code>.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>python3</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>0</allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>14</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload><![CDATA[import json
+
+def extract_result(response):
+    # Parse the JSON string and return the "result" field.
+    return ...
+]]></answerpreload>
+    <globalextra></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[import json
+
+def extract_result(response):
+    data = json.loads(response)
+    return data["result"]
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(extract_result('{"jsonrpc":"2.0","id":1,"result":"Geth/1.14.3-stable"}'))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>Geth/1.14.3-stable
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(extract_result('{"jsonrpc":"2.0","id":4213,"result":"0x1B1717FC7"}'))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>0x1B1717FC7
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(extract_result('{"jsonrpc":"2.0","id":7,"result":"0x0"}'))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>0x0
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+    </testcases>
+  </question>
+
+  <question type="coderunner">
+    <name><text>S3 Q3 — Fast-sync option</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #f7931a;border-radius:8px;padding:18px 22px;margin-bottom:16px;">
+<p style="color:#9a3412;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">S3 Q3 — Sync options</p>
+<p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;">Each kind of client has its own fast-sync option.</p>
+</div>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.8;">Write <strong><code>sync_option(client_type)</code></strong> that returns <code>"snap sync"</code> for an <code>"execution"</code> client and <code>"checkpoint sync"</code> for a <code>"consensus"</code> client. For any other input, return <code>"unknown client"</code>.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>python3</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>0</allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>14</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload><![CDATA[def sync_option(client_type):
+    # "execution" -> "snap sync", "consensus" -> "checkpoint sync".
+    return ...
+]]></answerpreload>
+    <globalextra></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[def sync_option(client_type):
+    options = {"execution": "snap sync", "consensus": "checkpoint sync"}
+    return options.get(client_type, "unknown client")
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(sync_option("execution"))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>snap sync
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(sync_option("consensus"))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>checkpoint sync
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(sync_option("mining"))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>unknown client
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+    </testcases>
+  </question>
+</quiz>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 7 - Smart Contracts and Solidity (Comprehension)</text></category>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S7 C1 — Immutability</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Once a smart contract is deployed, you can edit its code in place to fix a bug.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>False. Deployed code is immutable; the only way to change behaviour is to deploy a new contract.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+    <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S7 C2 — What starts execution</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What ultimately triggers every smart contract execution on Ethereum?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>A transaction from an externally owned account. Contracts never run on their own.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 2 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[A transaction initiated by an EOA]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A timer inside the contract]]></text><feedback format="html"><text>No — contracts have no background timers.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The validator that builds the block]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The contract calling itself on deployment]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S7 C3 — uint8 maximum</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What is the largest value a <code>uint8</code> can hold?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>2<sup>8</sup> &minus; 1 = 255.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>255</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S7 C4 — Default uint size</text></name>
+    <questiontext format="html"><text><![CDATA[<p>In Solidity, a bare <code>uint</code> with no size suffix is equivalent to which type?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p><code>uint</code> is an alias for <code>uint256</code>, matching the EVM's 256-bit word.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 3 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[uint256]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[uint8]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[uint32]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[uint64]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S7 C5 — Atomicity</text></name>
+    <questiontext format="html"><text><![CDATA[<p>If a transaction fails partway through, all of its state changes are rolled back as if it never ran.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. Transactions are atomic; only the gas is still charged, and the attempt is recorded.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S7 C6 — Contract accounts and keys</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which statement about a contract account is correct?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>A contract account has no private key; it is controlled entirely by its code, so we say it "owns itself".</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 2 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[It has no private key and is controlled by its code]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The creator receives its private key at deployment]]></text><feedback format="html"><text>No — no key exists.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It can initiate transactions by itself]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Its address is chosen randomly]]></text><feedback format="html"><text>No — it derives from creator and nonce.</text></feedback></answer>
+  </question>
+</quiz>

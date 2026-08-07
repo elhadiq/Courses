@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 2 - Ethereum Basics (Exercises)</text></category>
+  </question>
+
+  <question type="coderunner">
+    <name><text>S2 Q1 — Ether to wei</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #f7931a;border-radius:8px;padding:18px 22px;margin-bottom:16px;">
+<p style="color:#9a3412;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">S2 Q1 — Units</p>
+<p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;">Internally Ethereum counts everything in wei, where 1 ether = 10<sup>18</sup> wei.</p>
+</div>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.8;">Write <strong><code>ether_to_wei(ether)</code></strong> that takes a whole number of ether and returns the equivalent integer number of wei. For example <code>ether_to_wei(1)</code> must return <code>1000000000000000000</code>.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>python3</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>0</allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>12</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload><![CDATA[def ether_to_wei(ether):
+    # 1 ether = 10**18 wei
+    return ...
+]]></answerpreload>
+    <globalextra></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[def ether_to_wei(ether):
+    return ether * 10**18
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(ether_to_wei(1))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>1000000000000000000
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(ether_to_wei(5))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>5000000000000000000
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(ether_to_wei(0))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>0
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+    </testcases>
+  </question>
+
+  <question type="coderunner">
+    <name><text>S2 Q2 — Name the denomination</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #f7931a;border-radius:8px;padding:18px 22px;margin-bottom:16px;">
+<p style="color:#9a3412;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">S2 Q2 — Denominations</p>
+<p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;">Each power-of-ten denomination has a common name.</p>
+</div>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.8;">Write <strong><code>unit_name(exponent)</code></strong> that returns the common name for the given power of ten: 0&nbsp;&rarr;&nbsp;<code>"Wei"</code>, 9&nbsp;&rarr;&nbsp;<code>"Shannon"</code>, 12&nbsp;&rarr;&nbsp;<code>"Szabo"</code>, 15&nbsp;&rarr;&nbsp;<code>"Finney"</code>, 18&nbsp;&rarr;&nbsp;<code>"Ether"</code>. For any other exponent return <code>"Unknown"</code>.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>python3</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>0</allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>16</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload><![CDATA[def unit_name(exponent):
+    # Map the exponent to its common name, or "Unknown".
+    return ...
+]]></answerpreload>
+    <globalextra></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[def unit_name(exponent):
+    names = {0: "Wei", 9: "Shannon", 12: "Szabo", 15: "Finney", 18: "Ether"}
+    return names.get(exponent, "Unknown")
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(unit_name(0))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>Wei
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(unit_name(18))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>Ether
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(unit_name(9))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>Shannon
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(unit_name(7))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>Unknown
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+    </testcases>
+  </question>
+
+  <question type="coderunner">
+    <name><text>S2 Q3 — Faucet withdrawal</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #f7931a;border-radius:8px;padding:18px 22px;margin-bottom:16px;">
+<p style="color:#9a3412;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">S2 Q3 — The faucet rule</p>
+<p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;">A faucet checks two limits before it pays out.</p>
+</div>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.8;">Write <strong><code>faucet_withdraw(balance, request, limit)</code></strong>. If <code>request</code> is greater than <code>limit</code>, return the string <code>"Withdrawal too big"</code>. Otherwise, if <code>request</code> is greater than <code>balance</code>, return <code>"Insufficient funds"</code>. Otherwise pay out and return the integer new balance (<code>balance - request</code>). Check the limit first.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>python3</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>0</allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>18</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload><![CDATA[def faucet_withdraw(balance, request, limit):
+    # Check the per-withdrawal limit first, then the balance.
+    return ...
+]]></answerpreload>
+    <globalextra></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[def faucet_withdraw(balance, request, limit):
+    if request > limit:
+        return "Withdrawal too big"
+    if request > balance:
+        return "Insufficient funds"
+    return balance - request
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(faucet_withdraw(1000, 100, 100))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>900
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(faucet_withdraw(1000, 200, 100))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>Withdrawal too big
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(faucet_withdraw(50, 100, 100))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>Insufficient funds
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(faucet_withdraw(100, 100, 100))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>0
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+    </testcases>
+  </question>
+</quiz>

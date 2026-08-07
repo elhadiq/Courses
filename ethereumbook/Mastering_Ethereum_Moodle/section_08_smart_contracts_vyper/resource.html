@@ -1,0 +1,79 @@
+<div style="max-width:900px;margin:0 auto;font-family:Georgia,serif;color:#1e293b;line-height:1.85;font-size:16px;">
+
+  <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:30px 36px;margin-bottom:26px;color:#fff;">
+    <p style="color:#f7931a;font-size:12px;letter-spacing:3px;text-transform:uppercase;margin:0 0 6px;font-weight:bold;">Section 8 &middot; Reading</p>
+    <h1 style="font-size:28px;margin:0 0 8px;color:#fff;">Smart Contracts and Vyper</h1>
+    <p style="margin:0;color:#cbd5e1;font-size:15px;">By the end of this lesson you will understand Vyper's security-first philosophy, what it deliberately leaves out, its function decorators, and its built-in overflow protection.</p>
+  </div>
+
+  <div style="background:#fff7ed;border-left:5px solid #f7931a;border-radius:8px;padding:18px 24px;margin-bottom:26px;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#9a3412;">What you will be able to do</p>
+    <ul style="margin:0;">
+      <li>Explain why Vyper omits features like modifiers, inheritance, and overloading.</li>
+      <li>List the main function decorators and the rules that constrain them.</li>
+      <li>Describe Vyper's explicit, bounds-checked type conversions.</li>
+      <li>Explain built-in overflow protection and why it matters.</li>
+    </ul>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">1. Why Vyper exists</h2>
+  <p>In 2023 alone, nearly $2 billion was stolen through smart-contract vulnerabilities. Most bugs are honest mistakes, but the loss is real. <strong>Vyper</strong> is a contract language for the EVM, inspired by Python, whose central goal is <em>auditability</em>: it tries to make misleading or unsafe code virtually impossible to write. Its strategy is subtraction &mdash; it deliberately leaves out powerful Solidity features that make code harder to reason about.</p>
+  <table style="width:100%;border-collapse:collapse;font-size:15px;margin:10px 0;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:8px 14px;">Feature Vyper omits</th><th style="text-align:left;padding:8px 14px;">Why</th></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Modifiers</td><td style="padding:8px 14px;">They can silently change state; use explicit inline checks instead.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Inheritance</td><td style="padding:8px 14px;">Forces readers to jump between files; multiple inheritance is confusing.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Inline assembly</td><td style="padding:8px 14px;">Breaks the ability to search for where a variable is used.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Function overloading</td><td style="padding:8px 14px;">Two functions with the same name is ambiguous.</td></tr>
+  </table>
+  <p>The <strong>modifier</strong> case is the clearest. A Solidity modifier can look like a harmless precheck yet secretly call another function that advances the contract's state &mdash; a new developer calling the function might never notice. Vyper removes modifiers entirely: if you are checking a condition, write an inline <code>assert</code>; if you are changing state, make that change explicit in the function body.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">2. Decorators</h2>
+  <p>Each Vyper function begins with a decorator that declares what it may do. Understanding them is central to reading Vyper:</p>
+  <table style="width:100%;border-collapse:collapse;font-size:15px;margin:10px 0;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:8px 14px;">Decorator</th><th style="text-align:left;padding:8px 14px;">Meaning</th></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">@external</td><td style="padding:8px 14px;">Callable from outside the contract.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">@internal</td><td style="padding:8px 14px;">Callable only from inside (the default).</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">@view</td><td style="padding:8px 14px;">May read but not change state.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">@pure</td><td style="padding:8px 14px;">May not read state at all.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">@payable</td><td style="padding:8px 14px;">May receive ether.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">@nonreentrant</td><td style="padding:8px 14px;">Locks the function against reentrancy attacks.</td></tr>
+  </table>
+  <p>Vyper enforces the logic of these decorators. Every function must be marked <strong>exactly one</strong> of <code>@external</code> or <code>@internal</code> &mdash; never both, never neither. And a function cannot be both <code>@payable</code> and <code>@view</code>, because receiving value <em>is</em> a state change and so contradicts &ldquo;view.&rdquo; The compiler rejects any program that breaks these rules. Checking a decorator combination for validity is one of the exercises.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">3. Explicit, safe type conversion</h2>
+  <p>Where Solidity often converts types implicitly, Vyper requires every conversion to be written out with <code>convert()</code>, and it always bounds-checks. Converting a small type up to a bigger one is safe; converting a big type <em>down</em> to a smaller one will <strong>revert the transaction</strong> if the value does not fit. There is no silent truncation &mdash; every conversion is intentional and range-checked.</p>
+  <div style="background:#0d1117;color:#e6edf3;border-radius:10px;padding:16px 20px;margin:14px 0;font-family:'Courier New',monospace;font-size:13.5px;line-height:1.6;overflow-x:auto;">
+    small_value: uint8 = 42<br/>
+    large_value: uint256 = convert(small_value, uint256)&nbsp;&nbsp;# safe upcast<br/>
+    back_to_small: uint8 = convert(large_value, uint8)&nbsp;&nbsp;&nbsp;# bounds-checked
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">4. Overflow protection built in</h2>
+  <p>Integer overflow has caused catastrophic bugs &mdash; a 2018 flaw in an ERC-20 token let an attacker mint an astronomically large balance. Vyper has always shipped <strong>built-in overflow protection</strong>: addition, subtraction, multiplication, and division throw an exception on overflow or underflow, and clamps enforce bounds whenever a value is loaded, passed, or assigned. So <code>safe_add(a, b)</code> on 8-bit integers succeeds when the sum fits in 0&ndash;255 but reverts when it would exceed 255. (Modern Solidity 0.8+ added similar checks, but Vyper was designed this way from the start.)</p>
+  <p>Contracts write data to two places: the <strong>global state</strong> (a contract's own persistent storage, which it cannot share with other contracts) and <strong>logs</strong> (searchable events, with up to four indexed arguments). Modelling the safe-add rule and the convert bounds-check are the remaining exercises.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">Glossary for this section</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:15px;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:8px 14px;">Term</th><th style="text-align:left;padding:8px 14px;">Meaning</th></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Vyper</td><td style="padding:8px 14px;">Python-inspired EVM language focused on auditability.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Decorator</td><td style="padding:8px 14px;">A tag on a function declaring what it may do (@external, @view...).</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">convert()</td><td style="padding:8px 14px;">Vyper's explicit, bounds-checked type conversion.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Overflow protection</td><td style="padding:8px 14px;">Arithmetic that reverts instead of wrapping around.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">@nonreentrant</td><td style="padding:8px 14px;">A lock preventing reentrancy attacks.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Log / event</td><td style="padding:8px 14px;">Searchable data a contract writes to the chain.</td></tr>
+  </table>
+
+  <div style="background:#ecfdf5;border-left:5px solid #10b981;border-radius:8px;padding:16px 22px;margin:24px 0;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#065f46;">Check your understanding</p>
+    <ol style="margin:0;">
+      <li>Why did Vyper remove modifiers? <span style="color:#94a3b8;">(Answer: they can hide state changes and hurt auditability.)</span></li>
+      <li>Which two decorators can never appear together? <span style="color:#94a3b8;">(Answer: @payable and @view.)</span></li>
+      <li>What does Vyper do on a downcast that does not fit? <span style="color:#94a3b8;">(Answer: it reverts.)</span></li>
+      <li>What happens when 200 + 100 overflows a uint8? <span style="color:#94a3b8;">(Answer: it reverts / throws.)</span></li>
+    </ol>
+  </div>
+
+  <div style="background:#eef2ff;border-left:5px solid #6366f1;border-radius:8px;padding:16px 22px;margin-top:24px;">
+    <p style="margin:0;"><strong>Practice.</strong> Three Python exercises: (1) a SafeMath-style <code>safe_add</code> that reverts on overflow, (2) a bounds-checked <code>convert</code> that reverts when a value is out of range, and (3) a validator for a function's decorator set, enforcing Vyper's external/internal and payable/view rules.</p>
+  </div>
+</div>

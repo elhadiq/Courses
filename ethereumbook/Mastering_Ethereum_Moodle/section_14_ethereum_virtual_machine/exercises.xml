@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 14 - The Ethereum Virtual Machine (Exercises)</text></category>
+  </question>
+
+  <question type="coderunner">
+    <name><text>S14 Q1 — Tiny stack machine</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #f7931a;border-radius:8px;padding:18px 22px;margin-bottom:16px;">
+<p style="color:#9a3412;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">S14 Q1 — Stack execution</p>
+<p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;">The EVM works on a last-in, first-out stack.</p>
+</div>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.8;">Write <strong><code>evm_stack(ops)</code></strong> that runs a list of operations on a stack. An integer means &ldquo;push this value.&rdquo; The string <code>"ADD"</code> pops the top two values and pushes their sum; <code>"MUL"</code> pops two and pushes their product. Return the value left on top of the stack. For example <code>evm_stack([2, 3, "ADD"])</code> returns <code>5</code>.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>python3</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>0</allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>20</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload><![CDATA[def evm_stack(ops):
+    stack = []
+    for op in ops:
+        # push an int; "ADD"/"MUL" pop two and push the result.
+        pass
+    return stack[-1]
+]]></answerpreload>
+    <globalextra></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[def evm_stack(ops):
+    stack = []
+    for op in ops:
+        if op == "ADD":
+            b = stack.pop()
+            a = stack.pop()
+            stack.append(a + b)
+        elif op == "MUL":
+            b = stack.pop()
+            a = stack.pop()
+            stack.append(a * b)
+        else:
+            stack.append(op)
+    return stack[-1]
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(evm_stack([2, 3, "ADD"]))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>5
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(evm_stack([2, 3, "MUL", 4, "ADD"]))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>10
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(evm_stack([5]))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>5
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+    </testcases>
+  </question>
+
+  <question type="coderunner">
+    <name><text>S14 Q2 — Total gas cost</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #f7931a;border-radius:8px;padding:18px 22px;margin-bottom:16px;">
+<p style="color:#9a3412;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">S14 Q2 — Gas accounting</p>
+<p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;">Every transaction pays a 21,000 base cost plus the cost of each opcode.</p>
+</div>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.8;">Write <strong><code>total_gas(ops)</code></strong> that returns <code>21000</code> plus the gas for each opcode in the list, using these costs: <code>ADD</code> = 3, <code>MUL</code> = 5, <code>KECCAK256</code> = 30. For example <code>total_gas(["ADD"])</code> returns <code>21003</code>.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>python3</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>0</allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>16</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload><![CDATA[def total_gas(ops):
+    # 21000 base + cost of each opcode (ADD=3, MUL=5, KECCAK256=30).
+    return ...
+]]></answerpreload>
+    <globalextra></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[def total_gas(ops):
+    cost = {"ADD": 3, "MUL": 5, "KECCAK256": 30}
+    return 21000 + sum(cost[o] for o in ops)
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(total_gas(["ADD"]))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>21003
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(total_gas(["KECCAK256", "ADD"]))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>21033
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(total_gas([]))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>21000
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(total_gas(["ADD", "MUL", "MUL"]))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>21013
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+    </testcases>
+  </question>
+
+  <question type="coderunner">
+    <name><text>S14 Q3 — Persistent data location?</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #f7931a;border-radius:8px;padding:18px 22px;margin-bottom:16px;">
+<p style="color:#9a3412;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">S14 Q3 — Data areas</p>
+<p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;">Only one of the EVM's data areas survives between transactions.</p>
+</div>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.8;">Write <strong><code>is_persistent(location)</code></strong> that returns <code>True</code> only for <code>"storage"</code>, and <code>False</code> for the volatile or read-only areas <code>"stack"</code>, <code>"memory"</code>, and <code>"calldata"</code>.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>python3</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>0</allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>12</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload><![CDATA[def is_persistent(location):
+    # Only "storage" persists between transactions.
+    return ...
+]]></answerpreload>
+    <globalextra></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[def is_persistent(location):
+    return location == "storage"
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(is_persistent("storage"))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>True
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(is_persistent("memory"))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>False
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(is_persistent("calldata"))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>False
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(is_persistent("stack"))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>False
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+    </testcases>
+  </question>
+</quiz>

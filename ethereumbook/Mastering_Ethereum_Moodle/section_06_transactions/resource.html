@@ -1,0 +1,73 @@
+<div style="max-width:900px;margin:0 auto;font-family:Georgia,serif;color:#1e293b;line-height:1.85;font-size:16px;">
+
+  <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:30px 36px;margin-bottom:26px;color:#fff;">
+    <p style="color:#f7931a;font-size:12px;letter-spacing:3px;text-transform:uppercase;margin:0 0 6px;font-weight:bold;">Section 6 &middot; Reading</p>
+    <h1 style="font-size:28px;margin:0 0 8px;color:#fff;">Transactions</h1>
+    <p style="margin:0;color:#cbd5e1;font-size:15px;">By the end of this lesson you will know what a transaction contains, why the nonce matters, how gas fees are calculated under EIP-1559, and what the value and data fields do.</p>
+  </div>
+
+  <div style="background:#fff7ed;border-left:5px solid #f7931a;border-radius:8px;padding:18px 24px;margin-bottom:26px;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#9a3412;">What you will be able to do</p>
+    <ul style="margin:0;">
+      <li>Name the five EIP-2718 transaction types and identify each by its type byte.</li>
+      <li>Explain the two jobs the nonce does: ordering and duplicate protection.</li>
+      <li>Compute a simple transfer fee and an EIP-1559 fee from base and priority fees.</li>
+      <li>Describe the value and data fields and what makes a transaction a contract call.</li>
+    </ul>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">1. The shape of a transaction</h2>
+  <p>A transaction is a signed message that requests a change to Ethereum's state. Since EIP-2718, every transaction begins with a single <strong>type byte</strong> so the network can tell different formats apart:</p>
+  <table style="width:100%;border-collapse:collapse;font-size:15px;margin:10px 0;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:8px 14px;">Type byte</th><th style="text-align:left;padding:8px 14px;">Name</th><th style="text-align:left;padding:8px 14px;">Note</th></tr>
+    <tr><td style="padding:8px 14px;"><code>0x00</code></td><td style="padding:8px 14px;">Legacy</td><td style="padding:8px 14px;">The original format.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;"><code>0x01</code></td><td style="padding:8px 14px;">EIP-2930</td><td style="padding:8px 14px;">Adds an access list.</td></tr>
+    <tr><td style="padding:8px 14px;"><code>0x02</code></td><td style="padding:8px 14px;">EIP-1559</td><td style="padding:8px 14px;">Base fee + priority fee (today's default).</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;"><code>0x03</code></td><td style="padding:8px 14px;">EIP-4844</td><td style="padding:8px 14px;">Blob transactions for rollups.</td></tr>
+    <tr><td style="padding:8px 14px;"><code>0x04</code></td><td style="padding:8px 14px;">EIP-7702</td><td style="padding:8px 14px;">Lets an EOA act with contract code.</td></tr>
+  </table>
+  <p>Every transaction also carries a sender, a recipient, a value, a data payload, gas fields, a nonce, and a signature. We look at the most important of these next.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">2. The nonce: order and no duplicates</h2>
+  <p>The <strong>nonce</strong> is a counter of how many transactions an address has already sent. It is not stored directly; it is derived by counting confirmed transactions from that address. It quietly solves two problems.</p>
+  <p><strong>Ordering.</strong> Suppose you sign a 6-ETH payment (nonce 3) then an 8-ETH payment (nonce 4), but your account holds only 10 ETH. Across a decentralized network, nodes may see them in either order. The nonce forces the network to process nonce 4 only after nonce 3, so the transaction you sent first wins.</p>
+  <p><strong>Duplicate protection.</strong> Without a nonce, two payments of 2 ETH to the same address would look identical, and anyone could &ldquo;replay&rdquo; your transaction over and over to drain you. Because each transaction carries a unique, incrementing nonce, no two are ever identical &mdash; replay is impossible. This is why an account-based chain like Ethereum needs a nonce, unlike Bitcoin's UTXO model.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">3. Gas and fees</h2>
+  <p>Gas is the fuel that meters computation. It is <em>not</em> ether: it is a separate accounting unit priced in wei per gas, kept distinct so fee logic is insulated from ether's price swings. Two fields control it. The <strong>gas limit</strong> is the most gas you are willing to buy (like the capacity of a fuel tank). A plain transfer of ether between two EOAs always costs exactly <strong>21,000 gas</strong>; a contract call cannot be known exactly in advance because the code may take different paths.</p>
+  <p>Since EIP-1559 the fee has two parts. The <strong>base fee</strong> is the minimum price per gas a block demands; it is burned. The <strong>priority fee</strong> (a tip) is added on top and goes to the validator that includes your transaction. So the total you pay is:</p>
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px 24px;margin:16px 0;">
+    <p style="margin:0 0 6px;font-family:'Courier New',monospace;font-size:15px;color:#0f172a;">fee = gas_used &times; (base_fee + priority_fee)</p>
+    <p style="margin:0;font-size:14px;">A simple transfer: 21,000 &times; gas_price. At a price of 100 wei/gas that is 2,100,000 wei.</p>
+  </div>
+  <p>You must hold enough ether to cover the maximum (limit &times; max price) up front, but you are only billed for the gas actually consumed. Computing these fees is what the exercises drill.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">4. Recipient, value, and data</h2>
+  <p>The <strong>recipient</strong> (<code>to</code>) is a 20-byte address, either an EOA or a contract. Ethereum does <em>not</em> check that it corresponds to a real key or contract &mdash; sending to a mistyped address usually <em>burns</em> the ether forever, which is why address validation (the ERC-55 checksum from section 4) belongs in the user interface.</p>
+  <p>The payload lives in two fields, <strong>value</strong> (ether to transfer) and <strong>data</strong> (bytes). All four combinations are valid: value only, data only, both, or neither. When the recipient is a contract and the transaction carries data, that data selects which function to run and its arguments &mdash; this is how a transaction <em>calls</em> a contract. A special case with an empty <code>to</code> field creates a new contract.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">Glossary for this section</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:15px;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:8px 14px;">Term</th><th style="text-align:left;padding:8px 14px;">Meaning</th></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Type byte</td><td style="padding:8px 14px;">First byte of a transaction, selecting its format (EIP-2718).</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Nonce</td><td style="padding:8px 14px;">Per-sender count of transactions; orders them and blocks replays.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Gas limit</td><td style="padding:8px 14px;">Maximum gas the sender will buy for the transaction.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Base fee</td><td style="padding:8px 14px;">Minimum price per gas, burned (EIP-1559).</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Priority fee</td><td style="padding:8px 14px;">Tip per gas paid to the validator.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Value / data</td><td style="padding:8px 14px;">Ether transferred / bytes that can call a contract function.</td></tr>
+  </table>
+
+  <div style="background:#ecfdf5;border-left:5px solid #10b981;border-radius:8px;padding:16px 22px;margin:24px 0;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#065f46;">Check your understanding</p>
+    <ol style="margin:0;">
+      <li>Which type byte is an EIP-1559 transaction? <span style="color:#94a3b8;">(Answer: 0x02.)</span></li>
+      <li>Name the nonce's two jobs. <span style="color:#94a3b8;">(Answer: ordering and duplicate protection.)</span></li>
+      <li>How much gas does a plain EOA-to-EOA transfer use? <span style="color:#94a3b8;">(Answer: 21,000.)</span></li>
+      <li>Where does the priority fee go? <span style="color:#94a3b8;">(Answer: to the validator that includes the transaction.)</span></li>
+    </ol>
+  </div>
+
+  <div style="background:#eef2ff;border-left:5px solid #6366f1;border-radius:8px;padding:16px 22px;margin-top:24px;">
+    <p style="margin:0;"><strong>Practice.</strong> Three Python exercises: (1) map a transaction type byte to its name, (2) compute the fee of a simple 21,000-gas transfer, and (3) compute an EIP-1559 fee from gas used, base fee, and priority fee.</p>
+  </div>
+</div>

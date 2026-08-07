@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 17 - Zero-Knowledge Proofs (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S17 C1 — What a ZK proof reveals</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What does a zero-knowledge proof reveal to the verifier?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Only that the statement is true &mdash; nothing about the secret witness.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 1 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Only that the statement is true, and nothing about the witness]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The full secret witness]]></text><feedback format="html"><text>No — that would defeat the purpose.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The prover's private key]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Nothing at all, not even validity]]></text><feedback format="html"><text>No — validity is exactly what it proves.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S17 C2 — Soundness</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which property ensures a cheating prover cannot produce a valid proof for a false statement?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Soundness. Completeness is about true statements always being provable; zero knowledge is about revealing nothing.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 2 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Soundness]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Completeness]]></text><feedback format="html"><text>That is about true statements being provable.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Zero knowledge]]></text><feedback format="html"><text>That is about revealing nothing.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Liveness]]></text><feedback format="html"><text>That is a consensus property.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S17 C3 — Verify vs re-execute</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Zero-knowledge proofs help Ethereum scale because verifying a proof can be much cheaper than re-executing all the transactions.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. Most nodes can verify a proof instead of re-running the block, keeping node requirements low while raising throughput.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S17 C4 — Partition example</text></name>
+    <questiontext format="html"><text><![CDATA[<p>The set [1, 1, 5, 7] can be partitioned into two subsets with equal sums.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. [1, 1, 5] and [7] both sum to 7.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S17 C5 — Trusted setup</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which proof system typically requires a trusted setup?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>SNARKs usually need a one-time trusted setup; STARKs do not.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 5 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[SNARK]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[STARK]]></text><feedback format="html"><text>STARKs need no trusted setup.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Both equally]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Neither]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S17 C6 — ZK and rollups</text></name>
+    <questiontext format="html"><text><![CDATA[<p>How do ZK rollups use zero-knowledge proofs?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>They prove that a batch of L2 execution was carried out correctly, and post that proof to L1.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 3 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[They prove a batch of L2 execution was correct and post the proof to L1]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[They hide all transactions from validators]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[They replace consensus entirely]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[They make gas free]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+</quiz>

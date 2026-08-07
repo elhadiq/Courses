@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 9 - Smart Contract Security (Exercises)</text></category>
+  </question>
+
+  <question type="coderunner">
+    <name><text>S9 Q1 — Checks-effects-interactions</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #f7931a;border-radius:8px;padding:18px 22px;margin-bottom:16px;">
+<p style="color:#9a3412;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">S9 Q1 — CEI ordering</p>
+<p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;">Reentrancy is prevented by updating your own state before calling out.</p>
+</div>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.8;">Write <strong><code>cei_is_safe(steps)</code></strong> where <code>steps</code> is a list of the strings <code>"effect"</code> (a state update) and <code>"interaction"</code> (an external call). Return <code>True</code> if no <code>"effect"</code> ever appears after an <code>"interaction"</code> (i.e. all state updates happen first), and <code>False</code> otherwise.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>python3</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>0</allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>16</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload><![CDATA[def cei_is_safe(steps):
+    # Return False if any "effect" comes after an "interaction".
+    return ...
+]]></answerpreload>
+    <globalextra></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[def cei_is_safe(steps):
+    seen_interaction = False
+    for s in steps:
+        if s == "interaction":
+            seen_interaction = True
+        elif s == "effect" and seen_interaction:
+            return False
+    return True
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(cei_is_safe(["effect", "interaction"]))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>True
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(cei_is_safe(["interaction", "effect"]))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>False
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(cei_is_safe(["effect", "effect", "interaction"]))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>True
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(cei_is_safe(["effect", "interaction", "effect"]))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>False
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+    </testcases>
+  </question>
+
+  <question type="coderunner">
+    <name><text>S9 Q2 — Weekly-limited withdrawal</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #f7931a;border-radius:8px;padding:18px 22px;margin-bottom:16px;">
+<p style="color:#9a3412;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">S9 Q2 — Vault rules</p>
+<p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;">The EtherStore vault allows one withdrawal per week, capped at a limit.</p>
+</div>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.8;">Write <strong><code>withdraw_allowed(now, last, balance, limit)</code></strong>. Times are Unix seconds; one week is 604800 seconds. If <code>now - last</code> is less than 604800, return the string <code>"too soon"</code>. Otherwise return the amount paid out, which is the smaller of <code>balance</code> and <code>limit</code>.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>python3</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>0</allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>16</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload><![CDATA[def withdraw_allowed(now, last, balance, limit):
+    # One week = 604800 seconds. Return "too soon" or min(balance, limit).
+    return ...
+]]></answerpreload>
+    <globalextra></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[def withdraw_allowed(now, last, balance, limit):
+    if now - last < 604800:
+        return "too soon"
+    return min(balance, limit)
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(withdraw_allowed(1000000, 0, 5, 1))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>1
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(withdraw_allowed(100, 0, 5, 1))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>too soon
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(withdraw_allowed(700000, 0, 3, 10))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>3
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(withdraw_allowed(604800, 0, 8, 2))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>2
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+    </testcases>
+  </question>
+
+  <question type="coderunner">
+    <name><text>S9 Q3 — Match the defense</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #f7931a;border-radius:8px;padding:18px 22px;margin-bottom:16px;">
+<p style="color:#9a3412;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">S9 Q3 — Vulnerability to defense</p>
+<p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;">Each antipattern has a standard preventative technique.</p>
+</div>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.8;">Write <strong><code>defense_for(vuln)</code></strong> mapping a vulnerability name to its defense: <code>"reentrancy"</code>&nbsp;&rarr;&nbsp;<code>"check-effect-interaction"</code>, <code>"overflow"</code>&nbsp;&rarr;&nbsp;<code>"safe math"</code>, <code>"unchecked-call"</code>&nbsp;&rarr;&nbsp;<code>"check return values"</code>. For anything else return <code>"unknown"</code>.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <coderunnertype>python3</coderunnertype>
+    <prototypetype>0</prototypetype>
+    <allornothing>0</allornothing>
+    <penaltyregime>0</penaltyregime>
+    <precheck>0</precheck>
+    <hidecheck>0</hidecheck>
+    <showsource>0</showsource>
+    <answerboxlines>16</answerboxlines>
+    <answerboxcolumns>100</answerboxcolumns>
+    <answerpreload><![CDATA[def defense_for(vuln):
+    # Map the vulnerability to its standard defense, else "unknown".
+    return ...
+]]></answerpreload>
+    <globalextra></globalextra>
+    <useace></useace>
+    <resultcolumns></resultcolumns>
+    <template></template>
+    <iscombinatortemplate></iscombinatortemplate>
+    <allowmultiplestdins></allowmultiplestdins>
+    <answer><![CDATA[def defense_for(vuln):
+    defenses = {
+        "reentrancy": "check-effect-interaction",
+        "overflow": "safe math",
+        "unchecked-call": "check return values",
+    }
+    return defenses.get(vuln, "unknown")
+]]></answer>
+    <validateonsave>1</validateonsave>
+    <testsplitterre></testsplitterre>
+    <language></language>
+    <acelang></acelang>
+    <sandbox></sandbox>
+    <grader></grader>
+    <cputimelimitsecs></cputimelimitsecs>
+    <memlimitmb></memlimitmb>
+    <sandboxparams></sandboxparams>
+    <templateparams></templateparams>
+    <hoisttemplateparams>1</hoisttemplateparams>
+    <extractcodefromjson>1</extractcodefromjson>
+    <templateparamslang>None</templateparamslang>
+    <templateparamsevalpertry>0</templateparamsevalpertry>
+    <templateparamsevald>{}</templateparamsevald>
+    <twigall>0</twigall>
+    <uiplugin></uiplugin>
+    <uiparameters></uiparameters>
+    <attachments>0</attachments>
+    <attachmentsrequired>0</attachmentsrequired>
+    <maxfilesize>10240</maxfilesize>
+    <filenamesregex></filenamesregex>
+    <filenamesexplain></filenamesexplain>
+    <displayfeedback>1</displayfeedback>
+    <giveupallowed>0</giveupallowed>
+    <prototypeextra></prototypeextra>
+    <testcases>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(defense_for("reentrancy"))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>check-effect-interaction
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(defense_for("overflow"))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>safe math
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>SHOW</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(defense_for("unchecked-call"))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>check return values
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+      <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+        <testcode><text>print(defense_for("phishing"))</text></testcode>
+        <stdin><text></text></stdin>
+        <expected><text>unknown
+</text></expected>
+        <extra><text></text></extra>
+        <display><text>HIDE</text></display>
+      </testcase>
+    </testcases>
+  </question>
+</quiz>

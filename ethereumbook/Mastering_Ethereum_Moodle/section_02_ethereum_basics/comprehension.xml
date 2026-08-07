@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 2 - Ethereum Basics (Comprehension)</text></category>
+  </question>
+
+  <question type="numerical">
+    <name><text>S2 C1 — Wei in an ether</text></name>
+    <questiontext format="html"><text><![CDATA[<p>How many wei are there in exactly 1 ether? (Enter the number of zeros' worth as a plain integer.)</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>1 ether = 10<sup>18</sup> = 1,000,000,000,000,000,000 wei.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>1000000000000000000</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S2 C2 — System vs currency</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which statement uses the terms correctly?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Ethereum is the system; ether is the currency used to pay for it.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 1 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Ethereum is the system; ether is the currency]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Ether is the system; Ethereum is the currency]]></text><feedback format="html"><text>Reversed.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Ethereum and ether are two separate blockchains]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Wei is the system and ether is a wallet]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S2 C3 — Contract accounts and keys</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A contract account has its own private key that it uses to start transactions.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>False. Contract accounts have no private key and cannot initiate transactions; only EOAs can.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+    <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S2 C4 — Which account starts a tx</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which type of account can <em>initiate</em> a transaction on Ethereum?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Only an externally owned account (EOA), because it holds a private key. Contracts merely react when called.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 3 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[An externally owned account (EOA)]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A contract account]]></text><feedback format="html"><text>No — contracts only react.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Both types equally]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Neither type]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S2 C5 — Faucet payout</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A faucet holds 1000, its per-withdrawal limit is 100, and a user requests 100. What is the faucet's balance after a successful withdrawal?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>The request is within the limit and within the balance, so it pays out: 1000 &minus; 100 = 900.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>900</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S2 C6 — Losing keys</text></name>
+    <questiontext format="html"><text><![CDATA[<p>If you lose the private key that controls your account, a support team can recover your funds for you.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>False. Nobody can restore lost private keys; the funds they secure are locked forever.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+    <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  </question>
+</quiz>

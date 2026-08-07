@@ -1,0 +1,290 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{french.ldf}{\usepackage[french]{babel}}{\usepackage[english]{babel}}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}\geometry{margin=2.3cm}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lmodern}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, urlcolor=[RGB]{2,101,115}, linkcolor=black}
+\definecolor{codebg}{RGB}{247,249,251}
+\definecolor{kw}{RGB}{175,45,45}
+\definecolor{cmt}{RGB}{110,120,130}
+\definecolor{str}{RGB}{20,110,60}
+\lstset{language=Python, backgroundcolor=\color{codebg}, basicstyle=\ttfamily\small,
+  keywordstyle=\color{kw}\bfseries, commentstyle=\color{cmt}\itshape, stringstyle=\color{str},
+  numbers=left, numberstyle=\tiny\color{cmt}, numbersep=8pt, frame=single, rulecolor=\color{gray!40},
+  showstringspaces=false, breaklines=true, columns=fullflexible, extendedchars=true, inputencoding=utf8,
+  literate={é}{{\'e}}1 {è}{{\`e}}1 {à}{{\`a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ç}{{\c c}}1 {ô}{{\^o}}1 {û}{{\^u}}1 {ù}{{\`u}}1 {É}{{\'E}}1}
+\newcounter{qcnt}
+\newcommand{\Q}{\medskip\par\stepcounter{qcnt}\noindent\textbf{Question~\theqcnt.}~}
+\newcommand{\code}[1]{\lstinline!#1!}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Préparation au CNC 2026 --- Informatique MP}
+\rhead{\small Partition et programmation dynamique}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\titleformat*{\section}{\large\bfseries\scshape}
+
+\begin{document}
+
+\begin{center}
+{\large\bfseries Préparation au Concours National Commun 2026 --- Informatique MP}\\[8pt]
+\rule{0.9\linewidth}{0.5pt}\\[6pt]
+{\Large\bfseries Épreuve d'Informatique}\\[4pt]
+{\bfseries Filière MP --- Durée : 4 heures}\\[6pt]
+{\itshape Le problème de partition : recherche exhaustive, NP, programmation dynamique et reconstruction}\\[6pt]
+\rule{0.9\linewidth}{0.5pt}\\[8pt]
+{\small Auteur~: \href{https://orcid.org/0000-0002-6108-7176}{\textbf{Pr Agrégé El Hadiq Zouhair}}}\\[3pt]
+{\small \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}} \quad---\quad Tous droits réservés \textcopyright\ cpgeacademy.org}
+\end{center}
+\medskip
+\begin{center}
+\fcolorbox{gray}{gray!5}{\begin{minipage}{0.93\linewidth}\small
+\textbf{Avis important.} Ce document est une \textbf{initiative personnelle} du professeur,
+à but strictement pédagogique. Il ne s'agit \textbf{pas} d'un sujet officiel du Concours
+National Commun~; il s'en inspire uniquement par la forme et l'esprit.
+\smallskip
+\textbf{Pour aller plus loin.} Les élèves peuvent traiter une \textbf{nouvelle version} de
+ce problème dotée d'un \textbf{autocorrecteur des réponses}, et suivre un \textbf{cours
+complet}, sur \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}}.
+\end{minipage}}
+\end{center}
+
+\bigskip
+\section*{Présentation et notations}
+
+Le \emph{problème de partition} consiste, étant donné une liste $S$ d'entiers strictement
+positifs, à décider si l'on peut la séparer en deux sous-ensembles de même somme. Il apparaît dans
+les preuves à divulgation nulle de connaissance (chapitre « Zero-Knowledge Proofs » de
+\emph{Mastering Ethereum}) comme exemple canonique de problème \emph{facile à vérifier} mais
+\emph{difficile à résoudre}. On note $T = \sum_{x\in S} x$ la somme totale.
+
+\noindent\textbf{Conventions.} Langage Python 3~; \code{sum(S)} est la somme des éléments,
+\code{len(S)} leur nombre. Le module \code{itertools} fournit \code{combinations(S, r)} qui énumère
+les sous-ensembles de $S$ à $r$ éléments. Questions numérotées \textbf{en continu}.
+
+\bigskip
+\hrule
+\bigskip
+{\Large\bfseries É\,N\,O\,N\,C\,É}
+\medskip
+
+\section*{Partie I --- Recherche exhaustive}
+
+\Q Écrire \code{demi_somme(S)} qui renvoie \code{None} si $T=\mathtt{sum(S)}$ est impair, et
+$T/2$ (entier) sinon.
+
+\Q Écrire \code{partition_exhaustive(S)} qui décide, en énumérant tous les sous-ensembles à l'aide
+de \code{itertools.combinations}, s'il existe un sous-ensemble de somme $T/2$. La fonction renvoie
+un booléen. On renverra \code{False} si $T$ est impair.
+
+\Q Combien de sous-ensembles possède un ensemble à $n$ éléments~? En déduire que
+\code{partition_exhaustive} a une complexité temporelle en $\Theta(2^{n})$ dans le pire des cas,
+et expliquer pourquoi cette approche est inutilisable pour $n$ grand.
+
+\section*{Partie II --- Le problème de décision Subset-Sum}
+
+On suppose désormais $T$ paire et on pose $C = T/2$. Le \emph{problème de décision} Subset-Sum
+demande~: « existe-t-il un sous-ensemble de $S$ de somme exactement $C$~? »
+
+\Q Décrire un \emph{certificat} (une preuve courte) permettant de convaincre en temps polynomial
+qu'une instance est positive, et l'algorithme de \emph{vérification} associé. Donner sa complexité.
+
+\Q En déduire que Subset-Sum appartient à la classe \textbf{NP}. \emph{On rappelle qu'un problème
+de décision est dans NP s'il admet un certificat vérifiable en temps polynomial.} On mentionnera,
+sans le démontrer, que Subset-Sum est en fait NP-complet.
+
+\section*{Partie III --- Récurrence et table de programmation dynamique}
+
+On définit, pour $0 \le i \le n$ (avec $n=\mathtt{len(S)}$) et $0 \le c \le C$, le booléen
+$$A[i][c] = \text{« il existe un sous-ensemble des } i \text{ premiers éléments de } S
+\text{ de somme } c \text{ »}.$$
+
+\Q Justifier la relation de récurrence
+$$A[i][c] = A[i-1][c] \;\lor\; \bigl(c \ge S[i-1] \ \land\ A[i-1][c - S[i-1]]\bigr)
+\quad (i \ge 1),$$
+et préciser l'initialisation $A[0][\,\cdot\,]$.
+
+\Q En déduire une fonction \code{subset_sum_2d(S, C)} qui construit la table $A$ (de taille
+$(n+1)\times(C+1)$) et renvoie \code{A[n][C]}. Donner sa complexité en temps et en espace.
+
+\section*{Partie IV --- Version optimisée en espace}
+
+\Q Écrire \code{peut_partitionner(S)} qui, après avoir écarté le cas $T$ impair, décide
+l'existence d'une partition équilibrée en n'utilisant qu'un tableau \code{dp} \textbf{à une
+dimension} de taille $C+1$. \emph{Indication~:} parcourir $c$ de $C$ jusqu'à $x$ en
+\textbf{décroissant} pour chaque élément $x$ de $S$.
+
+\Q Expliquer précisément pourquoi le parcours \textbf{décroissant} de $c$ est nécessaire~: que se
+passerait-il avec un parcours croissant~?
+
+\Q Donner la complexité en temps et en espace de \code{peut_partitionner}, et expliquer le terme
+\emph{pseudo-polynomial} (comparer $C$ à la taille de codage de l'entrée).
+
+\section*{Partie V --- Reconstruction et correction}
+
+\Q À partir de la table $A$ de la Partie III, écrire \code{sous_ensemble(S, C)} qui renvoie
+\emph{un} sous-ensemble de somme $C$ (sous forme de liste), ou \code{None} s'il n'en existe pas.
+\emph{Indication~:} remonter la table de $i=n$ à $1$~; l'élément $S[i-1]$ est pris ssi
+$A[i-1][C]$ est faux (le retirer impose de l'utiliser).
+
+\Q Énoncer un \emph{invariant} portant sur \code{dp} après le traitement des $i$ premiers éléments
+dans \code{peut_partitionner}, puis le démontrer par récurrence sur $i$. Conclure sur la
+correction, et justifier la terminaison.
+
+\newpage
+\setcounter{qcnt}{0}
+\bigskip
+\hrule
+\bigskip
+{\Large\bfseries C\,O\,R\,R\,I\,G\,É}
+\medskip
+
+\section*{Partie I --- Recherche exhaustive}
+
+\Q
+\begin{lstlisting}
+def demi_somme(S):
+    T = sum(S)
+    if T % 2 == 1:
+        return None
+    return T // 2
+\end{lstlisting}
+
+\Q
+\begin{lstlisting}
+import itertools
+
+def partition_exhaustive(S):
+    T = sum(S)
+    if T % 2 == 1:
+        return False
+    C = T // 2
+    for r in range(len(S) + 1):
+        for comb in itertools.combinations(S, r):
+            if sum(comb) == C:
+                return True
+    return False
+\end{lstlisting}
+
+\Q Un ensemble à $n$ éléments possède $2^{n}$ sous-ensembles (chaque élément est pris ou non).
+La boucle les parcourt tous dans le pire des cas (instance négative), et chaque test de somme
+coûte $O(n)$~: la complexité est $\Theta(n\,2^{n}) = \Theta(2^{n})$ à un facteur polynomial près.
+Pour $n=60$, $2^{60}\approx 10^{18}$~: irréalisable. $\square$
+
+\section*{Partie II --- Le problème de décision Subset-Sum}
+
+\Q Le certificat est la \emph{liste des indices} d'un sous-ensemble candidat $I \subseteq
+\{0,\dots,n-1\}$. La vérification calcule $\sum_{k\in I} S[k]$ et teste l'égalité à $C$~; elle
+lit chaque indice une fois, d'où une complexité $O(n)$, polynomiale. Le certificat a une taille
+$O(n)$, elle aussi polynomiale.
+
+\Q Puisque toute instance positive admet un certificat de taille polynomiale vérifiable en temps
+polynomial, Subset-Sum est dans \textbf{NP}. (On admet qu'il est de plus NP-complet, donc parmi
+les plus difficiles de NP.) $\square$
+
+\section*{Partie III --- Récurrence et table}
+
+\Q Un sous-ensemble des $i$ premiers éléments de somme $c$ soit \emph{n'utilise pas} $S[i-1]$
+(c'est alors un sous-ensemble des $i-1$ premiers de somme $c$, d'où $A[i-1][c]$), soit
+\emph{l'utilise} (c'est alors un sous-ensemble des $i-1$ premiers de somme $c-S[i-1]$, licite
+seulement si $c \ge S[i-1]$, d'où $A[i-1][c-S[i-1]]$). D'où
+$A[i][c] = A[i-1][c] \lor (c \ge S[i-1] \land A[i-1][c-S[i-1]])$. Initialisation~: avec zéro
+élément, seule la somme $0$ est atteignable, donc $A[0][0]=\text{vrai}$ et $A[0][c]=\text{faux}$
+pour $c\ge 1$. $\square$
+
+\Q
+\begin{lstlisting}
+def subset_sum_2d(S, C):
+    n = len(S)
+    A = [[False] * (C + 1) for _ in range(n + 1)]
+    for i in range(n + 1):
+        A[i][0] = True                       # somme 0 : sous-ensemble vide
+    for i in range(1, n + 1):
+        x = S[i - 1]
+        for c in range(C + 1):
+            A[i][c] = A[i-1][c] or (c >= x and A[i-1][c - x])
+    return A[n][C]
+\end{lstlisting}
+Complexité~: $O(nC)$ en temps (deux boucles imbriquées) et $O(nC)$ en espace (table complète).
+
+\section*{Partie IV --- Version optimisée en espace}
+
+\Q
+\begin{lstlisting}
+def peut_partitionner(S):
+    T = sum(S)
+    if T % 2 == 1:
+        return False
+    C = T // 2
+    dp = [False] * (C + 1)
+    dp[0] = True
+    for x in S:
+        for c in range(C, x - 1, -1):        # DECROISSANT
+            if dp[c - x]:
+                dp[c] = True
+    return dp[C]
+\end{lstlisting}
+
+\Q Le tableau \code{dp} représente la ligne courante $A[i-1][\,\cdot\,]$ que l'on met à jour en
+$A[i][\,\cdot\,]$ « sur place ». En parcourant $c$ de façon \emph{décroissante}, la case
+\code{dp[c - x]} lue n'a pas encore été modifiée à ce tour~: elle vaut encore $A[i-1][c-x]$, ce
+qui est correct. Avec un parcours \emph{croissant}, \code{dp[c - x]} aurait déjà pu passer à
+\code{True} \emph{au même tour}, ce qui reviendrait à utiliser $x$ \textbf{plusieurs fois} (comme
+dans un sac à dos avec répétitions)~: on résoudrait un autre problème et la réponse serait fausse.
+
+\Q Complexité~: $O(nC)$ en temps, $O(C)$ en espace. L'entrée se code sur $O\!\left(\sum_i
+\log S_i\right)$ bits~; or $C$ peut être de l'ordre de $\max_i S_i$, donc \emph{exponentiel} en le
+nombre de bits de codage. L'algorithme est polynomial en la \emph{valeur} $C$ mais non en la
+\emph{taille} de l'entrée~: on dit qu'il est \emph{pseudo-polynomial}. $\square$
+
+\section*{Partie V --- Reconstruction et correction}
+
+\Q
+\begin{lstlisting}
+def sous_ensemble(S, C):
+    n = len(S)
+    A = [[False] * (C + 1) for _ in range(n + 1)]
+    for i in range(n + 1):
+        A[i][0] = True
+    for i in range(1, n + 1):
+        x = S[i - 1]
+        for c in range(C + 1):
+            A[i][c] = A[i-1][c] or (c >= x and A[i-1][c - x])
+    if not A[n][C]:
+        return None
+    res, c = [], C
+    for i in range(n, 0, -1):
+        if not A[i-1][c]:        # S[i-1] est indispensable
+            res.append(S[i-1])
+            c -= S[i-1]
+    return res[::-1]
+\end{lstlisting}
+Vérification~: $\mathtt{sous\_ensemble}([1,1,5,7],7) = [1,1,5]$ (somme $7$).
+
+\Q \textbf{Invariant.} Après le traitement des $i$ premiers éléments de $S$ dans
+\code{peut_partitionner}, pour tout $0\le c\le C$, \code{dp[c]} est vrai si et seulement s'il
+existe un sous-ensemble des $i$ premiers éléments de somme $c$ (c.-à-d. \code{dp[c]}$=A[i][c]$).
+
+\noindent\emph{Base} ($i=0$)~: seul \code{dp[0]} est vrai, correspondant au sous-ensemble vide~:
+conforme à $A[0]$. \emph{Hérédité}~: on suppose \code{dp}$=A[i-1][\,\cdot\,]$ et on traite
+$x=S[i-1]$. Pour chaque $c$ (de $C$ à $x$), on met \code{dp[c]} à \code{True} si \code{dp[c-x]}
+est vrai. Le parcours décroissant garantit \code{dp[c-x]}$=A[i-1][c-x]$~; combiné à la valeur
+préexistante $A[i-1][c]$ de \code{dp[c]}, on obtient exactement $A[i][c]=A[i-1][c]\lor(c\ge x\land
+A[i-1][c-x])$. L'invariant est donc préservé. \emph{Conclusion}~: après les $n$ éléments,
+\code{dp[C]}$=A[n][C]$, vrai ssi une partition équilibrée existe~: la fonction est correcte.
+\textbf{Terminaison}~: toutes les boucles \code{for} portent sur des intervalles finis. $\square$
+
+\medskip
+\noindent\emph{Vérifications numériques} (Python)~: sur $2000$ listes aléatoires,
+\code{peut_partitionner} et \code{partition_exhaustive} renvoient \emph{toujours} le même résultat.
+Exemples~: $[1,1,5,7]\mapsto\mathtt{True}$, $[1,1,5,8]\mapsto\mathtt{False}$,
+$[3,3,3,3]\mapsto\mathtt{True}$.
+
+\end{document}

@@ -1,0 +1,72 @@
+<div style="max-width:900px;margin:0 auto;font-family:Georgia,serif;color:#1e293b;line-height:1.85;font-size:16px;">
+
+  <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:30px 36px;margin-bottom:26px;color:#fff;">
+    <p style="color:#f7931a;font-size:12px;letter-spacing:3px;text-transform:uppercase;margin:0 0 6px;font-weight:bold;">Section 13 &middot; Reading</p>
+    <h1 style="font-size:28px;margin:0 0 8px;color:#fff;">Decentralized Finance</h1>
+    <p style="margin:0;color:#cbd5e1;font-size:15px;">By the end of this lesson you will understand how automated market makers price trades with the constant-product formula, why that shape protects a pool, and how over-collateralized lending works.</p>
+  </div>
+
+  <div style="background:#fff7ed;border-left:5px solid #f7931a;border-radius:8px;padding:18px 24px;margin-bottom:26px;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#9a3412;">What you will be able to do</p>
+    <ul style="margin:0;">
+      <li>Explain how a DEX replaces the order book with a liquidity pool.</li>
+      <li>Use the constant-product formula x &times; y = k to read a pool's price and trade output.</li>
+      <li>Explain why the hyperbola shape stops a pool from being drained.</li>
+      <li>Describe over-collateralized lending and the role of the collateralization ratio.</li>
+    </ul>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">1. DEXs and the AMM idea</h2>
+  <p><strong>DeFi</strong> (decentralized finance) rebuilds financial services &mdash; trading, lending, stablecoins &mdash; out of smart contracts, with no bank or broker in the middle. The flagship example is the <strong>decentralized exchange (DEX)</strong>. Traditional exchanges use an <em>order book</em> that matches buyers and sellers, but on a slow, pay-per-action blockchain that never worked well.</p>
+  <p>The breakthrough was the <strong>automated market maker (AMM)</strong>. Instead of matching orders, an AMM holds a <strong>liquidity pool</strong> of two tokens supplied by users, and a formula sets the price from the ratio of tokens in the pool. Anyone can supply liquidity and earn a share of the trading fees. Uniswap popularized the simplest such formula.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">2. The constant-product formula</h2>
+  <p>Uniswap V2's rule is <strong>x &times; y = k</strong>, where <code>x</code> and <code>y</code> are the amounts of the two tokens and <code>k</code> stays constant through every trade. The <strong>price</strong> of one token is simply the ratio of the reserves:</p>
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px 24px;margin:16px 0;">
+    <p style="margin:0;font-family:'Courier New',monospace;font-size:15px;color:#0f172a;">pool = 10 ETH + 100 USDC &rarr; price of 1 ETH = 100 &divide; 10 = 10 USDC<br/>pool = 10 ETH + 200 USDC &rarr; price of 1 ETH = 200 &divide; 10 = 20 USDC</p>
+  </div>
+  <p>When someone trades, the amount they receive follows from keeping <code>k</code> constant:</p>
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px 24px;margin:16px 0;">
+    <p style="margin:0;font-family:'Courier New',monospace;font-size:15px;color:#0f172a;">&Delta;y = (y &times; &Delta;x) &divide; (x + &Delta;x)</p>
+  </div>
+  <p>Here <code>&Delta;x</code> is what you put in and <code>&Delta;y</code> is what you get out. Computing the price and this trade output are the first two exercises.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">3. Why the hyperbola protects the pool</h2>
+  <p>The formula <code>x &times; y = k</code> traces a <strong>hyperbola</strong> &mdash; a curve that never touches either axis. That is the whole point. As you try to buy more and more of one token, its price climbs steeply, so it is <em>mathematically impossible</em> to drain either token to zero. A large trade relative to the pool gets a progressively worse rate, producing <strong>slippage</strong> (the gap between expected and actual price) that naturally discourages pool-draining trades.</p>
+  <p>A naive linear (fixed) price would be disastrous: whenever the fixed rate differed from the wider market, arbitrageurs would trade against the pool until one side ran dry. The self-protecting hyperbola is what made trustless, permissionless trading practical.</p>
+  <div style="background:#fff7ed;border-left:5px solid #f59e0b;border-radius:8px;padding:14px 20px;margin:16px 0;">
+    <p style="margin:0;"><strong>Impermanent loss.</strong> Providing liquidity is not risk-free: if the price of the pooled tokens moves a lot, your pool holdings can be worth less than if you had simply held the tokens &mdash; even after collecting fees.</p>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">4. Lending markets</h2>
+  <p>A <strong>lending market</strong> lets users deposit crypto to earn interest and lets borrowers take loans &mdash; all through smart contracts, with rates set algorithmically by supply and demand. Because crypto is volatile, loans are <strong>over-collateralized</strong>: you must lock up collateral worth <em>more</em> than you borrow. A common <strong>collateralization ratio</strong> of 150% means borrowing $100 requires at least $150 of collateral.</p>
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px 24px;margin:16px 0;">
+    <p style="margin:0;font-family:'Courier New',monospace;font-size:15px;color:#0f172a;">required collateral = loan &times; ratio &divide; 100<br/>loan 100 at 150% &rarr; 150 collateral</p>
+  </div>
+  <p>If the collateral's value falls below a threshold, the contract <strong>liquidates</strong> it &mdash; selling it to repay the loan and keep the pool solvent. DeFi relies on incentives here: liquidators are rewarded a slice of what they liquidate, so they watch the market for the protocol. Computing the required collateral is the third exercise.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">Glossary for this section</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:15px;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:8px 14px;">Term</th><th style="text-align:left;padding:8px 14px;">Meaning</th></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">DEX</td><td style="padding:8px 14px;">A decentralized exchange run by smart contracts.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">AMM</td><td style="padding:8px 14px;">Automated market maker; prices trades from a liquidity pool.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">x &times; y = k</td><td style="padding:8px 14px;">The constant-product pricing formula.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Slippage</td><td style="padding:8px 14px;">Gap between expected and actual trade price.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Impermanent loss</td><td style="padding:8px 14px;">Loss a liquidity provider takes when pooled prices move.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Collateralization ratio</td><td style="padding:8px 14px;">How much collateral a loan requires, as a percentage.</td></tr>
+  </table>
+
+  <div style="background:#ecfdf5;border-left:5px solid #10b981;border-radius:8px;padding:16px 22px;margin:24px 0;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#065f46;">Check your understanding</p>
+    <ol style="margin:0;">
+      <li>A pool holds 10 ETH and 200 USDC. What is 1 ETH worth? <span style="color:#94a3b8;">(Answer: 20 USDC.)</span></li>
+      <li>Why can't a constant-product pool be drained to zero? <span style="color:#94a3b8;">(Answer: the price rises steeply &mdash; the hyperbola never hits the axis.)</span></li>
+      <li>To borrow $100 at a 150% ratio, how much collateral is needed? <span style="color:#94a3b8;">(Answer: $150.)</span></li>
+      <li>Who triggers liquidations, and why? <span style="color:#94a3b8;">(Answer: incentivized users, for a reward.)</span></li>
+    </ol>
+  </div>
+
+  <div style="background:#eef2ff;border-left:5px solid #6366f1;border-radius:8px;padding:16px 22px;margin-top:24px;">
+    <p style="margin:0;"><strong>Practice.</strong> Three Python exercises: (1) compute a pool's price from its reserves, (2) compute an AMM trade output with &Delta;y = (y&middot;&Delta;x)/(x+&Delta;x), and (3) compute the collateral a loan requires from its collateralization ratio.</p>
+  </div>
+</div>

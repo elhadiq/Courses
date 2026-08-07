@@ -1,0 +1,68 @@
+<div style="max-width:900px;margin:0 auto;font-family:Georgia,serif;color:#1e293b;line-height:1.85;font-size:16px;">
+
+  <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:30px 36px;margin-bottom:26px;color:#fff;">
+    <p style="color:#f7931a;font-size:12px;letter-spacing:3px;text-transform:uppercase;margin:0 0 6px;font-weight:bold;">Section 16 &middot; Reading</p>
+    <h1 style="font-size:28px;margin:0 0 8px;color:#fff;">Scaling Ethereum</h1>
+    <p style="margin:0;color:#cbd5e1;font-size:15px;">By the end of this lesson you will understand the scalability trilemma, how rollups move work off-chain, and the difference between optimistic and zero-knowledge rollups.</p>
+  </div>
+
+  <div style="background:#fff7ed;border-left:5px solid #f7931a;border-radius:8px;padding:18px 24px;margin-bottom:26px;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#9a3412;">What you will be able to do</p>
+    <ul style="margin:0;">
+      <li>State the scalability trilemma and why Ethereum won't sacrifice decentralization.</li>
+      <li>Explain how a rollup executes off-chain (L2) and settles on L1.</li>
+      <li>Contrast optimistic rollups (fraud proofs) with ZK rollups (validity proofs).</li>
+      <li>Explain how batching amortizes the L1 cost across many transactions.</li>
+    </ul>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">1. The scalability trilemma</h2>
+  <p>Every permissionless blockchain wants three things: <strong>decentralization</strong>, <strong>security</strong>, and <strong>scalability</strong>. The <strong>trilemma</strong>, named by Vitalik Buterin, says improving one usually costs another. Ethereum keeps every node processing every transaction &mdash; great for decentralization and security, but a throughput bottleneck. You could raise throughput by making blocks bigger, but then only powerful machines could run a full node, pushing toward centralization. Some chains (like Solana) chose speed over decentralization; Ethereum refuses to compromise decentralization, which makes scaling genuinely hard.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">2. Rollups: do the work off-chain</h2>
+  <p>The leading answer is <strong>rollups</strong>. A rollup runs transactions on a dedicated <strong>layer 2 (L2)</strong>, then posts compressed data (or a proof) back to <strong>layer 1 (L1)</strong>. The heavy computation happens off-chain, so L1 avoids its throughput bottleneck while remaining the authoritative <em>settlement layer</em>. A rollup contract on L1 stores the L2 state (often a Merkle root) and accepts batches of transactions from a <em>sequencer</em>.</p>
+  <p>The power of a rollup is <strong>amortization</strong>: hundreds of L2 transactions are bundled into one L1 submission, so the fixed L1 cost is shared across all of them. The more transactions per batch, the lower the cost each one pays:</p>
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px 24px;margin:16px 0;">
+    <p style="margin:0;font-family:'Courier New',monospace;font-size:15px;color:#0f172a;">cost per tx = L1 cost &divide; number of transactions<br/>1000 &divide; 100 = 10 each</p>
+  </div>
+  <p>Computing this amortized cost is one of the exercises. Rollups protect users through <strong>data availability</strong> (so anyone can reconstruct or exit) and <strong>state-transition integrity</strong> (proving the new state is valid).</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">3. Optimistic vs zero-knowledge rollups</h2>
+  <p>The two dominant rollup types differ in how they prove the new state is correct:</p>
+  <table style="width:100%;border-collapse:collapse;font-size:15px;margin:10px 0;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:8px 14px;">&nbsp;</th><th style="text-align:left;padding:8px 14px;">Optimistic rollup</th><th style="text-align:left;padding:8px 14px;">ZK rollup</th></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Proof type</td><td style="padding:8px 14px;">Fraud proofs</td><td style="padding:8px 14px;">Validity proofs (SNARKs/STARKs)</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Assumption</td><td style="padding:8px 14px;">Assume valid; anyone can challenge.</td><td style="padding:8px 14px;">Prove valid up front, verified on-chain.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Withdrawal</td><td style="padding:8px 14px;">Wait a challenge window (~7 days).</td><td style="padding:8px 14px;">Near-instant.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Examples</td><td style="padding:8px 14px;">Arbitrum, Optimism, Base</td><td style="padding:8px 14px;">ZKsync, Starknet, Scroll</td></tr>
+  </table>
+  <p>An <strong>optimistic</strong> rollup posts state assuming it is correct, but leaves a challenge window (often about a week) in which anyone can submit a fraud proof; if upheld, the batch is reverted and the operator is slashed. A <strong>ZK</strong> rollup attaches a cryptographic <em>validity proof</em> to each state root, verified on-chain immediately &mdash; so there is no waiting period and withdrawals are fast, at the cost of expensive proof generation. Mapping a proof type to its rollup and its withdrawal wait are two of the exercises.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">4. Maturity stages and beyond</h2>
+  <p>Rollups mature through stages. <strong>Stage 0</strong> still has heavy operator control (&ldquo;training wheels&rdquo;); <strong>stage 1</strong> requires a working proof system and independent actors; <strong>stage 2</strong> is truly decentralized with permissionless proofs and long user-exit windows. Other approaches &mdash; validiums, sidechains, danksharding, and stateless Ethereum with Verkle trees &mdash; push scaling further, but rollups are today's main strategy.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">Glossary for this section</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:15px;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:8px 14px;">Term</th><th style="text-align:left;padding:8px 14px;">Meaning</th></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Trilemma</td><td style="padding:8px 14px;">Decentralization vs security vs scalability trade-off.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Rollup</td><td style="padding:8px 14px;">Executes on L2, settles data/proofs on L1.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Optimistic rollup</td><td style="padding:8px 14px;">Assumes validity; uses fraud proofs and a challenge window.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">ZK rollup</td><td style="padding:8px 14px;">Uses validity proofs, verified on-chain, for fast finality.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Sequencer</td><td style="padding:8px 14px;">Actor that batches and posts L2 transactions.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Amortization</td><td style="padding:8px 14px;">Sharing one L1 cost across many L2 transactions.</td></tr>
+  </table>
+
+  <div style="background:#ecfdf5;border-left:5px solid #10b981;border-radius:8px;padding:16px 22px;margin:24px 0;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#065f46;">Check your understanding</p>
+    <ol style="margin:0;">
+      <li>Which corner of the trilemma does Ethereum refuse to sacrifice? <span style="color:#94a3b8;">(Answer: decentralization.)</span></li>
+      <li>What kind of proof does an optimistic rollup rely on? <span style="color:#94a3b8;">(Answer: fraud proofs.)</span></li>
+      <li>Which rollup type offers near-instant withdrawals? <span style="color:#94a3b8;">(Answer: ZK rollups.)</span></li>
+      <li>If an L1 batch costs 1000 and holds 100 transactions, what does each pay? <span style="color:#94a3b8;">(Answer: 10.)</span></li>
+    </ol>
+  </div>
+
+  <div style="background:#eef2ff;border-left:5px solid #6366f1;border-radius:8px;padding:16px 22px;margin-top:24px;">
+    <p style="margin:0;"><strong>Practice.</strong> Three Python exercises: (1) map a proof type to its rollup (fraud &rarr; optimistic, validity &rarr; ZK), (2) return the withdrawal wait for a rollup type, and (3) compute the amortized L1 cost per transaction in a batch.</p>
+  </div>
+</div>

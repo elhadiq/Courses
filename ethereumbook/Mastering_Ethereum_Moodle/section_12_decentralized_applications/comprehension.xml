@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 12 - Decentralized Applications (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S12 C1 — DApp minimum</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What two components does a DApp need at minimum?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>At least a smart contract (the decentralized logic) and a frontend for users.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 2 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[A smart contract and a frontend]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A central database and a server]]></text><feedback format="html"><text>That describes a legacy app.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[An oracle and a wallet]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A token and an exchange]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S12 C2 — Censorship resistance</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Even if a DApp's official website is blocked, anyone can build an alternative frontend and users can still interact with the underlying contracts.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. No one can stop an address from calling a public contract, as the Tornado Cash case showed.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S12 C3 — Content addressing</text></name>
+    <questiontext format="html"><text><![CDATA[<p>In IPFS, what determines the address used to retrieve a file?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>The hash of the file's content is its address, so identical content always has the same address.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 3 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[The hash of the file's content]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The IP address of the server hosting it]]></text><feedback format="html"><text>No — that is location addressing.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The upload date]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A random identifier]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S12 C4 — What a Merkle tree stores on-chain</text></name>
+    <questiontext format="html"><text><![CDATA[<p>When using a Merkle tree to validate a large off-chain data set, what is stored on-chain?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Only the single Merkle root, a compact fingerprint of the whole set.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 4 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Only the Merkle root]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Every leaf of the tree]]></text><feedback format="html"><text>No — that would defeat the purpose.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The whole data set]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Nothing at all]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S12 C5 — On-chain storage cost</text></name>
+    <questiontext format="html"><text><![CDATA[<p>All of a DApp's data should be stored on-chain because on-chain storage is cheap and scales well.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>False. On-chain storage is expensive and does not scale, so only essential data goes on-chain; the rest lives off-chain (IPFS, indexers).</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+    <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S12 C6 — DApp vs legacy app</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What most distinguishes a DApp from a legacy application?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Its logic runs in smart contracts with no single point of failure, and it stays usable even without the original team.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 1 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Its logic lives in smart contracts, with no single point of failure]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It has a nicer user interface]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It runs faster than any web app]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It cannot use any off-chain components]]></text><feedback format="html"><text>No — DApps may use off-chain helpers.</text></feedback></answer>
+  </question>
+</quiz>

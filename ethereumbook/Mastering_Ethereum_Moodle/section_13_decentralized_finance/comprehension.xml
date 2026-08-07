@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 13 - Decentralized Finance (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S13 C1 — What an AMM replaces</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What does an automated market maker use instead of an order book?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>A liquidity pool whose token ratio sets the price via a formula.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 1 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[A liquidity pool priced by a formula]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A central matching engine]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A human broker]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[An oracle price feed]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S13 C2 — Pool price</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A constant-product pool holds 10 ETH and 200 USDC. What is the price of 1 ETH, in USDC?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>200 &divide; 10 = 20 USDC.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>20</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S13 C3 — Why a hyperbola</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Why does the constant-product curve prevent a pool from being drained to zero?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>The hyperbola never touches an axis, so a token's price rises steeply as it becomes scarce.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 3 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[As a token gets scarce its price rises steeply, so it can never reach zero]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The contract blocks large trades]]></text><feedback format="html"><text>No — it is the curve, not a block.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[An oracle caps the price]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Fees make trades impossible]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S13 C4 — Impermanent loss</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Providing liquidity is risk-free because you always earn trading fees.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>False. Impermanent loss can leave your pool holdings worth less than simply holding the tokens, even after fees.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+    <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S13 C5 — Collateral required</text></name>
+    <questiontext format="html"><text><![CDATA[<p>To borrow $100 at a 150% collateralization ratio, what is the minimum collateral (in dollars)?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>100 &times; 150 &divide; 100 = 150.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>150</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S13 C6 — Liquidation incentives</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Liquidations in a lending market rely on incentivized users who are rewarded for spotting and liquidating unsafe loans.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. This game-theoretic incentive keeps the lending pool solvent without a central operator.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+</quiz>

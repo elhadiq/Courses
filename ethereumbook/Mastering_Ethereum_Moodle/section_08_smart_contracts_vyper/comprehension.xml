@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 8 - Smart Contracts and Vyper (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S8 C1 — Vyper's guiding goal</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What is Vyper's central design goal?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Auditability — making unsafe or misleading code as hard as possible to write.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 1 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Auditability and safety, even at the cost of some features]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Maximum performance at any cost]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The largest possible feature set]]></text><feedback format="html"><text>No — Vyper deliberately omits features.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Compatibility with Bitcoin Script]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S8 C2 — Modifiers in Vyper</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Vyper supports Solidity-style function modifiers.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>False. Vyper removed modifiers because they can hide state changes; use inline checks instead.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+    <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S8 C3 — Forbidden decorator pair</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which pair of decorators can never be applied to the same function?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>@payable and @view: receiving value is a state change, which contradicts view.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 2 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[@payable and @view]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[@external and @view]]></text><feedback format="html"><text>No — that combination is allowed.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[@internal and @pure]]></text><feedback format="html"><text>No — that combination is allowed.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[@external and @payable]]></text><feedback format="html"><text>No — that combination is allowed.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S8 C4 — External or internal</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Every Vyper function must be marked with exactly one of @external or @internal.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. A function must be one or the other, never both and never neither.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S8 C5 — Downcast that does not fit</text></name>
+    <questiontext format="html"><text><![CDATA[<p>In Vyper, what happens when <code>convert()</code> is asked to shrink a value into a type too small to hold it?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>The transaction reverts. Vyper bounds-checks conversions instead of silently truncating.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 3 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[The transaction reverts]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The value is silently truncated]]></text><feedback format="html"><text>No — that is exactly what Vyper avoids.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The value wraps around to zero]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The compiler ignores the conversion]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S8 C6 — Built-in overflow checks</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Vyper has included built-in overflow protection from the start, throwing an exception on overflow or underflow.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. This is a core Vyper feature; Solidity added similar checks later, in version 0.8.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+</quiz>

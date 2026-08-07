@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 15 - Consensus (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S15 C1 — Liveness vs safety</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which property guarantees the chain keeps producing new blocks?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Liveness: something good always happens eventually. Safety is about never disagreeing on history.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 1 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Liveness]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Safety]]></text><feedback format="html"><text>Safety is about agreement, not progress.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Finality]]></text><feedback format="html"><text>Finality is about irreversibility.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Slashing]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S15 C2 — PoS punishment</text></name>
+    <questiontext format="html"><text><![CDATA[<p>How does the punishment in proof of stake differ from proof of work?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>In PoS the punishment is intrinsic (losing staked ether); in PoW it is extrinsic (wasted electricity).</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 2 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[PoS punishment is intrinsic (lost stake); PoW punishment is extrinsic (lost electricity)]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[PoS has no punishment at all]]></text><feedback format="html"><text>No — slashing exists.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Both punishments are identical]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[PoW punishment is loss of stake]]></text><feedback format="html"><text>Reversed.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S15 C3 — Validator deposit</text></name>
+    <questiontext format="html"><text><![CDATA[<p>How many ETH must be deposited to become an Ethereum validator?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>32 ETH, locked into the deposit contract.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>32</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S15 C4 — Slots per epoch</text></name>
+    <questiontext format="html"><text><![CDATA[<p>How many slots make up one epoch?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>32 slots, each 12 seconds long, so an epoch lasts 6.4 minutes.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>32</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S15 C5 — Gasper components</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Ethereum's Gasper protocol is the combination of which two mechanisms?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>LMD-GHOST (the fork-choice rule) and Casper FFG (the finality gadget).</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 4 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[LMD-GHOST and Casper FFG]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Ethash and Dagger]]></text><feedback format="html"><text>Those are PoW-related.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Snap sync and checkpoint sync]]></text><feedback format="html"><text>Those are sync options.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Optimistic and ZK rollups]]></text><feedback format="html"><text>Those are scaling solutions.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S15 C6 — Slashing</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Slashing is a severe penalty applied when a validator is provably malicious, such as signing two conflicting blocks.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. Minor faults like being offline incur small penalties; slashing is reserved for provable misbehaviour.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+</quiz>

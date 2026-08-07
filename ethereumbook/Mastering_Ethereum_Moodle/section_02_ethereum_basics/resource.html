@@ -1,0 +1,88 @@
+<div style="max-width:900px;margin:0 auto;font-family:Georgia,serif;color:#1e293b;line-height:1.85;font-size:16px;">
+
+  <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:30px 36px;margin-bottom:26px;color:#fff;">
+    <p style="color:#f7931a;font-size:12px;letter-spacing:3px;text-transform:uppercase;margin:0 0 6px;font-weight:bold;">Section 2 &middot; Reading</p>
+    <h1 style="font-size:28px;margin:0 0 8px;color:#fff;">Ethereum Basics</h1>
+    <p style="margin:0;color:#cbd5e1;font-size:15px;">By the end of this lesson you will understand ether's units, the two kinds of Ethereum account, and how a first smart contract &mdash; a faucet &mdash; actually behaves.</p>
+  </div>
+
+  <div style="background:#fff7ed;border-left:5px solid #f7931a;border-radius:8px;padding:18px 24px;margin-bottom:26px;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#9a3412;">What you will be able to do</p>
+    <ul style="margin:0;">
+      <li>Convert between ether and its smallest unit, wei, and name the denominations in between.</li>
+      <li>Explain what a wallet holds and why controlling your private keys matters.</li>
+      <li>Distinguish an externally owned account (EOA) from a contract account.</li>
+      <li>Trace what happens when someone withdraws from a faucet contract.</li>
+    </ul>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">1. Ether and its units</h2>
+  <p>Ethereum's currency is <strong>ether</strong> (ticker ETH, symbol &#926;). A common beginner's slip is to call the currency &ldquo;Ethereum&rdquo; &mdash; but Ethereum is the <em>system</em>, and ether is the <em>currency</em> that pays to use it.</p>
+  <p>Internally, Ethereum never stores fractional ether. Every value is an unsigned integer counted in the smallest unit, the <strong>wei</strong>. One ether is exactly one quintillion wei:</p>
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px 24px;margin:16px 0;">
+    <p style="margin:0;font-family:'Courier New',monospace;font-size:15px;color:#0f172a;">1 ether = 1 &times; 10<sup>18</sup> wei = 1,000,000,000,000,000,000 wei</p>
+  </div>
+  <p>So when you send &ldquo;1 ETH,&rdquo; the transaction really encodes the integer 1,000,000,000,000,000,000. The named denominations in between honour pioneers of computing and cryptography:</p>
+  <table style="width:100%;border-collapse:collapse;font-size:15px;margin:10px 0;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:8px 14px;">Value (wei)</th><th style="text-align:left;padding:8px 14px;">Exponent</th><th style="text-align:left;padding:8px 14px;">Common name</th></tr>
+    <tr><td style="padding:8px 14px;">1</td><td style="padding:8px 14px;">10<sup>0</sup></td><td style="padding:8px 14px;">Wei</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;">10<sup>9</sup></td><td style="padding:8px 14px;">10<sup>9</sup></td><td style="padding:8px 14px;">Shannon (gwei)</td></tr>
+    <tr><td style="padding:8px 14px;">10<sup>12</sup></td><td style="padding:8px 14px;">10<sup>12</sup></td><td style="padding:8px 14px;">Szabo</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;">10<sup>15</sup></td><td style="padding:8px 14px;">10<sup>15</sup></td><td style="padding:8px 14px;">Finney</td></tr>
+    <tr><td style="padding:8px 14px;">10<sup>18</sup></td><td style="padding:8px 14px;">10<sup>18</sup></td><td style="padding:8px 14px;"><strong>Ether</strong></td></tr>
+  </table>
+  <p>The <em>gwei</em> (gigawei, 10<sup>9</sup> wei) is worth remembering: gas prices are almost always quoted in gwei.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">2. Wallets and control</h2>
+  <p>A <strong>wallet</strong> is a software application that manages your Ethereum account: it holds your keys and can create and broadcast transactions on your behalf. MetaMask, Rabby, and Phantom are common starter wallets that work as both browser extensions and mobile apps.</p>
+  <p>The key idea is <em>control</em>. In a decentralized system, each user can &mdash; and should &mdash; control their own <strong>private keys</strong>. As a first approximation, one private key equals one account. With that control comes responsibility: if you lose your private keys, no one can restore them, and the funds they secure are locked forever. Handing keys to a third-party custodian (like a centralized exchange) trades that responsibility for trust in someone else.</p>
+
+  <div style="background:#fef2f2;border-left:5px solid #ef4444;border-radius:8px;padding:14px 20px;margin:16px 0;">
+    <p style="margin:0;"><strong>Golden rule.</strong> A wallet needs access to your private keys, so only install wallet software from sources you trust &mdash; and never share the keys themselves.</p>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">3. Two kinds of account</h2>
+  <p>Ethereum has exactly two account types, and telling them apart is essential:</p>
+  <table style="width:100%;border-collapse:collapse;font-size:15px;margin:10px 0;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:8px 14px;">&nbsp;</th><th style="text-align:left;padding:8px 14px;">Externally owned account (EOA)</th><th style="text-align:left;padding:8px 14px;">Contract account</th></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Has a private key?</td><td style="padding:8px 14px;">Yes</td><td style="padding:8px 14px;">No</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Has code?</td><td style="padding:8px 14px;">No</td><td style="padding:8px 14px;">Yes (a smart contract)</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Can start a transaction?</td><td style="padding:8px 14px;">Yes</td><td style="padding:8px 14px;">No &mdash; only reacts to being called</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Holds and sends ether?</td><td style="padding:8px 14px;">Yes</td><td style="padding:8px 14px;">Yes</td></tr>
+  </table>
+  <p>The account you make in MetaMask is an EOA &mdash; it has a private key, and having the key means control. A contract account has no key; it is controlled entirely by the logic of its code. When a transaction is sent <em>to</em> a contract address, it causes that contract to <strong>run</strong> in the EVM, using the transaction's data to choose which function to call. Because a contract has no key, it can never <em>initiate</em> a transaction &mdash; it can only react.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">4. A first contract: the faucet</h2>
+  <p>A <strong>faucet</strong> is one of the simplest useful contracts: it hands out a little ether to any address that asks, and anyone can refill it. It is written in <strong>Solidity</strong>, Ethereum's dominant smart-contract language, and compiled to EVM bytecode.</p>
+  <p>The important behaviour to understand is the <em>withdraw</em> rule. A well-behaved faucet enforces two limits before it pays out. First, a request cannot exceed a fixed maximum per withdrawal (so one person cannot drain it). Second, it cannot pay more ether than it currently holds. If either check fails the withdrawal is rejected; otherwise the balance goes down by the requested amount. This is exactly the logic you will implement in the exercises.</p>
+
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px 24px;margin:16px 0;">
+    <p style="margin:0 0 6px;font-weight:bold;color:#0f172a;">Worked example</p>
+    <p style="margin:0;font-family:'Courier New',monospace;font-size:14px;color:#0f172a;">balance = 1000, request = 100, limit = 100 &rarr; pay out, new balance = 900<br/>balance = 1000, request = 200, limit = 100 &rarr; rejected (over the per-withdrawal limit)<br/>balance = 50, request = 100, limit = 100 &rarr; rejected (not enough funds)</p>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">Glossary for this section</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:15px;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:8px 14px;">Term</th><th style="text-align:left;padding:8px 14px;">Meaning</th></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Wei</td><td style="padding:8px 14px;">The smallest unit of ether; 1 ETH = 10<sup>18</sup> wei.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Gwei</td><td style="padding:8px 14px;">10<sup>9</sup> wei; the unit gas prices are quoted in.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Wallet</td><td style="padding:8px 14px;">Software that holds your keys and sends transactions for you.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">EOA</td><td style="padding:8px 14px;">Externally owned account; has a private key, can start transactions.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Contract account</td><td style="padding:8px 14px;">An account governed by code, with no private key.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Faucet</td><td style="padding:8px 14px;">A contract that dispenses small amounts of (test) ether on request.</td></tr>
+  </table>
+
+  <div style="background:#ecfdf5;border-left:5px solid #10b981;border-radius:8px;padding:16px 22px;margin:24px 0;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#065f46;">Check your understanding</p>
+    <ol style="margin:0;">
+      <li>How many wei are in 3 ether? <span style="color:#94a3b8;">(Answer: 3,000,000,000,000,000,000.)</span></li>
+      <li>Which account type can <em>initiate</em> a transaction? <span style="color:#94a3b8;">(Answer: only an EOA.)</span></li>
+      <li>Why can't a contract account start a transaction on its own? <span style="color:#94a3b8;">(Answer: it has no private key.)</span></li>
+      <li>A faucet holds 50, its per-withdrawal limit is 100, and someone requests 60. What happens? <span style="color:#94a3b8;">(Answer: rejected &mdash; not enough funds.)</span></li>
+    </ol>
+  </div>
+
+  <div style="background:#eef2ff;border-left:5px solid #6366f1;border-radius:8px;padding:16px 22px;margin-top:24px;">
+    <p style="margin:0;"><strong>Practice.</strong> Three Python exercises: (1) convert whole ether into wei, (2) map a power-of-ten exponent to the denomination's common name, and (3) implement the faucet withdrawal rule with its two safety checks.</p>
+  </div>
+</div>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 11 - Oracles (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S11 C1 — Why no on-chain randomness</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Why can't the EVM provide a true random number to smart contracts?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Different nodes would compute different values, so the network could never agree on the resulting state.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 1 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[It would break determinism, so nodes could not reach consensus]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Random numbers are too expensive in gas]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The EVM has no integer type]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Randomness is banned by law]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S11 C2 — Pattern for a price feed</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which oracle pattern best suits data that changes frequently, like an exchange-rate feed?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Publish-subscribe: the oracle updates a value and subscribers poll or listen for changes.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 3 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Publish-subscribe]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Immediate-read]]></text><feedback format="html"><text>That is for one-off lookups.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Request-response]]></text><feedback format="html"><text>That is for huge datasets queried in slices.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Immediate-write]]></text><feedback format="html"><text>Not a real pattern.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S11 C3 — Oracle as attack target</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A high-value contract that trusts a single oracle creates a strong incentive to attack that oracle.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. Corrupting the oracle corrupts the decision the contract makes, which is why data authentication and decentralization matter.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S11 C4 — Resisting manipulation</text></name>
+    <questiontext format="html"><text><![CDATA[<p>How does a decentralized oracle reduce the impact of a single faulty or malicious data source?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>It aggregates reports from many nodes, commonly taking the median, so one outlier barely moves the result.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 4 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[It aggregates many independent reports, e.g. by taking the median]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It encrypts the single source's data]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It caches the last value forever]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It disables the oracle after one read]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S11 C5 — Data enters via transactions</text></name>
+    <questiontext format="html"><text><![CDATA[<p>The only way external data can enter the EVM is inside the data field of a signed transaction.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. That is why the trustworthiness of that data (and the oracle providing it) is a core concern.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S11 C6 — Median of reports</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Three oracle nodes report the prices 3, 1, and 2. What is the median the contract would use?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Sorted: 1, 2, 3. The middle value is 2.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>2</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+</quiz>

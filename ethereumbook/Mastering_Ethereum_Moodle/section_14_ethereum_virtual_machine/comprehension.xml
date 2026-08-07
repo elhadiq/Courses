@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 14 - The Ethereum Virtual Machine (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S14 C1 — Stack order</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What order does the EVM stack follow?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Last-in, first-out (LIFO): the most recently pushed item is the first one popped.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 1 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Last-in, first-out (LIFO)]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[First-in, first-out (FIFO)]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Random access]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Sorted order]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S14 C2 — Persistent area</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which EVM data area keeps its contents between transactions?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Storage is the persistent, per-contract key-value store; stack, memory and calldata do not survive.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 2 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Storage]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Memory]]></text><feedback format="html"><text>Memory is volatile.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The stack]]></text><feedback format="html"><text>The stack is temporary.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Calldata]]></text><feedback format="html"><text>Calldata is read-only input.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S14 C3 — Base transaction gas</text></name>
+    <questiontext format="html"><text><![CDATA[<p>How much gas is the base cost of sending a transaction?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>21,000 gas, before any opcode costs are added.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>21000</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S14 C4 — Out of gas</text></name>
+    <questiontext format="html"><text><![CDATA[<p>If a transaction runs out of gas, its state changes are rolled back but the gas already consumed is still charged.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. Validators did the work up to that point, so they are still compensated even though the transaction reverts.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S14 C5 — Quasi-Turing-complete</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Why is the EVM described as only <em>quasi</em>-Turing-complete?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>It can run any program, but only within a bounded amount of computation set by the gas limit.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 3 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Computation is bounded by the gas limit]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It cannot do arithmetic]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It has no memory]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It only runs Solidity]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S14 C6 — Storage cost</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Because storage is persistent, writing to it is among the most expensive operations in the EVM.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. Persisting data across all future blocks is costly, which is why writing to storage carries a high gas price.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+</quiz>

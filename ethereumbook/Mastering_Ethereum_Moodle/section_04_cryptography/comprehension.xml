@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 4 - Cryptography (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S4 C1 — What a private key is</text></name>
+    <questiontext format="html"><text><![CDATA[<p>In Ethereum, a private key is fundamentally:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>A private key is just a very large random number (below 2<sup>256</sup>), chosen from a secure source of randomness.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 1 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[A large random number below 2^256]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A password chosen by the user]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The last 20 bytes of a hash]]></text><feedback format="html"><text>That describes an address, not a private key.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A point on the elliptic curve]]></text><feedback format="html"><text>That describes the public key.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S4 C2 — One-way property</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Given only a public key, it is computationally infeasible to recover the corresponding private key.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. Elliptic-curve multiplication is a one-way function; reversing it is the intractable discrete logarithm problem.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S4 C3 — Address length</text></name>
+    <questiontext format="html"><text><![CDATA[<p>How many bytes of the Keccak-256 hash of the public key make up an Ethereum address?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>The last 20 bytes (40 hex characters).</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>20</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S4 C4 — ERC-55 capitalization rule</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Under ERC-55, an alphabetic address character is capitalized when:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>You capitalize the letter when the hash digit at the same position is 8 or greater.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 5 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[The hash digit at the same position is 8 or greater]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The address digit at that position is even]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The position index is odd]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The character is a digit 0-9]]></text><feedback format="html"><text>No — digits never change.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S4 C5 — Keccak vs SHA-3</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Ethereum's Keccak-256 produces the same output as the finalized FIPS-202 SHA-3 standard for the same input.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>False. NIST adjusted padding parameters, so Keccak-256 and FIPS-202 SHA-3 give different hashes; Ethereum uses the original Keccak.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+    <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S4 C6 — Determinism</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which property guarantees that hashing the same message twice always gives the same result?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Determinism: a given input always produces the same hash output.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 3 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Determinism]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Irreversibility]]></text><feedback format="html"><text>That is about not recovering the input.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Collision protection]]></text><feedback format="html"><text>That is about two inputs sharing a hash.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Noncorrelation]]></text><feedback format="html"><text>That is the avalanche effect.</text></feedback></answer>
+  </question>
+</quiz>

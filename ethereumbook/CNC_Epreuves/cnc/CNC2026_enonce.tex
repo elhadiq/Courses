@@ -1,0 +1,422 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{french.ldf}{\usepackage[french]{babel}}{\usepackage[english]{babel}}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}\geometry{margin=2.3cm}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lmodern}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, urlcolor=[RGB]{2,101,115}, linkcolor=black}
+\definecolor{codebg}{RGB}{247,249,251}
+\definecolor{kw}{RGB}{175,45,45}
+\definecolor{cmt}{RGB}{110,120,130}
+\definecolor{str}{RGB}{20,110,60}
+\lstset{language=Python, backgroundcolor=\color{codebg}, basicstyle=\ttfamily\small,
+  keywordstyle=\color{kw}\bfseries, commentstyle=\color{cmt}\itshape, stringstyle=\color{str},
+  numbers=left, numberstyle=\tiny\color{cmt}, numbersep=8pt, frame=single, rulecolor=\color{gray!40},
+  showstringspaces=false, breaklines=true, columns=fullflexible, extendedchars=true, inputencoding=utf8,
+  literate={é}{{\'e}}1 {è}{{\`e}}1 {à}{{\`a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ç}{{\c c}}1 {ô}{{\^o}}1 {û}{{\^u}}1 {ù}{{\`u}}1 {É}{{\'E}}1}
+\newcounter{qcnt}
+\newcommand{\Q}{\medskip\par\stepcounter{qcnt}\noindent\textbf{Question~\theqcnt.}~}
+\newcommand{\code}[1]{\lstinline!#1!}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Préparation au CNC 2026 --- Informatique MP}
+\rhead{\small Énoncé}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\titleformat*{\section}{\large\bfseries\scshape}
+\titleformat*{\subsection}{\normalsize\bfseries}
+\begin{document}
+
+\begin{center}
+{\large\bfseries Préparation au Concours National Commun 2026 --- Informatique MP}\\[8pt]
+\rule{0.9\linewidth}{0.5pt}\\[6pt]
+{\Large\bfseries Épreuve d'Informatique --- Énoncé}\\[4pt]
+{\bfseries Filière MP --- Durée : 4 heures --- Quatre problèmes indépendants}\\[6pt]
+{\itshape Autour de la blockchain Ethereum : algorithmique, arbres de Merkle, partition (programmation dynamique) et finance décentralisée}\\[6pt]
+\rule{0.9\linewidth}{0.5pt}\\[8pt]
+{\small Auteur~: \href{https://orcid.org/0000-0002-6108-7176}{\textbf{Pr Agrégé El Hadiq Zouhair}}}\\[3pt]
+{\small \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}} \quad---\quad Tous droits réservés \textcopyright\ cpgeacademy.org}
+\end{center}
+\medskip
+\begin{center}
+\fcolorbox{gray}{gray!5}{\begin{minipage}{0.93\linewidth}\small
+\textbf{Avis important.} Ce document est une \textbf{initiative personnelle} du professeur,
+à but strictement pédagogique. Il ne s'agit \textbf{pas} d'un sujet officiel du Concours
+National Commun~; il s'en inspire uniquement par la forme et l'esprit.
+\smallskip
+\textbf{Consignes.} L'épreuve comporte \textbf{quatre problèmes indépendants}. Les questions sont
+numérotées \textbf{en continu} sur l'ensemble du sujet~; le corrigé reprend la même numérotation.
+On pourra traiter les problèmes dans l'ordre de son choix.
+\end{minipage}}
+\end{center}
+\bigskip
+
+\setcounter{qcnt}{0}
+
+\section*{Problème I --- Algorithmique de la blockchain Ethereum}
+\noindent\emph{Présentation.} Ethereum est un ordinateur mondial décentralisé. Ce problème étudie, de manière \emph{largement
+indépendante} partie par partie, quelques structures et algorithmes qui le sous-tendent~: la
+mesure des ressources (le \emph{gaz}), l'encodage hexadécimal des adresses, les \emph{arbres de
+Merkle}, la sélection aléatoire d'un validateur, et enfin un problème d'optimisation résolu par
+\emph{programmation dynamique}.
+
+\noindent\textbf{Conventions.}
+\begin{itemize}[nosep]
+  \item Le langage est Python 3. Les entiers Python sont de taille arbitraire.
+  \item Pour une liste \code{L}, \code{len(L)} est sa longueur et \code{L[i]} son terme d'indice $i$ (à partir de $0$).
+  \item $\lfloor x \rfloor$ désigne la partie entière de $x$. $\log_b$ est le logarithme en base $b$.
+  \item On rappelle que \code{n // b} et \code{n \% b} sont le quotient et le reste de la division euclidienne.
+\end{itemize}
+
+\noindent Les questions sont numérotées \textbf{en continu} sur tout le sujet.
+
+\medskip
+\subsection*{Partie I --- Unités et compteur de gaz}
+
+L'unité de compte d'Ethereum est l'\emph{ether}~; sa plus petite subdivision est le \emph{wei},
+avec $1$ ether $= 10^{18}$ wei. Chaque instruction exécutée consomme une quantité fixe de
+\emph{gaz}~; une transaction fixe un plafond de gaz au-delà duquel l'exécution est interrompue.
+
+\Q Écrire une fonction \code{ether_vers_wei(e)} qui, pour un entier $e \ge 0$, renvoie le nombre
+de wei correspondant à $e$ ethers.
+
+\Q Écrire \code{gaz_restant(plafond, couts)} où \code{couts} est la liste des coûts (entiers
+positifs) des instructions exécutées dans l'ordre. La fonction retranche les coûts un à un~; si,
+avant une instruction, le gaz disponible est \emph{strictement} inférieur à son coût, l'exécution
+s'arrête et la fonction renvoie la chaîne \code{"panne de gaz"}. Sinon elle renvoie le gaz restant.
+
+\Q Un contrat exécute une boucle dont l'itération numéro $i$ (pour $i \ge 0$) coûte $g/2^{i}$
+unités de gaz, où $g$ est un réel strictement positif. Montrer que le coût total
+$\displaystyle C = \sum_{i=0}^{+\infty} \frac{g}{2^{i}}$ est fini et vaut exactement $2g$. En
+déduire que, quel que soit le nombre d'itérations effectivement exécutées, le coût cumulé est
+majoré par $2g$.
+
+\subsection*{Partie II --- Encodage hexadécimal des adresses}
+
+Une adresse Ethereum est un entier affiché en base $16$ (hexadécimal), avec l'alphabet
+\code{"0123456789abcdef"}. On étudie l'encodage d'un entier en base $16$.
+
+\Q Écrire \code{entier_vers_hex(n)} qui, pour un entier $n \ge 0$, renvoie la chaîne de ses
+chiffres hexadécimaux (sans le préfixe \code{0x}), avec la convention \code{entier_vers_hex(0) == "0"}.
+
+\Q Écrire \code{hex_vers_entier(s)} qui, pour une chaîne \code{s} de chiffres hexadécimaux
+minuscules, renvoie l'entier qu'elle représente.
+
+\Q Pour $n \ge 1$, montrer que le nombre de tours de la boucle de \code{entier_vers_hex(n)}
+(donc le nombre de chiffres produits) est exactement $\lfloor \log_{16} n \rfloor + 1$. En déduire
+la complexité temporelle de \code{entier_vers_hex} en fonction du nombre de chiffres.
+
+\Q Justifier la \textbf{terminaison} de la boucle de \code{entier_vers_hex} à l'aide d'un
+\emph{variant de boucle}, puis prouver la \textbf{correction}, c'est-à-dire que pour tout
+$n \ge 0$, \code{hex_vers_entier(entier_vers_hex(n))} est égal à $n$.
+
+\subsection*{Partie III --- Arbres de Merkle}
+
+Un \emph{arbre de Merkle} résume un ensemble de données par un seul haché, la \emph{racine}. On
+se donne une fonction de combinaison
+$$\mathtt{parent(a, b)} = (31\,a + b) \bmod 1000003,$$
+et les feuilles sont des entiers. La racine se calcule par niveaux~: à chaque niveau, on remplace
+la liste courante par la liste des \code{parent} de couples consécutifs~; si la liste a une
+longueur impaire, on \textbf{duplique son dernier élément} avant de l'appairer. On s'arrête
+lorsqu'il ne reste qu'un élément.
+
+\Q Écrire \code{racine_merkle(feuilles)} qui prend une liste non vide de feuilles et renvoie la
+racine. Vérifier à la main que \code{racine_merkle([1, 2, 3, 4])} vaut $1120$.
+
+\Q Soit $n$ le nombre de feuilles. Montrer que le nombre total d'appels à \code{parent} effectués
+par \code{racine_merkle} est un $O(n)$. \emph{Indication}~: majorer la somme des tailles des
+niveaux successifs.
+
+\Q On veut prouver l'\emph{inclusion} d'une feuille sans révéler tout l'arbre. Écrire
+\code{preuve_inclusion(feuilles, i)} qui renvoie la liste des couples $(\text{frère}, \text{côté})$
+rencontrés en remontant de la feuille d'indice $i$ jusqu'à la racine, où le côté vaut
+\code{'L'} ou \code{'R'} et indique si le frère est à gauche ou à droite. Écrire ensuite
+\code{verifier(feuille, preuve, racine)} qui recalcule la racine à partir de la feuille et de la
+preuve, et renvoie un booléen.
+
+\Q Montrer par récurrence sur la hauteur de l'arbre que, si la fonction \code{parent} est
+\emph{résistante aux collisions} (on ne sait pas produire $ (a,b) \ne (a',b')$ avec
+$\mathtt{parent}(a,b) = \mathtt{parent}(a',b')$), alors une preuve d'inclusion acceptée par
+\code{verifier} garantit que la feuille figure bien parmi les feuilles ayant produit la racine.
+Quelle est la taille d'une preuve d'inclusion en fonction de $n$~?
+
+\subsection*{Partie IV --- Sélection aléatoire d'un validateur}
+
+À chaque créneau (\emph{slot}), un validateur donné est choisi comme proposeur avec probabilité
+$p \in\, ]0,1[$, indépendamment des autres créneaux. On note $N$ le numéro (à partir de $1$) du
+premier créneau où ce validateur est choisi.
+
+\Q Donner, pour $k \ge 1$, la probabilité $\mathbb{P}(N = k)$. Reconnaître la loi de $N$ et en
+déduire l'espérance $\mathbb{E}[N]$.
+
+\Q Montrer que $\mathbb{P}(N > k) = (1-p)^{k}$, puis que $\mathbb{P}(N < +\infty) = 1$
+(\emph{terminaison presque sûre}~: le validateur est choisi en temps fini avec probabilité $1$).
+
+\Q Application numérique~: pour $p = 1/4$, donner $\mathbb{E}[N]$ et la probabilité
+$\mathbb{P}(N \le 4)$ sous forme de fraction irréductible.
+
+\subsection*{Partie V --- Partition équilibrée par programmation dynamique}
+
+On dispose d'une liste $S$ d'entiers strictement positifs. Le \emph{problème de partition}
+demande s'il existe un sous-ensemble de $S$ dont la somme vaut exactement la moitié de la somme
+totale (les deux parts ont alors la même somme). C'est un problème classique lié aux preuves à
+divulgation nulle.
+
+\Q Montrer que si la somme totale $T = \sum S$ est impaire, la réponse est nécessairement
+\emph{non}. On suppose désormais $T$ paire et on pose $C = T/2$.
+
+\Q Le \emph{problème de décision} associé (« existe-t-il un sous-ensemble de somme $C$~? ») est
+\textbf{NP}. Justifier en décrivant un \emph{certificat} et l'algorithme de vérification, ainsi
+que sa complexité.
+
+\Q On définit, pour $0 \le i \le \mathtt{len(S)}$ et $0 \le c \le C$, le booléen $A[i][c]$ = « il
+existe un sous-ensemble des $i$ premiers éléments de $S$ de somme $c$ ». Donner la relation de
+récurrence vérifiée par $A[i][c]$ et son initialisation.
+
+\Q En déduire une fonction \code{peut_partitionner(S)} utilisant un tableau à une dimension
+\code{dp} de taille $C+1$. \emph{Attention au sens de parcours} pour ne pas réutiliser deux fois
+le même élément. Donner sa complexité en temps et en espace, et expliquer le terme
+\emph{pseudo-polynomial}.
+
+\Q Prouver la correction de \code{peut_partitionner} en énonçant un \emph{invariant} portant sur
+\code{dp} après le traitement des $i$ premiers éléments, puis en le démontrant par récurrence sur
+$i$. Justifier enfin la terminaison.
+
+\clearpage
+\section*{Problème II --- Arbres de Merkle et preuves d'inclusion}
+\noindent\emph{Présentation.} Un \emph{arbre de Merkle} permet de résumer une grande collection de données par un unique
+condensé, la \emph{racine}, et de prouver qu'une donnée en fait partie à l'aide d'un
+\emph{certificat} de taille logarithmique. C'est un outil central des blockchains (preuves
+d'inclusion, listes d'autorisation, stockage vérifiable). Dans tout le problème, les
+\emph{feuilles} sont des entiers, et l'on combine deux n\oe uds par la fonction
+$$\mathtt{parent}(a,b) = (31\,a + b) \bmod p, \qquad p = 1000003 \ (\text{premier}).$$
+
+\noindent\textbf{Conventions.} Le langage est Python 3. Pour une liste \code{L}, \code{len(L)}
+est sa longueur, \code{L[i]} son terme d'indice $i$ ($\ge 0$), \code{L[-1]} son dernier terme.
+$\lceil x \rceil$ est la partie entière supérieure, $\log_2$ le logarithme binaire. Les questions
+sont numérotées \textbf{en continu}.
+
+\medskip
+\subsection*{Partie I --- La fonction de combinaison}
+
+\Q Écrire \code{parent(a, b)} conforme à la définition ci-dessus.
+
+\Q Calculer à la main $\mathtt{parent}(1,2)$, $\mathtt{parent}(3,4)$ et
+$\mathtt{parent}(33,97)$.
+
+\Q On dit que \code{parent} est \emph{déterministe}. Expliquer pourquoi ce caractère déterministe
+est indispensable pour que deux n\oe uds différents du réseau, partant des mêmes feuilles,
+calculent la même racine.
+
+\Q On admet, pour la suite, que \code{parent} est \emph{résistante aux collisions}~: on ne sait
+pas exhiber deux couples distincts $(a,b)\neq(a',b')$ tels que $\mathtt{parent}(a,b)=
+\mathtt{parent}(a',b')$. Rappeler pourquoi une fonction $h : \mathbb{N}^2 \to \{0,\dots,p-1\}$ ne
+peut pas être \emph{injective}, et donc pourquoi la résistance aux collisions est une hypothèse
+\emph{calculatoire} (« difficile à violer ») et non une impossibilité mathématique.
+
+\subsection*{Partie II --- Construction de la racine}
+
+La racine se calcule par niveaux~: tant qu'il reste plus d'un n\oe ud, si le nombre de n\oe uds
+est impair on \textbf{duplique le dernier}, puis on remplace la liste par celle des
+\code{parent} de couples consécutifs.
+
+\Q Écrire \code{racine_merkle(feuilles)} (liste non vide) renvoyant la racine.
+
+\Q Dérouler le calcul de \code{racine_merkle([1, 2, 3, 4])} niveau par niveau et donner la valeur
+de la racine.
+
+\Q Faire de même pour \code{racine_merkle([1, 2, 3])} en explicitant l'étape de duplication.
+
+\Q Soit $n$ le nombre de feuilles. En notant $t_0=n$ et $t_{k+1}=\lceil t_k/2\rceil$ la taille du
+niveau $k+1$, montrer que le nombre de niveaux est $O(\log n)$ et que le nombre total d'appels à
+\code{parent} est un $O(n)$.
+
+\subsection*{Partie III --- Preuves d'inclusion}
+
+\Q Écrire \code{preuve_inclusion(feuilles, i)} renvoyant la liste des couples
+$(\text{frère}, \text{côté})$, avec côté valant \code{'L'} ou \code{'R'}, rencontrés en remontant
+de la feuille d'indice $i$ jusqu'à la racine.
+
+\Q Écrire \code{verifier(feuille, preuve, racine)} qui recalcule la racine depuis la feuille et
+la preuve et renvoie un booléen. Vérifier sur l'exemple $[1,2,3,4]$, $i=0$.
+
+\Q Montrer que la taille d'une preuve d'inclusion est le nombre de niveaux, soit $O(\log n)$, et
+commenter l'intérêt (comparer au coût de transmettre toutes les feuilles).
+
+\Q \textbf{Soundness.} Démontrer par récurrence sur la hauteur $h$ de l'arbre que, sous
+l'hypothèse de résistance aux collisions, si \code{verifier(feuille, preuve, racine)} renvoie
+\code{True} alors \code{feuille} figure effectivement parmi les feuilles ayant produit
+\code{racine}.
+
+\subsection*{Partie IV --- Hauteur et mise à jour}
+
+\Q Montrer que la hauteur de l'arbre (nombre de niveaux au-dessus des feuilles) vaut
+$H(n) = \lceil \log_2 n \rceil$ pour $n \ge 1$ (avec $H(1)=0$). Donner $H(n)$ pour
+$n \in \{1,2,3,4,5,8,9\}$.
+
+\Q Lorsqu'une seule feuille change de valeur, quels n\oe uds de l'arbre doivent être recalculés~?
+En déduire qu'une mise à jour de la racine coûte $O(\log n)$ appels à \code{parent} (et non
+$O(n)$). Écrire \code{maj_racine(feuilles, i, v)} qui renvoie la nouvelle racine lorsque la feuille
+d'indice $i$ prend la valeur \code{v}, en \textbf{réutilisant} \code{racine_merkle}. \emph{On ne
+demande pas ici l'implémentation optimale en $O(\log n)$, mais on justifiera la borne.}
+
+\clearpage
+\section*{Problème III --- Le problème de partition et la programmation dynamique}
+\noindent\emph{Présentation.} Le \emph{problème de partition} consiste, étant donné une liste $S$ d'entiers strictement
+positifs, à décider si l'on peut la séparer en deux sous-ensembles de même somme. Il apparaît dans
+les preuves à divulgation nulle de connaissance (chapitre « Zero-Knowledge Proofs » de
+\emph{Mastering Ethereum}) comme exemple canonique de problème \emph{facile à vérifier} mais
+\emph{difficile à résoudre}. On note $T = \sum_{x\in S} x$ la somme totale.
+
+\noindent\textbf{Conventions.} Langage Python 3~; \code{sum(S)} est la somme des éléments,
+\code{len(S)} leur nombre. Le module \code{itertools} fournit \code{combinations(S, r)} qui énumère
+les sous-ensembles de $S$ à $r$ éléments. Questions numérotées \textbf{en continu}.
+
+\medskip
+\subsection*{Partie I --- Recherche exhaustive}
+
+\Q Écrire \code{demi_somme(S)} qui renvoie \code{None} si $T=\mathtt{sum(S)}$ est impair, et
+$T/2$ (entier) sinon.
+
+\Q Écrire \code{partition_exhaustive(S)} qui décide, en énumérant tous les sous-ensembles à l'aide
+de \code{itertools.combinations}, s'il existe un sous-ensemble de somme $T/2$. La fonction renvoie
+un booléen. On renverra \code{False} si $T$ est impair.
+
+\Q Combien de sous-ensembles possède un ensemble à $n$ éléments~? En déduire que
+\code{partition_exhaustive} a une complexité temporelle en $\Theta(2^{n})$ dans le pire des cas,
+et expliquer pourquoi cette approche est inutilisable pour $n$ grand.
+
+\subsection*{Partie II --- Le problème de décision Subset-Sum}
+
+On suppose désormais $T$ paire et on pose $C = T/2$. Le \emph{problème de décision} Subset-Sum
+demande~: « existe-t-il un sous-ensemble de $S$ de somme exactement $C$~? »
+
+\Q Décrire un \emph{certificat} (une preuve courte) permettant de convaincre en temps polynomial
+qu'une instance est positive, et l'algorithme de \emph{vérification} associé. Donner sa complexité.
+
+\Q En déduire que Subset-Sum appartient à la classe \textbf{NP}. \emph{On rappelle qu'un problème
+de décision est dans NP s'il admet un certificat vérifiable en temps polynomial.} On mentionnera,
+sans le démontrer, que Subset-Sum est en fait NP-complet.
+
+\subsection*{Partie III --- Récurrence et table de programmation dynamique}
+
+On définit, pour $0 \le i \le n$ (avec $n=\mathtt{len(S)}$) et $0 \le c \le C$, le booléen
+$$A[i][c] = \text{« il existe un sous-ensemble des } i \text{ premiers éléments de } S
+\text{ de somme } c \text{ »}.$$
+
+\Q Justifier la relation de récurrence
+$$A[i][c] = A[i-1][c] \;\lor\; \bigl(c \ge S[i-1] \ \land\ A[i-1][c - S[i-1]]\bigr)
+\quad (i \ge 1),$$
+et préciser l'initialisation $A[0][\,\cdot\,]$.
+
+\Q En déduire une fonction \code{subset_sum_2d(S, C)} qui construit la table $A$ (de taille
+$(n+1)\times(C+1)$) et renvoie \code{A[n][C]}. Donner sa complexité en temps et en espace.
+
+\subsection*{Partie IV --- Version optimisée en espace}
+
+\Q Écrire \code{peut_partitionner(S)} qui, après avoir écarté le cas $T$ impair, décide
+l'existence d'une partition équilibrée en n'utilisant qu'un tableau \code{dp} \textbf{à une
+dimension} de taille $C+1$. \emph{Indication~:} parcourir $c$ de $C$ jusqu'à $x$ en
+\textbf{décroissant} pour chaque élément $x$ de $S$.
+
+\Q Expliquer précisément pourquoi le parcours \textbf{décroissant} de $c$ est nécessaire~: que se
+passerait-il avec un parcours croissant~?
+
+\Q Donner la complexité en temps et en espace de \code{peut_partitionner}, et expliquer le terme
+\emph{pseudo-polynomial} (comparer $C$ à la taille de codage de l'entrée).
+
+\subsection*{Partie V --- Reconstruction et correction}
+
+\Q À partir de la table $A$ de la Partie III, écrire \code{sous_ensemble(S, C)} qui renvoie
+\emph{un} sous-ensemble de somme $C$ (sous forme de liste), ou \code{None} s'il n'en existe pas.
+\emph{Indication~:} remonter la table de $i=n$ à $1$~; l'élément $S[i-1]$ est pris ssi
+$A[i-1][C]$ est faux (le retirer impose de l'utiliser).
+
+\Q Énoncer un \emph{invariant} portant sur \code{dp} après le traitement des $i$ premiers éléments
+dans \code{peut_partitionner}, puis le démontrer par récurrence sur $i$. Conclure sur la
+correction, et justifier la terminaison.
+
+\clearpage
+\section*{Problème IV --- Finance décentralisée : teneurs de marché automatisés}
+\noindent\emph{Présentation.} Un \emph{teneur de marché automatisé} (\emph{Automated Market Maker}, AMM) remplace le carnet
+d'ordres par une \emph{réserve de liquidité} contenant deux jetons, en quantités $x$ et $y$. Le
+prix est fixé par une formule et non par l'appariement d'ordres. Le modèle le plus répandu
+(Uniswap V2) impose que le \emph{produit} $x\,y$ reste constant~: $x\,y = k$. Ce problème étudie
+ce mécanisme, ses bornes, puis un modèle de \emph{prêt sur-collatéralisé}.
+
+\noindent\textbf{Conventions.} Langage Python 3. Les réserves $x,y$ sont des réels
+strictement positifs. On note $\Delta x > 0$ la quantité de jeton $X$ apportée à la réserve et
+$\Delta y > 0$ la quantité de jeton $Y$ reçue en échange (échange \emph{sans frais}, sauf mention
+contraire). Questions numérotées \textbf{en continu}.
+
+\medskip
+\subsection*{Partie I --- Prix et produit constant}
+
+\Q Écrire \code{prix(x, y)} qui renvoie le prix d'une unité du jeton $X$ exprimé en jeton $Y$,
+c'est-à-dire $y/x$. Vérifier que pour une réserve de $10$ ETH et $100$ USDC, le prix d'un ETH est
+$10$ USDC.
+
+\Q Un échange amène la réserve de $(x, y)$ à $(x + \Delta x,\, y - \Delta y)$. En imposant la
+conservation du produit $(x+\Delta x)(y-\Delta y) = x\,y$, montrer que
+$$\Delta y = \frac{y\,\Delta x}{x + \Delta x}.$$
+
+\Q Écrire \code{sortie_amm(x, y, dx)} qui renvoie $\Delta y$. Vérifier que
+\code{sortie_amm(100, 100, 100)} vaut $50$.
+
+\subsection*{Partie II --- Bornes et monotonie (anti-drainage)}
+
+\Q Montrer que pour tout $\Delta x > 0$ on a $\Delta y < y$~: on ne peut jamais vider entièrement
+la réserve du jeton $Y$.
+
+\Q Montrer que la fonction $\Delta x \mapsto \Delta y(\Delta x) = \dfrac{y\,\Delta x}{x+\Delta x}$
+est \textbf{strictement croissante} sur $]0, +\infty[$ et que $\Delta y \to y$ lorsque
+$\Delta x \to +\infty$. Interpréter en termes de \emph{glissement} (\emph{slippage})~: plus
+l'échange est gros relativement à la réserve, plus le prix effectif se dégrade.
+
+\Q Le \emph{prix effectif} d'un échange est $\Delta x / \Delta y$. L'exprimer en fonction de
+$x, y, \Delta x$ et montrer qu'il est $> x/y$ (le prix « spot » inverse), avec égalité
+\emph{à la limite} $\Delta x \to 0$. Conclure sur l'impossibilité de drainer la réserve à prix
+constant.
+
+\subsection*{Partie III --- Frais cumulés et série géométrique}
+
+On modélise une suite d'échanges dont les volumes décroissent géométriquement~: le $i$-ième
+échange ($i \ge 0$) porte un volume $v_0\,\rho^{\,i}$ avec $0 < \rho < 1$, et prélève des frais
+proportionnels de taux $f$.
+
+\Q Montrer que le total des frais perçus $\displaystyle \Phi = \sum_{i=0}^{+\infty} f\,v_0\,
+\rho^{\,i}$ est fini et vaut $\dfrac{f\,v_0}{1-\rho}$.
+
+\Q Application~: pour $f = 0{,}003$, $v_0 = 1000$ et $\rho = 0{,}9$, calculer $\Phi$.
+
+\Q Écrire \code{frais_cumules(f, v0, rho, n)} qui calcule la somme \emph{partielle}
+$\sum_{i=0}^{n-1} f\,v_0\,\rho^{\,i}$, et donner une majoration de l'erreur
+$\Phi - \mathtt{frais\_cumules(f, v0, rho, n)}$ par une expression géométrique en $\rho^{\,n}$.
+
+\subsection*{Partie IV --- Prêt sur-collatéralisé et intérêts composés}
+
+Un emprunteur dépose un \emph{collatéral} de valeur $G$ et emprunte un principal $P$. Le taux de
+collatéralisation exigé est $\tau\%$~: l'emprunt n'est autorisé que si $G \ge P\,\tau/100$. La dette
+croît ensuite par intérêts composés~: après $n$ périodes au taux $r$ par période, la dette vaut
+$P(1+r)^n$. La position est \emph{liquidée} dès que la dette dépasse le collatéral $G$.
+
+\Q Écrire \code{collateral_requis(P, tau)} qui renvoie le collatéral minimal $\lfloor P\,\tau/100
+\rfloor$ (division entière). Vérifier \code{collateral_requis(100, 150) == 150}.
+
+\Q Écrire \code{dette(P, r, n)} renvoyant $P(1+r)^n$. Montrer que la dette dépasse strictement le
+collatéral $G$ pour la première fois à la période
+$$n^{\star} = \left\lfloor \frac{\ln(G/P)}{\ln(1+r)} \right\rfloor + 1
+\qquad (\text{si } G > P).$$
+
+\Q Application~: pour $P = 100$, $r = 0{,}10$ et $G = 150$, calculer $n^{\star}$ et vérifier
+l'encadrement $\mathtt{dette}(100, 0.1, n^{\star}-1) \le 150 < \mathtt{dette}(100, 0.1, n^{\star})$.
+Justifier la \textbf{terminaison} d'une boucle \code{while} qui incrémenterait $n$ tant que
+$\mathtt{dette}(P, r, n) \le G$.
+
+\end{document}

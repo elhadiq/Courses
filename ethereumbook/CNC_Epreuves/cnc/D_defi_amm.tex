@@ -1,0 +1,254 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{french.ldf}{\usepackage[french]{babel}}{\usepackage[english]{babel}}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}\geometry{margin=2.3cm}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lmodern}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, urlcolor=[RGB]{2,101,115}, linkcolor=black}
+\definecolor{codebg}{RGB}{247,249,251}
+\definecolor{kw}{RGB}{175,45,45}
+\definecolor{cmt}{RGB}{110,120,130}
+\definecolor{str}{RGB}{20,110,60}
+\lstset{language=Python, backgroundcolor=\color{codebg}, basicstyle=\ttfamily\small,
+  keywordstyle=\color{kw}\bfseries, commentstyle=\color{cmt}\itshape, stringstyle=\color{str},
+  numbers=left, numberstyle=\tiny\color{cmt}, numbersep=8pt, frame=single, rulecolor=\color{gray!40},
+  showstringspaces=false, breaklines=true, columns=fullflexible, extendedchars=true, inputencoding=utf8,
+  literate={é}{{\'e}}1 {è}{{\`e}}1 {à}{{\`a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ç}{{\c c}}1 {ô}{{\^o}}1 {û}{{\^u}}1 {ù}{{\`u}}1 {É}{{\'E}}1}
+\newcounter{qcnt}
+\newcommand{\Q}{\medskip\par\stepcounter{qcnt}\noindent\textbf{Question~\theqcnt.}~}
+\newcommand{\code}[1]{\lstinline!#1!}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Préparation au CNC 2026 --- Informatique MP}
+\rhead{\small Teneurs de marché automatisés (AMM)}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\titleformat*{\section}{\large\bfseries\scshape}
+
+\begin{document}
+
+\begin{center}
+{\large\bfseries Préparation au Concours National Commun 2026 --- Informatique MP}\\[8pt]
+\rule{0.9\linewidth}{0.5pt}\\[6pt]
+{\Large\bfseries Épreuve d'Informatique}\\[4pt]
+{\bfseries Filière MP --- Durée : 4 heures}\\[6pt]
+{\itshape Finance décentralisée : teneurs de marché automatisés, produit constant, séries et prêts sur-collatéralisés}\\[6pt]
+\rule{0.9\linewidth}{0.5pt}\\[8pt]
+{\small Auteur~: \href{https://orcid.org/0000-0002-6108-7176}{\textbf{Pr Agrégé El Hadiq Zouhair}}}\\[3pt]
+{\small \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}} \quad---\quad Tous droits réservés \textcopyright\ cpgeacademy.org}
+\end{center}
+\medskip
+\begin{center}
+\fcolorbox{gray}{gray!5}{\begin{minipage}{0.93\linewidth}\small
+\textbf{Avis important.} Ce document est une \textbf{initiative personnelle} du professeur,
+à but strictement pédagogique. Il ne s'agit \textbf{pas} d'un sujet officiel du Concours
+National Commun~; il s'en inspire uniquement par la forme et l'esprit.
+\smallskip
+\textbf{Pour aller plus loin.} Les élèves peuvent traiter une \textbf{nouvelle version} de
+ce problème dotée d'un \textbf{autocorrecteur des réponses}, et suivre un \textbf{cours
+complet}, sur \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}}.
+\end{minipage}}
+\end{center}
+
+\bigskip
+\section*{Présentation et notations}
+
+Un \emph{teneur de marché automatisé} (\emph{Automated Market Maker}, AMM) remplace le carnet
+d'ordres par une \emph{réserve de liquidité} contenant deux jetons, en quantités $x$ et $y$. Le
+prix est fixé par une formule et non par l'appariement d'ordres. Le modèle le plus répandu
+(Uniswap V2) impose que le \emph{produit} $x\,y$ reste constant~: $x\,y = k$. Ce problème étudie
+ce mécanisme, ses bornes, puis un modèle de \emph{prêt sur-collatéralisé}.
+
+\noindent\textbf{Conventions.} Langage Python 3. Les réserves $x,y$ sont des réels
+strictement positifs. On note $\Delta x > 0$ la quantité de jeton $X$ apportée à la réserve et
+$\Delta y > 0$ la quantité de jeton $Y$ reçue en échange (échange \emph{sans frais}, sauf mention
+contraire). Questions numérotées \textbf{en continu}.
+
+\bigskip
+\hrule
+\bigskip
+{\Large\bfseries É\,N\,O\,N\,C\,É}
+\medskip
+
+\section*{Partie I --- Prix et produit constant}
+
+\Q Écrire \code{prix(x, y)} qui renvoie le prix d'une unité du jeton $X$ exprimé en jeton $Y$,
+c'est-à-dire $y/x$. Vérifier que pour une réserve de $10$ ETH et $100$ USDC, le prix d'un ETH est
+$10$ USDC.
+
+\Q Un échange amène la réserve de $(x, y)$ à $(x + \Delta x,\, y - \Delta y)$. En imposant la
+conservation du produit $(x+\Delta x)(y-\Delta y) = x\,y$, montrer que
+$$\Delta y = \frac{y\,\Delta x}{x + \Delta x}.$$
+
+\Q Écrire \code{sortie_amm(x, y, dx)} qui renvoie $\Delta y$. Vérifier que
+\code{sortie_amm(100, 100, 100)} vaut $50$.
+
+\section*{Partie II --- Bornes et monotonie (anti-drainage)}
+
+\Q Montrer que pour tout $\Delta x > 0$ on a $\Delta y < y$~: on ne peut jamais vider entièrement
+la réserve du jeton $Y$.
+
+\Q Montrer que la fonction $\Delta x \mapsto \Delta y(\Delta x) = \dfrac{y\,\Delta x}{x+\Delta x}$
+est \textbf{strictement croissante} sur $]0, +\infty[$ et que $\Delta y \to y$ lorsque
+$\Delta x \to +\infty$. Interpréter en termes de \emph{glissement} (\emph{slippage})~: plus
+l'échange est gros relativement à la réserve, plus le prix effectif se dégrade.
+
+\Q Le \emph{prix effectif} d'un échange est $\Delta x / \Delta y$. L'exprimer en fonction de
+$x, y, \Delta x$ et montrer qu'il est $> x/y$ (le prix « spot » inverse), avec égalité
+\emph{à la limite} $\Delta x \to 0$. Conclure sur l'impossibilité de drainer la réserve à prix
+constant.
+
+\section*{Partie III --- Frais cumulés et série géométrique}
+
+On modélise une suite d'échanges dont les volumes décroissent géométriquement~: le $i$-ième
+échange ($i \ge 0$) porte un volume $v_0\,\rho^{\,i}$ avec $0 < \rho < 1$, et prélève des frais
+proportionnels de taux $f$.
+
+\Q Montrer que le total des frais perçus $\displaystyle \Phi = \sum_{i=0}^{+\infty} f\,v_0\,
+\rho^{\,i}$ est fini et vaut $\dfrac{f\,v_0}{1-\rho}$.
+
+\Q Application~: pour $f = 0{,}003$, $v_0 = 1000$ et $\rho = 0{,}9$, calculer $\Phi$.
+
+\Q Écrire \code{frais_cumules(f, v0, rho, n)} qui calcule la somme \emph{partielle}
+$\sum_{i=0}^{n-1} f\,v_0\,\rho^{\,i}$, et donner une majoration de l'erreur
+$\Phi - \mathtt{frais\_cumules(f, v0, rho, n)}$ par une expression géométrique en $\rho^{\,n}$.
+
+\section*{Partie IV --- Prêt sur-collatéralisé et intérêts composés}
+
+Un emprunteur dépose un \emph{collatéral} de valeur $G$ et emprunte un principal $P$. Le taux de
+collatéralisation exigé est $\tau\%$~: l'emprunt n'est autorisé que si $G \ge P\,\tau/100$. La dette
+croît ensuite par intérêts composés~: après $n$ périodes au taux $r$ par période, la dette vaut
+$P(1+r)^n$. La position est \emph{liquidée} dès que la dette dépasse le collatéral $G$.
+
+\Q Écrire \code{collateral_requis(P, tau)} qui renvoie le collatéral minimal $\lfloor P\,\tau/100
+\rfloor$ (division entière). Vérifier \code{collateral_requis(100, 150) == 150}.
+
+\Q Écrire \code{dette(P, r, n)} renvoyant $P(1+r)^n$. Montrer que la dette dépasse strictement le
+collatéral $G$ pour la première fois à la période
+$$n^{\star} = \left\lfloor \frac{\ln(G/P)}{\ln(1+r)} \right\rfloor + 1
+\qquad (\text{si } G > P).$$
+
+\Q Application~: pour $P = 100$, $r = 0{,}10$ et $G = 150$, calculer $n^{\star}$ et vérifier
+l'encadrement $\mathtt{dette}(100, 0.1, n^{\star}-1) \le 150 < \mathtt{dette}(100, 0.1, n^{\star})$.
+Justifier la \textbf{terminaison} d'une boucle \code{while} qui incrémenterait $n$ tant que
+$\mathtt{dette}(P, r, n) \le G$.
+
+\newpage
+\setcounter{qcnt}{0}
+\bigskip
+\hrule
+\bigskip
+{\Large\bfseries C\,O\,R\,R\,I\,G\,É}
+\medskip
+
+\section*{Partie I --- Prix et produit constant}
+
+\Q
+\begin{lstlisting}
+def prix(x, y):
+    return y / x
+\end{lstlisting}
+Pour $x=10$, $y=100$~: $\mathtt{prix}(10,100) = 100/10 = 10$ USDC par ETH.
+
+\Q La conservation du produit s'écrit $(x+\Delta x)(y-\Delta y) = xy$, d'où
+$y - \Delta y = \dfrac{xy}{x+\Delta x}$, puis
+$$\Delta y = y - \frac{xy}{x+\Delta x} = \frac{y(x+\Delta x) - xy}{x+\Delta x}
+= \frac{y\,\Delta x}{x+\Delta x}. \qquad \square$$
+
+\Q
+\begin{lstlisting}
+def sortie_amm(x, y, dx):
+    return (y * dx) / (x + dx)
+\end{lstlisting}
+$\mathtt{sortie\_amm}(100,100,100) = \dfrac{100\cdot100}{200} = 50$.
+
+\section*{Partie II --- Bornes et monotonie}
+
+\Q Pour $\Delta x > 0$ et $x > 0$, on a $\dfrac{\Delta x}{x+\Delta x} < 1$, donc
+$\Delta y = y\cdot\dfrac{\Delta x}{x+\Delta x} < y$. La réserve de $Y$ ne peut donc jamais être
+entièrement vidée. $\square$
+
+\Q Écrivons $\Delta y(\Delta x) = y\Bigl(1 - \dfrac{x}{x+\Delta x}\Bigr)$. La fonction
+$\Delta x \mapsto \dfrac{x}{x+\Delta x}$ est strictement décroissante (dérivée
+$-x/(x+\Delta x)^2 < 0$), donc $\Delta y$ est strictement \emph{croissante}. De plus
+$\dfrac{x}{x+\Delta x} \to 0$ quand $\Delta x \to +\infty$, donc $\Delta y \to y$ sans jamais
+l'atteindre. Plus l'échange est gros, plus $\Delta y$ approche son plafond $y$~: le rendement
+marginal s'effondre, ce qui traduit un \emph{glissement} croissant. $\square$
+
+\Q Le prix effectif est
+$$\frac{\Delta x}{\Delta y} = \frac{\Delta x (x+\Delta x)}{y\,\Delta x}
+= \frac{x+\Delta x}{y} = \frac{x}{y} + \frac{\Delta x}{y} > \frac{x}{y}.$$
+Il dépasse strictement le prix marginal $x/y$ dès que $\Delta x > 0$, et tend vers $x/y$ quand
+$\Delta x \to 0^{+}$. Ainsi tout achat s'effectue à un prix \emph{strictement moins favorable}
+que le prix marginal, et ce d'autant plus que l'échange est gros~: la courbe (une hyperbole)
+protège la réserve d'un drainage complet. $\square$
+
+\section*{Partie III --- Frais cumulés et série géométrique}
+
+\Q C'est une série géométrique de raison $\rho \in\, ]0,1[$, donc convergente~:
+$$\Phi = f\,v_0 \sum_{i=0}^{+\infty} \rho^{\,i} = \frac{f\,v_0}{1-\rho}. \qquad \square$$
+
+\Q Pour $f=0{,}003$, $v_0=1000$, $\rho=0{,}9$~:
+$\Phi = \dfrac{0{,}003 \times 1000}{1 - 0{,}9} = \dfrac{3}{0{,}1} = 30.$
+
+\Q
+\begin{lstlisting}
+def frais_cumules(f, v0, rho, n):
+    total = 0.0
+    puissance = 1.0            # rho**0
+    for _ in range(n):
+        total += f * v0 * puissance
+        puissance *= rho
+    return total
+\end{lstlisting}
+L'erreur est le reste de la série~:
+$$\Phi - \mathtt{frais\_cumules}(f,v_0,\rho,n)
+= \sum_{i=n}^{+\infty} f v_0 \rho^{\,i} = \frac{f v_0\,\rho^{\,n}}{1-\rho},$$
+qui tend vers $0$ géométriquement en $\rho^{\,n}$. $\square$
+
+\section*{Partie IV --- Prêt sur-collatéralisé et intérêts composés}
+
+\Q
+\begin{lstlisting}
+def collateral_requis(P, tau):
+    return P * tau // 100
+\end{lstlisting}
+$\mathtt{collateral\_requis}(100,150) = 100\cdot150 // 100 = 150$.
+
+\Q
+\begin{lstlisting}
+def dette(P, r, n):
+    return P * (1 + r)**n
+\end{lstlisting}
+La dette $P(1+r)^n$ est strictement croissante en $n$ (car $1+r>1$). Elle dépasse $G$ ssi
+$(1+r)^n > G/P$, soit $n \ln(1+r) > \ln(G/P)$, c'est-à-dire $n > \dfrac{\ln(G/P)}{\ln(1+r)}$. Le
+plus petit entier vérifiant cette inégalité stricte est
+$n^{\star} = \bigl\lfloor \tfrac{\ln(G/P)}{\ln(1+r)} \bigr\rfloor + 1$ (pour $G > P$, le membre de
+droite est positif). $\square$
+
+\Q Pour $P=100$, $r=0{,}10$, $G=150$~: $\dfrac{\ln(1{,}5)}{\ln(1{,}1)} \approx
+\dfrac{0{,}405}{0{,}0953} \approx 4{,}254$, donc $n^{\star} = \lfloor 4{,}254\rfloor + 1 = 5$.
+Vérification~: $\mathtt{dette}(100,0.1,4) = 100\cdot1{,}1^4 \approx 146{,}41 \le 150$ et
+$\mathtt{dette}(100,0.1,5) = 100\cdot1{,}1^5 \approx 161{,}05 > 150$, d'où l'encadrement annoncé.
+
+\noindent\textbf{Terminaison.} Une boucle \code{while dette(P, r, n) <= G: n += 1} termine~: la
+suite $n \mapsto \mathtt{dette}(P,r,n)$ est strictement croissante et non majorée (elle tend vers
+$+\infty$), donc elle finit par dépasser $G$ après un nombre fini d'itérations (au plus
+$n^{\star}$). L'entier $\lceil G/P\rceil - (1+r)^n$... plus simplement, $G - \mathtt{dette}(P,r,n)$
+décroît strictement et devient négatif~: la condition de boucle finit par être fausse. $\square$
+
+\medskip
+\noindent\emph{Vérifications numériques} (Python)~: $\mathtt{prix}(10,100)=10$~;
+$\mathtt{sortie\_amm}(100,100,100)=50$ et $(x+\Delta x)(y-\Delta y)=xy=20000$~; les sorties
+$\mathtt{sortie\_amm}(100,100,\Delta x)$ pour $\Delta x \in \{1,10,100,1000,10^6\}$ valent
+approximativement $0{,}99;\,9{,}09;\,50;\,90{,}91;\,99{,}99$ et croissent vers $y=100$~;
+$\Phi = 30$~; $n^{\star}=5$ avec $\mathtt{dette}(100,0.1,4)\approx146{,}41$ et
+$\mathtt{dette}(100,0.1,5)\approx161{,}05$.
+
+\end{document}

@@ -1,0 +1,423 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{french.ldf}{\usepackage[french]{babel}}{\usepackage[english]{babel}}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}\geometry{margin=2.3cm}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lmodern}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, urlcolor=[RGB]{2,101,115}, linkcolor=black}
+\definecolor{codebg}{RGB}{247,249,251}
+\definecolor{kw}{RGB}{175,45,45}
+\definecolor{cmt}{RGB}{110,120,130}
+\definecolor{str}{RGB}{20,110,60}
+\lstset{language=Python, backgroundcolor=\color{codebg}, basicstyle=\ttfamily\small,
+  keywordstyle=\color{kw}\bfseries, commentstyle=\color{cmt}\itshape, stringstyle=\color{str},
+  numbers=left, numberstyle=\tiny\color{cmt}, numbersep=8pt, frame=single, rulecolor=\color{gray!40},
+  showstringspaces=false, breaklines=true, columns=fullflexible, extendedchars=true, inputencoding=utf8,
+  literate={é}{{\'e}}1 {è}{{\`e}}1 {à}{{\`a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ç}{{\c c}}1 {ô}{{\^o}}1 {û}{{\^u}}1 {ù}{{\`u}}1 {É}{{\'E}}1}
+\newcounter{qcnt}
+\newcommand{\Q}{\medskip\par\stepcounter{qcnt}\noindent\textbf{Question~\theqcnt.}~}
+\newcommand{\code}[1]{\lstinline!#1!}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Préparation au CNC 2026 --- Informatique MP}
+\rhead{\small Algorithmique de la blockchain Ethereum}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\titleformat*{\section}{\large\bfseries\scshape}
+
+\begin{document}
+
+\begin{center}
+{\large\bfseries Préparation au Concours National Commun 2026 --- Informatique MP}\\[8pt]
+\rule{0.9\linewidth}{0.5pt}\\[6pt]
+{\Large\bfseries Épreuve d'Informatique}\\[4pt]
+{\bfseries Filière MP --- Durée : 4 heures}\\[6pt]
+{\itshape Algorithmique de la blockchain Ethereum : gaz, encodage, arbres de Merkle, aléa et programmation dynamique}\\[6pt]
+\rule{0.9\linewidth}{0.5pt}\\[8pt]
+{\small Auteur~: \href{https://orcid.org/0000-0002-6108-7176}{\textbf{Pr Agrégé El Hadiq Zouhair}}}\\[3pt]
+{\small \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}} \quad---\quad Tous droits réservés \textcopyright\ cpgeacademy.org}
+\end{center}
+\medskip
+\begin{center}
+\fcolorbox{gray}{gray!5}{\begin{minipage}{0.93\linewidth}\small
+\textbf{Avis important.} Ce document est une \textbf{initiative personnelle} du professeur,
+à but strictement pédagogique. Il ne s'agit \textbf{pas} d'un sujet officiel du Concours
+National Commun~; il s'en inspire uniquement par la forme et l'esprit.
+\smallskip
+\textbf{Pour aller plus loin.} Les élèves peuvent traiter une \textbf{nouvelle version} de
+ce problème dotée d'un \textbf{autocorrecteur des réponses}, et suivre un \textbf{cours
+complet}, sur \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}}.
+\end{minipage}}
+\end{center}
+
+\bigskip
+\section*{Présentation et notations}
+
+Ethereum est un ordinateur mondial décentralisé. Ce problème étudie, de manière \emph{largement
+indépendante} partie par partie, quelques structures et algorithmes qui le sous-tendent~: la
+mesure des ressources (le \emph{gaz}), l'encodage hexadécimal des adresses, les \emph{arbres de
+Merkle}, la sélection aléatoire d'un validateur, et enfin un problème d'optimisation résolu par
+\emph{programmation dynamique}.
+
+\noindent\textbf{Conventions.}
+\begin{itemize}[nosep]
+  \item Le langage est Python 3. Les entiers Python sont de taille arbitraire.
+  \item Pour une liste \code{L}, \code{len(L)} est sa longueur et \code{L[i]} son terme d'indice $i$ (à partir de $0$).
+  \item $\lfloor x \rfloor$ désigne la partie entière de $x$. $\log_b$ est le logarithme en base $b$.
+  \item On rappelle que \code{n // b} et \code{n \% b} sont le quotient et le reste de la division euclidienne.
+\end{itemize}
+
+\noindent Les questions sont numérotées \textbf{en continu} sur tout le sujet.
+
+\bigskip
+\hrule
+\bigskip
+{\Large\bfseries É\,N\,O\,N\,C\,É}
+\medskip
+
+\section*{Partie I --- Unités et compteur de gaz}
+
+L'unité de compte d'Ethereum est l'\emph{ether}~; sa plus petite subdivision est le \emph{wei},
+avec $1$ ether $= 10^{18}$ wei. Chaque instruction exécutée consomme une quantité fixe de
+\emph{gaz}~; une transaction fixe un plafond de gaz au-delà duquel l'exécution est interrompue.
+
+\Q Écrire une fonction \code{ether_vers_wei(e)} qui, pour un entier $e \ge 0$, renvoie le nombre
+de wei correspondant à $e$ ethers.
+
+\Q Écrire \code{gaz_restant(plafond, couts)} où \code{couts} est la liste des coûts (entiers
+positifs) des instructions exécutées dans l'ordre. La fonction retranche les coûts un à un~; si,
+avant une instruction, le gaz disponible est \emph{strictement} inférieur à son coût, l'exécution
+s'arrête et la fonction renvoie la chaîne \code{"panne de gaz"}. Sinon elle renvoie le gaz restant.
+
+\Q Un contrat exécute une boucle dont l'itération numéro $i$ (pour $i \ge 0$) coûte $g/2^{i}$
+unités de gaz, où $g$ est un réel strictement positif. Montrer que le coût total
+$\displaystyle C = \sum_{i=0}^{+\infty} \frac{g}{2^{i}}$ est fini et vaut exactement $2g$. En
+déduire que, quel que soit le nombre d'itérations effectivement exécutées, le coût cumulé est
+majoré par $2g$.
+
+\section*{Partie II --- Encodage hexadécimal des adresses}
+
+Une adresse Ethereum est un entier affiché en base $16$ (hexadécimal), avec l'alphabet
+\code{"0123456789abcdef"}. On étudie l'encodage d'un entier en base $16$.
+
+\Q Écrire \code{entier_vers_hex(n)} qui, pour un entier $n \ge 0$, renvoie la chaîne de ses
+chiffres hexadécimaux (sans le préfixe \code{0x}), avec la convention \code{entier_vers_hex(0) == "0"}.
+
+\Q Écrire \code{hex_vers_entier(s)} qui, pour une chaîne \code{s} de chiffres hexadécimaux
+minuscules, renvoie l'entier qu'elle représente.
+
+\Q Pour $n \ge 1$, montrer que le nombre de tours de la boucle de \code{entier_vers_hex(n)}
+(donc le nombre de chiffres produits) est exactement $\lfloor \log_{16} n \rfloor + 1$. En déduire
+la complexité temporelle de \code{entier_vers_hex} en fonction du nombre de chiffres.
+
+\Q Justifier la \textbf{terminaison} de la boucle de \code{entier_vers_hex} à l'aide d'un
+\emph{variant de boucle}, puis prouver la \textbf{correction}, c'est-à-dire que pour tout
+$n \ge 0$, \code{hex_vers_entier(entier_vers_hex(n))} est égal à $n$.
+
+\section*{Partie III --- Arbres de Merkle}
+
+Un \emph{arbre de Merkle} résume un ensemble de données par un seul haché, la \emph{racine}. On
+se donne une fonction de combinaison
+$$\mathtt{parent(a, b)} = (31\,a + b) \bmod 1000003,$$
+et les feuilles sont des entiers. La racine se calcule par niveaux~: à chaque niveau, on remplace
+la liste courante par la liste des \code{parent} de couples consécutifs~; si la liste a une
+longueur impaire, on \textbf{duplique son dernier élément} avant de l'appairer. On s'arrête
+lorsqu'il ne reste qu'un élément.
+
+\Q Écrire \code{racine_merkle(feuilles)} qui prend une liste non vide de feuilles et renvoie la
+racine. Vérifier à la main que \code{racine_merkle([1, 2, 3, 4])} vaut $1120$.
+
+\Q Soit $n$ le nombre de feuilles. Montrer que le nombre total d'appels à \code{parent} effectués
+par \code{racine_merkle} est un $O(n)$. \emph{Indication}~: majorer la somme des tailles des
+niveaux successifs.
+
+\Q On veut prouver l'\emph{inclusion} d'une feuille sans révéler tout l'arbre. Écrire
+\code{preuve_inclusion(feuilles, i)} qui renvoie la liste des couples $(\text{frère}, \text{côté})$
+rencontrés en remontant de la feuille d'indice $i$ jusqu'à la racine, où le côté vaut
+\code{'L'} ou \code{'R'} et indique si le frère est à gauche ou à droite. Écrire ensuite
+\code{verifier(feuille, preuve, racine)} qui recalcule la racine à partir de la feuille et de la
+preuve, et renvoie un booléen.
+
+\Q Montrer par récurrence sur la hauteur de l'arbre que, si la fonction \code{parent} est
+\emph{résistante aux collisions} (on ne sait pas produire $ (a,b) \ne (a',b')$ avec
+$\mathtt{parent}(a,b) = \mathtt{parent}(a',b')$), alors une preuve d'inclusion acceptée par
+\code{verifier} garantit que la feuille figure bien parmi les feuilles ayant produit la racine.
+Quelle est la taille d'une preuve d'inclusion en fonction de $n$~?
+
+\section*{Partie IV --- Sélection aléatoire d'un validateur}
+
+À chaque créneau (\emph{slot}), un validateur donné est choisi comme proposeur avec probabilité
+$p \in\, ]0,1[$, indépendamment des autres créneaux. On note $N$ le numéro (à partir de $1$) du
+premier créneau où ce validateur est choisi.
+
+\Q Donner, pour $k \ge 1$, la probabilité $\mathbb{P}(N = k)$. Reconnaître la loi de $N$ et en
+déduire l'espérance $\mathbb{E}[N]$.
+
+\Q Montrer que $\mathbb{P}(N > k) = (1-p)^{k}$, puis que $\mathbb{P}(N < +\infty) = 1$
+(\emph{terminaison presque sûre}~: le validateur est choisi en temps fini avec probabilité $1$).
+
+\Q Application numérique~: pour $p = 1/4$, donner $\mathbb{E}[N]$ et la probabilité
+$\mathbb{P}(N \le 4)$ sous forme de fraction irréductible.
+
+\section*{Partie V --- Partition équilibrée par programmation dynamique}
+
+On dispose d'une liste $S$ d'entiers strictement positifs. Le \emph{problème de partition}
+demande s'il existe un sous-ensemble de $S$ dont la somme vaut exactement la moitié de la somme
+totale (les deux parts ont alors la même somme). C'est un problème classique lié aux preuves à
+divulgation nulle.
+
+\Q Montrer que si la somme totale $T = \sum S$ est impaire, la réponse est nécessairement
+\emph{non}. On suppose désormais $T$ paire et on pose $C = T/2$.
+
+\Q Le \emph{problème de décision} associé (« existe-t-il un sous-ensemble de somme $C$~? ») est
+\textbf{NP}. Justifier en décrivant un \emph{certificat} et l'algorithme de vérification, ainsi
+que sa complexité.
+
+\Q On définit, pour $0 \le i \le \mathtt{len(S)}$ et $0 \le c \le C$, le booléen $A[i][c]$ = « il
+existe un sous-ensemble des $i$ premiers éléments de $S$ de somme $c$ ». Donner la relation de
+récurrence vérifiée par $A[i][c]$ et son initialisation.
+
+\Q En déduire une fonction \code{peut_partitionner(S)} utilisant un tableau à une dimension
+\code{dp} de taille $C+1$. \emph{Attention au sens de parcours} pour ne pas réutiliser deux fois
+le même élément. Donner sa complexité en temps et en espace, et expliquer le terme
+\emph{pseudo-polynomial}.
+
+\Q Prouver la correction de \code{peut_partitionner} en énonçant un \emph{invariant} portant sur
+\code{dp} après le traitement des $i$ premiers éléments, puis en le démontrant par récurrence sur
+$i$. Justifier enfin la terminaison.
+
+\newpage
+\setcounter{qcnt}{0}
+\bigskip
+\hrule
+\bigskip
+{\Large\bfseries C\,O\,R\,R\,I\,G\,É}
+\medskip
+
+\section*{Partie I --- Unités et compteur de gaz}
+
+\Q On multiplie par $10^{18}$.
+\begin{lstlisting}
+def ether_vers_wei(e):
+    return e * 10**18
+\end{lstlisting}
+Complexité $O(1)$ opérations sur grands entiers.
+
+\Q On parcourt les coûts en maintenant le gaz disponible.
+\begin{lstlisting}
+def gaz_restant(plafond, couts):
+    restant = plafond
+    for c in couts:
+        if restant < c:
+            return "panne de gaz"
+        restant -= c
+    return restant
+\end{lstlisting}
+La boucle est finie (\code{len(couts)} tours), d'où la terminaison~; complexité $O(m)$ avec
+$m = \mathtt{len(couts)}$.
+
+\Q C'est une série géométrique de raison $1/2 \in\, ]0,1[$, donc convergente~:
+$$ C = \sum_{i=0}^{+\infty} g\Bigl(\tfrac12\Bigr)^{i} = \frac{g}{1 - \tfrac12} = 2g. $$
+Une exécution qui s'arrête après $m$ itérations consomme
+$\sum_{i=0}^{m-1} g/2^{i} = g\,\dfrac{1-(1/2)^{m}}{1-1/2} = 2g\,(1 - 2^{-m}) < 2g.$
+Le coût cumulé est donc \emph{toujours} strictement majoré par $2g$, indépendamment de $m$.
+$\square$
+
+\section*{Partie II --- Encodage hexadécimal des adresses}
+
+\Q
+\begin{lstlisting}
+def entier_vers_hex(n):
+    if n == 0:
+        return "0"
+    chiffres = "0123456789abcdef"
+    s = ""
+    while n > 0:
+        s = chiffres[n % 16] + s
+        n //= 16
+    return s
+\end{lstlisting}
+
+\Q
+\begin{lstlisting}
+def hex_vers_entier(s):
+    chiffres = "0123456789abcdef"
+    n = 0
+    for c in s:
+        n = n * 16 + chiffres.index(c)
+    return n
+\end{lstlisting}
+
+\Q Soit $n \ge 1$ et $d$ le nombre de chiffres produits. À chaque tour, $n$ est remplacé par
+$\lfloor n/16 \rfloor$~; la boucle s'arrête dès que $n$ atteint $0$. Le nombre de tours est donc
+le plus petit $d$ tel que $\lfloor n / 16^{d} \rfloor = 0$, c'est-à-dire $16^{d} > n$, soit
+$d > \log_{16} n$. Le plus petit tel entier est $d = \lfloor \log_{16} n \rfloor + 1$. Chaque tour
+coûte $O(1)$ (hors coût des grands entiers), donc la complexité est $\Theta(d) = \Theta(\log n)$
+tours.
+
+\Q \textbf{Terminaison.} La quantité entière $n \ge 0$ décroît strictement à chaque tour
+(on passe de $n$ à $\lfloor n/16 \rfloor < n$ tant que $n \ge 1$) et reste positive~: c'est un
+\emph{variant de boucle}, donc la boucle termine.
+
+\noindent\textbf{Correction.} Notons $c_{d-1}\dots c_1 c_0$ les chiffres produits (poids faible
+$c_0$). Par construction, à chaque tour on extrait $c_j = n_j \bmod 16$ puis $n_{j+1} =
+\lfloor n_j / 16\rfloor$, avec $n_0 = n$. Par la division euclidienne, $n_j = 16\,n_{j+1} + c_j$
+avec $0 \le c_j < 16$. Une récurrence immédiate donne $n = \sum_{j=0}^{d-1} c_j\, 16^{j}$. Or
+\code{hex_vers_entier} évalue par schéma de Horner exactement $\sum_{j=0}^{d-1} c_j\,16^{j}$. Donc
+\code{hex_vers_entier(entier_vers_hex(n))} est égal à $n$. Le cas $n=0$ est traité à part et renvoie
+\code{"0"}, décodé en $0$. $\square$
+
+\medskip
+\noindent\emph{Vérification numérique}~: $255 \mapsto \mathtt{"ff"}$, $16 \mapsto \mathtt{"10"}$,
+$7271972807 \mapsto \mathtt{"1b1717fc7"}$ ($9$ chiffres, et $\lfloor\log_{16}
+7271972807\rfloor+1 = 9$).
+
+\section*{Partie III --- Arbres de Merkle}
+
+\Q
+\begin{lstlisting}
+def parent(a, b):
+    return (31 * a + b) % 1000003
+
+def racine_merkle(feuilles):
+    niveau = list(feuilles)
+    while len(niveau) > 1:
+        if len(niveau) % 2 == 1:
+            niveau.append(niveau[-1])
+        niveau = [parent(niveau[i], niveau[i+1])
+                  for i in range(0, len(niveau), 2)]
+    return niveau[0]
+\end{lstlisting}
+Vérification~: niveau $0 = [1,2,3,4]$~; $\mathtt{parent}(1,2)=33$, $\mathtt{parent}(3,4)=97$~; niveau
+$1 = [33,97]$~; $\mathtt{parent}(33,97)=33\cdot31+97=1120$. Donc la racine vaut $\mathbf{1120}$.
+(De même $\mathtt{racine\_merkle}([1,2,3])=1119$ après duplication du $3$.)
+
+\Q À chaque niveau, si la liste a une taille $t$, on effectue $\lceil t/2\rceil$ appels à
+\code{parent} et la taille suivante est $\lceil t/2\rceil$. Partant de $t_0 = n$, on a
+$t_{k+1} = \lceil t_k/2\rceil \le t_k/2 + 1$. Le nombre total d'appels est
+$\sum_{k\ge 0} \lceil t_k/2\rceil = \sum_{k\ge 1} t_k \le \sum_{k\ge 1}\bigl(n/2^{k} + 2\bigr)$.
+La partie géométrique se majore par $n$, et il y a $O(\log n)$ niveaux, donc le total est
+$\le n + O(\log n) = O(n)$. $\square$
+
+\Q
+\begin{lstlisting}
+def preuve_inclusion(feuilles, i):
+    niveau = list(feuilles)
+    preuve = []
+    idx = i
+    while len(niveau) > 1:
+        if len(niveau) % 2 == 1:
+            niveau.append(niveau[-1])
+        if idx % 2 == 0:
+            preuve.append((niveau[idx+1], 'R'))
+        else:
+            preuve.append((niveau[idx-1], 'L'))
+        niveau = [parent(niveau[j], niveau[j+1])
+                  for j in range(0, len(niveau), 2)]
+        idx //= 2
+    return preuve
+
+def verifier(feuille, preuve, racine):
+    acc = feuille
+    for frere, cote in preuve:
+        if cote == 'R':
+            acc = parent(acc, frere)
+        else:
+            acc = parent(frere, acc)
+    return acc == racine
+\end{lstlisting}
+Vérification~: $\mathtt{preuve\_inclusion}([1,2,3,4],0) = [(2,\mathtt{'R'}),(97,\mathtt{'R'})]$~; puis
+$\mathtt{parent}(1,2)=33$, $\mathtt{parent}(33,97)=1120=$ racine.
+
+\Q \textbf{Récurrence sur la hauteur $h$.} Pour $h=0$ (une seule feuille), la racine \emph{est}
+la feuille~; une preuve vide n'est acceptée que si $\mathtt{feuille} = \mathtt{racine}$. Supposons la
+propriété vraie à la hauteur $h$ et considérons un arbre de hauteur $h+1$. La vérification
+recalcule d'abord $r' = \mathtt{parent}(\mathtt{feuille}, \text{frère})$ (ou l'inverse), puis vérifie
+que $r'$, muni du reste de la preuve, mène à la racine~: c'est une preuve d'inclusion de $r'$
+dans un arbre de hauteur $h$, valide par hypothèse de récurrence, donc $r'$ est bien un n\oe ud
+interne du niveau $h$. Comme \code{parent} est résistante aux collisions, l'unique antécédent
+connu de $r'$ est le couple $(\mathtt{feuille}, \text{frère})$ réellement présent~; la feuille figure
+donc parmi celles ayant produit la racine. $\square$
+
+\noindent La preuve contient un couple par niveau, soit une taille $O(\log n)$~: c'est
+l'intérêt majeur des arbres de Merkle (certificat logarithmique).
+
+\section*{Partie IV --- Sélection aléatoire d'un validateur}
+
+\Q Le premier succès arrive au $k$-ième créneau si les $k-1$ premiers sont des échecs
+(probabilité $(1-p)^{k-1}$) suivis d'un succès (probabilité $p$)~:
+$$\mathbb{P}(N = k) = (1-p)^{k-1}\,p, \qquad k \ge 1.$$
+C'est la \emph{loi géométrique} de paramètre $p$, d'espérance
+$\mathbb{E}[N] = \sum_{k\ge1} k (1-p)^{k-1} p = \dfrac{1}{p}.$
+
+\Q $\mathbb{P}(N > k)$ est la probabilité de $k$ échecs consécutifs, soit $(1-p)^{k}$. Comme
+$0 < 1-p < 1$, $(1-p)^{k} \to 0$ quand $k \to +\infty$, donc
+$\mathbb{P}(N < +\infty) = 1 - \lim_k \mathbb{P}(N>k) = 1$~: terminaison presque sûre. $\square$
+
+\Q Pour $p = 1/4$~: $\mathbb{E}[N] = 4$, et
+$\mathbb{P}(N \le 4) = 1 - (3/4)^{4} = 1 - \dfrac{81}{256} = \dfrac{175}{256}
+\approx 0{,}684.$
+
+\section*{Partie V --- Partition équilibrée par programmation dynamique}
+
+\Q Si $T$ est impaire, aucune part entière ne peut valoir $T/2$ (qui n'est pas entier)~; les deux
+parts, de sommes entières égales, donneraient $T$ pair. Donc la réponse est \emph{non}. $\square$
+
+\Q Un \emph{certificat} est la liste des indices d'un sous-ensemble candidat. La vérification
+calcule sa somme et teste l'égalité à $C$, en temps $O(n)$ (polynomial). Le problème est donc
+dans \textbf{NP}. (Il s'agit du problème \textsc{Subset-Sum}, NP-complet.)
+
+\Q Un sous-ensemble des $i$ premiers éléments de somme $c$ ou bien n'utilise pas le $i$-ième
+élément (donc c'est un sous-ensemble des $i-1$ premiers de somme $c$), ou bien l'utilise (donc
+c'est un sous-ensemble des $i-1$ premiers de somme $c - S[i-1]$, licite si $c \ge S[i-1]$)~:
+$$A[i][c] = A[i-1][c] \;\lor\; \bigl(c \ge S[i-1] \;\land\; A[i-1][c - S[i-1]]\bigr),$$
+avec l'initialisation $A[0][0] = \text{vrai}$ et $A[0][c] = \text{faux}$ pour $c \ge 1$.
+
+\Q
+\begin{lstlisting}
+def peut_partitionner(S):
+    T = sum(S)
+    if T % 2 == 1:
+        return False
+    C = T // 2
+    dp = [False] * (C + 1)
+    dp[0] = True
+    for x in S:                       # traite un element a la fois
+        for c in range(C, x - 1, -1): # parcours DECROISSANT
+            if dp[c - x]:
+                dp[c] = True
+    return dp[C]
+\end{lstlisting}
+Le parcours \emph{décroissant} de $c$ garantit que \code{dp[c - x]} se réfère encore à l'état
+\emph{avant} l'introduction de $x$~: on n'utilise donc jamais deux fois le même élément.
+Complexité~: $O(nC)$ en temps et $O(C)$ en espace. Comme $C$ dépend de la \emph{valeur} des
+données (et non seulement de leur nombre), la taille de $C$ est exponentielle en le nombre de bits
+de codage~: l'algorithme est dit \emph{pseudo-polynomial}.
+
+\Q \textbf{Invariant.} Après le traitement des $i$ premiers éléments, pour tout
+$0 \le c \le C$, \code{dp[c]} est vrai si et seulement s'il existe un sous-ensemble des $i$
+premiers éléments de somme $c$ (c'est-à-dire \code{dp[c]} $= A[i][c]$).
+
+\noindent\emph{Initialisation} ($i=0$)~: seul \code{dp[0]} est vrai, ce qui correspond au
+sous-ensemble vide~; conforme à $A[0]$. \emph{Hérédité}~: supposons l'invariant vrai après $i-1$
+éléments et traitons $x = S[i-1]$. Pour chaque $c$ de $C$ à $x$, on met \code{dp[c]} à vrai
+lorsque \code{dp[c - x]} est vrai. Le parcours décroissant assure que \code{dp[c - x]} vaut encore
+$A[i-1][c-x]$~; combiné à la valeur préexistante $A[i-1][c]$, on obtient exactement
+$A[i][c] = A[i-1][c] \lor (c \ge x \land A[i-1][c-x])$. L'invariant est donc vrai après $i$
+éléments. \emph{Conclusion}~: après les $n$ éléments, \code{dp[C]} $= A[n][C]$, qui est vrai ssi
+une partition équilibrée existe. \textbf{Terminaison}~: les deux boucles \code{for} sont finies.
+$\square$
+
+\medskip
+\noindent\emph{Vérifications numériques}~: $\mathtt{peut\_partitionner}([1,1,5,7]) = \text{True}$
+(part $[1,1,5]$ de somme $7$), $\mathtt{peut\_partitionner}([1,1,5,8]) = \text{False}$ (somme
+$15$ impaire). Sur $2000$ jeux aléatoires, \code{peut_partitionner} coïncide avec une recherche
+exhaustive.
+
+\end{document}

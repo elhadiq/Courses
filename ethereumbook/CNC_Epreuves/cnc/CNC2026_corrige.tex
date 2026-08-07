@@ -1,0 +1,663 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{french.ldf}{\usepackage[french]{babel}}{\usepackage[english]{babel}}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}\geometry{margin=2.3cm}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lmodern}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, urlcolor=[RGB]{2,101,115}, linkcolor=black}
+\definecolor{codebg}{RGB}{247,249,251}
+\definecolor{kw}{RGB}{175,45,45}
+\definecolor{cmt}{RGB}{110,120,130}
+\definecolor{str}{RGB}{20,110,60}
+\lstset{language=Python, backgroundcolor=\color{codebg}, basicstyle=\ttfamily\small,
+  keywordstyle=\color{kw}\bfseries, commentstyle=\color{cmt}\itshape, stringstyle=\color{str},
+  numbers=left, numberstyle=\tiny\color{cmt}, numbersep=8pt, frame=single, rulecolor=\color{gray!40},
+  showstringspaces=false, breaklines=true, columns=fullflexible, extendedchars=true, inputencoding=utf8,
+  literate={é}{{\'e}}1 {è}{{\`e}}1 {à}{{\`a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ç}{{\c c}}1 {ô}{{\^o}}1 {û}{{\^u}}1 {ù}{{\`u}}1 {É}{{\'E}}1}
+\newcounter{qcnt}
+\newcommand{\Q}{\medskip\par\stepcounter{qcnt}\noindent\textbf{Question~\theqcnt.}~}
+\newcommand{\code}[1]{\lstinline!#1!}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Préparation au CNC 2026 --- Informatique MP}
+\rhead{\small Corrigé}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\titleformat*{\section}{\large\bfseries\scshape}
+\titleformat*{\subsection}{\normalsize\bfseries}
+\begin{document}
+
+\begin{center}
+{\large\bfseries Préparation au Concours National Commun 2026 --- Informatique MP}\\[8pt]
+\rule{0.9\linewidth}{0.5pt}\\[6pt]
+{\Large\bfseries Épreuve d'Informatique --- Corrigé}\\[4pt]
+{\bfseries Filière MP --- Durée : 4 heures --- Quatre problèmes indépendants}\\[6pt]
+{\itshape Autour de la blockchain Ethereum : algorithmique, arbres de Merkle, partition (programmation dynamique) et finance décentralisée}\\[6pt]
+\rule{0.9\linewidth}{0.5pt}\\[8pt]
+{\small Auteur~: \href{https://orcid.org/0000-0002-6108-7176}{\textbf{Pr Agrégé El Hadiq Zouhair}}}\\[3pt]
+{\small \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}} \quad---\quad Tous droits réservés \textcopyright\ cpgeacademy.org}
+\end{center}
+\medskip
+\begin{center}
+\fcolorbox{gray}{gray!5}{\begin{minipage}{0.93\linewidth}\small
+\textbf{Avis important.} Ce document est une \textbf{initiative personnelle} du professeur,
+à but strictement pédagogique. Il ne s'agit \textbf{pas} d'un sujet officiel du Concours
+National Commun~; il s'en inspire uniquement par la forme et l'esprit.
+\smallskip
+\textbf{Consignes.} L'épreuve comporte \textbf{quatre problèmes indépendants}. Les questions sont
+numérotées \textbf{en continu} sur l'ensemble du sujet~; le corrigé reprend la même numérotation.
+On pourra traiter les problèmes dans l'ordre de son choix.
+\end{minipage}}
+\end{center}
+\bigskip
+
+\setcounter{qcnt}{0}
+
+\section*{Problème I --- Algorithmique de la blockchain Ethereum}
+\subsection*{Partie I --- Unités et compteur de gaz}
+
+\Q On multiplie par $10^{18}$.
+\begin{lstlisting}
+def ether_vers_wei(e):
+    return e * 10**18
+\end{lstlisting}
+Complexité $O(1)$ opérations sur grands entiers.
+
+\Q On parcourt les coûts en maintenant le gaz disponible.
+\begin{lstlisting}
+def gaz_restant(plafond, couts):
+    restant = plafond
+    for c in couts:
+        if restant < c:
+            return "panne de gaz"
+        restant -= c
+    return restant
+\end{lstlisting}
+La boucle est finie (\code{len(couts)} tours), d'où la terminaison~; complexité $O(m)$ avec
+$m = \mathtt{len(couts)}$.
+
+\Q C'est une série géométrique de raison $1/2 \in\, ]0,1[$, donc convergente~:
+$$ C = \sum_{i=0}^{+\infty} g\Bigl(\tfrac12\Bigr)^{i} = \frac{g}{1 - \tfrac12} = 2g. $$
+Une exécution qui s'arrête après $m$ itérations consomme
+$\sum_{i=0}^{m-1} g/2^{i} = g\,\dfrac{1-(1/2)^{m}}{1-1/2} = 2g\,(1 - 2^{-m}) < 2g.$
+Le coût cumulé est donc \emph{toujours} strictement majoré par $2g$, indépendamment de $m$.
+$\square$
+
+\subsection*{Partie II --- Encodage hexadécimal des adresses}
+
+\Q
+\begin{lstlisting}
+def entier_vers_hex(n):
+    if n == 0:
+        return "0"
+    chiffres = "0123456789abcdef"
+    s = ""
+    while n > 0:
+        s = chiffres[n % 16] + s
+        n //= 16
+    return s
+\end{lstlisting}
+
+\Q
+\begin{lstlisting}
+def hex_vers_entier(s):
+    chiffres = "0123456789abcdef"
+    n = 0
+    for c in s:
+        n = n * 16 + chiffres.index(c)
+    return n
+\end{lstlisting}
+
+\Q Soit $n \ge 1$ et $d$ le nombre de chiffres produits. À chaque tour, $n$ est remplacé par
+$\lfloor n/16 \rfloor$~; la boucle s'arrête dès que $n$ atteint $0$. Le nombre de tours est donc
+le plus petit $d$ tel que $\lfloor n / 16^{d} \rfloor = 0$, c'est-à-dire $16^{d} > n$, soit
+$d > \log_{16} n$. Le plus petit tel entier est $d = \lfloor \log_{16} n \rfloor + 1$. Chaque tour
+coûte $O(1)$ (hors coût des grands entiers), donc la complexité est $\Theta(d) = \Theta(\log n)$
+tours.
+
+\Q \textbf{Terminaison.} La quantité entière $n \ge 0$ décroît strictement à chaque tour
+(on passe de $n$ à $\lfloor n/16 \rfloor < n$ tant que $n \ge 1$) et reste positive~: c'est un
+\emph{variant de boucle}, donc la boucle termine.
+
+\noindent\textbf{Correction.} Notons $c_{d-1}\dots c_1 c_0$ les chiffres produits (poids faible
+$c_0$). Par construction, à chaque tour on extrait $c_j = n_j \bmod 16$ puis $n_{j+1} =
+\lfloor n_j / 16\rfloor$, avec $n_0 = n$. Par la division euclidienne, $n_j = 16\,n_{j+1} + c_j$
+avec $0 \le c_j < 16$. Une récurrence immédiate donne $n = \sum_{j=0}^{d-1} c_j\, 16^{j}$. Or
+\code{hex_vers_entier} évalue par schéma de Horner exactement $\sum_{j=0}^{d-1} c_j\,16^{j}$. Donc
+\code{hex_vers_entier(entier_vers_hex(n))} est égal à $n$. Le cas $n=0$ est traité à part et renvoie
+\code{"0"}, décodé en $0$. $\square$
+
+\medskip
+\noindent\emph{Vérification numérique}~: $255 \mapsto \mathtt{"ff"}$, $16 \mapsto \mathtt{"10"}$,
+$7271972807 \mapsto \mathtt{"1b1717fc7"}$ ($9$ chiffres, et $\lfloor\log_{16}
+7271972807\rfloor+1 = 9$).
+
+\subsection*{Partie III --- Arbres de Merkle}
+
+\Q
+\begin{lstlisting}
+def parent(a, b):
+    return (31 * a + b) % 1000003
+
+def racine_merkle(feuilles):
+    niveau = list(feuilles)
+    while len(niveau) > 1:
+        if len(niveau) % 2 == 1:
+            niveau.append(niveau[-1])
+        niveau = [parent(niveau[i], niveau[i+1])
+                  for i in range(0, len(niveau), 2)]
+    return niveau[0]
+\end{lstlisting}
+Vérification~: niveau $0 = [1,2,3,4]$~; $\mathtt{parent}(1,2)=33$, $\mathtt{parent}(3,4)=97$~; niveau
+$1 = [33,97]$~; $\mathtt{parent}(33,97)=33\cdot31+97=1120$. Donc la racine vaut $\mathbf{1120}$.
+(De même $\mathtt{racine\_merkle}([1,2,3])=1119$ après duplication du $3$.)
+
+\Q À chaque niveau, si la liste a une taille $t$, on effectue $\lceil t/2\rceil$ appels à
+\code{parent} et la taille suivante est $\lceil t/2\rceil$. Partant de $t_0 = n$, on a
+$t_{k+1} = \lceil t_k/2\rceil \le t_k/2 + 1$. Le nombre total d'appels est
+$\sum_{k\ge 0} \lceil t_k/2\rceil = \sum_{k\ge 1} t_k \le \sum_{k\ge 1}\bigl(n/2^{k} + 2\bigr)$.
+La partie géométrique se majore par $n$, et il y a $O(\log n)$ niveaux, donc le total est
+$\le n + O(\log n) = O(n)$. $\square$
+
+\Q
+\begin{lstlisting}
+def preuve_inclusion(feuilles, i):
+    niveau = list(feuilles)
+    preuve = []
+    idx = i
+    while len(niveau) > 1:
+        if len(niveau) % 2 == 1:
+            niveau.append(niveau[-1])
+        if idx % 2 == 0:
+            preuve.append((niveau[idx+1], 'R'))
+        else:
+            preuve.append((niveau[idx-1], 'L'))
+        niveau = [parent(niveau[j], niveau[j+1])
+                  for j in range(0, len(niveau), 2)]
+        idx //= 2
+    return preuve
+
+def verifier(feuille, preuve, racine):
+    acc = feuille
+    for frere, cote in preuve:
+        if cote == 'R':
+            acc = parent(acc, frere)
+        else:
+            acc = parent(frere, acc)
+    return acc == racine
+\end{lstlisting}
+Vérification~: $\mathtt{preuve\_inclusion}([1,2,3,4],0) = [(2,\mathtt{'R'}),(97,\mathtt{'R'})]$~; puis
+$\mathtt{parent}(1,2)=33$, $\mathtt{parent}(33,97)=1120=$ racine.
+
+\Q \textbf{Récurrence sur la hauteur $h$.} Pour $h=0$ (une seule feuille), la racine \emph{est}
+la feuille~; une preuve vide n'est acceptée que si $\mathtt{feuille} = \mathtt{racine}$. Supposons la
+propriété vraie à la hauteur $h$ et considérons un arbre de hauteur $h+1$. La vérification
+recalcule d'abord $r' = \mathtt{parent}(\mathtt{feuille}, \text{frère})$ (ou l'inverse), puis vérifie
+que $r'$, muni du reste de la preuve, mène à la racine~: c'est une preuve d'inclusion de $r'$
+dans un arbre de hauteur $h$, valide par hypothèse de récurrence, donc $r'$ est bien un n\oe ud
+interne du niveau $h$. Comme \code{parent} est résistante aux collisions, l'unique antécédent
+connu de $r'$ est le couple $(\mathtt{feuille}, \text{frère})$ réellement présent~; la feuille figure
+donc parmi celles ayant produit la racine. $\square$
+
+\noindent La preuve contient un couple par niveau, soit une taille $O(\log n)$~: c'est
+l'intérêt majeur des arbres de Merkle (certificat logarithmique).
+
+\subsection*{Partie IV --- Sélection aléatoire d'un validateur}
+
+\Q Le premier succès arrive au $k$-ième créneau si les $k-1$ premiers sont des échecs
+(probabilité $(1-p)^{k-1}$) suivis d'un succès (probabilité $p$)~:
+$$\mathbb{P}(N = k) = (1-p)^{k-1}\,p, \qquad k \ge 1.$$
+C'est la \emph{loi géométrique} de paramètre $p$, d'espérance
+$\mathbb{E}[N] = \sum_{k\ge1} k (1-p)^{k-1} p = \dfrac{1}{p}.$
+
+\Q $\mathbb{P}(N > k)$ est la probabilité de $k$ échecs consécutifs, soit $(1-p)^{k}$. Comme
+$0 < 1-p < 1$, $(1-p)^{k} \to 0$ quand $k \to +\infty$, donc
+$\mathbb{P}(N < +\infty) = 1 - \lim_k \mathbb{P}(N>k) = 1$~: terminaison presque sûre. $\square$
+
+\Q Pour $p = 1/4$~: $\mathbb{E}[N] = 4$, et
+$\mathbb{P}(N \le 4) = 1 - (3/4)^{4} = 1 - \dfrac{81}{256} = \dfrac{175}{256}
+\approx 0{,}684.$
+
+\subsection*{Partie V --- Partition équilibrée par programmation dynamique}
+
+\Q Si $T$ est impaire, aucune part entière ne peut valoir $T/2$ (qui n'est pas entier)~; les deux
+parts, de sommes entières égales, donneraient $T$ pair. Donc la réponse est \emph{non}. $\square$
+
+\Q Un \emph{certificat} est la liste des indices d'un sous-ensemble candidat. La vérification
+calcule sa somme et teste l'égalité à $C$, en temps $O(n)$ (polynomial). Le problème est donc
+dans \textbf{NP}. (Il s'agit du problème \textsc{Subset-Sum}, NP-complet.)
+
+\Q Un sous-ensemble des $i$ premiers éléments de somme $c$ ou bien n'utilise pas le $i$-ième
+élément (donc c'est un sous-ensemble des $i-1$ premiers de somme $c$), ou bien l'utilise (donc
+c'est un sous-ensemble des $i-1$ premiers de somme $c - S[i-1]$, licite si $c \ge S[i-1]$)~:
+$$A[i][c] = A[i-1][c] \;\lor\; \bigl(c \ge S[i-1] \;\land\; A[i-1][c - S[i-1]]\bigr),$$
+avec l'initialisation $A[0][0] = \text{vrai}$ et $A[0][c] = \text{faux}$ pour $c \ge 1$.
+
+\Q
+\begin{lstlisting}
+def peut_partitionner(S):
+    T = sum(S)
+    if T % 2 == 1:
+        return False
+    C = T // 2
+    dp = [False] * (C + 1)
+    dp[0] = True
+    for x in S:                       # traite un element a la fois
+        for c in range(C, x - 1, -1): # parcours DECROISSANT
+            if dp[c - x]:
+                dp[c] = True
+    return dp[C]
+\end{lstlisting}
+Le parcours \emph{décroissant} de $c$ garantit que \code{dp[c - x]} se réfère encore à l'état
+\emph{avant} l'introduction de $x$~: on n'utilise donc jamais deux fois le même élément.
+Complexité~: $O(nC)$ en temps et $O(C)$ en espace. Comme $C$ dépend de la \emph{valeur} des
+données (et non seulement de leur nombre), la taille de $C$ est exponentielle en le nombre de bits
+de codage~: l'algorithme est dit \emph{pseudo-polynomial}.
+
+\Q \textbf{Invariant.} Après le traitement des $i$ premiers éléments, pour tout
+$0 \le c \le C$, \code{dp[c]} est vrai si et seulement s'il existe un sous-ensemble des $i$
+premiers éléments de somme $c$ (c'est-à-dire \code{dp[c]} $= A[i][c]$).
+
+\noindent\emph{Initialisation} ($i=0$)~: seul \code{dp[0]} est vrai, ce qui correspond au
+sous-ensemble vide~; conforme à $A[0]$. \emph{Hérédité}~: supposons l'invariant vrai après $i-1$
+éléments et traitons $x = S[i-1]$. Pour chaque $c$ de $C$ à $x$, on met \code{dp[c]} à vrai
+lorsque \code{dp[c - x]} est vrai. Le parcours décroissant assure que \code{dp[c - x]} vaut encore
+$A[i-1][c-x]$~; combiné à la valeur préexistante $A[i-1][c]$, on obtient exactement
+$A[i][c] = A[i-1][c] \lor (c \ge x \land A[i-1][c-x])$. L'invariant est donc vrai après $i$
+éléments. \emph{Conclusion}~: après les $n$ éléments, \code{dp[C]} $= A[n][C]$, qui est vrai ssi
+une partition équilibrée existe. \textbf{Terminaison}~: les deux boucles \code{for} sont finies.
+$\square$
+
+\medskip
+\noindent\emph{Vérifications numériques}~: $\mathtt{peut\_partitionner}([1,1,5,7]) = \text{True}$
+(part $[1,1,5]$ de somme $7$), $\mathtt{peut\_partitionner}([1,1,5,8]) = \text{False}$ (somme
+$15$ impaire). Sur $2000$ jeux aléatoires, \code{peut_partitionner} coïncide avec une recherche
+exhaustive.
+
+\clearpage
+\section*{Problème II --- Arbres de Merkle et preuves d'inclusion}
+\subsection*{Partie I --- La fonction de combinaison}
+
+\Q
+\begin{lstlisting}
+def parent(a, b):
+    return (31 * a + b) % 1000003
+\end{lstlisting}
+
+\Q $\mathtt{parent}(1,2) = 31\cdot1+2 = 33$~; $\mathtt{parent}(3,4)=31\cdot3+4=97$~;
+$\mathtt{parent}(33,97)=31\cdot33+97=1023+97=1120$.
+
+\Q Le calcul de la racine doit donner \emph{le même} résultat sur tous les n\oe uds du réseau
+pour que le consensus soit possible. Si \code{parent} pouvait renvoyer des valeurs différentes
+pour les mêmes entrées (aléa, dépendance à l'environnement), deux n\oe uds honnêtes partant des
+mêmes feuilles obtiendraient des racines différentes et ne pourraient pas s'accorder. Le
+déterminisme garantit la \emph{reproductibilité}.
+
+\Q L'ensemble de départ $\mathbb{N}^2$ est infini (ou, en pratique, de cardinal bien plus grand
+que $p$), tandis que l'ensemble d'arrivée $\{0,\dots,p-1\}$ est de cardinal fini $p$. Par le
+principe des tiroirs, $h$ ne peut être injective~: des collisions \emph{existent}
+nécessairement. La résistance aux collisions n'affirme donc pas leur absence, mais qu'il est
+\emph{calculatoirement difficile} d'en exhiber une~: c'est une hypothèse de sécurité, pas un
+théorème d'injectivité. $\square$
+
+\subsection*{Partie II --- Construction de la racine}
+
+\Q
+\begin{lstlisting}
+def racine_merkle(feuilles):
+    niveau = list(feuilles)
+    while len(niveau) > 1:
+        if len(niveau) % 2 == 1:
+            niveau.append(niveau[-1])       # duplique le dernier
+        niveau = [parent(niveau[i], niveau[i+1])
+                  for i in range(0, len(niveau), 2)]
+    return niveau[0]
+\end{lstlisting}
+
+\Q Niveau $0=[1,2,3,4]$~; $\mathtt{parent}(1,2)=33$, $\mathtt{parent}(3,4)=97$, donc niveau
+$1=[33,97]$~; $\mathtt{parent}(33,97)=1120$. Racine $=\mathbf{1120}$.
+
+\Q Niveau $0=[1,2,3]$, impair $\Rightarrow$ on duplique~: $[1,2,3,3]$. $\mathtt{parent}(1,2)=33$,
+$\mathtt{parent}(3,3)=31\cdot3+3=96$, donc niveau $1=[33,96]$~; $\mathtt{parent}(33,96)=1023+96=
+1119$. Racine $=\mathbf{1119}$.
+
+\Q On a $t_{k+1}=\lceil t_k/2\rceil \le t_k/2 + 1$. Par récurrence $t_k \le n/2^{k} + 2$, donc
+$t_k \le 2$ dès que $n/2^{k}\le 1$, c'est-à-dire $k \ge \log_2 n$~: il y a $O(\log n)$ niveaux. Le
+nombre d'appels à \code{parent} au niveau $k$ est $\lceil t_k/2\rceil$, et le total vaut
+$\sum_{k\ge 1} t_k \le \sum_{k\ge1}(n/2^k + 2) \le n + O(\log n) = O(n)$. $\square$
+
+\subsection*{Partie III --- Preuves d'inclusion}
+
+\Q
+\begin{lstlisting}
+def preuve_inclusion(feuilles, i):
+    niveau = list(feuilles)
+    preuve = []
+    idx = i
+    while len(niveau) > 1:
+        if len(niveau) % 2 == 1:
+            niveau.append(niveau[-1])
+        if idx % 2 == 0:
+            preuve.append((niveau[idx+1], 'R'))   # frere a droite
+        else:
+            preuve.append((niveau[idx-1], 'L'))   # frere a gauche
+        niveau = [parent(niveau[j], niveau[j+1])
+                  for j in range(0, len(niveau), 2)]
+        idx //= 2
+    return preuve
+\end{lstlisting}
+
+\Q
+\begin{lstlisting}
+def verifier(feuille, preuve, racine):
+    acc = feuille
+    for frere, cote in preuve:
+        if cote == 'R':
+            acc = parent(acc, frere)
+        else:
+            acc = parent(frere, acc)
+    return acc == racine
+\end{lstlisting}
+Exemple~: $\mathtt{preuve\_inclusion}([1,2,3,4],0)=[(2,\mathtt{'R'}),(97,\mathtt{'R'})]$. La
+vérification calcule $\mathtt{parent}(1,2)=33$ puis $\mathtt{parent}(33,97)=1120$, égal à la
+racine~: \code{True}.
+
+\Q La preuve contient exactement un couple par niveau au-dessus de la feuille, soit $H(n)=
+\lceil\log_2 n\rceil = O(\log n)$ couples. On transmet donc $O(\log n)$ valeurs au lieu des $n$
+feuilles~: pour $n=10^{6}$, une vingtaine de valeurs suffisent. C'est ce qui rend les preuves de
+Merkle utilisables sur une blockchain, où l'espace de stockage on-chain est coûteux.
+
+\Q \textbf{Récurrence sur $h$.} \emph{Base} $h=0$~: l'arbre est réduit à une feuille, la racine
+\emph{est} cette feuille, et la preuve est vide~; \code{verifier} renvoie \code{True} seulement si
+$\mathtt{feuille}=\mathtt{racine}$, donc la feuille est bien celle ayant produit la racine.
+\emph{Hérédité}~: supposons le résultat vrai pour tout arbre de hauteur $h$, et soit un arbre de
+hauteur $h+1$. La vérification calcule d'abord $r' = \mathtt{parent}(\mathtt{feuille},f)$ (ou
+$\mathtt{parent}(f,\mathtt{feuille})$), puis vérifie que $r'$, muni du reste de la preuve, mène à
+la racine~: c'est une preuve d'inclusion valide de $r'$ dans l'arbre des n\oe uds de niveau $1$,
+de hauteur $h$. Par hypothèse de récurrence, $r'$ est bien un n\oe ud de ce niveau, produit par
+un couple réel de l'arbre. Comme \code{parent} résiste aux collisions, le seul antécédent
+\emph{connu} de $r'$ est le couple effectivement présent~: c'est $(\mathtt{feuille},f)$. Donc
+\code{feuille} figure parmi les feuilles ayant produit la racine. $\square$
+
+\subsection*{Partie IV --- Hauteur et mise à jour}
+
+\Q À chaque niveau, la taille passe de $t$ à $\lceil t/2\rceil$~; partant de $n$, il faut le plus
+petit $H$ tel que $\lceil\cdots\lceil n/2\rceil\cdots\rceil = 1$ après $H$ divisions, soit
+$2^{H-1} < n \le 2^{H}$ pour $n \ge 2$, d'où $H(n)=\lceil\log_2 n\rceil$ (et $H(1)=0$). On obtient
+$$H(1)=0,\ H(2)=1,\ H(3)=2,\ H(4)=2,\ H(5)=3,\ H(8)=3,\ H(9)=4.$$
+
+\Q Seuls les n\oe uds situés \emph{sur le chemin} de la feuille modifiée jusqu'à la racine
+changent de valeur~: à chaque niveau, un seul n\oe ud dépend de la feuille modifiée (son
+ancêtre). Il y a $H(n)=O(\log n)$ tels n\oe uds~; recalculer chacun coûte un appel à \code{parent},
+d'où une mise à jour en $O(\log n)$ appels. Une implémentation simple, correcte mais non
+optimale, recalcule toute la racine~:
+\begin{lstlisting}
+def maj_racine(feuilles, i, v):
+    nouvelles = list(feuilles)
+    nouvelles[i] = v
+    return racine_merkle(nouvelles)
+\end{lstlisting}
+Cette version coûte $O(n)$~; l'argument ci-dessus montre qu'une version conservant les n\oe uds
+inchangés atteindrait $O(\log n)$. $\square$
+
+\medskip
+\noindent\emph{Vérifications numériques} (exécutées en Python)~: $\mathtt{racine\_merkle}([1,2,3,4])
+=1120$, $\mathtt{racine\_merkle}([1,2,3])=1119$, et les hauteurs annoncées correspondent à
+$\lceil\log_2 n\rceil$.
+
+\clearpage
+\section*{Problème III --- Le problème de partition et la programmation dynamique}
+\subsection*{Partie I --- Recherche exhaustive}
+
+\Q
+\begin{lstlisting}
+def demi_somme(S):
+    T = sum(S)
+    if T % 2 == 1:
+        return None
+    return T // 2
+\end{lstlisting}
+
+\Q
+\begin{lstlisting}
+import itertools
+
+def partition_exhaustive(S):
+    T = sum(S)
+    if T % 2 == 1:
+        return False
+    C = T // 2
+    for r in range(len(S) + 1):
+        for comb in itertools.combinations(S, r):
+            if sum(comb) == C:
+                return True
+    return False
+\end{lstlisting}
+
+\Q Un ensemble à $n$ éléments possède $2^{n}$ sous-ensembles (chaque élément est pris ou non).
+La boucle les parcourt tous dans le pire des cas (instance négative), et chaque test de somme
+coûte $O(n)$~: la complexité est $\Theta(n\,2^{n}) = \Theta(2^{n})$ à un facteur polynomial près.
+Pour $n=60$, $2^{60}\approx 10^{18}$~: irréalisable. $\square$
+
+\subsection*{Partie II --- Le problème de décision Subset-Sum}
+
+\Q Le certificat est la \emph{liste des indices} d'un sous-ensemble candidat $I \subseteq
+\{0,\dots,n-1\}$. La vérification calcule $\sum_{k\in I} S[k]$ et teste l'égalité à $C$~; elle
+lit chaque indice une fois, d'où une complexité $O(n)$, polynomiale. Le certificat a une taille
+$O(n)$, elle aussi polynomiale.
+
+\Q Puisque toute instance positive admet un certificat de taille polynomiale vérifiable en temps
+polynomial, Subset-Sum est dans \textbf{NP}. (On admet qu'il est de plus NP-complet, donc parmi
+les plus difficiles de NP.) $\square$
+
+\subsection*{Partie III --- Récurrence et table}
+
+\Q Un sous-ensemble des $i$ premiers éléments de somme $c$ soit \emph{n'utilise pas} $S[i-1]$
+(c'est alors un sous-ensemble des $i-1$ premiers de somme $c$, d'où $A[i-1][c]$), soit
+\emph{l'utilise} (c'est alors un sous-ensemble des $i-1$ premiers de somme $c-S[i-1]$, licite
+seulement si $c \ge S[i-1]$, d'où $A[i-1][c-S[i-1]]$). D'où
+$A[i][c] = A[i-1][c] \lor (c \ge S[i-1] \land A[i-1][c-S[i-1]])$. Initialisation~: avec zéro
+élément, seule la somme $0$ est atteignable, donc $A[0][0]=\text{vrai}$ et $A[0][c]=\text{faux}$
+pour $c\ge 1$. $\square$
+
+\Q
+\begin{lstlisting}
+def subset_sum_2d(S, C):
+    n = len(S)
+    A = [[False] * (C + 1) for _ in range(n + 1)]
+    for i in range(n + 1):
+        A[i][0] = True                       # somme 0 : sous-ensemble vide
+    for i in range(1, n + 1):
+        x = S[i - 1]
+        for c in range(C + 1):
+            A[i][c] = A[i-1][c] or (c >= x and A[i-1][c - x])
+    return A[n][C]
+\end{lstlisting}
+Complexité~: $O(nC)$ en temps (deux boucles imbriquées) et $O(nC)$ en espace (table complète).
+
+\subsection*{Partie IV --- Version optimisée en espace}
+
+\Q
+\begin{lstlisting}
+def peut_partitionner(S):
+    T = sum(S)
+    if T % 2 == 1:
+        return False
+    C = T // 2
+    dp = [False] * (C + 1)
+    dp[0] = True
+    for x in S:
+        for c in range(C, x - 1, -1):        # DECROISSANT
+            if dp[c - x]:
+                dp[c] = True
+    return dp[C]
+\end{lstlisting}
+
+\Q Le tableau \code{dp} représente la ligne courante $A[i-1][\,\cdot\,]$ que l'on met à jour en
+$A[i][\,\cdot\,]$ « sur place ». En parcourant $c$ de façon \emph{décroissante}, la case
+\code{dp[c - x]} lue n'a pas encore été modifiée à ce tour~: elle vaut encore $A[i-1][c-x]$, ce
+qui est correct. Avec un parcours \emph{croissant}, \code{dp[c - x]} aurait déjà pu passer à
+\code{True} \emph{au même tour}, ce qui reviendrait à utiliser $x$ \textbf{plusieurs fois} (comme
+dans un sac à dos avec répétitions)~: on résoudrait un autre problème et la réponse serait fausse.
+
+\Q Complexité~: $O(nC)$ en temps, $O(C)$ en espace. L'entrée se code sur $O\!\left(\sum_i
+\log S_i\right)$ bits~; or $C$ peut être de l'ordre de $\max_i S_i$, donc \emph{exponentiel} en le
+nombre de bits de codage. L'algorithme est polynomial en la \emph{valeur} $C$ mais non en la
+\emph{taille} de l'entrée~: on dit qu'il est \emph{pseudo-polynomial}. $\square$
+
+\subsection*{Partie V --- Reconstruction et correction}
+
+\Q
+\begin{lstlisting}
+def sous_ensemble(S, C):
+    n = len(S)
+    A = [[False] * (C + 1) for _ in range(n + 1)]
+    for i in range(n + 1):
+        A[i][0] = True
+    for i in range(1, n + 1):
+        x = S[i - 1]
+        for c in range(C + 1):
+            A[i][c] = A[i-1][c] or (c >= x and A[i-1][c - x])
+    if not A[n][C]:
+        return None
+    res, c = [], C
+    for i in range(n, 0, -1):
+        if not A[i-1][c]:        # S[i-1] est indispensable
+            res.append(S[i-1])
+            c -= S[i-1]
+    return res[::-1]
+\end{lstlisting}
+Vérification~: $\mathtt{sous\_ensemble}([1,1,5,7],7) = [1,1,5]$ (somme $7$).
+
+\Q \textbf{Invariant.} Après le traitement des $i$ premiers éléments de $S$ dans
+\code{peut_partitionner}, pour tout $0\le c\le C$, \code{dp[c]} est vrai si et seulement s'il
+existe un sous-ensemble des $i$ premiers éléments de somme $c$ (c.-à-d. \code{dp[c]}$=A[i][c]$).
+
+\noindent\emph{Base} ($i=0$)~: seul \code{dp[0]} est vrai, correspondant au sous-ensemble vide~:
+conforme à $A[0]$. \emph{Hérédité}~: on suppose \code{dp}$=A[i-1][\,\cdot\,]$ et on traite
+$x=S[i-1]$. Pour chaque $c$ (de $C$ à $x$), on met \code{dp[c]} à \code{True} si \code{dp[c-x]}
+est vrai. Le parcours décroissant garantit \code{dp[c-x]}$=A[i-1][c-x]$~; combiné à la valeur
+préexistante $A[i-1][c]$ de \code{dp[c]}, on obtient exactement $A[i][c]=A[i-1][c]\lor(c\ge x\land
+A[i-1][c-x])$. L'invariant est donc préservé. \emph{Conclusion}~: après les $n$ éléments,
+\code{dp[C]}$=A[n][C]$, vrai ssi une partition équilibrée existe~: la fonction est correcte.
+\textbf{Terminaison}~: toutes les boucles \code{for} portent sur des intervalles finis. $\square$
+
+\medskip
+\noindent\emph{Vérifications numériques} (Python)~: sur $2000$ listes aléatoires,
+\code{peut_partitionner} et \code{partition_exhaustive} renvoient \emph{toujours} le même résultat.
+Exemples~: $[1,1,5,7]\mapsto\mathtt{True}$, $[1,1,5,8]\mapsto\mathtt{False}$,
+$[3,3,3,3]\mapsto\mathtt{True}$.
+
+\clearpage
+\section*{Problème IV --- Finance décentralisée : teneurs de marché automatisés}
+\subsection*{Partie I --- Prix et produit constant}
+
+\Q
+\begin{lstlisting}
+def prix(x, y):
+    return y / x
+\end{lstlisting}
+Pour $x=10$, $y=100$~: $\mathtt{prix}(10,100) = 100/10 = 10$ USDC par ETH.
+
+\Q La conservation du produit s'écrit $(x+\Delta x)(y-\Delta y) = xy$, d'où
+$y - \Delta y = \dfrac{xy}{x+\Delta x}$, puis
+$$\Delta y = y - \frac{xy}{x+\Delta x} = \frac{y(x+\Delta x) - xy}{x+\Delta x}
+= \frac{y\,\Delta x}{x+\Delta x}. \qquad \square$$
+
+\Q
+\begin{lstlisting}
+def sortie_amm(x, y, dx):
+    return (y * dx) / (x + dx)
+\end{lstlisting}
+$\mathtt{sortie\_amm}(100,100,100) = \dfrac{100\cdot100}{200} = 50$.
+
+\subsection*{Partie II --- Bornes et monotonie}
+
+\Q Pour $\Delta x > 0$ et $x > 0$, on a $\dfrac{\Delta x}{x+\Delta x} < 1$, donc
+$\Delta y = y\cdot\dfrac{\Delta x}{x+\Delta x} < y$. La réserve de $Y$ ne peut donc jamais être
+entièrement vidée. $\square$
+
+\Q Écrivons $\Delta y(\Delta x) = y\Bigl(1 - \dfrac{x}{x+\Delta x}\Bigr)$. La fonction
+$\Delta x \mapsto \dfrac{x}{x+\Delta x}$ est strictement décroissante (dérivée
+$-x/(x+\Delta x)^2 < 0$), donc $\Delta y$ est strictement \emph{croissante}. De plus
+$\dfrac{x}{x+\Delta x} \to 0$ quand $\Delta x \to +\infty$, donc $\Delta y \to y$ sans jamais
+l'atteindre. Plus l'échange est gros, plus $\Delta y$ approche son plafond $y$~: le rendement
+marginal s'effondre, ce qui traduit un \emph{glissement} croissant. $\square$
+
+\Q Le prix effectif est
+$$\frac{\Delta x}{\Delta y} = \frac{\Delta x (x+\Delta x)}{y\,\Delta x}
+= \frac{x+\Delta x}{y} = \frac{x}{y} + \frac{\Delta x}{y} > \frac{x}{y}.$$
+Il dépasse strictement le prix marginal $x/y$ dès que $\Delta x > 0$, et tend vers $x/y$ quand
+$\Delta x \to 0^{+}$. Ainsi tout achat s'effectue à un prix \emph{strictement moins favorable}
+que le prix marginal, et ce d'autant plus que l'échange est gros~: la courbe (une hyperbole)
+protège la réserve d'un drainage complet. $\square$
+
+\subsection*{Partie III --- Frais cumulés et série géométrique}
+
+\Q C'est une série géométrique de raison $\rho \in\, ]0,1[$, donc convergente~:
+$$\Phi = f\,v_0 \sum_{i=0}^{+\infty} \rho^{\,i} = \frac{f\,v_0}{1-\rho}. \qquad \square$$
+
+\Q Pour $f=0{,}003$, $v_0=1000$, $\rho=0{,}9$~:
+$\Phi = \dfrac{0{,}003 \times 1000}{1 - 0{,}9} = \dfrac{3}{0{,}1} = 30.$
+
+\Q
+\begin{lstlisting}
+def frais_cumules(f, v0, rho, n):
+    total = 0.0
+    puissance = 1.0            # rho**0
+    for _ in range(n):
+        total += f * v0 * puissance
+        puissance *= rho
+    return total
+\end{lstlisting}
+L'erreur est le reste de la série~:
+$$\Phi - \mathtt{frais\_cumules}(f,v_0,\rho,n)
+= \sum_{i=n}^{+\infty} f v_0 \rho^{\,i} = \frac{f v_0\,\rho^{\,n}}{1-\rho},$$
+qui tend vers $0$ géométriquement en $\rho^{\,n}$. $\square$
+
+\subsection*{Partie IV --- Prêt sur-collatéralisé et intérêts composés}
+
+\Q
+\begin{lstlisting}
+def collateral_requis(P, tau):
+    return P * tau // 100
+\end{lstlisting}
+$\mathtt{collateral\_requis}(100,150) = 100\cdot150 // 100 = 150$.
+
+\Q
+\begin{lstlisting}
+def dette(P, r, n):
+    return P * (1 + r)**n
+\end{lstlisting}
+La dette $P(1+r)^n$ est strictement croissante en $n$ (car $1+r>1$). Elle dépasse $G$ ssi
+$(1+r)^n > G/P$, soit $n \ln(1+r) > \ln(G/P)$, c'est-à-dire $n > \dfrac{\ln(G/P)}{\ln(1+r)}$. Le
+plus petit entier vérifiant cette inégalité stricte est
+$n^{\star} = \bigl\lfloor \tfrac{\ln(G/P)}{\ln(1+r)} \bigr\rfloor + 1$ (pour $G > P$, le membre de
+droite est positif). $\square$
+
+\Q Pour $P=100$, $r=0{,}10$, $G=150$~: $\dfrac{\ln(1{,}5)}{\ln(1{,}1)} \approx
+\dfrac{0{,}405}{0{,}0953} \approx 4{,}254$, donc $n^{\star} = \lfloor 4{,}254\rfloor + 1 = 5$.
+Vérification~: $\mathtt{dette}(100,0.1,4) = 100\cdot1{,}1^4 \approx 146{,}41 \le 150$ et
+$\mathtt{dette}(100,0.1,5) = 100\cdot1{,}1^5 \approx 161{,}05 > 150$, d'où l'encadrement annoncé.
+
+\noindent\textbf{Terminaison.} Une boucle \code{while dette(P, r, n) <= G: n += 1} termine~: la
+suite $n \mapsto \mathtt{dette}(P,r,n)$ est strictement croissante et non majorée (elle tend vers
+$+\infty$), donc elle finit par dépasser $G$ après un nombre fini d'itérations (au plus
+$n^{\star}$). L'entier $\lceil G/P\rceil - (1+r)^n$... plus simplement, $G - \mathtt{dette}(P,r,n)$
+décroît strictement et devient négatif~: la condition de boucle finit par être fausse. $\square$
+
+\medskip
+\noindent\emph{Vérifications numériques} (Python)~: $\mathtt{prix}(10,100)=10$~;
+$\mathtt{sortie\_amm}(100,100,100)=50$ et $(x+\Delta x)(y-\Delta y)=xy=20000$~; les sorties
+$\mathtt{sortie\_amm}(100,100,\Delta x)$ pour $\Delta x \in \{1,10,100,1000,10^6\}$ valent
+approximativement $0{,}99;\,9{,}09;\,50;\,90{,}91;\,99{,}99$ et croissent vers $y=100$~;
+$\Phi = 30$~; $n^{\star}=5$ avec $\mathtt{dette}(100,0.1,4)\approx146{,}41$ et
+$\mathtt{dette}(100,0.1,5)\approx161{,}05$.
+
+\end{document}

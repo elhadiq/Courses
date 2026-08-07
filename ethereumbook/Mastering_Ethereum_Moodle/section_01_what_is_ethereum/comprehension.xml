@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 1 - What Is Ethereum (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S1 C1 — Purpose vs Bitcoin</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What is the main difference in <em>purpose</em> between Ethereum and Bitcoin?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Bitcoin is primarily a payment network; Ethereum is a general-purpose, programmable platform where ether is a utility currency.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 2 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Ethereum is a general-purpose programmable blockchain; Bitcoin is chiefly a digital-money network]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Ethereum has no currency, whereas Bitcoin does]]></text><feedback format="html"><text>No — ether is Ethereum's currency.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Bitcoin is Turing complete, whereas Ethereum is not]]></text><feedback format="html"><text>It is the other way around.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[They have identical purposes and only differ in name]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S1 C2 — Why gas exists</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Why did Ethereum introduce the concept of <strong>gas</strong>?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Because Ethereum is Turing complete and the halting problem means it cannot predict whether a contract will stop, gas caps the resources any program can consume.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 4 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[To meter and limit the computation a transaction can consume, since programs may never halt]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[To make ether more expensive on exchanges]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[To replace proof of stake]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[To store data in the blockchain]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S1 C3 — Turing complete meaning</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Being &ldquo;Turing complete&rdquo; means Ethereum can compute anything that is computable, given enough time and memory.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. A Turing-complete system can simulate any Turing machine.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S1 C4 — The Merge</text></name>
+    <questiontext format="html"><text><![CDATA[<p>The Merge (September 2022) switched Ethereum from proof of stake to proof of work.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>False — it moved Ethereum from proof of work to proof of stake.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+    <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S1 C5 — Gas left</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A transaction has a gas limit of 100. Its instructions cost 10, 20 and 30 gas and all run successfully. How many units of gas are left?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>100 &minus; (10 + 20 + 30) = 40.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>40</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S1 C6 — Classifying Ethereum</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Along the two dials described in the lesson, how is Ethereum best classified?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Anyone can read the data (public) and anyone can join and participate (permissionless).</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 3 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Public permissionless]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Private permissioned]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Public permissioned]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Private permissionless]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+</quiz>

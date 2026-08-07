@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 6 - Transactions (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S6 C1 — EIP-1559 type byte</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which type byte identifies an EIP-1559 transaction?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>0x02 is EIP-1559, the default transaction format today.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 1 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[0x02]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[0x00]]></text><feedback format="html"><text>That is Legacy.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[0x03]]></text><feedback format="html"><text>That is EIP-4844.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[0x04]]></text><feedback format="html"><text>That is EIP-7702.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S6 C2 — What the nonce does</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which two problems does the transaction nonce solve?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>It enforces the order transactions are processed in and prevents duplicate (replay) transactions.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 2 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Transaction ordering and duplicate (replay) protection]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Setting the gas price and the gas limit]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Encrypting the transaction and signing it]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Choosing the recipient and the value]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S6 C3 — Transfer gas</text></name>
+    <questiontext format="html"><text><![CDATA[<p>How many units of gas does a plain transfer of ether between two EOAs always cost?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>21,000 gas, a fixed amount for simple EOA-to-EOA transfers.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>21000</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S6 C4 — Base fee destination</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Under EIP-1559, the base fee is burned while the priority fee goes to the validator that includes the transaction.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. The base fee is destroyed; the priority fee is the validator's tip.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S6 C5 — Recipient validation</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Ethereum checks that a transaction's recipient address corresponds to a real account before accepting it.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>False. Any 20-byte value is accepted; sending to a wrong address can burn the ether. Validation belongs in the UI.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+    <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S6 C6 — Calling a contract</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What makes a transaction <em>call a function</em> on a contract?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>When the recipient is a contract, the transaction's data field selects which function to run and its arguments.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 4 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[The data field, sent to a contract recipient, selecting the function and arguments]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Setting the value field to zero]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Using a Legacy transaction type]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Leaving the to field empty]]></text><feedback format="html"><text>That creates a new contract instead.</text></feedback></answer>
+  </question>
+</quiz>

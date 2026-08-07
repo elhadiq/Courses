@@ -1,0 +1,280 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{french.ldf}{\usepackage[french]{babel}}{\usepackage[english]{babel}}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}\geometry{margin=2.3cm}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lmodern}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, urlcolor=[RGB]{2,101,115}, linkcolor=black}
+\definecolor{codebg}{RGB}{247,249,251}
+\definecolor{kw}{RGB}{175,45,45}
+\definecolor{cmt}{RGB}{110,120,130}
+\definecolor{str}{RGB}{20,110,60}
+\lstset{language=Python, backgroundcolor=\color{codebg}, basicstyle=\ttfamily\small,
+  keywordstyle=\color{kw}\bfseries, commentstyle=\color{cmt}\itshape, stringstyle=\color{str},
+  numbers=left, numberstyle=\tiny\color{cmt}, numbersep=8pt, frame=single, rulecolor=\color{gray!40},
+  showstringspaces=false, breaklines=true, columns=fullflexible, extendedchars=true, inputencoding=utf8,
+  literate={é}{{\'e}}1 {è}{{\`e}}1 {à}{{\`a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ç}{{\c c}}1 {ô}{{\^o}}1 {û}{{\^u}}1 {ù}{{\`u}}1 {É}{{\'E}}1}
+\newcounter{qcnt}
+\newcommand{\Q}{\medskip\par\stepcounter{qcnt}\noindent\textbf{Question~\theqcnt.}~}
+\newcommand{\code}[1]{\lstinline!#1!}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Préparation au CNC 2026 --- Informatique MP}
+\rhead{\small Arbres de Merkle et preuves d'inclusion}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\titleformat*{\section}{\large\bfseries\scshape}
+
+\begin{document}
+
+\begin{center}
+{\large\bfseries Préparation au Concours National Commun 2026 --- Informatique MP}\\[8pt]
+\rule{0.9\linewidth}{0.5pt}\\[6pt]
+{\Large\bfseries Épreuve d'Informatique}\\[4pt]
+{\bfseries Filière MP --- Durée : 4 heures}\\[6pt]
+{\itshape Arbres de Merkle et preuves d'inclusion : hachage, construction récursive, certificats logarithmiques}\\[6pt]
+\rule{0.9\linewidth}{0.5pt}\\[8pt]
+{\small Auteur~: \href{https://orcid.org/0000-0002-6108-7176}{\textbf{Pr Agrégé El Hadiq Zouhair}}}\\[3pt]
+{\small \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}} \quad---\quad Tous droits réservés \textcopyright\ cpgeacademy.org}
+\end{center}
+\medskip
+\begin{center}
+\fcolorbox{gray}{gray!5}{\begin{minipage}{0.93\linewidth}\small
+\textbf{Avis important.} Ce document est une \textbf{initiative personnelle} du professeur,
+à but strictement pédagogique. Il ne s'agit \textbf{pas} d'un sujet officiel du Concours
+National Commun~; il s'en inspire uniquement par la forme et l'esprit.
+\smallskip
+\textbf{Pour aller plus loin.} Les élèves peuvent traiter une \textbf{nouvelle version} de
+ce problème dotée d'un \textbf{autocorrecteur des réponses}, et suivre un \textbf{cours
+complet}, sur \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}}.
+\end{minipage}}
+\end{center}
+
+\bigskip
+\section*{Présentation et notations}
+
+Un \emph{arbre de Merkle} permet de résumer une grande collection de données par un unique
+condensé, la \emph{racine}, et de prouver qu'une donnée en fait partie à l'aide d'un
+\emph{certificat} de taille logarithmique. C'est un outil central des blockchains (preuves
+d'inclusion, listes d'autorisation, stockage vérifiable). Dans tout le problème, les
+\emph{feuilles} sont des entiers, et l'on combine deux n\oe uds par la fonction
+$$\mathtt{parent}(a,b) = (31\,a + b) \bmod p, \qquad p = 1000003 \ (\text{premier}).$$
+
+\noindent\textbf{Conventions.} Le langage est Python 3. Pour une liste \code{L}, \code{len(L)}
+est sa longueur, \code{L[i]} son terme d'indice $i$ ($\ge 0$), \code{L[-1]} son dernier terme.
+$\lceil x \rceil$ est la partie entière supérieure, $\log_2$ le logarithme binaire. Les questions
+sont numérotées \textbf{en continu}.
+
+\bigskip
+\hrule
+\bigskip
+{\Large\bfseries É\,N\,O\,N\,C\,É}
+\medskip
+
+\section*{Partie I --- La fonction de combinaison}
+
+\Q Écrire \code{parent(a, b)} conforme à la définition ci-dessus.
+
+\Q Calculer à la main $\mathtt{parent}(1,2)$, $\mathtt{parent}(3,4)$ et
+$\mathtt{parent}(33,97)$.
+
+\Q On dit que \code{parent} est \emph{déterministe}. Expliquer pourquoi ce caractère déterministe
+est indispensable pour que deux n\oe uds différents du réseau, partant des mêmes feuilles,
+calculent la même racine.
+
+\Q On admet, pour la suite, que \code{parent} est \emph{résistante aux collisions}~: on ne sait
+pas exhiber deux couples distincts $(a,b)\neq(a',b')$ tels que $\mathtt{parent}(a,b)=
+\mathtt{parent}(a',b')$. Rappeler pourquoi une fonction $h : \mathbb{N}^2 \to \{0,\dots,p-1\}$ ne
+peut pas être \emph{injective}, et donc pourquoi la résistance aux collisions est une hypothèse
+\emph{calculatoire} (« difficile à violer ») et non une impossibilité mathématique.
+
+\section*{Partie II --- Construction de la racine}
+
+La racine se calcule par niveaux~: tant qu'il reste plus d'un n\oe ud, si le nombre de n\oe uds
+est impair on \textbf{duplique le dernier}, puis on remplace la liste par celle des
+\code{parent} de couples consécutifs.
+
+\Q Écrire \code{racine_merkle(feuilles)} (liste non vide) renvoyant la racine.
+
+\Q Dérouler le calcul de \code{racine_merkle([1, 2, 3, 4])} niveau par niveau et donner la valeur
+de la racine.
+
+\Q Faire de même pour \code{racine_merkle([1, 2, 3])} en explicitant l'étape de duplication.
+
+\Q Soit $n$ le nombre de feuilles. En notant $t_0=n$ et $t_{k+1}=\lceil t_k/2\rceil$ la taille du
+niveau $k+1$, montrer que le nombre de niveaux est $O(\log n)$ et que le nombre total d'appels à
+\code{parent} est un $O(n)$.
+
+\section*{Partie III --- Preuves d'inclusion}
+
+\Q Écrire \code{preuve_inclusion(feuilles, i)} renvoyant la liste des couples
+$(\text{frère}, \text{côté})$, avec côté valant \code{'L'} ou \code{'R'}, rencontrés en remontant
+de la feuille d'indice $i$ jusqu'à la racine.
+
+\Q Écrire \code{verifier(feuille, preuve, racine)} qui recalcule la racine depuis la feuille et
+la preuve et renvoie un booléen. Vérifier sur l'exemple $[1,2,3,4]$, $i=0$.
+
+\Q Montrer que la taille d'une preuve d'inclusion est le nombre de niveaux, soit $O(\log n)$, et
+commenter l'intérêt (comparer au coût de transmettre toutes les feuilles).
+
+\Q \textbf{Soundness.} Démontrer par récurrence sur la hauteur $h$ de l'arbre que, sous
+l'hypothèse de résistance aux collisions, si \code{verifier(feuille, preuve, racine)} renvoie
+\code{True} alors \code{feuille} figure effectivement parmi les feuilles ayant produit
+\code{racine}.
+
+\section*{Partie IV --- Hauteur et mise à jour}
+
+\Q Montrer que la hauteur de l'arbre (nombre de niveaux au-dessus des feuilles) vaut
+$H(n) = \lceil \log_2 n \rceil$ pour $n \ge 1$ (avec $H(1)=0$). Donner $H(n)$ pour
+$n \in \{1,2,3,4,5,8,9\}$.
+
+\Q Lorsqu'une seule feuille change de valeur, quels n\oe uds de l'arbre doivent être recalculés~?
+En déduire qu'une mise à jour de la racine coûte $O(\log n)$ appels à \code{parent} (et non
+$O(n)$). Écrire \code{maj_racine(feuilles, i, v)} qui renvoie la nouvelle racine lorsque la feuille
+d'indice $i$ prend la valeur \code{v}, en \textbf{réutilisant} \code{racine_merkle}. \emph{On ne
+demande pas ici l'implémentation optimale en $O(\log n)$, mais on justifiera la borne.}
+
+\newpage
+\setcounter{qcnt}{0}
+\bigskip
+\hrule
+\bigskip
+{\Large\bfseries C\,O\,R\,R\,I\,G\,É}
+\medskip
+
+\section*{Partie I --- La fonction de combinaison}
+
+\Q
+\begin{lstlisting}
+def parent(a, b):
+    return (31 * a + b) % 1000003
+\end{lstlisting}
+
+\Q $\mathtt{parent}(1,2) = 31\cdot1+2 = 33$~; $\mathtt{parent}(3,4)=31\cdot3+4=97$~;
+$\mathtt{parent}(33,97)=31\cdot33+97=1023+97=1120$.
+
+\Q Le calcul de la racine doit donner \emph{le même} résultat sur tous les n\oe uds du réseau
+pour que le consensus soit possible. Si \code{parent} pouvait renvoyer des valeurs différentes
+pour les mêmes entrées (aléa, dépendance à l'environnement), deux n\oe uds honnêtes partant des
+mêmes feuilles obtiendraient des racines différentes et ne pourraient pas s'accorder. Le
+déterminisme garantit la \emph{reproductibilité}.
+
+\Q L'ensemble de départ $\mathbb{N}^2$ est infini (ou, en pratique, de cardinal bien plus grand
+que $p$), tandis que l'ensemble d'arrivée $\{0,\dots,p-1\}$ est de cardinal fini $p$. Par le
+principe des tiroirs, $h$ ne peut être injective~: des collisions \emph{existent}
+nécessairement. La résistance aux collisions n'affirme donc pas leur absence, mais qu'il est
+\emph{calculatoirement difficile} d'en exhiber une~: c'est une hypothèse de sécurité, pas un
+théorème d'injectivité. $\square$
+
+\section*{Partie II --- Construction de la racine}
+
+\Q
+\begin{lstlisting}
+def racine_merkle(feuilles):
+    niveau = list(feuilles)
+    while len(niveau) > 1:
+        if len(niveau) % 2 == 1:
+            niveau.append(niveau[-1])       # duplique le dernier
+        niveau = [parent(niveau[i], niveau[i+1])
+                  for i in range(0, len(niveau), 2)]
+    return niveau[0]
+\end{lstlisting}
+
+\Q Niveau $0=[1,2,3,4]$~; $\mathtt{parent}(1,2)=33$, $\mathtt{parent}(3,4)=97$, donc niveau
+$1=[33,97]$~; $\mathtt{parent}(33,97)=1120$. Racine $=\mathbf{1120}$.
+
+\Q Niveau $0=[1,2,3]$, impair $\Rightarrow$ on duplique~: $[1,2,3,3]$. $\mathtt{parent}(1,2)=33$,
+$\mathtt{parent}(3,3)=31\cdot3+3=96$, donc niveau $1=[33,96]$~; $\mathtt{parent}(33,96)=1023+96=
+1119$. Racine $=\mathbf{1119}$.
+
+\Q On a $t_{k+1}=\lceil t_k/2\rceil \le t_k/2 + 1$. Par récurrence $t_k \le n/2^{k} + 2$, donc
+$t_k \le 2$ dès que $n/2^{k}\le 1$, c'est-à-dire $k \ge \log_2 n$~: il y a $O(\log n)$ niveaux. Le
+nombre d'appels à \code{parent} au niveau $k$ est $\lceil t_k/2\rceil$, et le total vaut
+$\sum_{k\ge 1} t_k \le \sum_{k\ge1}(n/2^k + 2) \le n + O(\log n) = O(n)$. $\square$
+
+\section*{Partie III --- Preuves d'inclusion}
+
+\Q
+\begin{lstlisting}
+def preuve_inclusion(feuilles, i):
+    niveau = list(feuilles)
+    preuve = []
+    idx = i
+    while len(niveau) > 1:
+        if len(niveau) % 2 == 1:
+            niveau.append(niveau[-1])
+        if idx % 2 == 0:
+            preuve.append((niveau[idx+1], 'R'))   # frere a droite
+        else:
+            preuve.append((niveau[idx-1], 'L'))   # frere a gauche
+        niveau = [parent(niveau[j], niveau[j+1])
+                  for j in range(0, len(niveau), 2)]
+        idx //= 2
+    return preuve
+\end{lstlisting}
+
+\Q
+\begin{lstlisting}
+def verifier(feuille, preuve, racine):
+    acc = feuille
+    for frere, cote in preuve:
+        if cote == 'R':
+            acc = parent(acc, frere)
+        else:
+            acc = parent(frere, acc)
+    return acc == racine
+\end{lstlisting}
+Exemple~: $\mathtt{preuve\_inclusion}([1,2,3,4],0)=[(2,\mathtt{'R'}),(97,\mathtt{'R'})]$. La
+vérification calcule $\mathtt{parent}(1,2)=33$ puis $\mathtt{parent}(33,97)=1120$, égal à la
+racine~: \code{True}.
+
+\Q La preuve contient exactement un couple par niveau au-dessus de la feuille, soit $H(n)=
+\lceil\log_2 n\rceil = O(\log n)$ couples. On transmet donc $O(\log n)$ valeurs au lieu des $n$
+feuilles~: pour $n=10^{6}$, une vingtaine de valeurs suffisent. C'est ce qui rend les preuves de
+Merkle utilisables sur une blockchain, où l'espace de stockage on-chain est coûteux.
+
+\Q \textbf{Récurrence sur $h$.} \emph{Base} $h=0$~: l'arbre est réduit à une feuille, la racine
+\emph{est} cette feuille, et la preuve est vide~; \code{verifier} renvoie \code{True} seulement si
+$\mathtt{feuille}=\mathtt{racine}$, donc la feuille est bien celle ayant produit la racine.
+\emph{Hérédité}~: supposons le résultat vrai pour tout arbre de hauteur $h$, et soit un arbre de
+hauteur $h+1$. La vérification calcule d'abord $r' = \mathtt{parent}(\mathtt{feuille},f)$ (ou
+$\mathtt{parent}(f,\mathtt{feuille})$), puis vérifie que $r'$, muni du reste de la preuve, mène à
+la racine~: c'est une preuve d'inclusion valide de $r'$ dans l'arbre des n\oe uds de niveau $1$,
+de hauteur $h$. Par hypothèse de récurrence, $r'$ est bien un n\oe ud de ce niveau, produit par
+un couple réel de l'arbre. Comme \code{parent} résiste aux collisions, le seul antécédent
+\emph{connu} de $r'$ est le couple effectivement présent~: c'est $(\mathtt{feuille},f)$. Donc
+\code{feuille} figure parmi les feuilles ayant produit la racine. $\square$
+
+\section*{Partie IV --- Hauteur et mise à jour}
+
+\Q À chaque niveau, la taille passe de $t$ à $\lceil t/2\rceil$~; partant de $n$, il faut le plus
+petit $H$ tel que $\lceil\cdots\lceil n/2\rceil\cdots\rceil = 1$ après $H$ divisions, soit
+$2^{H-1} < n \le 2^{H}$ pour $n \ge 2$, d'où $H(n)=\lceil\log_2 n\rceil$ (et $H(1)=0$). On obtient
+$$H(1)=0,\ H(2)=1,\ H(3)=2,\ H(4)=2,\ H(5)=3,\ H(8)=3,\ H(9)=4.$$
+
+\Q Seuls les n\oe uds situés \emph{sur le chemin} de la feuille modifiée jusqu'à la racine
+changent de valeur~: à chaque niveau, un seul n\oe ud dépend de la feuille modifiée (son
+ancêtre). Il y a $H(n)=O(\log n)$ tels n\oe uds~; recalculer chacun coûte un appel à \code{parent},
+d'où une mise à jour en $O(\log n)$ appels. Une implémentation simple, correcte mais non
+optimale, recalcule toute la racine~:
+\begin{lstlisting}
+def maj_racine(feuilles, i, v):
+    nouvelles = list(feuilles)
+    nouvelles[i] = v
+    return racine_merkle(nouvelles)
+\end{lstlisting}
+Cette version coûte $O(n)$~; l'argument ci-dessus montre qu'une version conservant les n\oe uds
+inchangés atteindrait $O(\log n)$. $\square$
+
+\medskip
+\noindent\emph{Vérifications numériques} (exécutées en Python)~: $\mathtt{racine\_merkle}([1,2,3,4])
+=1120$, $\mathtt{racine\_merkle}([1,2,3])=1119$, et les hauteurs annoncées correspondent à
+$\lceil\log_2 n\rceil$.
+
+\end{document}

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category><text>$course$/Mastering Ethereum/Section 10 - Tokens (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S10 C1 — Fungibility</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What does it mean for a token to be <em>fungible</em>?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Every unit is identical and interchangeable, so the contract only needs to track balances.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 1 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Every unit is identical and interchangeable]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Each unit is unique and non-interchangeable]]></text><feedback format="html"><text>That describes non-fungible tokens.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The token cannot be transferred]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The token has no supply limit]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S10 C2 — approve then transferFrom</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Why must an owner call <code>approve</code> before a spender can use <code>transferFrom</code>?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>approve sets an allowance authorizing the spender to move up to that amount on the owner's behalf.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 2 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[approve grants an allowance the spender may then draw from]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[approve mints new tokens]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[approve burns the owner's tokens]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[approve changes the token's decimals]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S10 C3 — Decimals in practice</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A token has 2 decimals. A stored (raw) balance of 1000 represents how many whole tokens?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>1000 &divide; 10<sup>2</sup> = 10 whole tokens.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>10</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S10 C4 — NFT standard</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which standard represents unique, non-fungible tokens, each with its own ID and owner?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>ERC-721 maps each unique token ID to an owner.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review section 4 of the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[ERC-721]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[ERC-20]]></text><feedback format="html"><text>That is fungible.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[ERC-1155]]></text><feedback format="html"><text>That is the multitoken standard.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[ERC-2612]]></text><feedback format="html"><text>That is gasless permit for ERC-20.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S10 C5 — ERC-1155 purpose</text></name>
+    <questiontext format="html"><text><![CDATA[<p>ERC-1155 lets a single contract manage many token types (fungible and non-fungible) with batch transfers.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>True. That is exactly the multitoken standard's advantage, saving gas and complexity.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S10 C6 — allowance limit</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A spender can use <code>transferFrom</code> to move more tokens than the owner approved, as long as the owner has the balance.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>False. A transferFrom that exceeds the allowance is rejected, regardless of the owner's balance.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+    <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  </question>
+</quiz>
