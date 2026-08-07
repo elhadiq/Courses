@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Manuel Informatique MPSI PCSI TSI">
-  <rect width="64" height="64" rx="13" fill="#026573"/>
-  <path d="M20 21 L11 32 L20 43" fill="none" stroke="#ffffff" stroke-width="5"
-        stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M44 21 L53 32 L44 43" fill="none" stroke="#7fd3de" stroke-width="5"
-        stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M36 17 L28 47" fill="none" stroke="#f59e0b" stroke-width="5"
-        stroke-linecap="round"/>
-</svg>
