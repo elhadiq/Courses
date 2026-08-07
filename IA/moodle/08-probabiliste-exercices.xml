@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Regle de Bayes et depistage</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;FREQUENCE DE BASE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Un test tres fiable sur une maladie rare produit une majorite de faux positifs. Le calcul se fait proprement en effectifs.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;depistage(prevalence, sensibilite, specificite, population)&lt;/code&gt;&lt;/strong&gt; qui renvoie le dictionnaire de cles &lt;code&gt;'malades'&lt;/code&gt;, &lt;code&gt;'vp'&lt;/code&gt;, &lt;code&gt;'fp'&lt;/code&gt;, &lt;code&gt;'fn'&lt;/code&gt;, &lt;code&gt;'vn'&lt;/code&gt; (effectifs arrondis a l'entier le plus proche) et &lt;code&gt;'posterieur'&lt;/code&gt; (probabilite d'etre malade sachant un test positif, arrondie a 4 decimales, valant 0.0 si aucun positif).&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;depistage(0.001, 0.99, 0.95, 100000)['posterieur'] &amp;rarr; 0.0194&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def depistage(prevalence, sensibilite, specificite, population):
+    # repartir la population, puis croiser avec la reponse du test
+    # le posterieur est la part de vrais parmi TOUS les positifs
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def depistage(prevalence, sensibilite, specificite, population):
+    malades = prevalence * population
+    sains = population - malades
+    vp = malades * sensibilite
+    fn = malades - vp
+    vn = sains * specificite
+    fp = sains - vn
+    total_positifs = vp + fp
+    post = round(vp / total_positifs, 4) if total_positifs &gt; 0 else 0.0
+    return {'malades': round(malades), 'vp': round(vp), 'fp': round(fp),
+            'fn': round(fn), 'vn': round(vn), 'posterieur': post}
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>d = depistage(0.001, 0.99, 0.95, 100000)
+print(d['malades'], d['vp'], d['fp'], d['posterieur'])
+</text></testcode><stdin><text /></stdin><expected><text>100 99 4995 0.0194
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(depistage(0.01, 0.99, 0.99, 100000)['posterieur'])
+</text></testcode><stdin><text /></stdin><expected><text>0.5
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(depistage(0.30, 0.99, 0.95, 1000)['posterieur'])
+</text></testcode><stdin><text /></stdin><expected><text>0.8946
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(depistage(0.0, 0.99, 1.0, 1000)['posterieur'])
+</text></testcode><stdin><text /></stdin><expected><text>0.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>d = depistage(0.5, 1.0, 1.0, 100)
+print(d['vp'], d['fp'], d['posterieur'])
+</text></testcode><stdin><text /></stdin><expected><text>50 0 1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Inference exacte dans un reseau bayesien</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;RESEAU BAYESIEN&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;La loi jointe se factorise en un produit de probabilites conditionnelles ; l'inference somme sur les variables cachees.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Le reseau est decrit par un dictionnaire associant a chaque variable le couple &lt;code&gt;(parents, table)&lt;/code&gt;, ou &lt;code&gt;table&lt;/code&gt; associe au tuple des valeurs des parents la probabilite que la variable soit vraie. Ecrire &lt;strong&gt;&lt;code&gt;jointe(reseau, monde)&lt;/code&gt;&lt;/strong&gt; (probabilite d'un monde complet, arrondie a 8 decimales) puis &lt;strong&gt;&lt;code&gt;inferer(reseau, cible, observations)&lt;/code&gt;&lt;/strong&gt; qui renvoie la probabilite que &lt;code&gt;cible&lt;/code&gt; soit vraie sachant &lt;code&gt;observations&lt;/code&gt;, arrondie a 4 decimales.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;inferer(RESEAU, 'C', {'J': True, 'M': True}) &amp;rarr; 0.2842&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>from itertools import product
+
+def jointe(reseau, monde):
+    # produit, sur toutes les variables, de P(var | ses parents)
+    ...
+
+def inferer(reseau, cible, observations):
+    # sommer sur tous les mondes compatibles avec les observations
+    # puis normaliser
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>from itertools import product
+
+def jointe(reseau, monde):
+    p = 1.0
+    for var, (parents, table) in reseau.items():
+        cle = tuple(monde[q] for q in parents)
+        pv = table[cle]
+        p *= pv if monde[var] else 1 - pv
+    return round(p, 8)
+
+def inferer(reseau, cible, observations):
+    variables = list(reseau)
+    num, den = 0.0, 0.0
+    for valeurs in product([False, True], repeat=len(variables)):
+        monde = dict(zip(variables, valeurs))
+        if any(monde[k] != v for k, v in observations.items()):
+            continue
+        p = 1.0
+        for var, (parents, table) in reseau.items():
+            cle = tuple(monde[q] for q in parents)
+            pv = table[cle]
+            p *= pv if monde[var] else 1 - pv
+        den += p
+        if monde[cible]:
+            num += p
+    return round(num / den, 4) if den &gt; 0 else 0.0
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>RESEAU = {
+  'C': ((), {(): 0.001}),
+  'S': ((), {(): 0.002}),
+  'A': (('C','S'), {(True,True):0.95,(True,False):0.94,(False,True):0.29,(False,False):0.001}),
+  'J': (('A',), {(True,):0.90,(False,):0.05}),
+  'M': (('A',), {(True,):0.70,(False,):0.01})}
+print(inferer(RESEAU, 'C', {'J': True, 'M': True}))
+</text></testcode><stdin><text /></stdin><expected><text>0.2842
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>RESEAU = {
+  'C': ((), {(): 0.001}),
+  'S': ((), {(): 0.002}),
+  'A': (('C','S'), {(True,True):0.95,(True,False):0.94,(False,True):0.29,(False,False):0.001}),
+  'J': (('A',), {(True,):0.90,(False,):0.05}),
+  'M': (('A',), {(True,):0.70,(False,):0.01})}
+print(inferer(RESEAU, 'C', {}), inferer(RESEAU, 'C', {'J': True}))
+</text></testcode><stdin><text /></stdin><expected><text>0.001 0.0163
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>R = {'P': ((), {(): 0.2}),
+     'A': (('P',), {(True,): 0.01, (False,): 0.40}),
+     'H': (('P','A'), {(True,True):0.99,(True,False):0.80,(False,True):0.90,(False,False):0.0})}
+print(inferer(R, 'P', {'H': True}))
+</text></testcode><stdin><text /></stdin><expected><text>0.3577
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>R = {'X': ((), {(): 0.3})}
+print(jointe(R, {'X': True}), jointe(R, {'X': False}), inferer(R, 'X', {}))
+</text></testcode><stdin><text /></stdin><expected><text>0.3 0.7 0.3
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>R = {'X': ((), {(): 0.5}), 'Y': (('X',), {(True,): 1.0, (False,): 0.0})}
+print(inferer(R, 'X', {'Y': True}))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — Filtrage dans une chaine de Markov</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;FILTRAGE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Predire, corriger, normaliser : la croyance courante resume tout le passe, sans jamais conserver l'historique.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Un etat binaire. Ecrire &lt;strong&gt;&lt;code&gt;filtrer(croyance, observations, p_reste, p_capteur)&lt;/code&gt;&lt;/strong&gt; ou &lt;code&gt;p_reste&lt;/code&gt; est la probabilite que l'etat vrai reste vrai (et que l'etat faux reste faux avec la meme probabilite... non : &lt;code&gt;p_reste&lt;/code&gt; est un couple &lt;code&gt;(p_vrai_vers_vrai, p_faux_vers_vrai)&lt;/code&gt;), et &lt;code&gt;p_capteur&lt;/code&gt; le couple &lt;code&gt;(p_obs_si_vrai, p_obs_si_faux)&lt;/code&gt;. &lt;code&gt;observations&lt;/code&gt; est une liste de booleens. Renvoyer la liste des croyances successives, arrondies a 4 decimales, une par observation.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;filtrer(0.5, [True, True, False], (0.7, 0.3), (0.9, 0.2)) &amp;rarr; [0.8182, 0.8834, 0.1906]&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def filtrer(croyance, observations, p_reste, p_capteur):
+    # pour chaque observation : predire, corriger, normaliser
+    # NE PAS oublier la normalisation
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def filtrer(croyance, observations, p_reste, p_capteur):
+    pvv, pfv = p_reste
+    pov, pof = p_capteur
+    b = croyance
+    resultat = []
+    for obs in observations:
+        prediction = b * pvv + (1 - b) * pfv
+        if obs:
+            e1 = prediction * pov
+            e0 = (1 - prediction) * pof
+        else:
+            e1 = prediction * (1 - pov)
+            e0 = (1 - prediction) * (1 - pof)
+        b = e1 / (e1 + e0)
+        resultat.append(round(b, 4))
+    return resultat
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(filtrer(0.5, [True, True, False], (0.7, 0.3), (0.9, 0.2)))
+</text></testcode><stdin><text /></stdin><expected><text>[0.8182, 0.8834, 0.1907]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(filtrer(0.5, [True] * 5, (0.7, 0.3), (0.9, 0.2)))
+</text></testcode><stdin><text /></stdin><expected><text>[0.8182, 0.8834, 0.8945, 0.8964, 0.8967]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(filtrer(0.5, [], (0.7, 0.3), (0.9, 0.2)))
+</text></testcode><stdin><text /></stdin><expected><text>[]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(filtrer(0.9, [False, False], (0.7, 0.3), (0.9, 0.2)))
+</text></testcode><stdin><text /></stdin><expected><text>[0.1953, 0.0706]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(filtrer(0.5, [True], (1.0, 0.0), (1.0, 0.0)))
+</text></testcode><stdin><text /></stdin><expected><text>[1.0]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

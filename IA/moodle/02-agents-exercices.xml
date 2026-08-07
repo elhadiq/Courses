@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Agent reflexe et agent a etat</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;MONDE DE L'ASPIRATEUR&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Deux cases, chacune propre ou sale. L'agent percoit sa position et l'etat de sa case, et peut aspirer, aller a gauche ou aller a droite.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;reflexe(percept)&lt;/code&gt;&lt;/strong&gt; ou &lt;code&gt;percept&lt;/code&gt; est le couple &lt;code&gt;(position, sale)&lt;/code&gt; avec &lt;code&gt;position&lt;/code&gt; valant &lt;code&gt;'G'&lt;/code&gt; ou &lt;code&gt;'D'&lt;/code&gt; : renvoyer &lt;code&gt;'aspirer'&lt;/code&gt; si la case est sale, sinon &lt;code&gt;'droite'&lt;/code&gt; depuis G et &lt;code&gt;'gauche'&lt;/code&gt; depuis D. Ecrire &lt;strong&gt;&lt;code&gt;simuler(agent, etat0, n)&lt;/code&gt;&lt;/strong&gt; qui renvoie le couple &lt;code&gt;(etat_final, score)&lt;/code&gt; : l'etat est le triplet &lt;code&gt;(position, sale_G, sale_D)&lt;/code&gt;, et le score augmente de 1 par case propre a chaque pas, apres l'action.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;reflexe(('G', True)) &amp;rarr; 'aspirer'
+simuler(reflexe, ('G', True, True), 3) &amp;rarr; (('D', False, False), 4)&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def reflexe(percept):
+    # aucune memoire : la reponse ne depend que du percept courant
+    ...
+
+def simuler(agent, etat0, n):
+    # a chaque pas : construire le percept, demander l action, l appliquer, compter
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def reflexe(percept):
+    position, sale = percept
+    if sale:
+        return 'aspirer'
+    return 'droite' if position == 'G' else 'gauche'
+
+def simuler(agent, etat0, n):
+    position, sg, sd = etat0
+    score = 0
+    for _ in range(n):
+        sale = sg if position == 'G' else sd
+        action = agent((position, sale))
+        if action == 'aspirer':
+            if position == 'G':
+                sg = False
+            else:
+                sd = False
+        elif action == 'droite':
+            position = 'D'
+        elif action == 'gauche':
+            position = 'G'
+        score += (0 if sg else 1) + (0 if sd else 1)
+    return ((position, sg, sd), score)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(reflexe(('G', True)), reflexe(('G', False)), reflexe(('D', False)))
+</text></testcode><stdin><text /></stdin><expected><text>aspirer droite gauche
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(simuler(reflexe, ('G', True, True), 3))
+</text></testcode><stdin><text /></stdin><expected><text>(('D', False, False), 4)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(simuler(reflexe, ('G', False, False), 4))
+</text></testcode><stdin><text /></stdin><expected><text>(('G', False, False), 8)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(simuler(reflexe, ('D', True, True), 6))
+</text></testcode><stdin><text /></stdin><expected><text>(('D', False, False), 10)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(simuler(reflexe, ('G', True, True), 0))
+</text></testcode><stdin><text /></stdin><expected><text>(('G', True, True), 0)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Utilite esperee</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;DECIDER SOUS INCERTITUDE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Un agent rationnel choisit l'action qui maximise l'esperance d'utilite, et non le resultat le plus probable ni le pire cas.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;utilite_esperee(action)&lt;/code&gt;&lt;/strong&gt; ou &lt;code&gt;action&lt;/code&gt; est une liste de couples &lt;code&gt;(probabilite, utilite)&lt;/code&gt; : renvoyer l'esperance, arrondie a 4 decimales. Ecrire &lt;strong&gt;&lt;code&gt;meilleure_action(actions)&lt;/code&gt;&lt;/strong&gt; ou &lt;code&gt;actions&lt;/code&gt; est un dictionnaire nom vers liste de couples : renvoyer le couple &lt;code&gt;(nom, esperance)&lt;/code&gt; de plus grande esperance. A egalite, le nom le plus petit dans l'ordre alphabetique.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;utilite_esperee([(0.95, 70), (0.05, -500)]) &amp;rarr; 41.5&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def utilite_esperee(action):
+    # somme des probabilites multipliees par les utilites
+    ...
+
+def meilleure_action(actions):
+    # parcourir les noms TRIES pour departager les egalites
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def utilite_esperee(action):
+    return round(sum(p * u for p, u in action), 4)
+
+def meilleure_action(actions):
+    meilleur, valeur = None, None
+    for nom in sorted(actions):
+        e = utilite_esperee(actions[nom])
+        if valeur is None or e &gt; valeur:
+            meilleur, valeur = nom, e
+    return (meilleur, valeur)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(utilite_esperee([(0.95, 70), (0.05, -500)]))
+</text></testcode><stdin><text /></stdin><expected><text>41.5
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>A = {'90 min': [(0.80, 90), (0.20, -500)],
+     '120 min': [(0.95, 70), (0.05, -500)],
+     '180 min': [(0.99, 10), (0.01, -500)]}
+print(meilleure_action(A))
+</text></testcode><stdin><text /></stdin><expected><text>('120 min', 41.5)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(utilite_esperee([(1.0, 5)]), utilite_esperee([]))
+</text></testcode><stdin><text /></stdin><expected><text>5.0 0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(meilleure_action({'b': [(1.0, 3)], 'a': [(1.0, 3)]}))
+</text></testcode><stdin><text /></stdin><expected><text>('a', 3.0)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(utilite_esperee([(0.5, 10), (0.5, -10)]))
+</text></testcode><stdin><text /></stdin><expected><text>0.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — Mise a jour de l'etat interne</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;AGENT A MEMOIRE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Dans un monde partiellement observable, l'agent doit predire l'effet de sa derniere action puis corriger avec ce qu'il percoit — et ignorer un capteur incoherent.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Un robot avance d'une case par pas dans un couloir de &lt;code&gt;n&lt;/code&gt; cases numerotees de 0 a n-1. Ecrire &lt;strong&gt;&lt;code&gt;maj_etat(etat, action, percept, n)&lt;/code&gt;&lt;/strong&gt; qui renvoie la nouvelle position estimee. &lt;code&gt;action&lt;/code&gt; vaut &lt;code&gt;1&lt;/code&gt; (avancer), &lt;code&gt;-1&lt;/code&gt; (reculer) ou &lt;code&gt;0&lt;/code&gt;. La prediction est &lt;code&gt;etat + action&lt;/code&gt;, bornee a l'intervalle. Si &lt;code&gt;percept&lt;/code&gt; vaut &lt;code&gt;None&lt;/code&gt; ou differe de la prediction de plus de 1, garder la prediction ; sinon retenir le percept.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;maj_etat(3, 1, 1, 5) &amp;rarr; 4    (le capteur annonce 1 : saut impossible, ignore)&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def maj_etat(etat, action, percept, n):
+    # 1. predire par l effet de l action, en restant dans le couloir
+    # 2. si le percept est absent ou incoherent, garder la prediction
+    # 3. sinon faire confiance au percept
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def maj_etat(etat, action, percept, n):
+    prediction = etat + action
+    if prediction &lt; 0:
+        prediction = 0
+    if prediction &gt; n - 1:
+        prediction = n - 1
+    if percept is None:
+        return prediction
+    if abs(percept - prediction) &gt; 1:
+        return prediction
+    return percept
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(maj_etat(3, 1, 1, 5), maj_etat(3, 1, 4, 5))
+</text></testcode><stdin><text /></stdin><expected><text>4 4
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(maj_etat(0, -1, None, 5), maj_etat(4, 1, None, 5))
+</text></testcode><stdin><text /></stdin><expected><text>0 4
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>etat = 0
+for a, p in [(1, 1), (1, 2), (1, 0), (1, 4)]:
+    etat = maj_etat(etat, a, p, 5)
+    print(etat, end=' ')
+print()
+</text></testcode><stdin><text /></stdin><expected><text>1 2 3 4 
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(maj_etat(2, 0, 3, 5), maj_etat(2, 0, 2, 5))
+</text></testcode><stdin><text /></stdin><expected><text>3 2
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(maj_etat(0, 0, None, 1))
+</text></testcode><stdin><text /></stdin><expected><text>0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 13 &mdash; IA g&eacute;n&eacute;rative</title>
+<meta name="description" content="Modeles generatifs, autoregressifs, diffusion, attention, transformeurs.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Partie V &middot; Chapitre 13</div>
+<h1>Chapitre 13 &mdash; Mod&egrave;les g&eacute;n&eacute;ratifs et grands mod&egrave;les de langue</h1>
+<div class="lesson-sub">Mod&eacute;liser une distribution, autoencodeurs variationnels, mod&egrave;les adverses, diffusion, attention et transformeurs.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">Annexe compagnon</div><p>L'&eacute;chantillonnage autor&eacute;gressif, le calcul de l'attention, l'entra&icirc;nement adverse et la mesure de perplexit&eacute; sont d&eacute;taill&eacute;s <strong><a href="algorithms.html">pas &agrave; pas dans l'annexe</a></strong>.</p></div>
+
+<h2>13.1 Discriminer ou engendrer</h2>
+
+<p>Les chapitres 9 &agrave; 12 apprenaient &agrave; <em>d&eacute;cider</em> : classer, pr&eacute;dire, agir. Un mod&egrave;le g&eacute;n&eacute;ratif se donne un objectif diff&eacute;rent : apprendre la distribution \(P(x)\) elle-m&ecirc;me, de sorte que l'on puisse en tirer des exemples nouveaux et plausibles.</p>
+
+<figure class="viz"><div class="viz-title">Deux objectifs distincts</div>
+<svg viewBox="0 0 760 320" role="img" style="width:100%;height:auto;display:block;"><text x="190" y="30" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Mod&egrave;le discriminatif</text><text x="570" y="30" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Mod&egrave;le g&eacute;n&eacute;ratif</text><rect x="46" y="52" width="288" height="196" rx="10" style="fill:var(--primary);fill-opacity:0.06;stroke:var(--primary);stroke-width:2;"/><path d="M 80 230 L 300 78" style="fill:none;stroke:var(--primary);stroke-width:3;"/><circle cx="100" cy="100" r="5" style="fill:var(--accent);"/><circle cx="130" cy="88" r="5" style="fill:var(--accent);"/><circle cx="150" cy="120" r="5" style="fill:var(--accent);"/><circle cx="112" cy="140" r="5" style="fill:var(--accent);"/><circle cx="160" cy="92" r="5" style="fill:var(--accent);"/><circle cx="230" cy="200" r="5" style="fill:var(--viz-blue);"/><circle cx="262" cy="178" r="5" style="fill:var(--viz-blue);"/><circle cx="210" cy="230" r="5" style="fill:var(--viz-blue);"/><circle cx="276" cy="214" r="5" style="fill:var(--viz-blue);"/><circle cx="246" cy="236" r="5" style="fill:var(--viz-blue);"/><text x="190" y="272" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprend \(P(\text{classe} \mid x)\) : une fronti&egrave;re</text><text x="190" y="294" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">ne sait pas produire un nouveau point</text><rect x="426" y="52" width="288" height="196" rx="10" style="fill:var(--accent);fill-opacity:0.06;stroke:var(--accent);stroke-width:2;"/><circle cx="510" cy="118" r="52" style="fill:var(--accent);fill-opacity:0.10;"/><circle cx="510" cy="118" r="38" style="fill:var(--accent);fill-opacity:0.16;"/><circle cx="510" cy="118" r="24" style="fill:var(--accent);fill-opacity:0.24;"/><circle cx="510" cy="118" r="12" style="fill:var(--accent);fill-opacity:0.34;"/><circle cx="630" cy="200" r="52" style="fill:var(--viz-blue);fill-opacity:0.10;"/><circle cx="630" cy="200" r="38" style="fill:var(--viz-blue);fill-opacity:0.16;"/><circle cx="630" cy="200" r="24" style="fill:var(--viz-blue);fill-opacity:0.24;"/><circle cx="630" cy="200" r="12" style="fill:var(--viz-blue);fill-opacity:0.34;"/><circle cx="504" cy="112" r="5" style="fill:var(--accent);"/><circle cx="520" cy="126" r="5" style="fill:var(--accent);"/><circle cx="498" cy="128" r="5" style="fill:var(--accent);"/><circle cx="626" cy="196" r="5" style="fill:var(--viz-blue);"/><circle cx="640" cy="206" r="5" style="fill:var(--viz-blue);"/><circle cx="620" cy="210" r="5" style="fill:var(--viz-blue);"/><text x="570" y="272" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprend \(P(x)\) ou \(P(x \mid \text{classe})\) : une densit&eacute;</text><text x="570" y="294" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">sait tirer un point nouveau, jamais vu</text></svg>
+<figcaption class="viz-caption"><strong>Figure 13.1.</strong> Un mod&egrave;le discriminatif apprend une fronti&egrave;re ; il ne sait rien produire. Un mod&egrave;le g&eacute;n&eacute;ratif apprend une densit&eacute; ; il sait produire, et l'on peut aussi s'en servir pour classer par la r&egrave;gle de Bayes. Cette souplesse se paie : mod&eacute;liser la distribution enti&egrave;re est bien plus difficile que d'en apprendre une fronti&egrave;re, et sur les t&acirc;ches purement discriminatives, un mod&egrave;le discriminatif l'emporte g&eacute;n&eacute;ralement.</figcaption></figure>
+
+<div class="box def"><div class="box-title">Trois usages, une seule id&eacute;e</div>
+<ul>
+<li><strong>Produire</strong> : &eacute;chantillonner \(x \sim P(x)\).</li>
+<li><strong>&Eacute;valuer</strong> : calculer \(P(x)\) pour d&eacute;tecter ce qui est anormal &mdash; une fraude, une panne, une donn&eacute;e corrompue.</li>
+<li><strong>Compl&eacute;ter</strong> : calculer \(P(x_{\text{manquant}} \mid x_{\text{connu}})\), ce qui recouvre la traduction, la r&eacute;ponse &agrave; une question et le d&eacute;bruitage.</li>
+</ul></div>
+
+<h2>13.2 Les mod&egrave;les autor&eacute;gressifs</h2>
+
+<p>La difficult&eacute; est que \(x\) vit en tr&egrave;s grande dimension. La d&eacute;composition en cha&icirc;ne la contourne exactement, sans aucune approximation :</p>
+
+<div class="eq">\[P(x_1, \dots, x_n) = \prod_{t=1}^{n} P(x_t \mid x_1, \dots, x_{t-1})\]</div>
+
+<p>Mod&eacute;liser une distribution sur des s&eacute;quences enti&egrave;res se ram&egrave;ne donc &agrave; pr&eacute;dire l'&eacute;l&eacute;ment suivant &mdash; un probl&egrave;me de classification ordinaire, du chapitre 9. C'est toute l'astuce des grands mod&egrave;les de langue : <em>l'objectif d'entra&icirc;nement est une supervision gratuite</em>, puisque la bonne r&eacute;ponse est le mot suivant du texte.</p>
+
+<div class="algo"><div class="algo-cap">Algorithme 13.1 &mdash; &Eacute;chantillonnage d'un mod&egrave;le autor&eacute;gressif</div><div class="algo-io"><b>Entr&eacute;e :</b> un mod&egrave;le \(P_\theta\), une amorce \(x_{1:k}\), une longueur \(L\), une temp&eacute;rature \(T \gt 0\)<br><b>Sortie :</b> une s&eacute;quence \(x_{1:k+L}\)</div><ol class="algo-corps"><li><b class="kw">pour</b> \(t = k+1\) <b class="kw">jusqu'&agrave;</b> \(k+L\) <b class="kw">faire</b></li><li class="n1">\(z \leftarrow \log P_\theta(\,\cdot \mid x_{1:t-1})\)          <span class="cm">// un score par element possible</span></li><li class="n1">\(\displaystyle p_v \leftarrow \frac{\exp(z_v / T)}{\sum_{v'} \exp(z_{v'} / T)}\)          <span class="cm">// T petit : ecarts amplifies</span></li><li class="n1">\(x_t \sim p\)</li><li><b class="kw">retourner</b> \(x_{1:k+L}\)</li></ol><p class="algo-note">La d&eacute;composition \(P(x_{1:n}) = \prod_t P(x_t \mid x_{1:t-1})\) est une identit&eacute; exacte : mod&eacute;liser une distribution sur des s&eacute;quences se ram&egrave;ne &agrave; pr&eacute;dire l'&eacute;l&eacute;ment suivant. \(T \to 0\) donne l'&eacute;l&eacute;ment le plus probable, \(T \to \infty\) la loi uniforme : la temp&eacute;rature ne change pas le mod&egrave;le, seulement sa lecture.</p></div>
+
+<div class="box def"><div class="box-title">La perplexit&eacute;</div>
+<p>La mesure standard de qualit&eacute; d'un mod&egrave;le de langue est \(\exp\!\big(-\tfrac{1}{n}\sum_t \ln P(x_t \mid x_{\lt t})\big)\), l'exponentielle de l'entropie crois&eacute;e moyenne. Elle s'interpr&egrave;te comme le <em>nombre moyen de choix &eacute;quiprobables</em> auxquels le mod&egrave;le h&eacute;site &agrave; chaque pas. Une perplexit&eacute; de 4 sur un alphabet de 22 caract&egrave;res signifie que le mod&egrave;le a r&eacute;duit l'incertitude d'un facteur 5,5.</p></div>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Un mod&egrave;le de langue &agrave; deux caract&egrave;res, appris sur un corpus de 260 caract&egrave;res. Les curseurs r&egrave;glent la temp&eacute;rature d'&eacute;chantillonnage, le lissage des probabilit&eacute;s et le tirage al&eacute;atoire.</p>
+<div id="jxg1" class="viz-board" style="height:500px;"></div>
+<p class="viz-caption"><strong>Figure 13.2.</strong> &Agrave; temp&eacute;rature 0,3, le mod&egrave;le r&eacute;p&egrave;te &laquo; le le le &raquo; : il choisit toujours le plus probable. &Agrave; temp&eacute;rature 1, il produit un charabia o&ugrave; affleurent de vrais mots du corpus. &Agrave; temp&eacute;rature 2, tout se d&eacute;sagr&egrave;ge. Le lissage joue un autre r&ocirc;le : &agrave; z&eacute;ro, seules les transitions vues sont possibles ; &agrave; 2, le mod&egrave;le oublie ce qu'il a appris et la perplexit&eacute; monte de 4,1 &agrave; 9,2. <em>Ce mod&egrave;le minuscule et un grand mod&egrave;le de langue diff&egrave;rent par la taille du contexte et par l'architecture, pas par le principe.</em></p></div>
+
+<h2>13.3 Trois autres familles</h2>
+
+<figure class="viz"><div class="viz-title">Quatre fa&ccedil;ons de mod&eacute;liser une distribution</div>
+<svg viewBox="0 0 760 300" role="img" style="width:100%;height:auto;display:block;"><rect x="16" y="54" width="172" height="168" rx="9" style="fill:var(--primary);fill-opacity:0.09;stroke:var(--primary);stroke-width:2.2;"/><text x="102" y="84" text-anchor="middle" style="fill:var(--primary);font-size:13px;font-weight:700;font-family:inherit;">Autor&eacute;gressif</text><text x="102" y="112" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">produit un</text><text x="102" y="130" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">&eacute;l&eacute;ment</text><text x="102" y="148" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">apr&egrave;s l'autre</text><text x="102" y="172" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">vraisemblance exacte,</text><text x="102" y="189" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">g&eacute;n&eacute;ration</text><text x="102" y="206" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">lente</text><rect x="200" y="54" width="172" height="168" rx="9" style="fill:var(--viz-blue);fill-opacity:0.09;stroke:var(--viz-blue);stroke-width:2.2;"/><text x="286" y="84" text-anchor="middle" style="fill:var(--viz-blue);font-size:13px;font-weight:700;font-family:inherit;">Autoencodeur variationnel</text><text x="286" y="112" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">comprime puis</text><text x="286" y="130" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">reconstruit</text><text x="286" y="172" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">espace latent</text><text x="286" y="189" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">utilisable, sorties</text><text x="286" y="206" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">floues</text><rect x="384" y="54" width="172" height="168" rx="9" style="fill:var(--accent);fill-opacity:0.09;stroke:var(--accent);stroke-width:2.2;"/><text x="470" y="84" text-anchor="middle" style="fill:var(--accent);font-size:13px;font-weight:700;font-family:inherit;">Mod&egrave;le adverse</text><text x="470" y="112" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">deux r&eacute;seaux</text><text x="470" y="130" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">qui s'affrontent</text><text x="470" y="172" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">sorties nettes,</text><text x="470" y="189" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">entra&icirc;nement</text><text x="470" y="206" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">instable</text><rect x="568" y="54" width="172" height="168" rx="9" style="fill:var(--viz-ok);fill-opacity:0.09;stroke:var(--viz-ok);stroke-width:2.2;"/><text x="654" y="84" text-anchor="middle" style="fill:var(--viz-ok);font-size:13px;font-weight:700;font-family:inherit;">Diffusion</text><text x="654" y="112" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">bruite puis apprend</text><text x="654" y="130" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">&agrave;</text><text x="654" y="148" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">d&eacute;bruiter</text><text x="654" y="172" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">qualit&eacute;</text><text x="654" y="189" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">&eacute;lev&eacute;e,</text><text x="654" y="206" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">g&eacute;n&eacute;ration</text><text x="654" y="223" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">co&ucirc;teuse</text><text x="380" y="30" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Quatre fa&ccedil;ons de mod&eacute;liser une distribution, quatre compromis diff&eacute;rents</text><text x="380" y="258" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Aucune n'est meilleure dans l'absolu : le choix d&eacute;pend de ce que l'on veut pouvoir faire du mod&egrave;le.</text><text x="380" y="282" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Un mod&egrave;le qui donne une vraisemblance exacte permet de d&eacute;tecter l'anormal ; un mod&egrave;le adverse ne le permet pas.</text></svg>
+<figcaption class="viz-caption"><strong>Figure 13.3.</strong> Chaque famille fait un compromis diff&eacute;rent entre la qualit&eacute; des sorties, la stabilit&eacute; de l'entra&icirc;nement, la vitesse de production et la possibilit&eacute; de calculer une vraisemblance.</figcaption></figure>
+
+<p>L'<strong>autoencodeur variationnel</strong> apprend simultan&eacute;ment &agrave; comprimer une donn&eacute;e vers un espace latent de faible dimension et &agrave; la reconstruire, en for&ccedil;ant la distribution latente &agrave; ressembler &agrave; une loi normale. On peut alors engendrer en tirant un point latent au hasard. L'objectif optimis&eacute; est une borne inf&eacute;rieure sur la vraisemblance <a class="cite" href="#ref-kingma2014">[1]</a>. Ses sorties sont typiquement floues, parce que l'erreur quadratique moyenne pousse &agrave; produire la moyenne des reconstructions possibles.</p>
+
+<p>Le <strong>mod&egrave;le adverse</strong> oppose deux r&eacute;seaux : un g&eacute;n&eacute;rateur qui produit des faux, un discriminateur qui tente de les distinguer des vrais. &Agrave; l'&eacute;quilibre th&eacute;orique, la distribution engendr&eacute;e co&iuml;ncide avec la vraie <a class="cite" href="#ref-goodfellow2014">[2]</a>. En pratique, l'&eacute;quilibre est instable, et le d&eacute;faut le plus courant est l'<em>effondrement des modes</em> : le g&eacute;n&eacute;rateur trouve quelques sorties qui trompent le discriminateur et cesse de varier.</p>
+
+<p>Les <strong>mod&egrave;les de diffusion</strong> proc&egrave;dent autrement : on ajoute du bruit &agrave; une image par petites &eacute;tapes jusqu'&agrave; obtenir du bruit pur, et l'on apprend &agrave; inverser chaque &eacute;tape. Engendrer revient &agrave; partir du bruit et &agrave; d&eacute;bruiter progressivement <a class="cite" href="#ref-ho2020">[3]</a>. L'entra&icirc;nement est stable, la qualit&eacute; excellente, mais la production demande des dizaines &agrave; des centaines de passages.</p>
+
+<h2>13.4 L'attention et les transformeurs</h2>
+
+<p>Les mod&egrave;les de s&eacute;quence r&eacute;currents traitaient les &eacute;l&eacute;ments un par un, ce qui interdisait toute parall&eacute;lisation et faisait s'&eacute;vanouir l'information sur de longues distances. L'attention r&eacute;sout les deux probl&egrave;mes &agrave; la fois <a class="cite" href="#ref-vaswani2017">[4]</a>.</p>
+
+<div class="box def"><div class="box-title">D&eacute;finition &mdash; Attention par produit scalaire mis &agrave; l'&eacute;chelle</div>
+<div class="eq">\[\operatorname{Attention}(Q, K, V) = \operatorname{softmax}\!\left(\frac{QK^{\mathsf{T}}}{\sqrt{d_k}}\right) V\]</div>
+<p>Chaque position produit trois vecteurs &agrave; partir de sa repr&eacute;sentation : une <em>requ&ecirc;te</em> (ce qu'elle cherche), une <em>cl&eacute;</em> (ce par quoi on peut la trouver) et une <em>valeur</em> (ce qu'elle transmet). Le produit scalaire entre requ&ecirc;te et cl&eacute;s mesure la pertinence ; l'exponentielle normalis&eacute;e en fait une r&eacute;partition qui somme &agrave; 1 ; la sortie est la moyenne pond&eacute;r&eacute;e des valeurs.</p></div>
+
+<div class="algo"><div class="algo-cap">Algorithme 13.2 &mdash; Attention par produit scalaire mis &agrave; l'&eacute;chelle</div><div class="algo-io"><b>Entr&eacute;e :</b> \(Q \in \mathbb{R}^{m \times d_k}\), \(K \in \mathbb{R}^{p \times d_k}\), \(V \in \mathbb{R}^{p \times d_v}\)<br><b>Sortie :</b> une matrice de \(\mathbb{R}^{m \times d_v}\)</div><ol class="algo-corps"><li>\(\displaystyle S \leftarrow \frac{QK^{\mathsf{T}}}{\sqrt{d_k}}\)          <span class="cm">// sinon les scores croissent avec d_k</span></li><li>\(S \leftarrow S - \max_{\text{ligne}} S\)          <span class="cm">// stabilite numerique</span></li><li>\(\displaystyle P_{ij} \leftarrow \frac{\exp(S_{ij})}{\sum_{j'} \exp(S_{ij'})}\)          <span class="cm">// chaque ligne somme a 1</span></li><li><b class="kw">retourner</b> \(PV\)</li></ol><p class="algo-note">Chaque position produit \(q\), \(k\) et \(v\) par trois applications lin&eacute;aires apprises de la m&ecirc;me repr&eacute;sentation : ce qu'elle cherche, ce par quoi on la trouve, ce qu'elle transmet. <strong>Co&ucirc;t :</strong> \(\Theta(m\,p\,d_k)\), soit le carr&eacute; de la longueur de contexte.</p></div>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Cinq mots, chacun repr&eacute;sent&eacute; par deux nombres. Le premier curseur choisit le mot qui &laquo; regarde &raquo;, le second r&egrave;gle la nettet&eacute; de la r&eacute;partition.</p>
+<div id="jxg2" class="viz-board" style="height:480px;"></div>
+<p class="viz-caption"><strong>Figure 13.4.</strong> Le mot &laquo; chat &raquo; concentre 98 % de son attention sur lui-m&ecirc;me : sa repr&eacute;sentation est tr&egrave;s diff&eacute;rente des autres. Les verbes &laquo; dort &raquo; et &laquo; mange &raquo; se partagent leur attention, leurs repr&eacute;sentations &eacute;tant proches. Faites varier la nettet&eacute; : &agrave; 1, l'attention est presque uniforme et le m&eacute;canisme n'apporte rien ; &agrave; 40, elle d&eacute;g&eacute;n&egrave;re en s&eacute;lection dure. La division par la racine de la dimension sert exactement &agrave; maintenir ce r&eacute;glage dans une plage utile quand la dimension grandit.</p></div>
+
+<div class="box tip"><div class="box-title">Ce que l'attention n'est pas</div>
+Les cartes d'attention sont souvent pr&eacute;sent&eacute;es comme des explications du raisonnement du mod&egrave;le. C'est abusif : plusieurs travaux ont montr&eacute; qu'on peut modifier substantiellement les poids d'attention sans changer la pr&eacute;diction, ce qui interdit de les lire comme la cause de celle-ci <a class="cite" href="#ref-jain2019">[5]</a>. L'attention est un m&eacute;canisme de calcul, pas une justification.</div>
+
+<h2>13.5 Les grands mod&egrave;les de langue</h2>
+
+<p>Un grand mod&egrave;le de langue est un transformeur autor&eacute;gressif entra&icirc;n&eacute; sur une tr&egrave;s grande quantit&eacute; de texte &agrave; pr&eacute;dire l'&eacute;l&eacute;ment suivant. Rien de plus, au niveau du principe. Deux observations empiriques expliquent leur trajectoire.</p>
+
+<div class="box thm"><div class="box-title">Lois d'&eacute;chelle</div>
+<p>La perte d'entra&icirc;nement suit approximativement une loi de puissance en fonction du nombre de param&egrave;tres, de la quantit&eacute; de donn&eacute;es et du calcul investi, sur plusieurs ordres de grandeur <a class="cite" href="#ref-kaplan2020">[6]</a>. Ce sont des <em>r&eacute;gularit&eacute;s empiriques</em>, pas des th&eacute;or&egrave;mes : elles ont d&eacute;j&agrave; &eacute;t&eacute; corrig&eacute;es une fois, lorsqu'il est apparu que les mod&egrave;les de l'&eacute;poque &eacute;taient nettement sous-entra&icirc;n&eacute;s en donn&eacute;es pour leur taille <a class="cite" href="#ref-hoffmann2022">[7]</a>. Rien ne garantit leur prolongement.</p></div>
+
+<div class="box warn"><div class="box-title">Quatre limites &agrave; conna&icirc;tre pr&eacute;cis&eacute;ment</div>
+<p><strong>L'objectif est la vraisemblance, pas la v&eacute;rit&eacute;.</strong> Un mod&egrave;le entra&icirc;n&eacute; &agrave; produire du texte plausible produit du texte plausible, y compris quand il est faux. Ce n'est pas une d&eacute;faillance : c'est exactement ce qui a &eacute;t&eacute; demand&eacute;.</p>
+<p><strong>Aucune s&eacute;paration entre ce qui est su et ce qui est invent&eacute;.</strong> Le mod&egrave;le ne dispose d'aucun m&eacute;canisme interne distinguant un fait m&eacute;moris&eacute; d'une interpolation plausible.</p>
+<p><strong>La contamination des &eacute;valuations.</strong> Les donn&eacute;es d'entra&icirc;nement couvrent une large part du web ; il devient tr&egrave;s difficile de garantir qu'un rep&egrave;re d'&eacute;valuation n'y figure pas, ce qui rend beaucoup de scores publi&eacute;s ininterpr&eacute;tables.</p>
+<p><strong>Le d&eacute;bat sur la compr&eacute;hension.</strong> Certains soutiennent que pr&eacute;dire le mot suivant &agrave; ce niveau exige n&eacute;cessairement une forme de mod&egrave;le du monde ; d'autres que le syst&egrave;me manipule des formes sans acc&egrave;s au sens, la coh&eacute;rence apparente venant du lecteur qui interpr&egrave;te <a class="cite" href="#ref-bender2021">[8]</a>. Le d&eacute;bat n'est pas tranch&eacute;, et il prolonge directement celui de la chambre chinoise du chapitre 1.</p></div>
+
+<h2>Synth&egrave;se</h2>
+<ul>
+<li>Un mod&egrave;le g&eacute;n&eacute;ratif apprend une distribution et non une fronti&egrave;re : il peut produire, &eacute;valuer l'anormal et compl&eacute;ter.</li>
+<li>La d&eacute;composition en cha&icirc;ne ram&egrave;ne exactement la mod&eacute;lisation d'une s&eacute;quence &agrave; la pr&eacute;diction de l'&eacute;l&eacute;ment suivant, avec une supervision gratuite.</li>
+<li>La temp&eacute;rature ne change pas le mod&egrave;le, seulement la fa&ccedil;on de l'&eacute;chantillonner.</li>
+<li>Autoencodeurs variationnels <a class="cite" href="#ref-kingma2014">[1]</a>, mod&egrave;les adverses <a class="cite" href="#ref-goodfellow2014">[2]</a> et diffusion <a class="cite" href="#ref-ho2020">[3]</a> font trois compromis diff&eacute;rents.</li>
+<li>L'attention pond&egrave;re les positions par produit scalaire ; ce n'est pas une explication du raisonnement <a class="cite" href="#ref-jain2019">[5]</a>.</li>
+<li>Les lois d'&eacute;chelle sont des r&eacute;gularit&eacute;s empiriques, d&eacute;j&agrave; corrig&eacute;es une fois <a class="cite" href="#ref-hoffmann2022">[7]</a>.</li>
+</ul>
+
+<h2>R&eacute;f&eacute;rences</h2>
+<ol class="reflist">
+<li id="ref-kingma2014">Kingma, D. P. &amp; Welling, M. (2014). Auto-encoding variational Bayes. <em>Proceedings of ICLR 2014</em>. arXiv&nbsp;: 1312.6114. <a href="https://arxiv.org/abs/1312.6114">https://arxiv.org/abs/1312.6114</a></li>
+<li id="ref-goodfellow2014">Goodfellow, I., Pouget-Abadie, J., Mirza, M. <em>et al.</em> (2014). Generative adversarial nets. <em>Advances in Neural Information Processing Systems 27</em>. <a href="https://papers.nips.cc/paper/5423-generative-adversarial-nets">https://papers.nips.cc/paper/5423-generative-adversarial-nets</a></li>
+<li id="ref-ho2020">Ho, J., Jain, A. &amp; Abbeel, P. (2020). Denoising diffusion probabilistic models. <em>Advances in Neural Information Processing Systems 33</em>. arXiv&nbsp;: 2006.11239. <a href="https://arxiv.org/abs/2006.11239">https://arxiv.org/abs/2006.11239</a></li>
+<li id="ref-vaswani2017">Vaswani, A., Shazeer, N., Parmar, N. <em>et al.</em> (2017). Attention is all you need. <em>Advances in Neural Information Processing Systems 30</em>. arXiv&nbsp;: 1706.03762. <a href="https://arxiv.org/abs/1706.03762">https://arxiv.org/abs/1706.03762</a></li>
+<li id="ref-jain2019">Jain, S. &amp; Wallace, B. C. (2019). Attention is not explanation. <em>Proceedings of NAACL-HLT 2019</em>, 3543&ndash;3556. DOI&nbsp;: 10.18653/v1/N19-1357. <a href="https://doi.org/10.18653/v1/N19-1357">https://doi.org/10.18653/v1/N19-1357</a></li>
+<li id="ref-kaplan2020">Kaplan, J., McCandlish, S., Henighan, T. <em>et al.</em> (2020). Scaling laws for neural language models. arXiv&nbsp;: 2001.08361. <a href="https://arxiv.org/abs/2001.08361">https://arxiv.org/abs/2001.08361</a></li>
+<li id="ref-hoffmann2022">Hoffmann, J., Borgeaud, S., Mensch, A. <em>et al.</em> (2022). Training compute-optimal large language models. arXiv&nbsp;: 2203.15556. <a href="https://arxiv.org/abs/2203.15556">https://arxiv.org/abs/2203.15556</a></li>
+<li id="ref-bender2021">Bender, E. M., Gebru, T., McMillan-Major, A. &amp; Shmitchell, S. (2021). On the dangers of stochastic parrots: can language models be too big? <em>Proceedings of FAccT 2021</em>, 610&ndash;623. DOI&nbsp;: 10.1145/3442188.3445922. <a href="https://doi.org/10.1145/3442188.3445922">https://doi.org/10.1145/3442188.3445922</a></li>
+<li id="ref-shannon1948">Shannon, C. E. (1948). A mathematical theory of communication. <em>Bell System Technical Journal</em>, 27(3), 379&ndash;423. DOI&nbsp;: 10.1002/j.1538-7305.1948.tb01338.x. <a href="https://doi.org/10.1002/j.1538-7305.1948.tb01338.x">https://doi.org/10.1002/j.1538-7305.1948.tb01338.x</a></li>
+</ol>
+<p>L'id&eacute;e d'engendrer du texte en tirant le caract&egrave;re suivant selon les fr&eacute;quences observ&eacute;es &mdash; exactement la figure 13.2 &mdash; figure d&eacute;j&agrave; dans l'article fondateur de la th&eacute;orie de l'information <a class="cite" href="#ref-shannon1948">[9]</a>, en 1948.</p>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../12-renforcement/page.html">\(\leftarrow\) Chapitre 12 &mdash; Apprentissage par renforcement</a>
+<a href="algorithms.html">Annexe algorithmique</a>
+<a href="../../index.html">Sommaire du manuel</a>
+<a href="../14-ethique/page.html">Chapitre 14 &mdash; &Eacute;thique et soci&eacute;t&eacute; \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">La figure interactive n\'a pas pu etre chargee. Verifiez votre connexion reseau.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ======= Figure : echantillonnage d'un modele de langue caractere par caractere === */
+/* Modele bigramme appris sur un petit corpus francais fixe. */
+var CORPUS = "le chat dort sur le tapis. la souris mange le fromage. le chien court dans le jardin. "
+           + "la souris dort dans le tapis. le chat mange la souris. le chien dort sur le tapis. "
+           + "la fille lit le livre. le livre parle de la mer. la mer est bleue et la mer est grande.";
+var ALPHA = (function(){
+  var vus = {}, l = [];
+  for (var i = 0; i < CORPUS.length; i++){ if (!vus[CORPUS[i]]) { vus[CORPUS[i]] = true; l.push(CORPUS[i]); } }
+  l.sort();
+  return l;
+})();
+var IDX = {};
+for (var i = 0; i < ALPHA.length; i++){ IDX[ALPHA[i]] = i; }
+var N = ALPHA.length;
+var COMPTES = (function(){
+  var m = [];
+  for (var a = 0; a < N; a++){ var r = []; for (var b = 0; b < N; b++){ r.push(0); } m.push(r); }
+  for (var k = 0; k + 1 < CORPUS.length; k++){
+    m[IDX[CORPUS[k]]][IDX[CORPUS[k+1]]]++;
+  }
+  return m;
+})();
+function proba(a, temperature, lissage){
+  var p = [], somme = 0, b;
+  for (b = 0; b < N; b++){
+    var c = COMPTES[a][b] + lissage;
+    p.push(c);
+    somme += c;
+  }
+  for (b = 0; b < N; b++){ p[b] = p[b] / somme; }
+  if (Math.abs(temperature - 1) > 1e-9){
+    var s2 = 0;
+    for (b = 0; b < N; b++){ p[b] = Math.pow(p[b], 1 / temperature); s2 += p[b]; }
+    for (b = 0; b < N; b++){ p[b] = p[b] / s2; }
+  }
+  return p;
+}
+function aleaG(g){ var s = g; return function(){ s = (s*1103515245+12345)%2147483648; return s/2147483648; }; }
+function engendrer(temperature, lissage, longueur, graine){
+  var rnd = aleaG(graine), a = IDX['l'], sortie = 'l';
+  for (var k = 0; k < longueur; k++){
+    var p = proba(a, temperature, lissage), u = rnd(), cum = 0, b = N - 1;
+    for (var j = 0; j < N; j++){ cum += p[j]; if (u <= cum){ b = j; break; } }
+    sortie += ALPHA[b];
+    a = b;
+  }
+  return sortie;
+}
+/* Perplexite du modele sur le corpus : mesure objective de la qualite. */
+function perplexite(lissage){
+  var somme = 0, n = 0;
+  for (var k = 0; k + 1 < CORPUS.length; k++){
+    var p = proba(IDX[CORPUS[k]], 1, lissage);
+    somme += -Math.log(Math.max(1e-12, p[IDX[CORPUS[k+1]]]));
+    n++;
+  }
+  return Math.exp(somme / n);
+}
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-0.06, 1.28, 1.06, -0.62], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sTemp = b1.create('slider', [[0.02, -0.16], [0.46, -0.16], [0.2, 1.0, 2.5]], {
+  name: 'temperature', snapWidth: 0.1, precision: 1,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }}
+});
+var sLiss = b1.create('slider', [[0.56, -0.16], [1.00, -0.16], [0.0, 0.10, 2.0]], {
+  name: 'lissage', snapWidth: 0.05, precision: 2,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sGr = b1.create('slider', [[0.02, -0.38], [0.46, -0.38], [1, 3, 12]], {
+  name: 'tirage', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function temp13(){ return Math.round(sTemp.Value() * 10) / 10; }
+function liss13(){ return Math.round(sLiss.Value() * 20) / 20; }
+function gr13(){ return Math.round(sGr.Value()) * 7919 + 11; }
+b1.create('text', [-0.05, 1.22, function(){
+  return 'Temperature ' + temp13().toFixed(1) + '   |   lissage ' + liss13().toFixed(2)
+       + '   |   perplexite du modele sur son propre corpus : ' + perplexite(liss13()).toFixed(2)
+       + ' (sur ' + N + ' caracteres possibles)';
+}], {fontSize: 13, strokeColor: PAL.text, fixed: true, highlight: false});
+for (var ligne = 0; ligne < 4; ligne++){
+  (function(l){
+    b1.create('text', [-0.05, 1.06 - l * 0.13, function(){
+      var t = engendrer(temp13(), liss13(), 240, gr13() + l * 37);
+      return t.slice(l * 60, (l + 1) * 60);
+    }], {fontSize: 15, fixed: true, highlight: false,
+         strokeColor: function(){ return cssv('--primary-dark', '#014a55'); }});
+  })(ligne);
+}
+b1.create('text', [-0.05, 0.44, function(){
+  if (temp13() < 0.5) { return 'Temperature basse : le modele repete les sequences les plus frequentes, sans surprise.'; }
+  if (temp13() > 1.7) { return 'Temperature haute : les caracteres rares deviennent probables, le texte se desagrege.'; }
+  return 'Temperature moyenne : compromis entre fidelite au corpus et variete.';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-0.05, 0.30, function(){
+  if (liss13() < 0.02) { return 'Lissage nul : seules les transitions vues dans le corpus sont possibles ; le modele ne peut rien inventer.'; }
+  if (liss13() > 1.0) { return 'Lissage fort : toutes les transitions deviennent presque equiprobables, le modele oublie ce qu il a appris.'; }
+  return 'Lissage modere : les transitions jamais vues restent possibles, mais rares.';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-0.05, -0.56,
+  'Modele bigramme sur un corpus de 260 caracteres : le plus simple des modeles de langue, et deja les memes reglages qu un grand modele.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+/* ======= Figure : l'attention, calculee sur un exemple minuscule ========== */
+var MOTS = ['le', 'chat', 'qui', 'dort', 'mange'];
+/* vecteurs a 2 dimensions, choisis a la main pour que l'exemple parle */
+var VEC = {
+  'le':    [0.10, 0.05],
+  'chat':  [0.90, 0.20],
+  'qui':   [0.15, 0.30],
+  'dort':  [0.25, 0.85],
+  'mange': [0.35, 0.80]
+};
+function attention(iRequete, echelle){
+  var q = VEC[MOTS[iRequete]], scores = [], somme = 0, k;
+  for (k = 0; k < MOTS.length; k++){
+    var v = VEC[MOTS[k]];
+    scores.push(Math.exp(echelle * (q[0]*v[0] + q[1]*v[1])));
+  }
+  for (k = 0; k < MOTS.length; k++){ somme += scores[k]; }
+  for (k = 0; k < MOTS.length; k++){ scores[k] = scores[k] / somme; }
+  return scores;
+}
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-1.6, 6.0, 6.6, -2.6], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sReq = b2.create('slider', [[-1.2, -1.3], [1.6, -1.3], [0, 4, 4]], {
+  name: 'mot courant', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sEch = b2.create('slider', [[2.8, -1.3], [6.4, -1.3], [1, 12, 40]], {
+  name: 'nettete', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function req(){ return Math.round(sReq.Value()); }
+function ech(){ return Math.round(sEch.Value()); }
+for (var m = 0; m < MOTS.length; m++){
+  (function(k){
+    b2.create('curve', [[k*1.2, k*1.2+1.0, k*1.2+1.0, k*1.2, k*1.2],
+                        [2.0, 2.0, 2.7, 2.7, 2.0]], {
+      strokeWidth: function(){ return k === req() ? 3 : 1.4; },
+      strokeColor: function(){ return k === req() ? cssv('--primary','#026573') : PAL.axis(); },
+      fillColor: function(){ return cssv('--primary', '#026573'); },
+      fillOpacity: function(){ return attention(req(), ech())[k] * 0.9; },
+      highlight: false, fixed: true});
+    b2.create('text', [k*1.2 + 0.5, 2.35, MOTS[k]], {fontSize: 14, anchorX: 'middle',
+      anchorY: 'middle', strokeColor: PAL.text, fixed: true, highlight: false});
+    b2.create('text', [k*1.2 + 0.5, 1.72, function(){
+      return (100 * attention(req(), ech())[k]).toFixed(0) + ' %';
+    }], {fontSize: 13, anchorX: 'middle', fixed: true, highlight: false,
+         strokeColor: function(){ return cssv('--primary-dark', '#014a55'); }});
+    /* barre de poids */
+    b2.create('curve', [
+      function(){ return [k*1.2 + 0.1, k*1.2 + 0.1 + 0.8 * attention(req(), ech())[k],
+                          k*1.2 + 0.1 + 0.8 * attention(req(), ech())[k], k*1.2 + 0.1, k*1.2 + 0.1]; },
+      function(){ return [0.9, 0.9, 1.3, 1.3, 0.9]; }], {
+      strokeWidth: 0, fillColor: function(){ return cssv('--accent', '#f59e0b'); },
+      fillOpacity: 0.8, highlight: false, fixed: true});
+  })(m);
+}
+b2.create('text', [-1.5, 5.6, function(){
+  return 'Mot courant : ' + MOTS[req()]
+       + '   |   nettete ' + ech()
+       + '   |   les pourcentages somment a 100 : c’est une repartition de l’attention.';
+}], {fontSize: 14, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-1.5, 5.1, function(){
+  var a = attention(req(), ech()), best = 0;
+  for (var k = 1; k < MOTS.length; k++){ if (a[k] > a[best]) { best = k; } }
+  return 'Le mot le plus regarde est « ' + MOTS[best] + ' » avec ' + (100*a[best]).toFixed(0) + ' %.';
+}], {fontSize: 13, fixed: true, highlight: false,
+     strokeColor: function(){ return cssv('--primary','#026573'); }});
+b2.create('text', [-1.5, 4.6, function(){
+  if (ech() <= 3) { return 'Nettete faible : l’attention se repartit presque uniformement, le mecanisme n’apporte rien.'; }
+  if (ech() >= 30) { return 'Nettete forte : l’attention se concentre sur un seul mot, comme une selection dure.'; }
+  return 'Nettete moyenne : quelques mots dominent, les autres contribuent un peu.';
+}], {fontSize: 12.5, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-1.5, -2.0,
+  'Chaque mot est ici represente par deux nombres seulement ; un modele reel en utilise plusieurs milliers.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-1.5, -2.4,
+  'Le calcul est le meme : produit scalaire, mise a l’echelle, exponentielle normalisee.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Min-max sur un arbre de jeu</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;MIN-MAX&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Un arbre de jeu est represente par des listes imbriquees : une feuille est un entier, un noeud interne est une liste de sous-arbres. La racine est un noeud MAX, et les niveaux alternent MAX, MIN, MAX, ...&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;minmax(arbre, maximisant=True)&lt;/code&gt;&lt;/strong&gt; qui renvoie la valeur du jeu, c'est-a-dire le resultat obtenu si les deux joueurs jouent parfaitement.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;minmax([[3, 12, 8], [2, 4, 6], [14, 5, 2]]) &amp;rarr; 3&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def minmax(arbre, maximisant=True):
+    # cas de base : une feuille est un entier
+    # sinon : evaluer chaque sous-arbre en inversant le joueur
+    # puis rendre le maximum ou le minimum selon le joueur au trait
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def minmax(arbre, maximisant=True):
+    if not isinstance(arbre, list):
+        return arbre
+    valeurs = [minmax(fils, not maximisant) for fils in arbre]
+    return max(valeurs) if maximisant else min(valeurs)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(minmax([[3, 12, 8], [2, 4, 6], [14, 5, 2]]))
+</text></testcode><stdin><text /></stdin><expected><text>3
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(minmax([[3, 12], [8, 2, 4], [6, 14, 5]]))
+</text></testcode><stdin><text /></stdin><expected><text>5
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(minmax(7))
+</text></testcode><stdin><text /></stdin><expected><text>7
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(minmax([[[1, 2], [3, 4]], [[5, 6], [7, 8]]]))
+</text></testcode><stdin><text /></stdin><expected><text>6
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(minmax([[3, 12, 8], [2, 4, 6], [14, 5, 2]], False))
+</text></testcode><stdin><text /></stdin><expected><text>6
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Elagage alpha-beta</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;ELAGAGE ALPHA-BETA&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;L'elagage rend exactement la meme valeur que min-max, mais sans visiter les sous-arbres dont le contenu ne peut plus influencer la racine.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;alpha_beta(arbre)&lt;/code&gt;&lt;/strong&gt; qui renvoie le couple &lt;code&gt;(valeur, feuilles_lues)&lt;/code&gt;, ou &lt;code&gt;feuilles_lues&lt;/code&gt; est le nombre de feuilles effectivement evaluees. Les fils sont examines de gauche a droite, et la coupure intervient des que &lt;code&gt;alpha &amp;gt;= beta&lt;/code&gt;. La racine est un noeud MAX.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;alpha_beta([[3, 12, 8], [2, 4, 6], [14, 5, 2]]) &amp;rarr; (3, 7)&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def alpha_beta(arbre):
+    compteur = [0]           # liste mutable pour compter les feuilles lues
+
+    def explorer(noeud, alpha, beta, maximisant):
+        # feuille : incrementer le compteur et renvoyer sa valeur
+        # noeud MAX : relever alpha, couper des que alpha &gt;= beta
+        # noeud MIN : abaisser beta, couper des que alpha &gt;= beta
+        ...
+
+    return (explorer(arbre, float('-inf'), float('inf'), True), compteur[0])
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def alpha_beta(arbre):
+    compteur = [0]
+
+    def explorer(noeud, alpha, beta, maximisant):
+        if not isinstance(noeud, list):
+            compteur[0] += 1
+            return noeud
+        if maximisant:
+            valeur = float('-inf')
+            for fils in noeud:
+                valeur = max(valeur, explorer(fils, alpha, beta, False))
+                alpha = max(alpha, valeur)
+                if alpha &gt;= beta:
+                    break
+            return valeur
+        valeur = float('inf')
+        for fils in noeud:
+            valeur = min(valeur, explorer(fils, alpha, beta, True))
+            beta = min(beta, valeur)
+            if alpha &gt;= beta:
+                break
+        return valeur
+
+    v = explorer(arbre, float('-inf'), float('inf'), True)
+    return (v, compteur[0])
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(alpha_beta([[3, 12, 8], [2, 4, 6], [14, 5, 2]]))
+</text></testcode><stdin><text /></stdin><expected><text>(3, 7)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(alpha_beta([[3, 12], [8, 2, 4], [6, 14, 5]]))
+</text></testcode><stdin><text /></stdin><expected><text>(5, 7)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>a = [[3, 12, 8], [2, 4, 6], [14, 5, 2]]
+def minmax(t, m=True):
+    if not isinstance(t, list): return t
+    v = [minmax(f, not m) for f in t]
+    return max(v) if m else min(v)
+print(alpha_beta(a)[0] == minmax(a))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(alpha_beta([[[1, 2], [3, 4]], [[5, 6], [7, 8]]]))
+</text></testcode><stdin><text /></stdin><expected><text>(6, 6)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(alpha_beta(9))
+</text></testcode><stdin><text /></stdin><expected><text>(9, 1)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — Un joueur de morpion parfait</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;MORPION&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;La grille est une chaine de neuf caracteres, lue ligne par ligne : 'X', 'O' ou '.'. Le joueur 'X' maximise, le joueur 'O' minimise.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;meilleur_coup(grille, joueur)&lt;/code&gt;&lt;/strong&gt; qui renvoie l'indice (entre 0 et 8) d'un coup optimal pour &lt;code&gt;joueur&lt;/code&gt;, ou &lt;code&gt;-1&lt;/code&gt; si la partie est finie. La valeur d'une position finale est &lt;code&gt;+1&lt;/code&gt; si 'X' gagne, &lt;code&gt;-1&lt;/code&gt; si 'O' gagne, &lt;code&gt;0&lt;/code&gt; pour une partie nulle. A valeur egale, renvoyer le coup d'indice le plus petit.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;meilleur_coup('XX.OO....', 'X') &amp;rarr; 2      (X aligne la premiere ligne)&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>LIGNES = [(0,1,2),(3,4,5),(6,7,8),(0,3,6),(1,4,7),(2,5,8),(0,4,8),(2,4,6)]
+
+def gagnant(g):
+    # renvoie 'X', 'O' ou None
+    ...
+
+def valeur(g, joueur):
+    # valeur min-max de la position, joueur etant celui qui doit jouer
+    ...
+
+def meilleur_coup(grille, joueur):
+    # essayer chaque case libre, garder la meilleure valeur
+    # a valeur egale, garder l'indice le plus petit
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>LIGNES = [(0,1,2),(3,4,5),(6,7,8),(0,3,6),(1,4,7),(2,5,8),(0,4,8),(2,4,6)]
+
+def gagnant(g):
+    for a, b, c in LIGNES:
+        if g[a] != '.' and g[a] == g[b] == g[c]:
+            return g[a]
+    return None
+
+def valeur(g, joueur):
+    v = gagnant(g)
+    if v == 'X':
+        return 1
+    if v == 'O':
+        return -1
+    if '.' not in g:
+        return 0
+    scores = []
+    for i in range(9):
+        if g[i] == '.':
+            suite = g[:i] + joueur + g[i+1:]
+            scores.append(valeur(suite, 'O' if joueur == 'X' else 'X'))
+    return max(scores) if joueur == 'X' else min(scores)
+
+def meilleur_coup(grille, joueur):
+    if gagnant(grille) is not None or '.' not in grille:
+        return -1
+    autre = 'O' if joueur == 'X' else 'X'
+    meilleur, indice = None, -1
+    for i in range(9):
+        if grille[i] != '.':
+            continue
+        v = valeur(grille[:i] + joueur + grille[i+1:], autre)
+        if meilleur is None or (joueur == 'X' and v &gt; meilleur) or (joueur == 'O' and v &lt; meilleur):
+            meilleur, indice = v, i
+    return indice
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(meilleur_coup('XX.OO....', 'X'))
+</text></testcode><stdin><text /></stdin><expected><text>2
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(meilleur_coup('XX.OO....', 'O'))
+</text></testcode><stdin><text /></stdin><expected><text>2
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(meilleur_coup('XXXOO....', 'O'))
+</text></testcode><stdin><text /></stdin><expected><text>-1
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(meilleur_coup('.........', 'X'))
+</text></testcode><stdin><text /></stdin><expected><text>0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(meilleur_coup('XOXXOOOXX', 'X'))
+</text></testcode><stdin><text /></stdin><expected><text>-1
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q4 — Selection UCB1</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;EXPLORATION ET EXPLOITATION&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Dans une exploration arborescente par echantillonnage, on choisit a chaque noeud le fils qui maximise son taux de victoire augmente d'un bonus d'exploration.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;choisir(stats, c=1.0)&lt;/code&gt;&lt;/strong&gt; qui renvoie l'indice du fils selectionne. &lt;code&gt;stats&lt;/code&gt; est une liste de couples &lt;code&gt;(victoires, visites)&lt;/code&gt;. Le score d'un fils est &lt;code&gt;v / n + c * sqrt(log(N) / n)&lt;/code&gt;, ou &lt;code&gt;N&lt;/code&gt; est la somme des visites. Un fils jamais visite (&lt;code&gt;n == 0&lt;/code&gt;) est prioritaire ; en cas d'egalite, renvoyer l'indice le plus petit. Ecrire aussi &lt;strong&gt;&lt;code&gt;coup_final(stats)&lt;/code&gt;&lt;/strong&gt; qui renvoie l'indice du fils &lt;em&gt;le plus visite&lt;/em&gt; : ce n'est pas le meme critere.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;choisir([(42, 70), (11, 20), (4, 10)]) &amp;rarr; 2
+coup_final([(42, 70), (11, 20), (4, 10)]) &amp;rarr; 0&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>from math import log, sqrt
+
+def choisir(stats, c=1.0):
+    # N = somme des visites
+    # un fils jamais visite passe en premier
+    # score = v / n + c * sqrt(log(N) / n), garder le maximum
+    ...
+
+def coup_final(stats):
+    # le fils le plus VISITE, pas le mieux note
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>from math import log, sqrt
+
+def choisir(stats, c=1.0):
+    total = sum(n for _, n in stats)
+    for i, (v, n) in enumerate(stats):
+        if n == 0:
+            return i
+    meilleur, indice = None, -1
+    for i, (v, n) in enumerate(stats):
+        score = v / n + c * sqrt(log(total) / n)
+        if meilleur is None or score &gt; meilleur:
+            meilleur, indice = score, i
+    return indice
+
+def coup_final(stats):
+    meilleur, indice = -1, -1
+    for i, (v, n) in enumerate(stats):
+        if n &gt; meilleur:
+            meilleur, indice = n, i
+    return indice
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(choisir([(42, 70), (11, 20), (4, 10)]))
+</text></testcode><stdin><text /></stdin><expected><text>2
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(coup_final([(42, 70), (11, 20), (4, 10)]))
+</text></testcode><stdin><text /></stdin><expected><text>0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(choisir([(5, 10), (0, 0), (3, 4)]))
+</text></testcode><stdin><text /></stdin><expected><text>1
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(choisir([(42, 70), (11, 20), (4, 10)], 0.0))
+</text></testcode><stdin><text /></stdin><expected><text>0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(round(sum(n for _, n in [(42, 70), (11, 20), (4, 10)]) / 100, 2), coup_final([(1, 3), (2, 3)]))
+</text></testcode><stdin><text /></stdin><expected><text>1.0 0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

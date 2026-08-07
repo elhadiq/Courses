@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Montee stricte</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;MONTEE STRICTE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Une solution est une liste d'entiers. Un voisin s'obtient en modifiant un seul element. On cherche a maximiser une fonction de notation.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;montee(depart, voisins, valeur)&lt;/code&gt;&lt;/strong&gt; qui renvoie le couple &lt;code&gt;(solution, nb_pas)&lt;/code&gt;, ou &lt;code&gt;solution&lt;/code&gt; est un optimum local et &lt;code&gt;nb_pas&lt;/code&gt; le nombre de deplacements effectues. &lt;code&gt;voisins(x)&lt;/code&gt; renvoie la liste des voisins de &lt;code&gt;x&lt;/code&gt;. A valeur egale, on ne se deplace pas. En cas d'egalite entre plusieurs meilleurs voisins, prendre le premier de la liste.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;montee(0, lambda x: [x - 1, x + 1], lambda x: -(x - 3) ** 2) &amp;rarr; (3, 3)&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def montee(depart, voisins, valeur):
+    # tant qu un voisin fait STRICTEMENT mieux, s y deplacer
+    # compter les deplacements ; a valeur egale, on s arrete
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def montee(depart, voisins, valeur):
+    x = depart
+    pas = 0
+    while True:
+        candidats = voisins(x)
+        if not candidats:
+            return (x, pas)
+        meilleur = candidats[0]
+        for v in candidats[1:]:
+            if valeur(v) &gt; valeur(meilleur):
+                meilleur = v
+        if valeur(meilleur) &lt;= valeur(x):
+            return (x, pas)
+        x = meilleur
+        pas += 1
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(montee(0, lambda x: [x - 1, x + 1], lambda x: -(x - 3) ** 2))
+</text></testcode><stdin><text /></stdin><expected><text>(3, 3)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(montee(10, lambda x: [x - 1, x + 1], lambda x: -(x - 3) ** 2))
+</text></testcode><stdin><text /></stdin><expected><text>(3, 7)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(montee(3, lambda x: [x - 1, x + 1], lambda x: -(x - 3) ** 2))
+</text></testcode><stdin><text /></stdin><expected><text>(3, 0)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>f = lambda x: [0, 1, 2, 3][x] if 0 &lt;= x &lt; 4 else 0
+print(montee(0, lambda x: [], f))
+</text></testcode><stdin><text /></stdin><expected><text>(0, 0)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>paysage = {0: 5, 1: 3, 2: 8, 3: 2, 4: 9}
+vois = lambda x: [y for y in (x - 1, x + 1) if y in paysage]
+print(montee(0, vois, lambda x: paysage[x]))
+</text></testcode><stdin><text /></stdin><expected><text>(0, 0)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Redemarrages aleatoires</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;REDEMARRAGES&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Une montee isolee s'arrete au premier sommet. La relancer depuis des points tires au hasard rend la methode complete avec probabilite 1.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;redemarrages(departs, voisins, valeur)&lt;/code&gt;&lt;/strong&gt; qui lance une montee stricte depuis chacun des points de &lt;code&gt;departs&lt;/code&gt; et renvoie le couple &lt;code&gt;(meilleure_solution, meilleure_valeur)&lt;/code&gt;. En cas d'egalite, garder la premiere trouvee. Ecrire aussi &lt;strong&gt;&lt;code&gt;proba_succes(p, n)&lt;/code&gt;&lt;/strong&gt; qui renvoie la probabilite d'au moins un succes en &lt;code&gt;n&lt;/code&gt; essais independants de probabilite &lt;code&gt;p&lt;/code&gt;, arrondie a 4 decimales.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;proba_succes(0.14, 7) &amp;rarr; 0.6521&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def montee(depart, voisins, valeur):
+    ...
+
+def redemarrages(departs, voisins, valeur):
+    # lancer une montee depuis chaque depart, garder le meilleur resultat
+    ...
+
+def proba_succes(p, n):
+    # probabilite d au moins un succes : 1 moins la probabilite de n echecs
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def montee(depart, voisins, valeur):
+    x = depart
+    while True:
+        candidats = voisins(x)
+        if not candidats:
+            return x
+        meilleur = candidats[0]
+        for v in candidats[1:]:
+            if valeur(v) &gt; valeur(meilleur):
+                meilleur = v
+        if valeur(meilleur) &lt;= valeur(x):
+            return x
+        x = meilleur
+
+def redemarrages(departs, voisins, valeur):
+    meilleur, meilleure = None, None
+    for d in departs:
+        x = montee(d, voisins, valeur)
+        if meilleure is None or valeur(x) &gt; meilleure:
+            meilleur, meilleure = x, valeur(x)
+    return (meilleur, meilleure)
+
+def proba_succes(p, n):
+    return round(1 - (1 - p) ** n, 4)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(proba_succes(0.14, 1), proba_succes(0.14, 7), proba_succes(0.14, 20))
+</text></testcode><stdin><text /></stdin><expected><text>0.14 0.6521 0.951
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>paysage = {0: 5, 1: 3, 2: 8, 3: 2, 4: 9, 5: 1}
+vois = lambda x: [y for y in (x - 1, x + 1) if y in paysage]
+print(redemarrages([0, 3], vois, lambda x: paysage[x]))
+</text></testcode><stdin><text /></stdin><expected><text>(4, 9)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>paysage = {0: 5, 1: 3, 2: 8, 3: 2, 4: 9, 5: 1}
+vois = lambda x: [y for y in (x - 1, x + 1) if y in paysage]
+print(redemarrages([0], vois, lambda x: paysage[x]))
+</text></testcode><stdin><text /></stdin><expected><text>(0, 5)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(proba_succes(0.5, 0), proba_succes(1.0, 1))
+</text></testcode><stdin><text /></stdin><expected><text>0.0 1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>paysage = {0: 1, 1: 1, 2: 1}
+vois = lambda x: [y for y in (x - 1, x + 1) if y in paysage]
+print(redemarrages([2, 0, 1], vois, lambda x: paysage[x]))
+</text></testcode><stdin><text /></stdin><expected><text>(2, 1)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — Critere de Metropolis</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;RECUIT SIMULE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Le recuit accepte une degradation avec une probabilite qui decroit avec l'ampleur de la degradation et avec la temperature.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;probabilite_acceptation(delta, T)&lt;/code&gt;&lt;/strong&gt; qui renvoie 1.0 si &lt;code&gt;delta &amp;gt; 0&lt;/code&gt;, 0.0 si &lt;code&gt;T &amp;lt;= 0&lt;/code&gt;, et &lt;code&gt;exp(delta / T)&lt;/code&gt; sinon, arrondi a 6 decimales. Ecrire ensuite &lt;strong&gt;&lt;code&gt;recuit(depart, voisin, valeur, T0, refroid, n_pas, tirages)&lt;/code&gt;&lt;/strong&gt; qui deroule le recuit de facon &lt;em&gt;deterministe&lt;/em&gt; : &lt;code&gt;voisin(x, k)&lt;/code&gt; donne le voisin propose a l'etape &lt;code&gt;k&lt;/code&gt;, et &lt;code&gt;tirages[k]&lt;/code&gt; est le nombre tire dans &lt;code&gt;[0, 1[&lt;/code&gt; a cette etape. La temperature vaut &lt;code&gt;T0 * refroid ** k&lt;/code&gt;. Renvoyer le couple &lt;code&gt;(meilleur, valeur(meilleur))&lt;/code&gt;.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;probabilite_acceptation(-7, 8) &amp;rarr; 0.416862&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>from math import exp
+
+def probabilite_acceptation(delta, T):
+    # amelioration : 1.0 ; temperature nulle : 0.0 ; sinon exp(delta / T)
+    ...
+
+def recuit(depart, voisin, valeur, T0, refroid, n_pas, tirages):
+    # memoriser SEPAREMENT le meilleur point rencontre
+    # accepter si delta &gt; 0, sinon si la probabilite depasse le tirage
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>from math import exp
+
+def probabilite_acceptation(delta, T):
+    if delta &gt; 0:
+        return 1.0
+    if T &lt;= 0:
+        return 0.0
+    return round(exp(delta / T), 6)
+
+def recuit(depart, voisin, valeur, T0, refroid, n_pas, tirages):
+    x = depart
+    meilleur = x
+    for k in range(n_pas):
+        T = T0 * refroid ** k
+        y = voisin(x, k)
+        delta = valeur(y) - valeur(x)
+        if delta &gt; 0:
+            x = y
+        elif probabilite_acceptation(delta, T) &gt; tirages[k]:
+            x = y
+        if valeur(x) &gt; valeur(meilleur):
+            meilleur = x
+    return (meilleur, valeur(meilleur))
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(probabilite_acceptation(4, 10), probabilite_acceptation(-7, 8))
+</text></testcode><stdin><text /></stdin><expected><text>1.0 0.416862
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(probabilite_acceptation(-22, 5.1), probabilite_acceptation(-3, 0))
+</text></testcode><stdin><text /></stdin><expected><text>0.013384 0.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>vals = {0: 40, 1: 44, 2: 37, 3: 52, 4: 30, 5: 49, 6: 55}
+suite = [1, 2, 3, 4, 5, 6]
+print(recuit(0, lambda x, k: suite[k], lambda x: vals[x],
+             10.0, 0.8, 6, [0.0, 0.31, 0.0, 0.66, 0.72, 0.0]))
+</text></testcode><stdin><text /></stdin><expected><text>(6, 55)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>vals = {0: 10, 1: 5, 2: 20}
+print(recuit(0, lambda x, k: [1, 2][k], lambda x: vals[x], 0.0, 0.9, 2, [0.5, 0.5]))
+</text></testcode><stdin><text /></stdin><expected><text>(2, 20)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>vals = {0: 10, 1: 5}
+print(recuit(0, lambda x, k: 1, lambda x: vals[x], 100.0, 0.9, 1, [0.0]))
+</text></testcode><stdin><text /></stdin><expected><text>(0, 10)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(probabilite_acceptation(0, 5))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q4 — Operateurs genetiques</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;CROISEMENT ET MUTATION&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Le croisement recombine ce qui existe deja dans la population ; seule la mutation peut reintroduire une valeur perdue.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;croiser(p1, p2, coupe)&lt;/code&gt;&lt;/strong&gt; qui renvoie la liste formee des &lt;code&gt;coupe&lt;/code&gt; premiers elements de &lt;code&gt;p1&lt;/code&gt; suivis du reste de &lt;code&gt;p2&lt;/code&gt;. Ecrire &lt;strong&gt;&lt;code&gt;muter(individu, positions)&lt;/code&gt;&lt;/strong&gt; qui renvoie une &lt;em&gt;nouvelle&lt;/em&gt; liste ou les bits des indices de &lt;code&gt;positions&lt;/code&gt; sont inverses. Ecrire enfin &lt;strong&gt;&lt;code&gt;tournoi(population, adaptation, i, j)&lt;/code&gt;&lt;/strong&gt; qui renvoie celui des individus d'indices &lt;code&gt;i&lt;/code&gt; et &lt;code&gt;j&lt;/code&gt; dont l'adaptation est la plus grande, en preferant &lt;code&gt;i&lt;/code&gt; a egalite.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;croiser([1,0,1,1,0,0,1,0], [0,1,1,0,1,1,0,1], 3) &amp;rarr; [1, 0, 1, 0, 1, 1, 0, 1]&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def croiser(p1, p2, coupe):
+    # prefixe de p1, suffixe de p2
+    ...
+
+def muter(individu, positions):
+    # NE PAS modifier la liste d origine : en construire une nouvelle
+    ...
+
+def tournoi(population, adaptation, i, j):
+    # le mieux adapte des deux, i a egalite
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def croiser(p1, p2, coupe):
+    return list(p1[:coupe]) + list(p2[coupe:])
+
+def muter(individu, positions):
+    resultat = list(individu)
+    for k in positions:
+        resultat[k] = 1 - resultat[k]
+    return resultat
+
+def tournoi(population, adaptation, i, j):
+    return population[i] if adaptation(population[i]) &gt;= adaptation(population[j]) else population[j]
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(croiser([1,0,1,1,0,0,1,0], [0,1,1,0,1,1,0,1], 3))
+</text></testcode><stdin><text /></stdin><expected><text>[1, 0, 1, 0, 1, 1, 0, 1]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>a = [1,0,1,0,1,1,0,1]
+print(muter(a, [3, 6]), a)
+</text></testcode><stdin><text /></stdin><expected><text>[1, 0, 1, 1, 1, 1, 1, 1] [1, 0, 1, 0, 1, 1, 0, 1]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pop = [[1,1,0], [0,0,1], [1,1,1]]
+print(tournoi(pop, sum, 0, 1), tournoi(pop, sum, 0, 2))
+</text></testcode><stdin><text /></stdin><expected><text>[1, 1, 0] [1, 1, 1]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(croiser([1,2,3], [4,5,6], 0), croiser([1,2,3], [4,5,6], 3))
+</text></testcode><stdin><text /></stdin><expected><text>[4, 5, 6] [1, 2, 3]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>pop = [[1,1], [1,1]]
+print(tournoi(pop, sum, 1, 0), muter([0,0], []))
+</text></testcode><stdin><text /></stdin><expected><text>[1, 1] [0, 0]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

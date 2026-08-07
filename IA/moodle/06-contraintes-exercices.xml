@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Coloration par retour sur trace</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;RETOUR SUR TRACE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Colorier les sommets d'un graphe de sorte que deux sommets voisins n'aient jamais la meme couleur, en fixant les sommets un par un et en revenant en arriere des qu'une contrainte est violee.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;colorier(graphe, couleurs)&lt;/code&gt;&lt;/strong&gt; qui renvoie un dictionnaire associant une couleur a chaque sommet, ou &lt;code&gt;None&lt;/code&gt; si aucune coloration n'existe. Les sommets sont traites dans l'ordre de &lt;code&gt;sorted(graphe)&lt;/code&gt; et les couleurs dans l'ordre de la liste fournie. &lt;code&gt;graphe&lt;/code&gt; est un dictionnaire associant a chaque sommet la liste de ses voisins.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;colorier({'A': ['B'], 'B': ['A']}, ['r', 'v']) &amp;rarr; {'A': 'r', 'B': 'v'}&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def colorier(graphe, couleurs):
+    sommets = sorted(graphe)
+    affectation = {}
+
+    def explorer(i):
+        # si toutes les variables sont affectees : succes
+        # sinon essayer chaque couleur compatible avec les voisins DEJA affectes
+        # en cas d'echec de l'appel recursif, defaire l'affectation
+        ...
+
+    return dict(affectation) if explorer(0) else None
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def colorier(graphe, couleurs):
+    sommets = sorted(graphe)
+    affectation = {}
+
+    def explorer(i):
+        if i == len(sommets):
+            return True
+        s = sommets[i]
+        for c in couleurs:
+            if all(affectation.get(v) != c for v in graphe[s]):
+                affectation[s] = c
+                if explorer(i + 1):
+                    return True
+                del affectation[s]
+        return False
+
+    return dict(affectation) if explorer(0) else None
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(colorier({'A': ['B'], 'B': ['A']}, ['r', 'v']))
+</text></testcode><stdin><text /></stdin><expected><text>{'A': 'r', 'B': 'v'}
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'A': ['B', 'C'], 'B': ['A', 'C'], 'C': ['A', 'B']}
+print(colorier(G, ['r', 'v']))
+</text></testcode><stdin><text /></stdin><expected><text>None
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'A': ['B', 'C'], 'B': ['A', 'C'], 'C': ['A', 'B']}
+print(colorier(G, ['r', 'v', 'b']))
+</text></testcode><stdin><text /></stdin><expected><text>{'A': 'r', 'B': 'v', 'C': 'b'}
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'WA': ['NT', 'SA'], 'NT': ['WA', 'SA', 'Q'], 'SA': ['WA', 'NT', 'Q', 'NSW', 'V'],
+     'Q': ['NT', 'SA', 'NSW'], 'NSW': ['SA', 'Q', 'V'], 'V': ['SA', 'NSW'], 'T': []}
+sol = colorier(G, ['r', 'v', 'b'])
+print(all(sol[u] != sol[w] for u in G for w in G[u]))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(colorier({'A': []}, []))
+</text></testcode><stdin><text /></stdin><expected><text>None
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Revision d'un arc</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;COHERENCE D'ARC&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Reviser l'arc (x, y) consiste a supprimer du domaine de x toute valeur qui n'admet aucun support dans le domaine de y.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;reviser(domaines, x, y, contrainte)&lt;/code&gt;&lt;/strong&gt; qui modifie &lt;code&gt;domaines[x]&lt;/code&gt; en place et renvoie &lt;code&gt;True&lt;/code&gt; si au moins une valeur a ete supprimee. &lt;code&gt;domaines&lt;/code&gt; est un dictionnaire de listes triees, &lt;code&gt;contrainte(a, b)&lt;/code&gt; vaut &lt;code&gt;True&lt;/code&gt; si le couple est autorise. L'ordre des valeurs restantes doit etre preserve.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;d = {'X': [1, 2, 3], 'Y': [1, 2, 3]}
+reviser(d, 'X', 'Y', lambda a, b: a &amp;lt; b) &amp;rarr; True, et d['X'] vaut [1, 2]&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def reviser(domaines, x, y, contrainte):
+    # garder les valeurs de domaines[x] qui ont au moins un support dans domaines[y]
+    # modifier domaines[x] EN PLACE (utiliser domaines[x][:] = ...)
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def reviser(domaines, x, y, contrainte):
+    garde = [a for a in domaines[x] if any(contrainte(a, b) for b in domaines[y])]
+    modifie = len(garde) != len(domaines[x])
+    domaines[x][:] = garde
+    return modifie
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>d = {'X': [1, 2, 3], 'Y': [1, 2, 3]}
+print(reviser(d, 'X', 'Y', lambda a, b: a &lt; b), d['X'])
+</text></testcode><stdin><text /></stdin><expected><text>True [1, 2]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>d = {'X': [1, 2, 3], 'Y': [1, 2, 3]}
+print(reviser(d, 'Y', 'X', lambda a, b: a &gt; b), d['Y'])
+</text></testcode><stdin><text /></stdin><expected><text>True [2, 3]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>d = {'X': [1, 2], 'Y': [5, 6]}
+print(reviser(d, 'X', 'Y', lambda a, b: a &lt; b), d['X'])
+</text></testcode><stdin><text /></stdin><expected><text>False [1, 2]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>d = {'X': [1, 2], 'Y': [1]}
+print(reviser(d, 'X', 'Y', lambda a, b: a != b), d['X'])
+</text></testcode><stdin><text /></stdin><expected><text>True [2]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>d = {'X': [1, 2], 'Y': []}
+print(reviser(d, 'X', 'Y', lambda a, b: True), d['X'])
+</text></testcode><stdin><text /></stdin><expected><text>True []
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — AC-3</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;PROPAGATION COMPLETE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;AC-3 rend tout le reseau coherent d'arc : chaque suppression remet en file les arcs qui pointaient vers la variable modifiee.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;ac3(domaines, arcs, contrainte)&lt;/code&gt;&lt;/strong&gt; qui rend les domaines coherents d'arc, en place, et renvoie &lt;code&gt;False&lt;/code&gt; si un domaine devient vide, &lt;code&gt;True&lt;/code&gt; sinon. &lt;code&gt;arcs&lt;/code&gt; est une liste de couples &lt;code&gt;(x, y)&lt;/code&gt; orientes ; &lt;code&gt;contrainte(x, a, y, b)&lt;/code&gt; vaut &lt;code&gt;True&lt;/code&gt; si le couple de valeurs est autorise pour cet arc. La file est traitee dans l'ordre d'arrivee.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;d = {'X': [1,2,3], 'Y': [1,2,3], 'Z': [1,2,3]}   avec X &amp;lt; Y et Y &amp;lt; Z
+apres ac3 : d vaut {'X': [1], 'Y': [2], 'Z': [3]}&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>from collections import deque
+
+def ac3(domaines, arcs, contrainte):
+    file = deque(arcs)
+    while file:
+        # depiler un arc, le reviser
+        # si une valeur a disparu : verifier le domaine vide,
+        # puis remettre en file tous les arcs pointant vers x (sauf celui vers y)
+        ...
+    return True
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>from collections import deque
+
+def ac3(domaines, arcs, contrainte):
+    file = deque(arcs)
+    while file:
+        x, y = file.popleft()
+        garde = [a for a in domaines[x]
+                 if any(contrainte(x, a, y, b) for b in domaines[y])]
+        if len(garde) != len(domaines[x]):
+            domaines[x][:] = garde
+            if not domaines[x]:
+                return False
+            for u, v in arcs:
+                if v == x and u != y:
+                    file.append((u, x))
+    return True
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>d = {'X': [1, 2, 3], 'Y': [1, 2, 3], 'Z': [1, 2, 3]}
+arcs = [('X', 'Y'), ('Y', 'X'), ('Y', 'Z'), ('Z', 'Y')]
+inf = {('X', 'Y'), ('Y', 'Z')}
+def c(x, a, y, b):
+    return a &lt; b if (x, y) in inf else a &gt; b
+print(ac3(d, arcs, c), d)
+</text></testcode><stdin><text /></stdin><expected><text>True {'X': [1], 'Y': [2], 'Z': [3]}
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>d = {'X': [1, 2], 'Y': [1, 2]}
+arcs = [('X', 'Y'), ('Y', 'X')]
+print(ac3(d, arcs, lambda x, a, y, b: a != b), d)
+</text></testcode><stdin><text /></stdin><expected><text>True {'X': [1, 2], 'Y': [1, 2]}
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>d = {'X': [1], 'Y': [1]}
+arcs = [('X', 'Y'), ('Y', 'X')]
+print(ac3(d, arcs, lambda x, a, y, b: a != b))
+</text></testcode><stdin><text /></stdin><expected><text>False
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>d = {'A': [1, 2, 3], 'B': [1, 2, 3], 'C': [1, 2, 3]}
+arcs = [(u, v) for u in 'ABC' for v in 'ABC' if u != v]
+print(ac3(d, arcs, lambda x, a, y, b: a != b), d['A'])
+</text></testcode><stdin><text /></stdin><expected><text>True [1, 2, 3]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>d = {'X': [1, 2, 3]}
+print(ac3(d, [], lambda x, a, y, b: False), d)
+</text></testcode><stdin><text /></stdin><expected><text>True {'X': [1, 2, 3]}
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q4 — Heuristique du domaine minimal</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;CHOIX DE VARIABLE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;A chaque etape du retour sur trace, on choisit la variable dont le domaine restant est le plus petit ; a egalite, celle qui a le plus de voisines non encore affectees.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;choisir_variable(domaines, voisins, affectation)&lt;/code&gt;&lt;/strong&gt; qui renvoie le nom de la prochaine variable a affecter, ou &lt;code&gt;None&lt;/code&gt; si toutes le sont. &lt;code&gt;domaines&lt;/code&gt; est un dictionnaire de listes, &lt;code&gt;voisins&lt;/code&gt; un dictionnaire de listes, &lt;code&gt;affectation&lt;/code&gt; un dictionnaire deja rempli. En cas d'egalite parfaite, renvoyer la premiere variable dans l'ordre alphabetique.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;choisir_variable({'A': [1, 2], 'B': [1], 'C': [1, 2, 3]}, {'A': ['B'], 'B': ['A'], 'C': []}, {}) &amp;rarr; 'B'&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def choisir_variable(domaines, voisins, affectation):
+    # variables encore libres, dans l'ordre alphabetique
+    # cle de tri : (taille du domaine, - nombre de voisines libres, nom)
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def choisir_variable(domaines, voisins, affectation):
+    libres = [v for v in sorted(domaines) if v not in affectation]
+    if not libres:
+        return None
+    def cle(v):
+        degre = sum(1 for u in voisins.get(v, []) if u not in affectation)
+        return (len(domaines[v]), -degre, v)
+    return min(libres, key=cle)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(choisir_variable({'A': [1, 2], 'B': [1], 'C': [1, 2, 3]},
+                       {'A': ['B'], 'B': ['A'], 'C': []}, {}))
+</text></testcode><stdin><text /></stdin><expected><text>B
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(choisir_variable({'A': [1, 2], 'B': [1, 2], 'C': [1, 2]},
+                       {'A': ['B'], 'B': ['A', 'C'], 'C': ['B']}, {}))
+</text></testcode><stdin><text /></stdin><expected><text>B
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(choisir_variable({'A': [1]}, {'A': []}, {'A': 1}))
+</text></testcode><stdin><text /></stdin><expected><text>None
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(choisir_variable({'A': [1, 2], 'B': [1, 2]}, {'A': ['B'], 'B': ['A']}, {'B': 1}))
+</text></testcode><stdin><text /></stdin><expected><text>A
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(choisir_variable({'Z': [1], 'A': [1]}, {'Z': [], 'A': []}, {}))
+</text></testcode><stdin><text /></stdin><expected><text>A
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q5 — Reparation par minimum de conflits</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;N REINES&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Une configuration place une reine par colonne. Deux reines sont en conflit si elles partagent une ligne ou une diagonale.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;conflits(pos, col)&lt;/code&gt;&lt;/strong&gt; qui renvoie le nombre de reines en conflit avec celle de la colonne &lt;code&gt;col&lt;/code&gt;, puis &lt;strong&gt;&lt;code&gt;meilleure_ligne(pos, col)&lt;/code&gt;&lt;/strong&gt; qui renvoie la plus petite ligne minimisant ce nombre, et enfin &lt;strong&gt;&lt;code&gt;total(pos)&lt;/code&gt;&lt;/strong&gt; qui renvoie le nombre de &lt;em&gt;paires&lt;/em&gt; de reines en conflit. &lt;code&gt;pos[j]&lt;/code&gt; est la ligne de la reine de la colonne &lt;code&gt;j&lt;/code&gt;, les lignes allant de 0 a n-1.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;conflits([0, 0, 2, 2], 0) &amp;rarr; 2
+meilleure_ligne([0, 0, 2, 2], 1) &amp;rarr; 3
+total([0, 0, 2, 2]) &amp;rarr; 4&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def conflits(pos, col):
+    # meme ligne ou meme diagonale : abs(pos[j] - pos[col]) == abs(j - col)
+    ...
+
+def meilleure_ligne(pos, col):
+    # essayer chaque ligne, restaurer la position d'origine avant de renvoyer
+    ...
+
+def total(pos):
+    # somme des conflits individuels, divisee par 2 : chaque paire est comptee deux fois
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def conflits(pos, col):
+    n = len(pos)
+    return sum(1 for j in range(n) if j != col and
+               (pos[j] == pos[col] or abs(pos[j] - pos[col]) == abs(j - col)))
+
+def meilleure_ligne(pos, col):
+    n = len(pos)
+    ancien = pos[col]
+    meilleur, ligne = None, ancien
+    for l in range(n):
+        pos[col] = l
+        c = conflits(pos, col)
+        if meilleur is None or c &lt; meilleur:
+            meilleur, ligne = c, l
+    pos[col] = ancien
+    return ligne
+
+def total(pos):
+    return sum(conflits(pos, j) for j in range(len(pos))) // 2
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(conflits([0, 0, 2, 2], 0), meilleure_ligne([0, 0, 2, 2], 1), total([0, 0, 2, 2]))
+</text></testcode><stdin><text /></stdin><expected><text>2 3 4
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(total([1, 3, 0, 2]))
+</text></testcode><stdin><text /></stdin><expected><text>0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(conflits([0, 1, 2, 3], 0), total([0, 1, 2, 3]))
+</text></testcode><stdin><text /></stdin><expected><text>3 6
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>p = [3, 1, 0, 2]
+print(total(p), [conflits(p, j) for j in range(4)])
+</text></testcode><stdin><text /></stdin><expected><text>1 [0, 1, 1, 0]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(meilleure_ligne([2, 0, 0, 0], 0), [2, 0, 0, 0])
+</text></testcode><stdin><text /></stdin><expected><text>1 [2, 0, 0, 0]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

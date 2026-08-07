@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introduction g&eacute;n&eacute;rale</title>
+<meta name="description" content="Introduction generale : boucle agent-environnement, carte des quatorze chapitres.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Ouverture</div>
+<h1>Introduction g&eacute;n&eacute;rale</h1>
+<div class="lesson-sub">Ce que recouvre le mot &laquo; intelligence artificielle &raquo;, comment ce manuel est organis&eacute;, et par quel bout le prendre.</div>
+</div></section>
+<main class="lesson-content">
+
+<h2>Pourquoi ce manuel</h2>
+
+<p>Peu de mots ont autant servi et aussi mal vieilli que celui d'<em>intelligence artificielle</em>. Il d&eacute;signe tour &agrave; tour un domaine de recherche vieux de soixante-dix ans, une famille de techniques statistiques, un argument commercial, et une inqui&eacute;tude collective. La confusion n'est pas seulement affaire de vocabulaire : elle emp&ecirc;che de voir que sous ce mot unique se cachent des probl&egrave;mes math&eacute;matiques distincts, chacun avec ses hypoth&egrave;ses, ses garanties et ses limites d&eacute;montr&eacute;es.</p>
+
+<p>Ce manuel prend le parti inverse du survol. Il traite quatorze chapitres, chacun centr&eacute; sur une classe de probl&egrave;mes pr&eacute;cise, avec &agrave; chaque fois la m&ecirc;me exigence : une d&eacute;finition, un algorithme, une preuve de ce qu'il garantit, une mesure de ce qu'il co&ucirc;te, et un exemple explicite de ce qu'il ne sait pas faire. Vous n'y trouverez ni promesse ni prophétie, mais des r&eacute;sultats datables et v&eacute;rifiables, cit&eacute;s &agrave; leur source d'origine.</p>
+
+<div class="box tip"><div class="box-title">Ce que vous saurez faire &agrave; la fin</div>
+<ul>
+<li>Reconna&icirc;tre &agrave; quelle classe de probl&egrave;mes appartient une t&acirc;che concr&egrave;te, et donc quelle famille d'algorithmes lui convient.</li>
+<li>Justifier qu'un algorithme rend une r&eacute;ponse correcte, qu'il s'arr&ecirc;te, et &agrave; quel prix.</li>
+<li>Distinguer une garantie math&eacute;matique d'une observation exp&eacute;rimentale, et une observation exp&eacute;rimentale d'une affirmation publicitaire.</li>
+<li>&Eacute;valuer un syst&egrave;me apprenant sans vous mentir &agrave; vous-m&ecirc;me.</li>
+</ul></div>
+
+<h2>Une seule id&eacute;e, quatorze fois</h2>
+
+<p>Tout le manuel s'organise autour d'un sch&eacute;ma unique : un <strong>agent</strong> per&ccedil;oit un <strong>environnement</strong> et agit sur lui, en cherchant &agrave; maximiser une mesure de performance. Ce que l'on appelle intelligence artificielle est l'ensemble des m&eacute;thodes permettant de calculer la fl&egrave;che du haut &mdash; l'action &mdash; &agrave; partir de la fl&egrave;che du bas &mdash; la perception.</p>
+
+<figure class="viz"><div class="viz-title">La boucle agent-environnement</div>
+<svg viewBox="0 0 760 300" role="img" style="width:100%;height:auto;display:block;"><rect x="70" y="90" width="230" height="120" rx="10" style="fill:var(--primary);fill-opacity:0.12;stroke:var(--primary);stroke-width:2.5;"/><text x="185" y="140" text-anchor="middle" style="fill:var(--primary);font-size:15px;font-weight:700;font-family:inherit;">AGENT</text><text x="185" y="168" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">ce que nous concevons</text><rect x="460" y="90" width="230" height="120" rx="10" style="fill:var(--viz-ref);fill-opacity:0.35;stroke:var(--viz-axis);stroke-width:2.5;"/><text x="575" y="140" text-anchor="middle" style="fill:var(--color-text);font-size:15px;font-weight:700;font-family:inherit;">ENVIRONNEMENT</text><text x="575" y="168" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">ce que nous subissons</text><path d="M 300 122 C 370 92, 400 92, 452 122" style="fill:none;stroke:var(--primary);stroke-width:3;"/><path d="M 444 112 L 460 122 L 442 130 Z" style="fill:var(--primary);"/><text x="378" y="86" text-anchor="middle" style="fill:var(--primary);font-size:13.5px;font-weight:700;font-family:inherit;">actions</text><path d="M 460 178 C 400 208, 370 208, 302 178" style="fill:none;stroke:var(--accent);stroke-width:3;"/><path d="M 316 170 L 298 178 L 316 188 Z" style="fill:var(--accent);"/><text x="378" y="228" text-anchor="middle" style="fill:var(--accent);font-size:13.5px;font-weight:700;font-family:inherit;">percepts</text><text x="380" y="42" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">toute la mati&egrave;re de ce manuel tient dans cette boucle</text><text x="380" y="272" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">chercher, raisonner, apprendre : trois fa&ccedil;ons de choisir la fl&egrave;che du haut &agrave; partir de celle du bas</text></svg>
+<figcaption class="viz-caption"><strong>Figure 0.1.</strong> Cette boucle est la seule structure commune &agrave; tous les chapitres. Ce qui change d'un chapitre &agrave; l'autre, c'est la nature de l'environnement (connu ou non, d&eacute;terministe ou al&eacute;atoire, seul ou avec un adversaire) et la fa&ccedil;on dont l'agent d&eacute;cide.</figcaption></figure>
+
+<p>Trois grandes r&eacute;ponses ont &eacute;t&eacute; apport&eacute;es &agrave; cette question, et elles structurent le manuel.</p>
+
+<table>
+<thead><tr><th>R&eacute;ponse</th><th>Hypoth&egrave;se de d&eacute;part</th><th>Ce qu'elle calcule</th><th>Chapitres</th></tr></thead>
+<tbody>
+<tr><td><strong>Chercher</strong></td><td>Le monde est connu et se d&eacute;crit par des &eacute;tats et des transitions</td><td>Une suite d'actions menant &agrave; un &eacute;tat souhait&eacute;</td><td>3 &agrave; 6</td></tr>
+<tr><td><strong>Raisonner</strong></td><td>Le monde se d&eacute;crit par des &eacute;nonc&eacute;s, certains ou probables</td><td>Ce qui d&eacute;coule logiquement ou probabilistiquement de ce que l'on sait</td><td>7 et 8</td></tr>
+<tr><td><strong>Apprendre</strong></td><td>Le monde n'est pas connu, mais on dispose d'exemples de son comportement</td><td>Une fonction qui g&eacute;n&eacute;ralise &agrave; des cas jamais vus</td><td>9 &agrave; 13</td></tr>
+</tbody></table>
+
+<p>Ces trois r&eacute;ponses ne se sont pas succ&eacute;d&eacute; en se rempla&ccedil;ant : elles coexistent, et les syst&egrave;mes qui fonctionnent le mieux aujourd'hui les combinent. Le programme qui a battu les meilleurs joueurs de go associe une recherche arborescente du chapitre 5 &agrave; des r&eacute;seaux appris du chapitre 11 ; un solveur de contraintes industriel combine la propagation du chapitre 6 &agrave; des heuristiques statistiques.</p>
+
+<h2>Comment le manuel est b&acirc;ti</h2>
+
+<figure class="viz"><div class="viz-title">Les cinq parties</div>
+<svg viewBox="0 0 760 278" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Cinq parties, quatorze chapitres : la difficult&eacute; du probl&egrave;me monte de gauche &agrave; droite</text><rect x="14.0" y="62.0" width="148.6" height="104.0" rx="9" style="fill:var(--primary);fill-opacity:0.07;stroke:var(--primary);stroke-width:2;"/><text x="88.3" y="84.0" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;font-family:inherit;letter-spacing:0.8px;">Partie I</text><text x="88.3" y="103.0" text-anchor="middle" style="fill:var(--color-text);font-size:12.5px;font-weight:700;font-family:inherit;">Fondements</text><text x="88.3" y="124.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">1 &mdash; Qu'est-ce que l'IA ?</text><text x="88.3" y="148.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">2 &mdash; Agents et environnements</text><path d="M 165.6 114.0 L 169.7 114.0" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 166.7 109.0 L 176.7 114.0 L 166.7 119.0 Z" style="fill:var(--viz-axis);"/><rect x="178.7" y="62.0" width="135.6" height="152.0" rx="9" style="fill:var(--primary);fill-opacity:0.10;stroke:var(--primary);stroke-width:2;"/><text x="246.5" y="84.0" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;font-family:inherit;letter-spacing:0.8px;">Partie II</text><text x="246.5" y="103.0" text-anchor="middle" style="fill:var(--color-text);font-size:12.5px;font-weight:700;font-family:inherit;">R&eacute;soudre en cherchant</text><text x="246.5" y="124.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">3 &mdash; Recherche d'&eacute;tats</text><text x="246.5" y="148.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">4 &mdash; M&eacute;taheuristiques</text><text x="246.5" y="172.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">5 &mdash; Jeux &agrave; deux joueurs</text><text x="246.5" y="196.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">6 &mdash; Contraintes</text><path d="M 317.3 138.0 L 321.4 138.0" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 318.4 133.0 L 328.4 138.0 L 318.4 143.0 Z" style="fill:var(--viz-axis);"/><rect x="330.4" y="62.0" width="147.5" height="104.0" rx="9" style="fill:var(--primary);fill-opacity:0.13;stroke:var(--primary);stroke-width:2;"/><text x="404.1" y="84.0" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;font-family:inherit;letter-spacing:0.8px;">Partie III</text><text x="404.1" y="103.0" text-anchor="middle" style="fill:var(--color-text);font-size:12.5px;font-weight:700;font-family:inherit;">Repr&eacute;senter et raisonner</text><text x="404.1" y="124.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">7 &mdash; Logique et SAT</text><text x="404.1" y="148.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">8 &mdash; Probabilit&eacute;s</text><path d="M 480.9 114.0 L 485.0 114.0" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 482.0 109.0 L 492.0 114.0 L 482.0 119.0 Z" style="fill:var(--viz-axis);"/><rect x="494.0" y="62.0" width="134.2" height="152.0" rx="9" style="fill:var(--primary);fill-opacity:0.16;stroke:var(--primary);stroke-width:2;"/><text x="561.1" y="84.0" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;font-family:inherit;letter-spacing:0.8px;">Partie IV</text><text x="561.1" y="103.0" text-anchor="middle" style="fill:var(--color-text);font-size:12.5px;font-weight:700;font-family:inherit;">Apprendre</text><text x="561.1" y="124.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">9 &mdash; Supervis&eacute;</text><text x="561.1" y="148.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">10 &mdash; Non supervis&eacute;</text><text x="561.1" y="172.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">11 &mdash; R&eacute;seaux de neurones</text><text x="561.1" y="196.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">12 &mdash; Renforcement</text><path d="M 631.2 138.0 L 635.3 138.0" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 632.3 133.0 L 642.3 138.0 L 632.3 143.0 Z" style="fill:var(--viz-axis);"/><rect x="644.3" y="62.0" width="101.7" height="104.0" rx="9" style="fill:var(--primary);fill-opacity:0.19;stroke:var(--primary);stroke-width:2;"/><text x="695.1" y="84.0" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;font-family:inherit;letter-spacing:0.8px;">Partie V</text><text x="695.1" y="103.0" text-anchor="middle" style="fill:var(--color-text);font-size:12.5px;font-weight:700;font-family:inherit;">Aujourd'hui</text><text x="695.1" y="124.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">13 &mdash; IA g&eacute;n&eacute;rative</text><text x="695.1" y="148.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">14 &mdash; &Eacute;thique</text><text x="380" y="242" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Les parties II et III supposent la connaissance du monde <tspan style="font-weight:700;">donn&eacute;e</tspan> ; la partie IV la fait <tspan style="font-weight:700;">apprendre</tspan>.</text><text x="380" y="264" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Chaque chapitre est lisible seul, mais l'ordre construit un vocabulaire commun.</text></svg>
+<figcaption class="viz-caption"><strong>Figure 0.2.</strong> L'ordre n'est pas chronologique mais logique : chaque partie l&egrave;ve une hypoth&egrave;se que la pr&eacute;c&eacute;dente faisait. La partie II suppose le monde enti&egrave;rement connu ; la partie III accepte l'incertitude ; la partie IV renonce &agrave; conna&icirc;tre le monde et se contente d'exemples.</figcaption></figure>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Passez la souris sur un chapitre : ses pr&eacute;requis s'allument en fonc&eacute;, les chapitres qu'il rend accessibles en clair. Un clic ouvre le chapitre.</p>
+<div id="jxg1" class="viz-board" style="height:480px;"></div>
+<p class="viz-caption"><strong>Figure 0.3.</strong> Le graphe des d&eacute;pendances, parcourable &agrave; la souris. Il est presque lin&eacute;aire, ce qui est voulu : chaque chapitre r&eacute;utilise le vocabulaire du pr&eacute;c&eacute;dent. Deux exceptions m&eacute;ritent l'attention : le chapitre 12 a besoin &agrave; la fois du raisonnement probabiliste et des r&eacute;seaux de neurones, et le chapitre 14 ne se comprend qu'une fois que l'on sait comment les mod&egrave;les des chapitres 9 &agrave; 13 sont r&eacute;ellement construits.</p></div>
+
+<h3>La structure d'un chapitre</h3>
+
+<p>Chaque chapitre suit le m&ecirc;me d&eacute;coupage, pour que vous sachiez toujours o&ugrave; chercher.</p>
+
+<ul>
+<li>Une <strong>d&eacute;finition formelle</strong> du probl&egrave;me, dans un encadr&eacute; bleu.</li>
+<li>Des <strong>th&eacute;or&egrave;mes</strong> et leurs preuves, dans un encadr&eacute; vert : ce sont les garanties, et elles sont ce qui distingue une m&eacute;thode d'une recette.</li>
+<li>Des <strong>encadr&eacute;s d'avertissement</strong> orange, qui recensent les erreurs que l'on commet r&eacute;ellement.</li>
+<li>Un ou plusieurs <strong>pseudo-codes</strong>, ind&eacute;pendants de tout langage de programmation.</li>
+<li>Des <strong>figures interactives</strong>, &agrave; manipuler et non &agrave; regarder : un chapitre lu sans toucher aux curseurs n'est lu qu'&agrave; moiti&eacute;.</li>
+<li>Une <strong>analyse</strong> de correction, de terminaison et de complexit&eacute;.</li>
+<li>Une <strong>synth&egrave;se</strong> et une <strong>bibliographie</strong> renvoyant aux articles d'origine.</li>
+</ul>
+
+<div class="box method"><div class="box-title">Le pseudo-code, et pourquoi pas de programme</div>
+<p>Les chapitres n'exposent jamais de programme dans un langage particulier. Un algorithme n'est pas un texte de programme : c'est une m&eacute;thode, et un programme n'en est qu'une r&eacute;alisation possible. Le pseudo-code employ&eacute; ici se lit &agrave; voix haute et se transpose dans n'importe quel langage. Sa convention est minimale : la fl&egrave;che <code>&lt;-</code> se lit &laquo; re&ccedil;oit &raquo;, les mots-cl&eacute;s sont en gras, les commentaires apr&egrave;s deux barres obliques sont en italique.</p>
+<p>La programmation effective a sa place, mais ailleurs : dans les exercices auto-not&eacute;s, o&ugrave; elle est test&eacute;e plut&ocirc;t que contempl&eacute;e.</p></div>
+
+<div class="box method"><div class="box-title">L'annexe algorithmique</div>
+Chaque chapitre est doubl&eacute; d'une annexe qui reprend ses quatre ou cinq algorithmes centraux, sans la moindre notation : ce qu'ils re&ccedil;oivent, ce qu'ils produisent, leurs &eacute;tapes dans l'ordre o&ugrave; on les ex&eacute;cuterait &agrave; la main, un exemple d&eacute;roul&eacute; en tableau avec de vrais nombres, puis pourquoi la r&eacute;ponse est correcte, pourquoi la proc&eacute;dure s'arr&ecirc;te, ce qu'elle co&ucirc;te et o&ugrave; elle se casse. C'est l&agrave; qu'il faut aller quand une formule r&eacute;siste.</div>
+
+<h2>Comment travailler</h2>
+
+<p>Le manuel se lit dans l'ordre, mais il se <em>travaille</em> en trois passages successifs sur chaque chapitre, et l'exp&eacute;rience montre que sauter le deuxi&egrave;me est ce qui co&ucirc;te le plus cher.</p>
+
+<table>
+<thead><tr><th>Passage</th><th>Ce que l'on fait</th><th>Comment savoir que c'est acquis</th></tr></thead>
+<tbody>
+<tr><td>1. Lire</td><td>Lire le chapitre en manipulant chaque figure interactive, sans rien noter</td><td>Vous pouvez expliquer &agrave; quelqu'un ce que r&eacute;sout le chapitre et pourquoi c'est difficile</td></tr>
+<tr><td>2. D&eacute;rouler</td><td>Refaire &agrave; la main, sur papier et sans regarder, les tableaux d&eacute;roul&eacute;s de l'annexe</td><td>Vos tableaux co&iuml;ncident avec ceux du manuel, ligne par ligne</td></tr>
+<tr><td>3. Programmer</td><td>Traiter les exercices auto-not&eacute;s associ&eacute;s</td><td>Les cas de test cach&eacute;s passent, pas seulement les exemples</td></tr>
+</tbody></table>
+
+<div class="box warn"><div class="box-title">Un pi&egrave;ge de m&eacute;thode</div>
+La sensation de comprendre en lisant est trompeuse, particuli&egrave;rement dans ce domaine o&ugrave; les id&eacute;es sont simples et les d&eacute;tails f&eacute;roces. Le test honn&ecirc;te n'est pas &laquo; est-ce que je comprends ? &raquo; mais &laquo; suis-je capable de d&eacute;rouler l'algorithme &agrave; la main sur un exemple que je n'ai jamais vu ? &raquo;. C'est pour cela que chaque annexe propose un exemple v&eacute;rifiable de t&ecirc;te : il est fait pour &ecirc;tre refait, pas pour &ecirc;tre lu.</div>
+
+<h2>Ce que ce manuel ne fait pas</h2>
+
+<p>Trois honn&ecirc;tet&eacute;s valent mieux qu'une promesse.</p>
+
+<p><strong>Il ne pr&eacute;dit pas l'avenir.</strong> L'histoire du domaine, racont&eacute;e au chapitre 1, est une succession de pr&eacute;dictions confiantes et fausses, dans les deux sens. Nous nous en tiendrons &agrave; ce qui est &eacute;tabli.</p>
+
+<p><strong>Il ne traite pas l'ing&eacute;nierie des grands syst&egrave;mes.</strong> Entra&icirc;ner un mod&egrave;le sur des milliers de processeurs, servir des millions de requ&ecirc;tes, industrialiser un flux de donn&eacute;es : ce sont des m&eacute;tiers, et ils supposent d'abord de conna&icirc;tre les principes expos&eacute;s ici.</p>
+
+<p><strong>Il ne remplace pas les math&eacute;matiques.</strong> Probabilit&eacute;s, alg&egrave;bre lin&eacute;aire et analyse ne sont pas des outils annexes de ce domaine : ce sont sa langue. Les chapitres 8 et 11 le rendront tr&egrave;s concret.</p>
+
+<div class="box example"><div class="box-title">Par o&ugrave; commencer si vous &ecirc;tes press&eacute;</div>
+Le chapitre 1 pour comprendre de quoi on parle, le chapitre 3 pour le premier algorithme non trivial, le chapitre 9 pour le c&oelig;ur de ce que l'on appelle aujourd'hui IA, et le chapitre 14 pour savoir ce qui se joue. Les quatre se lisent en une soir&eacute;e chacun. Mais la figure interactive ci-dessus vous dira exactement ce qu'il vous manque pour aborder un chapitre pr&eacute;cis.</div>
+
+<h2>Sources</h2>
+<p>Les r&eacute;f&eacute;rences g&eacute;n&eacute;rales du manuel sont r&eacute;unies ici ; chaque chapitre ajoute les siennes, propres &agrave; son sujet.</p>
+<ol class="reflist">
+<li id="ref-russell2020">Russell, S. &amp; Norvig, P. (2020). <em>Artificial Intelligence: A Modern Approach</em> (4<sup>e</sup> &eacute;dition). Pearson. ISBN 978-0-13-461099-3. <a href="https://aima.cs.berkeley.edu/">https://aima.cs.berkeley.edu/</a></li>
+<li id="ref-nilsson2009">Nilsson, N. J. (2009). <em>The Quest for Artificial Intelligence: A History of Ideas and Achievements</em>. Cambridge University Press. DOI&nbsp;: 10.1017/CBO9780511819346. <a href="https://doi.org/10.1017/CBO9780511819346">https://doi.org/10.1017/CBO9780511819346</a></li>
+<li id="ref-turing1950">Turing, A. M. (1950). Computing machinery and intelligence. <em>Mind</em>, LIX(236), 433&ndash;460. DOI&nbsp;: 10.1093/mind/LIX.236.433. <a href="https://doi.org/10.1093/mind/LIX.236.433">https://doi.org/10.1093/mind/LIX.236.433</a></li>
+</ol>
+<p>Le sch&eacute;ma agent-environnement et le d&eacute;coupage en probl&egrave;mes de recherche, de raisonnement et d'apprentissage suivent l'organisation devenue standard depuis Russell et Norvig <a class="cite" href="#ref-russell2020">[1]</a> ; l'histoire d&eacute;taill&eacute;e du domaine est celle de Nilsson <a class="cite" href="#ref-nilsson2009">[2]</a>, et le texte fondateur reste celui de Turing <a class="cite" href="#ref-turing1950">[3]</a>.</p>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../../index.html">Sommaire du manuel</a>
+<a href="../01-qu-est-ce-que-l-ia/page.html">Chapitre 1 &mdash; Qu'est-ce que l'IA ? \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">La figure interactive n\'a pas pu etre chargee. Verifiez votre connexion reseau.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ====== Carte interactive du manuel : chapitres cliquables a la souris ===== */
+var CHAPS = [
+  {n:1,  t:'Qu’est-ce que l’IA ?',       p:[],     c:0, x:0.55, y:4.35, d:'01-qu-est-ce-que-l-ia'},
+  {n:2,  t:'Agents',                     p:[1],    c:0, x:0.55, y:3.15, d:'02-agents'},
+  {n:3,  t:'Recherche d’états',          p:[2],    c:1, x:2.75, y:4.65, d:'03-recherche'},
+  {n:4,  t:'Métaheuristiques',           p:[3],    c:1, x:2.75, y:3.45, d:'04-metaheuristiques'},
+  {n:5,  t:'Jeux',                       p:[3],    c:1, x:2.75, y:2.25, d:'05-jeux'},
+  {n:6,  t:'Contraintes',                p:[3],    c:1, x:2.75, y:1.05, d:'06-contraintes'},
+  {n:7,  t:'Logique',                    p:[6],    c:2, x:4.95, y:4.05, d:'07-logique'},
+  {n:8,  t:'Probabilités',               p:[7],    c:2, x:4.95, y:2.85, d:'08-probabiliste'},
+  {n:9,  t:'Supervisé',                  p:[8],    c:3, x:7.15, y:4.65, d:'09-apprentissage'},
+  {n:10, t:'Non supervisé',              p:[9],    c:3, x:7.15, y:3.45, d:'10-non-supervise'},
+  {n:11, t:'Réseaux de neurones',        p:[9],    c:3, x:7.15, y:2.25, d:'11-reseaux-neurones'},
+  {n:12, t:'Renforcement',               p:[8,11], c:3, x:7.15, y:1.05, d:'12-renforcement'},
+  {n:13, t:'IA générative',              p:[11],   c:4, x:9.35, y:3.45, d:'13-generative'},
+  {n:14, t:'Éthique',                    p:[13],   c:4, x:9.35, y:2.25, d:'14-ethique'}
+];
+var PARTIES = ['I. Fondements', 'II. Chercher', 'III. Raisonner', 'IV. Apprendre', 'V. Aujourd’hui'];
+var COLX = [0.55, 2.75, 4.95, 7.15, 9.35];
+var COL = ['--primary', '--viz-blue', '--accent', '--viz-ok', '--viz-cmp'];
+var DEMI_L = 0.86, DEMI_H = 0.40;
+
+/* Chapitre designe par le curseur ; a defaut, le premier du manuel. */
+var SURVOL = 0;
+function courant(){ return SURVOL || 1; }
+
+function fiche(n){
+  for (var i = 0; i < CHAPS.length; i++){ if (CHAPS[i].n === n) { return CHAPS[i]; } }
+  return null;
+}
+function amont(n){
+  var vus = {}, pile = [n];
+  while (pile.length){
+    var m = pile.pop();
+    if (vus[m]) { continue; }
+    vus[m] = true;
+    var f = fiche(m);
+    for (var i = 0; i < f.p.length; i++){ pile.push(f.p[i]); }
+  }
+  return vus;
+}
+function aval(n){
+  var vus = {}, change = true;
+  vus[n] = true;
+  while (change){
+    change = false;
+    for (var i = 0; i < CHAPS.length; i++){
+      if (vus[CHAPS[i].n]) { continue; }
+      for (var k = 0; k < CHAPS[i].p.length; k++){
+        if (vus[CHAPS[i].p[k]]) { vus[CHAPS[i].n] = true; change = true; }
+      }
+    }
+  }
+  return vus;
+}
+var CACHE_A = {}, CACHE_V = {};
+function etat(n){
+  var c = courant();
+  if (n === c) { return 2; }
+  if (!(c in CACHE_A)) { CACHE_A[c] = amont(c); CACHE_V[c] = aval(c); }
+  if (CACHE_A[c][n]) { return 1; }      /* prerequis */
+  return CACHE_V[c][n] ? 3 : 0;         /* accessible ensuite, ou sans lien direct */
+}
+
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-0.95, 6.15, 11.4, -0.85], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+
+/* ---- aretes de prerequis */
+for (var i = 0; i < CHAPS.length; i++){
+  for (var k = 0; k < CHAPS[i].p.length; k++){
+    (function(dest, src){
+      var a = fiche(src), b = fiche(dest);
+      b1.create('segment', [[a.x + DEMI_L, a.y], [b.x - DEMI_L, b.y]], {
+        strokeColor: function(){
+          var ea = etat(src), eb = etat(dest);
+          return (ea <= 2 && eb <= 2 && (ea === 2 || eb === 2 || (ea === 1 && eb === 1)))
+                 ? cssv('--primary', '#026573') : PAL.ref();
+        },
+        strokeWidth: function(){
+          var ea = etat(src), eb = etat(dest);
+          return (ea <= 2 && eb <= 2 && (ea === 2 || eb === 2 || (ea === 1 && eb === 1))) ? 3 : 1.3;
+        },
+        straightFirst: false, straightLast: false, highlight: false, fixed: true});
+    })(CHAPS[i].n, CHAPS[i].p[k]);
+  }
+}
+
+/* ---- boites de chapitre, sensibles a la souris */
+for (var i = 0; i < CHAPS.length; i++){
+  (function(f){
+    var boite = b1.create('polygon', [
+      [f.x - DEMI_L, f.y - DEMI_H], [f.x + DEMI_L, f.y - DEMI_H],
+      [f.x + DEMI_L, f.y + DEMI_H], [f.x - DEMI_L, f.y + DEMI_H]], {
+      withLines: true, vertices: {visible: false, fixed: true},
+      borders: {
+        strokeColor: function(){
+          var e = etat(f.n);
+          return (e === 2 || e === 1) ? cssv('--primary', '#026573') : PAL.axis(); },
+        strokeWidth: function(){ return etat(f.n) === 2 ? 3.2 : 1.5; },
+        highlight: false, fixed: true},
+      fillColor: function(){ return cssv(COL[f.c], '#026573'); },
+      fillOpacity: function(){
+        var e = etat(f.n);
+        return e === 2 ? 0.9 : (e === 1 ? 0.34 : (e === 3 ? 0.14 : 0.05));
+      },
+      highlightFillOpacity: function(){
+        var e = etat(f.n);
+        return e === 2 ? 0.9 : (e === 1 ? 0.34 : (e === 3 ? 0.14 : 0.05));
+      },
+      fixed: true, hasInnerPoints: true, highlight: true
+    });
+    /* survol : le curseur designe le chapitre et allume ses prerequis */
+    boite.on('over', function(){ SURVOL = f.n; b1.update(); });
+    boite.on('out',  function(){ if (SURVOL === f.n) { SURVOL = 0; b1.update(); } });
+    /* clic : ouverture du chapitre */
+    boite.on('down', function(){ window.location.href = '../' + f.d + '/page.html'; });
+    b1.create('text', [f.x, f.y + 0.11, String(f.n)], {
+      fontSize: 15, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+      cssStyle: 'pointer-events:none;',
+      strokeColor: function(){ return etat(f.n) === 2 ? PAL.bg() : PAL.text(); }});
+    b1.create('text', [f.x, f.y - 0.16, f.t], {
+      fontSize: 9.5, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+      cssStyle: 'pointer-events:none;',
+      strokeColor: function(){ return etat(f.n) === 2 ? PAL.bg() : PAL.muted(); }});
+  })(CHAPS[i]);
+}
+for (var i = 0; i < 5; i++){
+  (function(k){
+    b1.create('text', [COLX[k], 5.55, PARTIES[k]], {
+      fontSize: 12, anchorX: 'middle', fixed: true, highlight: false,
+      strokeColor: function(){ return cssv(COL[k], '#026573'); }});
+  })(i);
+}
+b1.create('text', [-0.9, 6.05, function(){
+  var f = fiche(courant());
+  return 'Chapitre ' + f.n + ' : ' + f.t
+       + (SURVOL ? '   —  cliquez pour l’ouvrir' : '   —  passez la souris sur un chapitre');
+}], {fontSize: 14, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-0.9, -0.35, function(){
+  var pre = [], suite = [];
+  for (var i = 0; i < CHAPS.length; i++){
+    if (etat(CHAPS[i].n) === 1) { pre.push(CHAPS[i].n); }
+    if (etat(CHAPS[i].n) === 3) { suite.push(CHAPS[i].n); }
+  }
+  pre.sort(function(a,b){ return a-b; }); suite.sort(function(a,b){ return a-b; });
+  return 'A lire avant : ' + (pre.length ? pre.join(', ') : 'rien')
+       + '   |   ouvre la voie a : ' + (suite.length ? suite.join(', ') : 'rien')
+       + '   |   chemin le plus court : ' + (pre.length + 1) + ' chapitres';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-0.9, -0.72,
+  'Survolez un chapitre : ses prerequis s’allument en fonce, les chapitres qu’il rend accessibles en clair. Cliquez pour l’ouvrir.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update();
+
+})();
+</script>
+</body></html>

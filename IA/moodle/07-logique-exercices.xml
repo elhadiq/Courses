@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Consequence logique par enumeration</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;ENUMERATION DES MODELES&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Une formule est representee par une fonction Python qui prend un dictionnaire d'interpretation et renvoie un booleen.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;modeles(variables, formule)&lt;/code&gt;&lt;/strong&gt; qui renvoie la liste triee des interpretations satisfaisant &lt;code&gt;formule&lt;/code&gt;, chacune donnee comme un tuple de booleens dans l'ordre de &lt;code&gt;variables&lt;/code&gt;. Ecrire ensuite &lt;strong&gt;&lt;code&gt;consequence(variables, base, question)&lt;/code&gt;&lt;/strong&gt; qui renvoie &lt;code&gt;True&lt;/code&gt; si tout modele de &lt;code&gt;base&lt;/code&gt; est un modele de &lt;code&gt;question&lt;/code&gt;.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;consequence(['p','m'], lambda i: (not i['p'] or i['m']) and not i['m'],
+            lambda i: not i['p']) &amp;rarr; True&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>from itertools import product
+
+def modeles(variables, formule):
+    # parcourir toutes les affectations de booleens
+    ...
+
+def consequence(variables, base, question):
+    # chercher un CONTRE-EXEMPLE : base vraie et question fausse
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>from itertools import product
+
+def modeles(variables, formule):
+    res = []
+    for valeurs in product([False, True], repeat=len(variables)):
+        interp = dict(zip(variables, valeurs))
+        if formule(interp):
+            res.append(valeurs)
+    return sorted(res)
+
+def consequence(variables, base, question):
+    for valeurs in product([False, True], repeat=len(variables)):
+        interp = dict(zip(variables, valeurs))
+        if base(interp) and not question(interp):
+            return False
+    return True
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(consequence(['p','m'], lambda i: (not i['p'] or i['m']) and not i['m'],
+                  lambda i: not i['p']))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(modeles(['p','q'], lambda i: i['p'] or i['q']))
+</text></testcode><stdin><text /></stdin><expected><text>[(False, True), (True, False), (True, True)]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(consequence(['p'], lambda i: True, lambda i: i['p']))
+</text></testcode><stdin><text /></stdin><expected><text>False
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(modeles(['p'], lambda i: i['p'] and not i['p']))
+</text></testcode><stdin><text /></stdin><expected><text>[]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(consequence(['p','q'], lambda i: i['p'] and i['q'], lambda i: i['p'] or i['q']))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Resolution propositionnelle</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;RESOLUTION&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Une clause est un ensemble de litteraux ; un litteral est un entier non nul, negatif pour une negation. La clause vide est fausse partout.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;resolvante(c1, c2, litteral)&lt;/code&gt;&lt;/strong&gt; qui renvoie la clause obtenue en resolvant &lt;code&gt;c1&lt;/code&gt; et &lt;code&gt;c2&lt;/code&gt; sur &lt;code&gt;litteral&lt;/code&gt;, ou &lt;code&gt;None&lt;/code&gt; si la resolution est impossible. Ecrire ensuite &lt;strong&gt;&lt;code&gt;refuter(clauses)&lt;/code&gt;&lt;/strong&gt; qui renvoie &lt;code&gt;True&lt;/code&gt; si la clause vide se derive, en saturant l'ensemble.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;resolvante({-1, 2}, {1}, 1) &amp;rarr; {2}
+refuter([{-1, 2}, {-2}, {1}]) &amp;rarr; True&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def resolvante(c1, c2, litteral):
+    # le litteral doit figurer dans l une et son oppose dans l autre
+    # la resolvante est l union privee des deux
+    ...
+
+def refuter(clauses):
+    # saturer : produire toutes les resolvantes jusqu a la clause vide
+    # ou jusqu a ce qu aucune clause nouvelle n apparaisse
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def resolvante(c1, c2, litteral):
+    if litteral in c1 and -litteral in c2:
+        a, b = c1, c2
+    elif -litteral in c1 and litteral in c2:
+        a, b = c2, c1
+    else:
+        return None
+    return (a - {litteral}) | (b - {-litteral})
+
+def refuter(clauses):
+    connues = [frozenset(c) for c in clauses]
+    vues = set(connues)
+    while True:
+        nouvelles = []
+        for i in range(len(connues)):
+            for j in range(i + 1, len(connues)):
+                for l in connues[i]:
+                    if -l in connues[j]:
+                        r = resolvante(set(connues[i]), set(connues[j]), l)
+                        if r is None:
+                            continue
+                        if not r:
+                            return True
+                        f = frozenset(r)
+                        if f not in vues:
+                            vues.add(f)
+                            nouvelles.append(f)
+        if not nouvelles:
+            return False
+        connues = connues + nouvelles
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(sorted(resolvante({-1, 2}, {1}, 1)))
+</text></testcode><stdin><text /></stdin><expected><text>[2]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(refuter([{-1, 2}, {-2}, {1}]))
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(refuter([{1, 2}, {-1}]))
+</text></testcode><stdin><text /></stdin><expected><text>False
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(resolvante({1, 2}, {3, 4}, 1))
+</text></testcode><stdin><text /></stdin><expected><text>None
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(refuter([{1}, {-1}]), refuter([{1, 2}]))
+</text></testcode><stdin><text /></stdin><expected><text>True False
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — Propagation unitaire et DPLL</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;DPLL&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;La propagation unitaire ne fait aucun choix : elle constate qu'une clause n'a plus qu'un litteral indetermine et force sa valeur.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Une affectation est un dictionnaire de la variable (entier positif) vers un booleen. Ecrire &lt;strong&gt;&lt;code&gt;propager(clauses, aff)&lt;/code&gt;&lt;/strong&gt; qui renvoie l'affectation etendue par propagation unitaire jusqu'a saturation, ou &lt;code&gt;None&lt;/code&gt; si une clause devient fausse. Ecrire &lt;strong&gt;&lt;code&gt;dpll(clauses, n)&lt;/code&gt;&lt;/strong&gt; qui renvoie une affectation satisfaisant toutes les clauses, ou &lt;code&gt;None&lt;/code&gt;. Les variables vont de 1 a &lt;code&gt;n&lt;/code&gt; et sont essayees dans l'ordre croissant, avec &lt;code&gt;True&lt;/code&gt; avant &lt;code&gt;False&lt;/code&gt;.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;dpll([{1, 2}, {-1, 3}, {-3}], 3) &amp;rarr; {3: False, 1: False, 2: True}   (l ordre d insertion suit la propagation)&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def propager(clauses, aff):
+    # tant qu une clause non satisfaite n a qu un litteral libre, le forcer
+    # une clause sans litteral libre et non satisfaite : echec
+    ...
+
+def dpll(clauses, n):
+    # propager, verifier l echec, choisir la premiere variable libre,
+    # essayer True puis False
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def propager(clauses, aff):
+    a = dict(aff)
+    change = True
+    while change:
+        change = False
+        for cl in clauses:
+            libres, satisfaite = [], False
+            for l in cl:
+                v, signe = abs(l), l &gt; 0
+                if v not in a:
+                    libres.append(l)
+                elif a[v] == signe:
+                    satisfaite = True
+            if satisfaite:
+                continue
+            if not libres:
+                return None
+            if len(libres) == 1:
+                l = libres[0]
+                a[abs(l)] = l &gt; 0
+                change = True
+    return a
+
+def dpll(clauses, n):
+    def explorer(aff):
+        a = propager(clauses, aff)
+        if a is None:
+            return None
+        choisie = None
+        for v in range(1, n + 1):
+            if v not in a:
+                choisie = v
+                break
+        if choisie is None:
+            return a
+        for b in (True, False):
+            suivante = dict(a)
+            suivante[choisie] = b
+            r = explorer(suivante)
+            if r is not None:
+                return r
+        return None
+    return explorer({})
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(dpll([{1, 2}, {-1, 3}, {-3}], 3))
+</text></testcode><stdin><text /></stdin><expected><text>{3: False, 1: False, 2: True}
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(propager([{-3}, {-1, 3}], {}))
+</text></testcode><stdin><text /></stdin><expected><text>{3: False, 1: False}
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(dpll([{1}, {-1}], 1))
+</text></testcode><stdin><text /></stdin><expected><text>None
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>C = [{1, 2}, {-1, 3}, {-3}, {-2, 4}, {-4, 1}]
+print(dpll(C, 4))
+</text></testcode><stdin><text /></stdin><expected><text>None
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(propager([{1, 2}], {}), dpll([], 2))
+</text></testcode><stdin><text /></stdin><expected><text>{} {1: True, 2: True}
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

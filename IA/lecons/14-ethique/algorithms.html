@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 14 &mdash; Annexe algorithmique</title>
+<meta name="description" content="Audit, ecart d equite, contre-factuel, fiche descriptive.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Chapitre 14 &middot; Annexe</div>
+<h1>&Eacute;valuer les cons&eacute;quences, pas &agrave; pas</h1>
+<div class="lesson-sub">Quatre proc&eacute;dures d&eacute;crites en fran&ccedil;ais, avec un exemple chiffr&eacute; v&eacute;rifiable pour chacune.</div>
+</div></section>
+<main class="lesson-content">
+<div class="box tip"><div class="box-title">Comment lire cette annexe</div>Aucune ligne de programme, aucune formule inutile : chaque proc&eacute;dure est pr&eacute;sent&eacute;e comme on l'ex&eacute;cuterait &agrave; la main. <a href="page.html">Retour au chapitre</a>.</div>
+<div class="annex-toc">
+<a href="#n1">1. Auditer un syst&egrave;me</a>
+<a href="#n2">2. Mesurer un &eacute;cart d'&eacute;quit&eacute;</a>
+<a href="#n3">3. Explication contre-factuelle</a>
+<a href="#n4">4. Fiche descriptive d'un mod&egrave;le</a>
+</div>
+<p>Ces proc&eacute;dures ne calculent pas une pr&eacute;diction : elles examinent ce qu'un syst&egrave;me fait aux personnes. La deuxi&egrave;me contient le seul r&eacute;sultat d'impossibilit&eacute; de tout le manuel qui porte sur des cons&eacute;quences sociales, et c'est un r&eacute;sultat d'alg&egrave;bre &eacute;l&eacute;mentaire : il se v&eacute;rifie en quatre divisions.</p>
+<figure class="viz"><div class="viz-title">Deux groupes, deux pr&eacute;cisions</div><svg viewBox="0 0 760 364" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">M&ecirc;me syst&egrave;me, m&ecirc;me taux de d&eacute;tection, pr&eacute;cisions tr&egrave;s diff&eacute;rentes</text><text x="20" y="78" style="fill:var(--viz-blue);font-size:13.5px;font-weight:700;font-family:inherit;">Groupe A</text><text x="20" y="98" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">1 000 personnes</text><text x="20" y="116" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">300 positives</text><rect x="170" y="58" width="132" height="34" rx="4" style="fill:var(--viz-ok);fill-opacity:0.75;"/><text x="310" y="81" style="fill:var(--color-text);font-size:13px;font-family:inherit;">240 vrais positifs</text><rect x="170" y="100" width="77" height="34" rx="4" style="fill:var(--viz-bad);fill-opacity:0.75;"/><text x="255" y="123" style="fill:var(--color-text);font-size:13px;font-family:inherit;">140 faux positifs</text><text x="740" y="81" text-anchor="end" style="fill:var(--viz-blue);font-size:14px;font-weight:700;font-family:inherit;">pr&eacute;cision 63.2 %</text><text x="740" y="123" text-anchor="end" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">taux de vrais positifs 80,0 %</text><text x="20" y="200" style="fill:var(--accent);font-size:13.5px;font-weight:700;font-family:inherit;">Groupe B</text><text x="20" y="220" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">1 000 personnes</text><text x="20" y="238" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">100 positives</text><rect x="170" y="180" width="44" height="34" rx="4" style="fill:var(--viz-ok);fill-opacity:0.75;"/><text x="222" y="203" style="fill:var(--color-text);font-size:13px;font-family:inherit;">80 vrais positifs</text><rect x="170" y="222" width="99" height="34" rx="4" style="fill:var(--viz-bad);fill-opacity:0.75;"/><text x="277" y="245" style="fill:var(--color-text);font-size:13px;font-family:inherit;">180 faux positifs</text><text x="740" y="203" text-anchor="end" style="fill:var(--accent);font-size:14px;font-weight:700;font-family:inherit;">pr&eacute;cision 30.8 %</text><text x="740" y="245" text-anchor="end" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">taux de vrais positifs 80,0 %</text><text x="380" y="332" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">L'&eacute;cart ne vient ni de l'algorithme ni des donn&eacute;es, mais de la diff&eacute;rence des taux de base. Aucun r&eacute;glage ne peut &eacute;galiser</text><text x="380" y="350" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">les deux crit&egrave;res &agrave; la fois.</text></svg><figcaption class="viz-caption"><strong>Figure A.1.</strong> Le syst&egrave;me est rigoureusement identique dans les deux groupes : m&ecirc;me taux de d&eacute;tection, m&ecirc;me taux d'erreur. Et pourtant, un avis favorable n'y a pas la m&ecirc;me valeur.</figcaption></figure>
+<h2 id="n1">1. Auditer un syst&egrave;me de d&eacute;cision</h2>
+<div class="algo-tag">proc&eacute;dure de contr&ocirc;le &middot; produit un tableau, jamais un verdict</div>
+<p><strong>But.</strong> D&eacute;terminer si un syst&egrave;me traite diff&eacute;remment des groupes de personnes, et de quelle mani&egrave;re exactement.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : le syst&egrave;me, un jeu de donn&eacute;es &eacute;tiquet&eacute;es repr&eacute;sentatif de la population d'usage, et la liste des attributs sur lesquels une discrimination est interdite ou pr&eacute;occupante.<br>
+<strong>Sortie</strong> : un tableau des taux, groupe par groupe et crit&egrave;re par crit&egrave;re.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>V&eacute;rifier d'abord que le jeu de donn&eacute;es ressemble &agrave; la population r&eacute;elle d'usage.</strong> Un audit sur des donn&eacute;es non repr&eacute;sentatives ne mesure rien.</li>
+<li><strong>Constituer les groupes</strong>, y compris les intersections. Un syst&egrave;me peut &ecirc;tre correct sur les femmes, correct sur les personnes &acirc;g&eacute;es, et d&eacute;faillant sur les femmes &acirc;g&eacute;es : c'est le cas le plus fr&eacute;quemment manqu&eacute;.</li>
+<li><strong>Calculer s&eacute;par&eacute;ment, pour chaque groupe</strong>, le taux de s&eacute;lection, le taux de vrais positifs, le taux de faux positifs, la pr&eacute;cision et l'effectif. Ce dernier n'est pas d&eacute;coratif : un &eacute;cart mesur&eacute; sur douze personnes ne prouve rien.</li>
+<li><strong>Comparer crit&egrave;re par crit&egrave;re</strong>, en gardant &agrave; l'esprit que tous ne peuvent pas &ecirc;tre &eacute;galis&eacute;s en m&ecirc;me temps.</li>
+<li><strong>&Eacute;crire noir sur blanc quel crit&egrave;re a &eacute;t&eacute; privil&eacute;gi&eacute; et pourquoi.</strong> C'est la seule partie de l'audit qui rel&egrave;ve d'une d&eacute;cision, et elle doit &ecirc;tre assum&eacute;e explicitement.</li>
+<li><strong>Ne jamais r&eacute;sumer par un score unique.</strong> Un score d'&eacute;quit&eacute; agr&eacute;g&eacute; choisit en secret l'un des crit&egrave;res incompatibles.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Un syst&egrave;me d'aide &agrave; la s&eacute;lection, &eacute;valu&eacute; sur 2 000 dossiers. Le taux de base &mdash; la proportion de candidats r&eacute;ellement qualifi&eacute;s &mdash; diff&egrave;re entre les deux groupes, et le m&ecirc;me seuil est appliqu&eacute; aux deux.</p>
+<table><thead><tr><th>Mesure</th><th>Groupe A (taux de base 30 %)</th><th>Groupe B (taux de base 10 %)</th><th>&Eacute;cart</th></tr></thead><tbody>
+<tr><td>Effectif</td><td>1 000</td><td>1 000</td><td>&mdash;</td></tr>
+<tr><td>Taux de s&eacute;lection</td><td>38,1 %</td><td>26,2 %</td><td>11,9 points</td></tr>
+<tr><td>Taux de vrais positifs</td><td>79,8 %</td><td>79,8 %</td><td><strong>0 : satisfait</strong></td></tr>
+<tr><td>Pr&eacute;cision</td><td>62,8 %</td><td>30,5 %</td><td>32,3 points</td></tr>
+</tbody></table>
+<p>Le syst&egrave;me satisfait parfaitement l'&eacute;galit&eacute; des chances : un candidat qualifi&eacute; a la m&ecirc;me probabilit&eacute; d'&ecirc;tre retenu, quel que soit son groupe. Et pourtant, parmi les retenus du groupe B, moins d'un tiers sont r&eacute;ellement qualifi&eacute;s, contre pr&egrave;s des deux tiers dans le groupe A : le m&ecirc;me avis favorable n'a pas la m&ecirc;me valeur. Aucun r&eacute;glage de seuil ne corrige les deux &agrave; la fois.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> L'audit ne d&eacute;montre pas l'&eacute;quit&eacute; : il mesure des &eacute;carts. Un &eacute;cart nul sur tous les crit&egrave;res mesur&eacute;s ne garantit rien sur un crit&egrave;re non mesur&eacute;, ni sur un groupe non consid&eacute;r&eacute;. Ce que l'audit &eacute;tablit avec certitude, en revanche, c'est l'existence d'un &eacute;cart lorsqu'il en trouve un.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Deux boucles finies : sur les attributs, sur les groupes.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Une &eacute;valuation du syst&egrave;me sur le jeu d'audit, plus des comptages. C'est d&eacute;risoire devant le co&ucirc;t de constitution d'un jeu d'audit repr&eacute;sentatif et correctement &eacute;tiquet&eacute;, qui est le vrai obstacle.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Ne regarder que la performance moyenne. Oublier les intersections de groupes. Auditer sur un &eacute;chantillon trop petit pour les groupes minoritaires &mdash; pr&eacute;cis&eacute;ment ceux qui posent probl&egrave;me. R&eacute;duire le r&eacute;sultat &agrave; un score unique. Et auditer une fois &agrave; la livraison : la population &eacute;volue, et la d&eacute;cision elle-m&ecirc;me la modifie.</p>
+<h2 id="n2">2. Mesurer un &eacute;cart, et comprendre ce qu'on ne peut pas &eacute;galiser</h2>
+<div class="algo-tag">calcul &eacute;l&eacute;mentaire &middot; th&eacute;or&egrave;me d'impossibilit&eacute;</div>
+<p><strong>But.</strong> Comprendre, sur des nombres, pourquoi trois exigences raisonnables ne peuvent pas &ecirc;tre satisfaites ensemble.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : pour chaque groupe : l'effectif, la proportion de personnes r&eacute;ellement positives, et le tableau des d&eacute;cisions du syst&egrave;me.<br>
+<strong>Sortie</strong> : les trois taux, et le constat de ce qui peut ou non &ecirc;tre &eacute;galis&eacute;.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Calculer le taux de s&eacute;lection</strong> : la proportion de personnes retenues dans le groupe, toutes ensemble.</li>
+<li><strong>Calculer le taux de vrais positifs</strong> : parmi les personnes r&eacute;ellement positives du groupe, la proportion retenue.</li>
+<li><strong>Calculer la pr&eacute;cision</strong> : parmi les personnes retenues du groupe, la proportion r&eacute;ellement positive.</li>
+<li><strong>Comparer chacun des trois entre les groupes.</strong></li>
+<li><strong>Constater la relation qui les lie.</strong> Pr&eacute;cision, taux de vrais positifs, taux de faux positifs et taux de base sont li&eacute;s par une identit&eacute; alg&eacute;brique : fixer trois d'entre eux d&eacute;termine le quatri&egrave;me. Si les taux de base diff&egrave;rent, &eacute;galiser deux crit&egrave;res force le troisi&egrave;me &agrave; diff&eacute;rer.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Deux groupes de 1 000 personnes. Dans A, 300 sont r&eacute;ellement positives ; dans B, 100. Le syst&egrave;me d&eacute;tecte 80 % des positives et se trompe sur 20 % des n&eacute;gatives, dans les deux groupes.</p>
+<table><thead><tr><th></th><th>Groupe A</th><th>Groupe B</th></tr></thead><tbody>
+<tr><td>R&eacute;ellement positives</td><td>300</td><td>100</td></tr>
+<tr><td>Retenues parmi elles</td><td>240</td><td>80</td></tr>
+<tr><td>R&eacute;ellement n&eacute;gatives</td><td>700</td><td>900</td></tr>
+<tr><td>Retenues parmi elles &agrave; tort</td><td>140</td><td>180</td></tr>
+<tr><td><strong>Total retenues</strong></td><td><strong>380</strong></td><td><strong>260</strong></td></tr>
+<tr><td>Taux de vrais positifs</td><td>240/300 = 80 %</td><td>80/100 = 80 %</td></tr>
+<tr><td>Pr&eacute;cision</td><td>240/380 = 63,2 %</td><td>80/260 = 30,8 %</td></tr>
+</tbody></table>
+<p>Le syst&egrave;me est rigoureusement identique dans les deux groupes : m&ecirc;me taux de d&eacute;tection, m&ecirc;me taux d'erreur. Et pourtant, un avis favorable dans le groupe B a deux fois moins de valeur que dans le groupe A. La cause n'est ni l'algorithme ni les donn&eacute;es : c'est la diff&eacute;rence des taux de base. Aucune modification du mod&egrave;le ne peut supprimer cet &eacute;cart tout en conservant l'&eacute;galit&eacute; des taux de d&eacute;tection.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Le r&eacute;sultat est un th&eacute;or&egrave;me, pas une observation : d&egrave;s que les taux de base diff&egrave;rent et que le classifieur n'est pas parfait, calibration et &eacute;galit&eacute; des taux d'erreur sont incompatibles. Un balayage exhaustif des seuils, comme celui de la figure interactive du chapitre, ne trouve aucune exception &mdash; et il ne peut pas en trouver.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Quelques divisions.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> N&eacute;gligeable. Ce qui co&ucirc;te, c'est d'obtenir les vraies &eacute;tiquettes, sans lesquelles aucun de ces taux n'est calculable &mdash; et elles manquent pr&eacute;cis&eacute;ment pour les personnes que le syst&egrave;me a &eacute;cart&eacute;es.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Croire qu'un &eacute;cart de pr&eacute;cision prouve un algorithme discriminatoire : il peut n'&ecirc;tre que la cons&eacute;quence math&eacute;matique de taux de base diff&eacute;rents. Croire inversement qu'un &eacute;cart n'a pas d'importance parce qu'il est math&eacute;matiquement in&eacute;vitable : ses effets sur les personnes sont bien r&eacute;els. Et surtout, l'obstacle pratique : les &eacute;tiquettes r&eacute;elles des personnes refus&eacute;es sont inconnues, ce qui rend l'audit structurellement partiel.</p>
+<h2 id="n3">3. Produire une explication contre-factuelle</h2>
+<div class="algo-tag">m&eacute;thode locale &middot; actionnable pour la personne</div>
+<p><strong>But.</strong> R&eacute;pondre &agrave; la question que se pose r&eacute;ellement une personne dont la demande a &eacute;t&eacute; refus&eacute;e : qu'aurait-il fallu changer ?</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : le syst&egrave;me, le dossier refus&eacute;, la liste des variables sur lesquelles la personne peut agir, et une notion de co&ucirc;t de modification par variable.<br>
+<strong>Sortie</strong> : un dossier modifi&eacute;, le plus proche possible du dossier r&eacute;el, que le syst&egrave;me accepterait.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>&Eacute;carter les variables non actionnables</strong> : l'&acirc;ge, l'origine, le lieu de naissance. Sugg&eacute;rer de les changer est absurde et, dans certains cas, r&eacute;v&egrave;le une discrimination.</li>
+<li><strong>Chercher la modification de co&ucirc;t minimal</strong> qui fait basculer la d&eacute;cision. Le co&ucirc;t n'est pas la distance math&eacute;matique : augmenter un revenu de 300 euros et d&eacute;m&eacute;nager ne se comparent pas.</li>
+<li><strong>V&eacute;rifier que le dossier obtenu est plausible</strong>. Un contre-factuel qui propose un revenu de 8 000 euros pour un &acirc;ge de 19 ans est math&eacute;matiquement correct et pratiquement inutile.</li>
+<li><strong>Pr&eacute;senter plusieurs contre-factuels</strong> plut&ocirc;t qu'un seul : il en existe une infinit&eacute;, et le choix d'un seul est d&eacute;j&agrave; un acte de conception qui oriente la personne.</li>
+<li><strong>Ne pas pr&eacute;senter le r&eacute;sultat comme la cause du refus.</strong> C'est une modification suffisante pour changer la d&eacute;cision, ce qui n'est pas la m&ecirc;me chose.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Un pr&ecirc;t refus&eacute;. Le dossier r&eacute;el et trois contre-factuels possibles, tous menant &agrave; une acceptation.</p>
+<table><thead><tr><th>Dossier</th><th>Revenu mensuel</th><th>Anciennet&eacute;</th><th>Dettes</th><th>Montant demand&eacute;</th><th>Verdict</th></tr></thead><tbody>
+<tr><td>r&eacute;el</td><td>2 100 &euro;</td><td>14 mois</td><td>480 &euro;</td><td>18 000 &euro;</td><td>refus&eacute;</td></tr>
+<tr><td>contre-factuel 1</td><td><strong>2 400 &euro;</strong></td><td>14 mois</td><td>480 &euro;</td><td>18 000 &euro;</td><td>accept&eacute;</td></tr>
+<tr><td>contre-factuel 2</td><td>2 100 &euro;</td><td>14 mois</td><td><strong>200 &euro;</strong></td><td>18 000 &euro;</td><td>accept&eacute;</td></tr>
+<tr><td>contre-factuel 3</td><td>2 100 &euro;</td><td>14 mois</td><td>480 &euro;</td><td><strong>14 500 &euro;</strong></td><td>accept&eacute;</td></tr>
+</tbody></table>
+<p>Les trois sont corrects et disent des choses tr&egrave;s diff&eacute;rentes. Le troisi&egrave;me est imm&eacute;diatement actionnable ; le premier demande un changement d'emploi ; le deuxi&egrave;me suppose de rembourser d'abord. Choisir lequel pr&eacute;senter n'est pas une question technique.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Le contre-factuel est exact vis-&agrave;-vis du mod&egrave;le : il produit r&eacute;ellement une acceptation. Mais il n'&eacute;tablit aucune causalit&eacute; dans le monde r&eacute;el : rien ne dit qu'augmenter le revenu de cette personne changerait sa capacit&eacute; de remboursement dans la r&eacute;alit&eacute;. On explique le <em>mod&egrave;le</em>, pas le monde.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Une recherche d'optimisation sous contrainte, born&eacute;e par un budget de calcul. Elle peut &eacute;chouer &agrave; trouver un contre-factuel plausible.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Variable : imm&eacute;diat sur un mod&egrave;le lin&eacute;aire, co&ucirc;teux sur un r&eacute;seau profond o&ugrave; il faut une recherche it&eacute;rative.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Proposer de modifier une variable non actionnable. Produire un dossier invraisemblable. Pr&eacute;senter un seul contre-factuel comme &laquo; la &raquo; raison du refus. Et donner des indications si pr&eacute;cises qu'elles permettent de reconstituer le mod&egrave;le ou de le contourner : l'explication est aussi une fuite d'information.</p>
+<h2 id="n4">4. R&eacute;diger la fiche descriptive d'un mod&egrave;le</h2>
+<div class="algo-tag">documentation &middot; le meilleur rapport co&ucirc;t-b&eacute;n&eacute;fice du chapitre</div>
+<p><strong>But.</strong> Permettre &agrave; quelqu'un qui n'a pas construit le mod&egrave;le de savoir s'il peut l'employer pour son usage, et &agrave; quelles conditions.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : le mod&egrave;le, ses donn&eacute;es d'entra&icirc;nement, ses r&eacute;sultats d'&eacute;valuation.<br>
+<strong>Sortie</strong> : un document de deux &agrave; quatre pages, publi&eacute; avec le mod&egrave;le.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>D&eacute;crire l'usage pr&eacute;vu</strong> en une phrase, et surtout les usages <em>d&eacute;conseill&eacute;s</em>. Cette seconde liste est la plus utile et la plus souvent absente.</li>
+<li><strong>D&eacute;crire les donn&eacute;es d'entra&icirc;nement</strong> : origine, p&eacute;riode, langue, population repr&eacute;sent&eacute;e, et populations absentes.</li>
+<li><strong>Donner les performances ventil&eacute;es par sous-population</strong>, pas seulement en moyenne. Un score global &eacute;lev&eacute; masque r&eacute;guli&egrave;rement un &eacute;chec complet sur un sous-groupe.</li>
+<li><strong>Indiquer les conditions d'&eacute;valuation</strong> : quel jeu de test, combien d'exemples, quelle mesure, et si ce jeu a pu &ecirc;tre vu pendant l'entra&icirc;nement.</li>
+<li><strong>&Eacute;crire ce qui n'a pas &eacute;t&eacute; test&eacute;.</strong> C'est la ligne la plus courte et la plus pr&eacute;cieuse du document.</li>
+<li><strong>Dater et versionner.</strong> Un mod&egrave;le r&eacute;entra&icirc;n&eacute; est un mod&egrave;le diff&eacute;rent, et sa fiche doit l'&ecirc;tre aussi.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Extrait d'une fiche pour un mod&egrave;le de tri de candidatures, avec la version insuffisante et la version acceptable de chaque rubrique.</p>
+<table><thead><tr><th>Rubrique</th><th>Version insuffisante</th><th>Version acceptable</th></tr></thead><tbody>
+<tr><td>Usage pr&eacute;vu</td><td>&laquo; tri de candidatures &raquo;</td><td>pr&eacute;-classement pour lecture humaine ; jamais de rejet automatique</td></tr>
+<tr><td>Usages d&eacute;conseill&eacute;s</td><td>(absent)</td><td>postes non repr&eacute;sent&eacute;s dans les donn&eacute;es ; langues autres que le fran&ccedil;ais</td></tr>
+<tr><td>Donn&eacute;es</td><td>&laquo; 50 000 candidatures &raquo;</td><td>candidatures 2019-2023, secteur informatique, France, 18 % de femmes</td></tr>
+<tr><td>Performance</td><td>&laquo; 91 % de bonnes r&eacute;ponses &raquo;</td><td>91 % global ; 93 % hommes ; 84 % femmes ; 71 % sur les profils atypiques</td></tr>
+<tr><td>Non test&eacute;</td><td>(absent)</td><td>reconversions professionnelles ; candidatures de plus de 50 ans</td></tr>
+</tbody></table>
+<p>La colonne de droite ne demande pas plus de travail que la colonne de gauche : elle demande de <em>regarder</em> les r&eacute;sultats par sous-groupe avant de publier une moyenne. La derni&egrave;re ligne, &agrave; elle seule, aurait &eacute;vit&eacute; plusieurs affaires publiques.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Une fiche descriptive ne rend le mod&egrave;le ni meilleur ni plus &eacute;quitable. Elle d&eacute;place la responsabilit&eacute; l&agrave; o&ugrave; elle doit &ecirc;tre : celui qui d&eacute;ploie le mod&egrave;le hors de son domaine de validit&eacute; ne peut plus dire qu'il l'ignorait.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Quelques jours de travail, une fois les &eacute;valuations par sous-groupe disponibles.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Faible en absolu, et tr&egrave;s faible au regard du co&ucirc;t d'un mod&egrave;le mal employ&eacute;. L'obstacle est culturel, pas technique : personne n'est &eacute;valu&eacute; sur la qualit&eacute; de sa documentation.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Ne donner que les performances moyennes. D&eacute;crire l'usage pr&eacute;vu sans d&eacute;crire les usages d&eacute;conseill&eacute;s. Recopier la fiche d'une version pr&eacute;c&eacute;dente sans la mettre &agrave; jour. Et r&eacute;diger la fiche apr&egrave;s le d&eacute;ploiement, alors que son int&eacute;r&ecirc;t principal est de r&eacute;v&eacute;ler, pendant la conception, ce que l'on ne sait pas encore.</p>
+<nav class="lesson-nav"><div class="container">
+<a href="page.html">&larr; Retour au chapitre 14</a>
+<a href="../../index.html">Sommaire du manuel</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+</body></html>

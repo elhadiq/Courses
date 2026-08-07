@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 2 &mdash; Annexe algorithmique</title>
+<meta name="description" content="Specifier, maintenir un etat, decider par utilite, boucle d apprentissage.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Chapitre 2 &middot; Annexe</div>
+<h1>Concevoir un agent, pas &agrave; pas</h1>
+<div class="lesson-sub">Quatre m&eacute;thodes de conception d&eacute;crites en fran&ccedil;ais, avec un exemple chiffr&eacute; v&eacute;rifiable pour chacune.</div>
+</div></section>
+<main class="lesson-content">
+<div class="box tip"><div class="box-title">Comment lire cette annexe</div>Aucune ligne de programme, aucune formule inutile : chaque proc&eacute;dure est pr&eacute;sent&eacute;e comme on l'ex&eacute;cuterait &agrave; la main. <a href="page.html">Retour au chapitre</a>.</div>
+<div class="annex-toc">
+<a href="#f1">1. Sp&eacute;cifier une t&acirc;che</a>
+<a href="#f2">2. Maintenir un &eacute;tat interne</a>
+<a href="#f3">3. Choisir par utilit&eacute; esp&eacute;r&eacute;e</a>
+<a href="#f4">4. La boucle d'apprentissage</a>
+</div>
+<p>Les proc&eacute;dures de ce chapitre ne calculent pas une r&eacute;ponse : elles organisent une conception. On les d&eacute;taille avec la m&ecirc;me rigueur que les algorithmes des chapitres suivants, parce que la plupart des &eacute;checs de projets d'intelligence artificielle se jouent ici, avant la premi&egrave;re ligne de programme.</p>
+<figure class="viz"><div class="viz-title">Les quatre moments de la conception</div><svg viewBox="0 0 760 250" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Les quatre moments de la conception d'un agent</text><rect x="40" y="64" width="150" height="86" rx="9" style="fill:var(--primary);fill-opacity:0.10;stroke:var(--primary);stroke-width:2;"/><text x="115" y="94" text-anchor="middle" style="fill:var(--primary);font-size:13.5px;font-weight:700;font-family:inherit;">Sp&eacute;cifier</text><text x="115" y="118" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">mesure de performance,</text><text x="115" y="135" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">environnement, capteurs</text><path d="M 192 107 L 210 107" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 208 102 L 216 107 L 208 112 Z" style="fill:var(--viz-axis);"/><rect x="218" y="64" width="150" height="86" rx="9" style="fill:var(--primary);fill-opacity:0.15;stroke:var(--primary);stroke-width:2;"/><text x="293" y="94" text-anchor="middle" style="fill:var(--primary);font-size:13.5px;font-weight:700;font-family:inherit;">Percevoir</text><text x="293" y="118" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">mettre &agrave; jour</text><text x="293" y="135" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">l'&eacute;tat interne</text><path d="M 370 107 L 388 107" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 386 102 L 394 107 L 386 112 Z" style="fill:var(--viz-axis);"/><rect x="396" y="64" width="150" height="86" rx="9" style="fill:var(--primary);fill-opacity:0.20;stroke:var(--primary);stroke-width:2;"/><text x="471" y="94" text-anchor="middle" style="fill:var(--primary);font-size:13.5px;font-weight:700;font-family:inherit;">D&eacute;cider</text><text x="471" y="118" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">maximiser l'esp&eacute;rance</text><text x="471" y="135" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">d'utilit&eacute;</text><path d="M 548 107 L 566 107" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 564 102 L 572 107 L 564 112 Z" style="fill:var(--viz-axis);"/><rect x="574" y="64" width="150" height="86" rx="9" style="fill:var(--primary);fill-opacity:0.25;stroke:var(--primary);stroke-width:2;"/><text x="649" y="94" text-anchor="middle" style="fill:var(--primary);font-size:13.5px;font-weight:700;font-family:inherit;">Apprendre</text><text x="649" y="118" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">corriger l'&eacute;l&eacute;ment</text><text x="649" y="135" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">d'ex&eacute;cution</text><path d="M 705 150 L 705 176 L 115 176 L 115 152" style="fill:none;stroke:var(--accent);stroke-width:2;stroke-dasharray:5 4;"/><path d="M 110 158 L 115 148 L 120 158 Z" style="fill:var(--accent);"/><text x="410" y="196" text-anchor="middle" style="fill:var(--accent);font-size:12px;font-family:inherit;">l'apprentissage modifie l'agent, pas la sp&eacute;cification &mdash; celle-ci reste ext&eacute;rieure</text><text x="380" y="218" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">La sp&eacute;cification est ext&eacute;rieure &agrave; la boucle : si l'agent pouvait la modifier, il lui suffirait de l'abaisser pour para&icirc;tre</text><text x="380" y="236" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">parfait.</text></svg><figcaption class="viz-caption"><strong>Figure A.1.</strong> Les quatre proc&eacute;dures de cette annexe, dans l'ordre o&ugrave; elles interviennent. La fl&egrave;che de retour est l'apprentissage ; elle ne remonte d&eacute;lib&eacute;r&eacute;ment pas jusqu'&agrave; la sp&eacute;cification.</figcaption></figure>
+<h2 id="f1">1. Sp&eacute;cifier une t&acirc;che avant de la programmer</h2>
+<div class="algo-tag">m&eacute;thode de conception &middot; &agrave; faire en premier</div>
+<p><strong>But.</strong> D&eacute;crire compl&egrave;tement le probl&egrave;me &agrave; r&eacute;soudre, de sorte que deux &eacute;quipes diff&eacute;rentes construisent des agents comparables et &eacute;valuables sur la m&ecirc;me &eacute;chelle.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : une intention exprim&eacute;e en langue courante, du type &laquo; je voudrais un syst&egrave;me qui fasse ceci &raquo;.<br>
+<strong>Sortie</strong> : quatre listes &eacute;crites : mesure de performance, environnement, actionneurs, capteurs.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>&Eacute;crire d'abord la mesure de performance</strong>, et l'&eacute;crire sur l'&eacute;tat du monde, jamais sur l'&eacute;tat interne de l'agent. C'est la seule &eacute;tape qui d&eacute;cide de tout : un agent optimise ce qu'on mesure, pas ce qu'on souhaite.</li>
+<li><strong>Chercher activement comment tricher</strong> avec la mesure ainsi &eacute;crite. Si l'on trouve un moyen d'obtenir un bon score sans rendre le service attendu, la mesure est mauvaise et il faut la r&eacute;&eacute;crire tout de suite.</li>
+<li><strong>Pond&eacute;rer les objectifs contradictoires</strong> explicitement. La s&eacute;curit&eacute;, la rapidit&eacute; et le confort d'un v&eacute;hicule s'opposent ; refuser d'&eacute;crire les poids ne les supprime pas, cela les cache dans le code.</li>
+<li><strong>D&eacute;crire l'environnement</strong> : qui d'autre y agit, ce qui change tout seul, ce qui est impr&eacute;visible. Puis le situer sur les six axes du chapitre.</li>
+<li><strong>Lister les actionneurs</strong> : l'ensemble exact des actions r&eacute;alisables. Une action absente de cette liste n'existe pas pour l'agent, quelle que soit son intelligence.</li>
+<li><strong>Lister les capteurs</strong>, puis v&eacute;rifier une chose : la mesure de performance est-elle calculable &agrave; partir de ce que les capteurs per&ccedil;oivent ? Si non, l'agent ne pourra jamais savoir s'il r&eacute;ussit.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Une m&ecirc;me intention &mdash; &laquo; un robot qui range la maison &raquo; &mdash; sp&eacute;cifi&eacute;e deux fois, mal puis bien.</p>
+<table><thead><tr><th>&Eacute;l&eacute;ment</th><th>Sp&eacute;cification na&iuml;ve</th><th>Ce qu'un agent en fait</th><th>Sp&eacute;cification corrig&eacute;e</th></tr></thead><tbody>
+<tr><td>Performance</td><td>nombre d'objets rang&eacute;s par heure</td><td>sort les objets des placards pour les y remettre</td><td>proportion de la surface libre, objets &agrave; leur place attitr&eacute;e</td></tr>
+<tr><td>Performance (bis)</td><td>aucune p&eacute;nalit&eacute; de casse</td><td>traverse la table basse en ligne droite</td><td>p&eacute;nalit&eacute; forte pour tout objet d&eacute;plac&eacute; de force ou endommag&eacute;</td></tr>
+<tr><td>Environnement</td><td>&laquo; une maison &raquo;</td><td>&eacute;choue d&egrave;s qu'un animal ou un enfant appara&icirc;t</td><td>maison habit&eacute;e, dynamique, partiellement observable, multi-agent</td></tr>
+<tr><td>Capteurs</td><td>une cam&eacute;ra frontale</td><td>ne per&ccedil;oit jamais s'il a fait tomber quelque chose derri&egrave;re lui</td><td>cam&eacute;ra, contact, et v&eacute;rification apr&egrave;s chaque d&eacute;pose</td></tr>
+</tbody></table>
+<p>La derni&egrave;re ligne illustre le test de l'&eacute;tape 6 : la mesure corrig&eacute;e p&eacute;nalise les objets tomb&eacute;s, or aucun capteur ne les voit. La sp&eacute;cification est donc incoh&eacute;rente tant qu'on n'ajoute pas un moyen de le percevoir.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Il n'y a pas de correction &agrave; d&eacute;montrer : c'est une m&eacute;thode, pas un algorithme. Son seul crit&egrave;re de r&eacute;ussite est n&eacute;gatif et se v&eacute;rifie &agrave; l'&eacute;tape 2 : si personne dans l'&eacute;quipe ne trouve comment tricher avec la mesure, elle est provisoirement acceptable.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> L'exercice se termine quand les quatre listes sont &eacute;crites et que le test de coh&eacute;rence de l'&eacute;tape 6 passe. En pratique, deux ou trois it&eacute;rations.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Quelques heures, contre des mois de d&eacute;veloppement engag&eacute;s sur une mauvaise sp&eacute;cification. C'est l'&eacute;tape dont le rapport entre le co&ucirc;t et le b&eacute;n&eacute;fice est le plus favorable de tout un projet.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Trois d&eacute;faillances habituelles. Mesurer une <em>action</em> plut&ocirc;t qu'un <em>r&eacute;sultat</em> : &laquo; nombre de messages envoy&eacute;s &raquo; au lieu de &laquo; probl&egrave;mes r&eacute;solus &raquo;. Choisir une mesure parce qu'elle est facile &agrave; calculer plut&ocirc;t que parce qu'elle est juste. Et laisser des objectifs contradictoires implicites, ce qui d&eacute;place l'arbitrage vers celui qui &eacute;crit le code, sans qu'il en ait ni le mandat ni conscience.</p>
+<h2 id="f2">2. Maintenir un &eacute;tat interne</h2>
+<div class="algo-tag">m&eacute;thode incr&eacute;mentale &middot; suivi du monde</div>
+<p><strong>But.</strong> Permettre &agrave; un agent d'agir correctement dans un monde qu'il ne per&ccedil;oit que partiellement, en se souvenant de ce qu'il a vu et en pr&eacute;disant ce qui a chang&eacute;.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : l'&eacute;tat interne pr&eacute;c&eacute;dent, la derni&egrave;re action ex&eacute;cut&eacute;e, la perception courante, et deux mod&egrave;les : comment le monde &eacute;volue seul, et ce que fait chaque action.<br>
+<strong>Sortie</strong> : le nouvel &eacute;tat interne, meilleure estimation courante de l'&eacute;tat du monde.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Pr&eacute;dire.</strong> Appliquer &agrave; l'&eacute;tat pr&eacute;c&eacute;dent l'effet attendu de la derni&egrave;re action, puis l'&eacute;volution propre du monde pendant l'intervalle. On obtient une estimation avant toute observation.</li>
+<li><strong>Corriger.</strong> Confronter cette pr&eacute;diction &agrave; ce que les capteurs rapportent r&eacute;ellement. Les deux ne co&iuml;ncident jamais tout &agrave; fait : les mod&egrave;les sont approximatifs et les capteurs bruit&eacute;s.</li>
+<li><strong>Arbitrer entre les deux</strong> selon la confiance accord&eacute;e &agrave; chacun. Si le capteur est fiable, il l'emporte ; s'il est bruit&eacute;, la pr&eacute;diction sert de garde-fou. Cet arbitrage est ce que formalise le chapitre 8 dans le cas probabiliste.</li>
+<li><strong>Conserver ce qui n'est plus per&ccedil;u.</strong> Une case nettoy&eacute;e reste propre m&ecirc;me quand on ne la voit plus &mdash; sauf si le mod&egrave;le d'&eacute;volution dit le contraire. C'est pr&eacute;cis&eacute;ment ce que l'agent sans m&eacute;moire ne peut pas faire.</li>
+<li><strong>Marquer explicitement l'incertain.</strong> Une case jamais visit&eacute;e n'est ni propre ni sale : elle est inconnue. Confondre &laquo; inconnu &raquo; et &laquo; propre &raquo; produit un agent qui croit avoir fini.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Un robot dans un couloir de cinq cases, qui avance d'une case par &eacute;tape. Son capteur de position se trompe une fois sur cinq ; il ne per&ccedil;oit que la case sous lui.</p>
+<table><thead><tr><th>&Eacute;tape</th><th>Position pr&eacute;dite</th><th>Capteur</th><th>Coh&eacute;rent ?</th><th>&Eacute;tat retenu</th><th>Carte connue</th></tr></thead><tbody>
+<tr><td>0</td><td>&mdash;</td><td>case 1</td><td>&mdash;</td><td>case 1</td><td>1 : propre. 2-5 : inconnues</td></tr>
+<tr><td>1</td><td>case 2 (avanc&eacute; de 1)</td><td>case 2</td><td>oui</td><td>case 2</td><td>1-2 : propres. 3-5 : inconnues</td></tr>
+<tr><td>2</td><td>case 3</td><td>case 3</td><td>oui</td><td>case 3</td><td>1-3 : propres. 4-5 : inconnues</td></tr>
+<tr><td>3</td><td>case 4</td><td>case 1</td><td>non : saut impossible</td><td>case 4, capteur ignor&eacute;</td><td>1-4 : propres. 5 : inconnue</td></tr>
+<tr><td>4</td><td>case 5</td><td>case 5</td><td>oui</td><td>case 5</td><td>1-5 : propres, exploration termin&eacute;e</td></tr>
+</tbody></table>
+<p>L'&eacute;tape 3 est celle qui justifie tout le proc&eacute;d&eacute; : la pr&eacute;diction contredit le capteur, et c'est la pr&eacute;diction qui l'emporte, parce qu'aucune action ne permet de passer de la case 3 &agrave; la case 1 en un pas. Un agent sans m&eacute;moire aurait cru &ecirc;tre revenu au d&eacute;but et aurait tout recommenc&eacute;.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> L'&eacute;tat interne n'est jamais garanti exact : c'est une <em>estimation</em>. Ce que l'on peut garantir est plus faible et suffisant : si les deux mod&egrave;les sont corrects et les capteurs non syst&eacute;matiquement biais&eacute;s, l'ensemble des &eacute;tats compatibles avec l'historique contient toujours l'&eacute;tat r&eacute;el. C'est cette propri&eacute;t&eacute; que la version probabiliste du chapitre 8 rend quantitative.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Chaque mise &agrave; jour est un calcul born&eacute; ; la proc&eacute;dure est appel&eacute;e une fois par perception et se termine trivialement. Ce qui ne se termine pas, c'est la boucle de l'agent &mdash; et c'est voulu.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Proportionnel &agrave; la taille de la repr&eacute;sentation d'&eacute;tat. C'est la limite pratique : repr&eacute;senter explicitement un monde &agrave; un million de variables est impossible, d'o&ugrave; les repr&eacute;sentations factoris&eacute;es du chapitre 8.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Confondre les deux mod&egrave;les &mdash; &eacute;volution propre du monde et effet des actions &mdash; donne un agent qui s'attribue les changements dus &agrave; autrui. Faire aveugl&eacute;ment confiance au capteur annule tout le b&eacute;n&eacute;fice de la m&eacute;moire. Ne jamais r&eacute;viser l'&eacute;tat, &agrave; l'inverse, produit un agent qui d&eacute;rive et finit par agir sur un monde imaginaire.</p>
+<h2 id="f3">3. Choisir une action par utilit&eacute; esp&eacute;r&eacute;e</h2>
+<div class="algo-tag">r&egrave;gle de d&eacute;cision &middot; arbitrage sous incertitude</div>
+<p><strong>But.</strong> Choisir entre des actions dont les cons&eacute;quences sont incertaines et de valeurs in&eacute;gales, sans se contenter du r&eacute;sultat le plus probable ni du pire cas.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : l'&eacute;tat courant estim&eacute;, les actions applicables, la probabilit&eacute; de chaque r&eacute;sultat possible pour chaque action, et une utilit&eacute; num&eacute;rique par r&eacute;sultat.<br>
+<strong>Sortie</strong> : l'action dont l'utilit&eacute; moyenne est la plus &eacute;lev&eacute;e.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>&Eacute;num&eacute;rer les actions applicables</strong> dans l'&eacute;tat courant.</li>
+<li><strong>Pour chaque action, &eacute;num&eacute;rer ses r&eacute;sultats possibles</strong> avec leur probabilit&eacute;. La somme des probabilit&eacute;s d'une m&ecirc;me action vaut 1 : si elle ne la vaut pas, un cas a &eacute;t&eacute; oubli&eacute;.</li>
+<li><strong>Attribuer une utilit&eacute; &agrave; chaque r&eacute;sultat.</strong> L'&eacute;chelle est arbitraire &agrave; une transformation affine croissante pr&egrave;s : seuls comptent les rapports d'&eacute;carts, pas les valeurs absolues.</li>
+<li><strong>Calculer, pour chaque action, la moyenne des utilit&eacute;s pond&eacute;r&eacute;e par les probabilit&eacute;s.</strong> C'est l'utilit&eacute; esp&eacute;r&eacute;e.</li>
+<li><strong>Retenir l'action de plus grande utilit&eacute; esp&eacute;r&eacute;e</strong>, en d&eacute;partageant les &eacute;galit&eacute;s par une r&egrave;gle fixe pour rester d&eacute;terministe.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Faut-il partir pour l'a&eacute;roport 90, 120 ou 180 minutes &agrave; l'avance ? Manquer l'avion co&ucirc;te tr&egrave;s cher ; attendre sur place co&ucirc;te un peu.</p>
+<table><thead><tr><th>Action</th><th>Rater l'avion</th><th>Attente sur place</th><th>Utilit&eacute; si &agrave; l'heure</th><th>Utilit&eacute; si rat&eacute;</th><th>Utilit&eacute; esp&eacute;r&eacute;e</th></tr></thead><tbody>
+<tr><td>partir 90 min avant</td><td>20 %</td><td>courte : &minus;10</td><td>90</td><td>&minus;500</td><td>0,80 &times; 90 + 0,20 &times; (&minus;500) = &minus;28</td></tr>
+<tr><td>partir 120 min avant</td><td>5 %</td><td>moyenne : &minus;30</td><td>70</td><td>&minus;500</td><td>0,95 &times; 70 + 0,05 &times; (&minus;500) = <strong>41,5</strong></td></tr>
+<tr><td>partir 180 min avant</td><td>1 %</td><td>longue : &minus;90</td><td>10</td><td>&minus;500</td><td>0,99 &times; 10 + 0,01 &times; (&minus;500) = 4,9</td></tr>
+</tbody></table>
+<p>La bonne d&eacute;cision est de partir 120 minutes avant. Ni le crit&egrave;re du r&eacute;sultat le plus probable &mdash; qui donnerait 90 minutes, puisque arriver &agrave; l'heure est probable dans les trois cas &mdash; ni le crit&egrave;re du pire cas &mdash; qui donnerait 180 minutes &mdash; ne conduisent &agrave; ce choix. C'est l&agrave; tout l'apport de l'esp&eacute;rance : elle p&egrave;se la gravit&eacute; par la vraisemblance.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> La r&egrave;gle est optimale au sens pr&eacute;cis du th&eacute;or&egrave;me de von Neumann et Morgenstern : si les pr&eacute;f&eacute;rences de l'agent sont compl&egrave;tes, transitives, continues et ind&eacute;pendantes, alors il existe une utilit&eacute; telle que maximiser son esp&eacute;rance reproduise exactement ces pr&eacute;f&eacute;rences. Un agent qui d&eacute;ciderait autrement violerait l'un des quatre axiomes, et pourrait alors accepter une suite de paris dont il ressortirait perdant &agrave; coup s&ucirc;r.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Deux boucles imbriqu&eacute;es sur des ensembles finis : la proc&eacute;dure se termine toujours. C'est le calcul des probabilit&eacute;s, en amont, qui peut &ecirc;tre co&ucirc;teux.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Proportionnel au produit du nombre d'actions par le nombre de r&eacute;sultats possibles. Ce co&ucirc;t explose d&egrave;s qu'on veut &eacute;valuer des <em>suites</em> d'actions plut&ocirc;t que des actions isol&eacute;es : c'est le probl&egrave;me du chapitre 12.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Confondre utilit&eacute; et somme d'argent : l'utilit&eacute; de la richesse est concave, ce qui explique pourquoi les gens s'assurent. Oublier un r&eacute;sultat rare mais catastrophique, dont la faible probabilit&eacute; ne compense pas l'utilit&eacute; tr&egrave;s n&eacute;gative. Et surtout : appliquer la r&egrave;gle action par action, sans voir qu'une action peu rentable seule le devient dans une s&eacute;quence &mdash; c'est exactement le d&eacute;faut que la figure 2.4 du chapitre rend visible.</p>
+<h2 id="f4">4. La boucle d'un agent apprenant</h2>
+<div class="algo-tag">m&eacute;thode it&eacute;rative &middot; am&eacute;lioration par l'exp&eacute;rience</div>
+<p><strong>But.</strong> Am&eacute;liorer l'agent lui-m&ecirc;me &agrave; l'usage, plut&ocirc;t que d'exiger du concepteur qu'il ait tout pr&eacute;vu.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : un agent initial, m&ecirc;me m&eacute;diocre, un standard de performance ext&eacute;rieur, et la possibilit&eacute; d'agir dans l'environnement.<br>
+<strong>Sortie</strong> : un agent modifi&eacute;, dont la performance moyenne s'est am&eacute;lior&eacute;e.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Agir</strong> avec l'agent courant et observer ce qui se produit.</li>
+<li><strong>Faire &eacute;valuer le r&eacute;sultat par la critique</strong>, au regard d'un standard fixe et <em>ext&eacute;rieur &agrave; l'agent</em>. Ce point est absolument central : si l'agent pouvait modifier son propre standard, il lui suffirait de l'abaisser pour para&icirc;tre parfait.</li>
+<li><strong>Attribuer le m&eacute;rite ou la faute &agrave; une d&eacute;cision pr&eacute;cise.</strong> C'est le probl&egrave;me difficile : quand une partie d'&eacute;checs est perdue, quel coup l'a perdue ? Le chapitre 12 lui consacre une m&eacute;thode enti&egrave;re.</li>
+<li><strong>Modifier l'&eacute;l&eacute;ment d'ex&eacute;cution</strong> dans le sens indiqu&eacute;, par petits pas plut&ocirc;t que brutalement : un retour isol&eacute; est bruit&eacute;.</li>
+<li><strong>Faire proposer par le g&eacute;n&eacute;rateur de probl&egrave;mes une action exploratoire</strong>, dont l'int&eacute;r&ecirc;t imm&eacute;diat est nul mais qui r&eacute;v&eacute;lera quelque chose. Sans cette &eacute;tape, l'agent ne d&eacute;couvrira jamais qu'une strat&eacute;gie qu'il n'a jamais essay&eacute;e &eacute;tait meilleure.</li>
+<li><strong>Recommencer &agrave; l'&eacute;tape 1</strong>, ind&eacute;finiment.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Le programme de dames de Samuel, en 1959, appliquait d&eacute;j&agrave; cette boucle : les poids de sa fonction d'&eacute;valuation &eacute;taient corrig&eacute;s en comparant l'&eacute;valuation d'une position &agrave; celle obtenue quelques coups plus tard.</p>
+<table><thead><tr><th>Composant</th><th>Dans le programme de dames de 1959</th><th>Aujourd'hui, dans un syst&egrave;me appris</th></tr></thead><tbody>
+<tr><td>&Eacute;l&eacute;ment d'ex&eacute;cution</td><td>recherche arborescente et fonction d'&eacute;valuation lin&eacute;aire</td><td>r&eacute;seau qui associe une action &agrave; une observation</td></tr>
+<tr><td>Critique</td><td>comparaison entre l'&eacute;valuation actuelle et celle de la position future</td><td>fonction de perte calcul&eacute;e sur des donn&eacute;es &eacute;tiquet&eacute;es ou sur une r&eacute;compense</td></tr>
+<tr><td>&Eacute;l&eacute;ment d'apprentissage</td><td>ajustement des poids de l'&eacute;valuation</td><td>descente de gradient sur les param&egrave;tres</td></tr>
+<tr><td>G&eacute;n&eacute;rateur de probl&egrave;mes</td><td>parties jou&eacute;es contre une variante de lui-m&ecirc;me</td><td>exploration al&eacute;atoire, jeu contre soi, augmentation des donn&eacute;es</td></tr>
+</tbody></table>
+<p>La colonne de droite ne comporte aucune id&eacute;e absente de celle de gauche : ce sont les m&ecirc;mes quatre r&ocirc;les, avec soixante ans de moyens en plus. C'est un rappel utile &agrave; l'heure des annonces de rupture.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Aucune garantie g&eacute;n&eacute;rale n'existe : la boucle peut diverger, osciller, ou converger vers un comportement m&eacute;diocre. Les garanties sont locales et conditionnelles &mdash; convexit&eacute; de l'objectif, pas d'apprentissage assez petit, exploration suffisante &mdash; et ce sont pr&eacute;cis&eacute;ment celles que les chapitres 9, 11 et 12 &eacute;tablissent dans leurs cadres respectifs.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> La boucle ne s'arr&ecirc;te pas d'elle-m&ecirc;me : elle est interrompue de l'ext&eacute;rieur, quand la performance mesur&eacute;e sur des donn&eacute;es non vues cesse de progresser. S'arr&ecirc;ter quand la performance sur les donn&eacute;es d'apprentissage cesse de progresser est une erreur classique, et le chapitre 9 explique pourquoi.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Le co&ucirc;t dominant est celui de l'exp&eacute;rience elle-m&ecirc;me : agir dans le monde r&eacute;el est lent, risqu&eacute; et parfois irr&eacute;versible. D'o&ugrave; l'usage de simulateurs, avec le probl&egrave;me corollaire du transfert vers le monde r&eacute;el.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Un standard de performance que l'agent peut influencer : il l'optimise au lieu d'optimiser la t&acirc;che. Une exploration insuffisante : l'agent se fige sur la premi&egrave;re strat&eacute;gie qui marche &agrave; peu pr&egrave;s. Une exploration excessive : il n'exploite jamais ce qu'il a appris. Et l'attribution de m&eacute;rite &agrave; la mauvaise d&eacute;cision, qui fait apprendre exactement le contraire de ce qu'il fallait.</p>
+<nav class="lesson-nav"><div class="container">
+<a href="page.html">&larr; Retour au chapitre 2</a>
+<a href="../../index.html">Sommaire du manuel</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+</body></html>

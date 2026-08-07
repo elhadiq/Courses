@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 1 &mdash; Annexe algorithmique</title>
+<meta name="description" content="Jeu de l imitation, moyens et fins, moteur de regles, evaluation.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Chapitre 1 &middot; Annexe</div>
+<h1>Les proc&eacute;dures fondatrices, pas &agrave; pas</h1>
+<div class="lesson-sub">Quatre m&eacute;thodes historiques d&eacute;crites en fran&ccedil;ais, avec un exemple d&eacute;roul&eacute; &agrave; la main pour chacune.</div>
+</div></section>
+<main class="lesson-content">
+<div class="box tip"><div class="box-title">Comment lire cette annexe</div>Aucune ligne de programme, aucune formule inutile : chaque proc&eacute;dure est pr&eacute;sent&eacute;e comme on l'ex&eacute;cuterait &agrave; la main. <a href="page.html">Retour au chapitre</a>.</div>
+<div class="annex-toc">
+<a href="#e1">1. Le jeu de l'imitation</a>
+<a href="#e2">2. Analyse des moyens et des fins</a>
+<a href="#e3">3. Moteur de r&egrave;gles d'un syst&egrave;me expert</a>
+<a href="#e4">4. &Eacute;valuer sur un rep&egrave;re de r&eacute;f&eacute;rence</a>
+</div>
+<p>Ce chapitre est le seul dont les proc&eacute;dures ne sont pas des algorithmes au sens strict : ce sont deux protocoles exp&eacute;rimentaux et deux m&eacute;thodes symboliques. On les d&eacute;taille ici parce qu'elles fixent le vocabulaire de tout le manuel, et parce que leurs limites annoncent les chapitres suivants.</p>
+<figure class="viz"><div class="viz-title">Quatre proc&eacute;dures, deux natures</div><svg viewBox="0 0 760 370" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Quatre proc&eacute;dures, deux natures diff&eacute;rentes</text><rect x="18" y="54" width="724" height="56" rx="8" style="fill:var(--accent);fill-opacity:0.08;stroke:var(--accent);stroke-width:1.8;"/><text x="40" y="78" style="fill:var(--color-text);font-size:13px;font-weight:700;font-family:inherit;">Le jeu de l'imitation</text><text x="40" y="98" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">mesure une fr&eacute;quence, ne d&eacute;montre rien</text><text x="724" y="78" text-anchor="end" style="fill:var(--accent);font-size:12px;font-weight:700;font-family:inherit;">protocole exp&eacute;rimental</text><rect x="18" y="120" width="724" height="56" rx="8" style="fill:var(--primary);fill-opacity:0.08;stroke:var(--primary);stroke-width:1.8;"/><text x="40" y="144" style="fill:var(--color-text);font-size:13px;font-weight:700;font-family:inherit;">Analyse des moyens et des fins</text><text x="40" y="164" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">incompl&egrave;te : &eacute;choue si r&eacute;duire un &eacute;cart en cr&eacute;e un autre</text><text x="724" y="144" text-anchor="end" style="fill:var(--primary);font-size:12px;font-weight:700;font-family:inherit;">m&eacute;thode symbolique</text><rect x="18" y="186" width="724" height="56" rx="8" style="fill:var(--primary);fill-opacity:0.08;stroke:var(--primary);stroke-width:1.8;"/><text x="40" y="210" style="fill:var(--color-text);font-size:13px;font-weight:700;font-family:inherit;">Moteur de r&egrave;gles</text><text x="40" y="230" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">correcte et compl&egrave;te vis-&agrave;-vis de sa base, jamais du monde</text><text x="724" y="210" text-anchor="end" style="fill:var(--primary);font-size:12px;font-weight:700;font-family:inherit;">m&eacute;thode symbolique</text><rect x="18" y="252" width="724" height="56" rx="8" style="fill:var(--accent);fill-opacity:0.08;stroke:var(--accent);stroke-width:1.8;"/><text x="40" y="276" style="fill:var(--color-text);font-size:13px;font-weight:700;font-family:inherit;">&Eacute;valuation sur un rep&egrave;re</text><text x="40" y="296" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">ne conclut que sur la distribution test&eacute;e</text><text x="724" y="276" text-anchor="end" style="fill:var(--accent);font-size:12px;font-weight:700;font-family:inherit;">protocole de mesure</text><text x="380" y="338" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Deux protocoles et deux m&eacute;thodes : les premiers mesurent, les secondes calculent. Aucun des quatre ne prouve quoi que</text><text x="380" y="356" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">ce soit sur l'intelligence.</text></svg><figcaption class="viz-caption"><strong>Figure A.1.</strong> Deux protocoles exp&eacute;rimentaux et deux m&eacute;thodes symboliques. Les distinguer &eacute;vite l'erreur la plus courante : attendre d'un protocole qu'il d&eacute;montre, ou d'une m&eacute;thode qu'elle mesure.</figcaption></figure>
+<h2 id="e1">1. Le jeu de l'imitation</h2>
+<div class="algo-tag">protocole exp&eacute;rimental &middot; crit&egrave;re observable</div>
+<p><strong>But.</strong> Rempla&ccedil;er la question &laquo; cette machine pense-t-elle ? &raquo;, dont personne ne sait ce qui la trancherait, par une exp&eacute;rience dont le r&eacute;sultat est un nombre.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : un programme conversationnel, un interrogateur humain, un t&eacute;moin humain, une dur&eacute;e d'&eacute;change et un canal qui masque tout indice physique.<br>
+<strong>Sortie</strong> : la proportion de parties o&ugrave; l'interrogateur d&eacute;signe correctement la machine.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Isoler les trois participants</strong> de sorte qu'ils ne communiquent que par &eacute;crit. Le canal &eacute;crit n'est pas un d&eacute;tail : il &eacute;limine la voix, l'apparence et le d&eacute;lai physique, qui trahiraient imm&eacute;diatement la machine sans rien dire de sa pens&eacute;e.</li>
+<li><strong>L'interrogateur dialogue librement</strong> avec les deux interlocuteurs, sans limite de sujet. C'est cette libert&eacute; qui fait la force du test : n'importe quelle comp&eacute;tence peut &ecirc;tre sollicit&eacute;e, du calcul mental &agrave; la po&eacute;sie.</li>
+<li><strong>Au terme du temps imparti, l'interrogateur d&eacute;signe</strong> lequel des deux est la machine.</li>
+<li><strong>R&eacute;p&eacute;ter avec de nombreux interrogateurs</strong> et compter les d&eacute;signations correctes. Une seule partie ne prouve rien : le r&eacute;sultat est une fr&eacute;quence.</li>
+<li><strong>Comparer au hasard.</strong> Si la proportion de bonnes d&eacute;signations ne d&eacute;passe pas significativement une chance sur deux, la machine a r&eacute;ussi.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Turing donne lui-m&ecirc;me, en 1950, un &eacute;change fictif dont chaque r&eacute;ponse est instructive.</p>
+<table><thead><tr><th>Question de l'interrogateur</th><th>R&eacute;ponse de la machine</th><th>Ce que la r&eacute;ponse r&eacute;v&egrave;le</th></tr></thead><tbody>
+<tr><td>&Eacute;crivez-moi un sonnet sur le pont du Forth.</td><td>Passez la main sur ce sujet, je n'ai jamais su &eacute;crire de po&eacute;sie.</td><td>Refuser est une strat&eacute;gie gagnante : les humains refusent aussi.</td></tr>
+<tr><td>Additionnez 34957 et 70764.</td><td>(apr&egrave;s trente secondes) 105621.</td><td>La somme est fausse de 100, et la pause est simul&eacute;e : la machine imite une faiblesse.</td></tr>
+<tr><td>Jouez-vous aux &eacute;checs ? J'ai roi en e1, vous avez roi en e3 et tour en a8. &Agrave; vous.</td><td>Tour en a1, &eacute;chec et mat.</td><td>Ici la comp&eacute;tence est r&eacute;elle et v&eacute;rifiable ind&eacute;pendamment.</td></tr>
+</tbody></table>
+<p>Les deux premi&egrave;res r&eacute;ponses montrent le c&oelig;ur du probl&egrave;me : pour r&eacute;ussir le test, il faut parfois <em>d&eacute;grader</em> ses performances. Un syst&egrave;me qui additionne juste et instantan&eacute;ment se trahit. Le test mesure la ressemblance &agrave; l'humain, pas la comp&eacute;tence.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Il n'y a rien &agrave; d&eacute;montrer : le test ne prouve pas la pens&eacute;e, il fournit un crit&egrave;re conventionnel. Turing l'assume et pr&eacute;cise que la question originelle est &laquo; trop d&eacute;pourvue de sens pour m&eacute;riter discussion &raquo;. Le seul r&eacute;sultat &eacute;tabli est n&eacute;gatif : &eacute;chouer au test ne prouve pas l'absence d'intelligence, et le r&eacute;ussir ne prouve pas sa pr&eacute;sence.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> La dur&eacute;e de l'&eacute;change est fix&eacute;e d'avance, ainsi que le nombre de parties. C'est un protocole, pas un algorithme : sa terminaison est impos&eacute;e.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Le co&ucirc;t r&eacute;el est humain : il faut de nombreux interrogateurs, non pr&eacute;venus et non entra&icirc;n&eacute;s, sans quoi la mesure est biais&eacute;e. C'est la raison principale pour laquelle le test n'a jamais &eacute;t&eacute; conduit s&eacute;rieusement &agrave; grande &eacute;chelle.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Un interrogateur complaisant ou peu curieux fait passer n'importe quoi : les utilisateurs d'ELIZA, en 1966, pr&ecirc;taient une compr&eacute;hension &agrave; un programme de reformulation. Un interrogateur au contraire averti d&eacute;masque la machine en quelques questions, en exploitant la m&eacute;moire longue ou le raisonnement spatial. Enfin, le test ne dit rien de la perception ni de l'action : un syst&egrave;me qui le r&eacute;ussirait pourrait &ecirc;tre incapable de reconna&icirc;tre une chaise.</p>
+<h2 id="e2">2. L'analyse des moyens et des fins</h2>
+<div class="algo-tag">m&eacute;thode symbolique &middot; r&eacute;duction d'&eacute;cart</div>
+<p><strong>But.</strong> R&eacute;soudre un probl&egrave;me en rep&eacute;rant la diff&eacute;rence entre l'&eacute;tat courant et le but, puis en cherchant une action qui r&eacute;duit pr&eacute;cis&eacute;ment cette diff&eacute;rence.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : un &eacute;tat courant, un &eacute;tat but, une liste d'actions dont on conna&icirc;t pour chacune les conditions d'application et les diff&eacute;rences qu'elle r&eacute;duit.<br>
+<strong>Sortie</strong> : une suite d'actions menant au but, ou un &eacute;chec.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Comparer l'&eacute;tat courant au but</strong> et dresser la liste des diff&eacute;rences. C'est ici que se joue toute la m&eacute;thode : elle suppose que l'on sache d&eacute;crire un &eacute;cart, pas seulement constater qu'on n'y est pas.</li>
+<li><strong>S'il n'y a plus de diff&eacute;rence, c'est termin&eacute;.</strong></li>
+<li><strong>Choisir la diff&eacute;rence jug&eacute;e la plus importante</strong> et chercher dans le catalogue une action connue pour la r&eacute;duire. Traiter d'abord le plus gros &eacute;cart &eacute;vite de peaufiner des d&eacute;tails qu'une action ult&eacute;rieure d&eacute;truira.</li>
+<li><strong>Si les conditions de cette action ne sont pas r&eacute;unies, en faire un sous-but</strong> et appliquer la m&ecirc;me proc&eacute;dure &agrave; ce sous-but. C'est la r&eacute;cursion : atteindre les conditions d'une action est un probl&egrave;me de m&ecirc;me nature.</li>
+<li><strong>Appliquer l'action</strong> et recommencer &agrave; l'&eacute;tape 1 avec le nouvel &eacute;tat.</li>
+<li><strong>Si aucune action ne r&eacute;duit la diff&eacute;rence choisie, revenir en arri&egrave;re</strong> et essayer la diff&eacute;rence suivante.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Le probl&egrave;me du singe et des bananes, classique du domaine : les bananes sont suspendues au plafond, le singe est &agrave; la porte, la caisse est &agrave; la fen&ecirc;tre.</p>
+<table><thead><tr><th>&Eacute;tape</th><th>Diff&eacute;rence la plus importante</th><th>Action choisie</th><th>Nouveau sous-but</th></tr></thead><tbody>
+<tr><td>1</td><td>le singe n'a pas les bananes</td><td>attraper les bananes</td><td>&ecirc;tre en hauteur sous les bananes</td></tr>
+<tr><td>2</td><td>le singe n'est pas en hauteur</td><td>monter sur la caisse</td><td>la caisse doit &ecirc;tre sous les bananes</td></tr>
+<tr><td>3</td><td>la caisse est &agrave; la fen&ecirc;tre</td><td>pousser la caisse</td><td>le singe doit &ecirc;tre &agrave; la fen&ecirc;tre</td></tr>
+<tr><td>4</td><td>le singe est &agrave; la porte</td><td>marcher jusqu'&agrave; la fen&ecirc;tre</td><td>aucun : condition remplie</td></tr>
+<tr><td>5</td><td>&mdash;</td><td>ex&eacute;cution en sens inverse : marcher, pousser, monter, attraper</td><td>but atteint</td></tr>
+</tbody></table>
+<p>Remarquez que le plan se construit &agrave; l'envers, du but vers l'&eacute;tat initial, puis s'ex&eacute;cute &agrave; l'endroit. C'est ce renversement qui donne son efficacit&eacute; &agrave; la m&eacute;thode &mdash; et sa fragilit&eacute; : il suppose que r&eacute;duire un &eacute;cart n'en cr&eacute;e pas un autre.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> La m&eacute;thode ne garantit rien. Elle est correcte au sens faible o&ugrave; le plan produit, s'il existe, est bien une suite d'actions applicables menant au but &mdash; chaque action n'&eacute;tant appliqu&eacute;e qu'une fois ses conditions v&eacute;rifi&eacute;es. Mais elle est <em>incompl&egrave;te</em> : il existe des probl&egrave;mes solubles qu'elle ne r&eacute;sout pas, quand la solution passe par une action qui aggrave temporairement l'&eacute;cart.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Rien ne l'assure en g&eacute;n&eacute;ral. On impose une profondeur maximale de sous-buts, ou l'on interdit de reprendre un sous-but d&eacute;j&agrave; ouvert sur la branche courante.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Dans le meilleur cas, lin&eacute;aire en la longueur du plan : c'est ce qui rendait la m&eacute;thode spectaculaire sur les probl&egrave;mes-jouets. Dans le pire cas, exponentiel comme toute recherche. Le rapport Lighthill de 1973 a pr&eacute;cis&eacute;ment reproch&eacute; au domaine de publier les premiers et de taire les seconds.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Elle exige un catalogue d'actions annot&eacute;es &agrave; la main, ce qui ne passe pas &agrave; l'&eacute;chelle. Elle suppose que les diff&eacute;rences sont ind&eacute;pendantes, ce qui est faux d&egrave;s que r&eacute;duire l'une augmente l'autre &mdash; le probl&egrave;me dit des sous-buts en conflit. Enfin, elle n'a aucun moyen de reconna&icirc;tre qu'une diff&eacute;rence est irr&eacute;ductible.</p>
+<h2 id="e3">3. Le moteur de r&egrave;gles d'un syst&egrave;me expert</h2>
+<div class="algo-tag">m&eacute;thode symbolique &middot; cha&icirc;nage avant</div>
+<p><strong>But.</strong> D&eacute;duire tout ce qui d&eacute;coule d'un ensemble de faits observ&eacute;s et d'un ensemble de r&egrave;gles &eacute;crites par un sp&eacute;cialiste du domaine.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : une base de faits initiaux et une base de r&egrave;gles de la forme &laquo; si telles conditions sont v&eacute;rifi&eacute;es, alors ajouter tel fait &raquo;.<br>
+<strong>Sortie</strong> : la base de faits satur&eacute;e, et la trace des r&egrave;gles utilis&eacute;es.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Partir des faits observ&eacute;s.</strong> Ce sont les seules donn&eacute;es d'entr&eacute;e : les sympt&ocirc;mes d'un patient, les mesures d'un capteur, les r&eacute;ponses d'un questionnaire.</li>
+<li><strong>Rechercher toutes les r&egrave;gles dont les conditions sont enti&egrave;rement satisfaites</strong> par la base de faits courante. C'est le point co&ucirc;teux : &agrave; chaque tour, il faut confronter chaque r&egrave;gle &agrave; chaque fait.</li>
+<li><strong>S'il n'y en a aucune, s'arr&ecirc;ter</strong> : la base est satur&eacute;e, plus rien ne se d&eacute;duit.</li>
+<li><strong>En choisir une</strong> &mdash; par ordre de priorit&eacute;, ou la plus sp&eacute;cifique, ou la moins r&eacute;cemment employ&eacute;e. Ce choix ne change pas le r&eacute;sultat final mais change l'ordre des questions pos&eacute;es &agrave; l'utilisateur, donc l'ergonomie.</li>
+<li><strong>Ajouter sa conclusion &agrave; la base de faits</strong> et noter la r&egrave;gle dans la trace. Ne rien ajouter si le fait y figure d&eacute;j&agrave; : sinon la proc&eacute;dure boucle.</li>
+<li><strong>Recommencer &agrave; l'&eacute;tape 2.</strong></li>
+<li><strong>La trace est l'explication.</strong> C'est l&agrave; l'avantage d&eacute;cisif de l'approche : &agrave; toute conclusion on peut r&eacute;pondre &laquo; pourquoi ? &raquo; en remontant les r&egrave;gles.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Quatre r&egrave;gles d'un diagnostic simplifi&eacute;, et trois faits observ&eacute;s : <em>fi&egrave;vre</em>, <em>toux</em>, <em>contact r&eacute;cent</em>.</p>
+<table><thead><tr><th>Tour</th><th>R&egrave;gle d&eacute;clench&eacute;e</th><th>Conditions v&eacute;rifi&eacute;es</th><th>Fait ajout&eacute;</th></tr></thead><tbody>
+<tr><td>1</td><td>si fi&egrave;vre et toux alors infection respiratoire</td><td>fi&egrave;vre, toux</td><td>infection respiratoire</td></tr>
+<tr><td>2</td><td>si infection respiratoire et contact r&eacute;cent alors origine contagieuse</td><td>infection respiratoire, contact r&eacute;cent</td><td>origine contagieuse</td></tr>
+<tr><td>3</td><td>si origine contagieuse alors isolement recommand&eacute;</td><td>origine contagieuse</td><td>isolement recommand&eacute;</td></tr>
+<tr><td>4</td><td>si fi&egrave;vre et &eacute;ruption alors maladie &eacute;ruptive</td><td>&eacute;ruption absente</td><td>aucune : r&egrave;gle non d&eacute;clenchable</td></tr>
+</tbody></table>
+<p>&Agrave; la question &laquo; pourquoi l'isolement ? &raquo;, le syst&egrave;me r&eacute;pond en remontant : &agrave; cause de l'origine contagieuse, elle-m&ecirc;me d&eacute;duite de l'infection et du contact r&eacute;cent, eux-m&ecirc;mes issus des sympt&ocirc;mes observ&eacute;s. Aucun mod&egrave;le statistique actuel ne fournit une explication de cette nature.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> La proc&eacute;dure est correcte et compl&egrave;te vis-&agrave;-vis de sa base : elle ajoute exactement les faits qui d&eacute;coulent des r&egrave;gles, ni plus ni moins. Invariant : &agrave; tout instant, tout fait de la base est une cons&eacute;quence des faits initiaux par les r&egrave;gles. Attention au glissement : cela ne dit rien de la <em>v&eacute;rit&eacute;</em> des conclusions, qui d&eacute;pend enti&egrave;rement de la qualit&eacute; des r&egrave;gles &eacute;crites.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Variant : le nombre de faits d&eacute;ductibles non encore pr&eacute;sents dans la base. Il est fini d&egrave;s que le vocabulaire est fini, et il d&eacute;cro&icirc;t strictement &agrave; chaque tour productif. Sans le test &laquo; ne rien ajouter deux fois &raquo;, ce variant dispara&icirc;t et la proc&eacute;dure boucle ind&eacute;finiment.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Na&iuml;vement, chaque tour confronte toutes les r&egrave;gles &agrave; tous les faits, ce qui donne un produit du nombre de r&egrave;gles par le nombre de faits, r&eacute;p&eacute;t&eacute; autant de fois qu'il y a de d&eacute;ductions. Les moteurs industriels &eacute;vitent ce co&ucirc;t en m&eacute;morisant, pour chaque r&egrave;gle, les conditions d&eacute;j&agrave; satisfaites, et en ne r&eacute;examinant que ce que le nouveau fait a chang&eacute;.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Le point de rupture est humain, pas algorithmique : au-del&agrave; de quelques milliers de r&egrave;gles, plus personne ne sait si une r&egrave;gle nouvelle en contredit une ancienne. S'ajoutent l'absence de gradation &mdash; une r&egrave;gle s'applique ou non, il n'y a pas de &laquo; plut&ocirc;t vrai &raquo; &mdash; et l'incapacit&eacute; &agrave; traiter le bon sens, dont personne n'a jamais r&eacute;ussi &agrave; &eacute;crire les r&egrave;gles.</p>
+<h2 id="e4">4. &Eacute;valuer un syst&egrave;me sur un rep&egrave;re de r&eacute;f&eacute;rence</h2>
+<div class="algo-tag">protocole de mesure &middot; comparaison &eacute;quitable</div>
+<p><strong>But.</strong> Comparer des syst&egrave;mes entre eux, et suivre les progr&egrave;s d'un domaine, autrement que par l'impression que produit une d&eacute;monstration.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : une t&acirc;che pr&eacute;cis&eacute;ment sp&eacute;cifi&eacute;e, un jeu de donn&eacute;es public, une mesure de performance unique, et une performance humaine de r&eacute;f&eacute;rence quand elle existe.<br>
+<strong>Sortie</strong> : un score comparable d'un syst&egrave;me &agrave; l'autre et d'une ann&eacute;e &agrave; l'autre.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Fixer la t&acirc;che avant de conna&icirc;tre les syst&egrave;mes</strong> qui y seront &eacute;valu&eacute;s. Une t&acirc;che d&eacute;finie apr&egrave;s coup mesure l'ing&eacute;niosit&eacute; de celui qui l'a d&eacute;finie.</li>
+<li><strong>S&eacute;parer les donn&eacute;es en trois parts</strong> : une pour construire le syst&egrave;me, une pour r&eacute;gler ses param&egrave;tres, une derni&egrave;re gard&eacute;e secr&egrave;te pour le score final. La troisi&egrave;me ne doit &ecirc;tre utilis&eacute;e qu'une fois.</li>
+<li><strong>Choisir une mesure unique</strong> et la publier &agrave; l'avance. Choisir la mesure apr&egrave;s avoir vu les r&eacute;sultats revient &agrave; choisir le gagnant.</li>
+<li><strong>&Eacute;tablir la performance humaine dans les m&ecirc;mes conditions</strong> : m&ecirc;mes donn&eacute;es, m&ecirc;me temps, m&ecirc;mes informations disponibles. C'est l'&eacute;tape la plus souvent bacl&eacute;e, et elle rend la plupart des annonces de &laquo; niveau surhumain &raquo; ininterpr&eacute;tables.</li>
+<li><strong>Publier aussi les cas d'&eacute;chec</strong>, et pas seulement le score agr&eacute;g&eacute;. Un score moyen &eacute;lev&eacute; peut masquer un &eacute;chec syst&eacute;matique sur une sous-population.</li>
+<li><strong>Rejouer le rep&egrave;re quelques ann&eacute;es plus tard sur des donn&eacute;es fra&icirc;ches.</strong> Un rep&egrave;re trop utilis&eacute; finit toujours par &ecirc;tre appris plut&ocirc;t que r&eacute;solu.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Quatre annonces c&eacute;l&egrave;bres, et ce que l'application du protocole ci-dessus en conserve.</p>
+<table><thead><tr><th>Annonce</th><th>Ce qui est solide</th><th>Ce qui manque au protocole</th></tr></thead><tbody>
+<tr><td>Une machine bat le champion du monde d'&eacute;checs (1997)</td><td>R&egrave;gles fix&eacute;es, adversaire de r&eacute;f&eacute;rence incontestable, r&eacute;sultat public</td><td>Un seul match de six parties : l'&eacute;chantillon est minuscule</td></tr>
+<tr><td>Une machine gagne &agrave; un jeu t&eacute;l&eacute;vis&eacute; de culture g&eacute;n&eacute;rale (2011)</td><td>M&ecirc;mes questions et m&ecirc;me temps que les humains</td><td>La t&acirc;che favorise la m&eacute;moire encyclop&eacute;dique, non le raisonnement</td></tr>
+<tr><td>Un syst&egrave;me d&eacute;passe l'humain sur un rep&egrave;re de compr&eacute;hension de texte</td><td>Jeu de donn&eacute;es public, mesure publi&eacute;e &agrave; l'avance</td><td>La r&eacute;f&eacute;rence humaine vient d'annotateurs pay&eacute;s &agrave; la t&acirc;che, non d'experts</td></tr>
+<tr><td>Un mod&egrave;le pr&eacute;dit la structure des prot&eacute;ines &agrave; la pr&eacute;cision exp&eacute;rimentale (2020)</td><td>&Eacute;valuation en aveugle par un tiers, sur des structures non publi&eacute;es</td><td>Peu de choses : c'est le protocole le plus rigoureux des quatre</td></tr>
+</tbody></table>
+<p>La quatri&egrave;me ligne montre &agrave; quoi ressemble une &eacute;valuation bien conduite : les cibles &eacute;taient inconnues de tous au moment de la pr&eacute;diction, et l'&eacute;valuateur &eacute;tait ind&eacute;pendant des &eacute;quipes concurrentes.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Un rep&egrave;re ne mesure jamais une capacit&eacute; g&eacute;n&eacute;rale : il mesure la performance sur une distribution de donn&eacute;es particuli&egrave;re. La seule conclusion l&eacute;gitime a la forme &laquo; sur ces donn&eacute;es, avec cette mesure, ce syst&egrave;me obtient tel score &raquo;. Toute extrapolation au-del&agrave; est une hypoth&egrave;se, &agrave; tester s&eacute;par&eacute;ment.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Le protocole se termine par construction : il consiste &agrave; &eacute;valuer un nombre fini de syst&egrave;mes sur un nombre fini d'exemples.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Le co&ucirc;t dominant est la constitution du jeu de donn&eacute;es et l'&eacute;tablissement de la r&eacute;f&eacute;rence humaine, souvent plus co&ucirc;teux que l'entra&icirc;nement des syst&egrave;mes &eacute;valu&eacute;s. C'est pourquoi les bons rep&egrave;res sont rares et tr&egrave;s r&eacute;utilis&eacute;s &mdash; ce qui les use.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Trois d&eacute;faillances reviennent. La <em>contamination</em> : les donn&eacute;es de test se retrouvent, directement ou non, dans les donn&eacute;es d'entra&icirc;nement, et le score n'a plus de sens. Le <em>surajustement au rep&egrave;re</em> : &agrave; force d'&ecirc;tre optimis&eacute;s dessus, les syst&egrave;mes progressent sur lui sans progresser sur la t&acirc;che. Et les <em>raccourcis</em> : le syst&egrave;me d&eacute;couvre dans les donn&eacute;es un indice accidentel &mdash; un mot fr&eacute;quent, un cadrage d'image &mdash; qui pr&eacute;dit la bonne r&eacute;ponse sans rien r&eacute;soudre.</p>
+<nav class="lesson-nav"><div class="container">
+<a href="page.html">&larr; Retour au chapitre 1</a>
+<a href="../../index.html">Sommaire du manuel</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+</body></html>

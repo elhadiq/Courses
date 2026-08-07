@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 3 &mdash; Recherche dans un espace d&#39;&eacute;tats</title>
+<meta name="description" content="Espace d etats, recherche non informee, heuristiques admissibles et coherentes, A*, IDA*.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Partie II &middot; Chapitre 3</div>
+<h1>Chapitre 3 &mdash; R&eacute;solution de probl&egrave;mes par recherche dans un espace d'&eacute;tats</h1>
+<div class="lesson-sub">Mod&eacute;lisation par &eacute;tats et transitions, recherche non inform&eacute;e, heuristiques admissibles et coh&eacute;rentes, algorithme A*, versions &agrave; m&eacute;moire born&eacute;e.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">Annexe compagnon</div><p>Chacun des algorithmes de ce chapitre est aussi expos&eacute; <strong><a href="algorithms.html">pas &agrave; pas dans l'annexe</a></strong> : ce qu'il re&ccedil;oit, ce qu'il produit, ses &eacute;tapes dans l'ordre, un exemple d&eacute;roul&eacute; &agrave; la main, et pourquoi il est correct, pourquoi il s'arr&ecirc;te et ce qu'il co&ucirc;te &mdash; en fran&ccedil;ais, sans une ligne de programme.</p></div>
+
+<h2>1.1 Qu'est-ce qu'un probl&egrave;me de recherche ?</h2>
+
+<p>Un grand nombre de t&acirc;ches dites &laquo; intelligentes &raquo; &mdash; sortir d'un labyrinthe, r&eacute;soudre un taquin, planifier un itin&eacute;raire, ordonnancer des op&eacute;rations &mdash; se ram&egrave;nent &agrave; un seul sch&eacute;ma : on part d'une situation, on dispose d'actions qui transforment une situation en une autre, et on cherche une suite d'actions menant &agrave; une situation jug&eacute;e satisfaisante. Ce sch&eacute;ma est le <strong>probl&egrave;me de recherche</strong>, formalis&eacute; sous cette forme d&egrave;s les premiers travaux de r&eacute;solution automatique de probl&egrave;mes <a class="cite" href="#ref-newell1959">[1]</a>.</p>
+
+<div class="box def"><div class="box-title">D&eacute;finition &mdash; Probl&egrave;me de recherche</div>
+<p>Un probl&egrave;me de recherche est un quintuplet \((S, s_0, A, T, B)\) o&ugrave; :</p>
+<ul>
+<li>\(S\) est l'ensemble des <strong>&eacute;tats</strong> ;</li>
+<li>\(s_0 \in S\) est l'<strong>&eacute;tat initial</strong> ;</li>
+<li>\(A\) est l'ensemble des <strong>actions</strong> ; \(A(s)\) d&eacute;signe celles applicables dans l'&eacute;tat \(s\) ;</li>
+<li>\(T : S \times A \to S\) est la <strong>fonction de transition</strong> ; le passage de \(s\) &agrave; \(s'\) porte un co&ucirc;t \(c(s,a,s') \gt 0\) ;</li>
+<li>\(B \subseteq S\) est l'ensemble des <strong>&eacute;tats buts</strong>, d&eacute;crit le plus souvent par un test \(\text{but}(s)\).</li>
+</ul>
+<p>Une <strong>solution</strong> est une suite d'actions menant de \(s_0\) &agrave; un &eacute;tat de \(B\) ; elle est <strong>optimale</strong> si la somme des co&ucirc;ts de ses transitions est minimale.</p></div>
+
+<p>Le quintuplet d&eacute;finit implicitement un graphe orient&eacute; pond&eacute;r&eacute;, le <strong>graphe d'&eacute;tats</strong>, dont les sommets sont les &eacute;tats et les arcs les transitions. R&eacute;soudre le probl&egrave;me, c'est donc chercher un plus court chemin dans ce graphe. La difficult&eacute; est que ce graphe n'est <em>jamais construit en entier</em> : il est bien trop gros. Le taquin \(4\times 4\) compte \(16!/2 \approx 1{,}05\times 10^{13}\) &eacute;tats atteignables ; le Rubik's cube en compte environ \(4{,}3\times 10^{19}\). On ne dispose que de deux primitives : le test de but, et la fonction qui &eacute;num&egrave;re les successeurs d'un &eacute;tat. Toute la difficult&eacute; algorithmique tient dans cette contrainte : <em>explorer le moins possible d'un graphe qu'on ne voit qu'&agrave; travers un trou de serrure</em>.</p>
+
+<figure class="viz"><div class="viz-title">Graphe d'&eacute;tats et arbre de recherche</div>
+<svg viewBox="0 0 760 360" role="img" style="width:100%;height:auto;display:block;"><text x="16" y="22" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Graphe d'&eacute;tats (fini)</text><text x="404" y="22" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Arbre de recherche (infini)</text><path d="M 380 40 L 380 340" style="fill:none;stroke:var(--color-rule);stroke-width:1.5;stroke-dasharray:5 5;"/><path d="M 100 100 L 270 100" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 100 100 L 100 265" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 270 100 L 270 265" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 100 265 L 270 265" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 100 100 L 270 265" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><circle cx="100" cy="100" r="21" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="100" y="105" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">A</text><circle cx="270" cy="100" r="21" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="270" y="105" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">B</text><circle cx="100" cy="265" r="21" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="100" y="270" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">C</text><circle cx="270" cy="265" r="21" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="270" y="270" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">D</text><text x="185" y="332" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">4 sommets, 5 ar&ecirc;tes</text><path d="M 570 78 L 470 122" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 570 78 L 570 122" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 570 78 L 670 122" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 470 158 L 430 207" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 470 158 L 505 207" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 570 158 L 570 207" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 670 158 L 640 207" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 670 158 L 700 207" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><circle cx="570" cy="60" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="570" y="65" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">A</text><circle cx="470" cy="140" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="470" y="145" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">B</text><circle cx="570" cy="140" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="570" y="145" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">C</text><circle cx="670" cy="140" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="670" y="145" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">D</text><circle cx="430" cy="225" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="430" y="230" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">A</text><circle cx="505" cy="225" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="505" y="230" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">D</text><circle cx="570" cy="225" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="570" y="230" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">A</text><circle cx="640" cy="225" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="640" y="230" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">A</text><circle cx="700" cy="225" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="700" y="230" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">B</text><path d="M 430 243 L 430 285" style="fill:none;stroke:var(--viz-ref);stroke-width:2;stroke-dasharray:4 5;"/><path d="M 505 243 L 505 285" style="fill:none;stroke:var(--viz-ref);stroke-width:2;stroke-dasharray:4 5;"/><path d="M 570 243 L 570 285" style="fill:none;stroke:var(--viz-ref);stroke-width:2;stroke-dasharray:4 5;"/><path d="M 640 243 L 640 285" style="fill:none;stroke:var(--viz-ref);stroke-width:2;stroke-dasharray:4 5;"/><path d="M 700 243 L 700 285" style="fill:none;stroke:var(--viz-ref);stroke-width:2;stroke-dasharray:4 5;"/><text x="570" y="308" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">&hellip; sans fin</text><text x="570" y="332" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">chaque cycle du graphe se red&eacute;plie</text></svg>
+<figcaption class="viz-caption"><strong>Figure 3.1.</strong> &Agrave; gauche, le graphe d'&eacute;tats : quatre sommets, des cycles, un objet fini. &Agrave; droite, l'arbre de recherche engendr&eacute; en d&eacute;pliant ce graphe depuis \(A\) : il est <em>infini</em>, car chaque cycle se red&eacute;plie ind&eacute;finiment. Un algorithme qui ne m&eacute;morise pas les &eacute;tats d&eacute;j&agrave; vus explore l'arbre de droite, pas le graphe de gauche &mdash; c'est la premi&egrave;re source de non-terminaison en pratique.</figcaption></figure>
+
+<div class="box warn"><div class="box-title">Ne pas confondre &eacute;tat et n&oelig;ud</div>
+Un <strong>&eacute;tat</strong> est une configuration du monde ; un <strong>n&oelig;ud</strong> est une entr&eacute;e de la structure de donn&eacute;es de l'algorithme, qui m&eacute;morise un &eacute;tat <em>et</em> le chemin qui y m&egrave;ne (parent, action, co&ucirc;t cumul&eacute;, profondeur). Un m&ecirc;me &eacute;tat peut appara&icirc;tre dans plusieurs n&oelig;uds ; c'est exactement ce que la table des &eacute;tats ferm&eacute;s sert &agrave; &eacute;viter.</div>
+
+<h3>Sch&eacute;ma g&eacute;n&eacute;ral de recherche</h3>
+
+<p>Tous les algorithmes de ce chapitre sont des instances d'un unique squelette. On maintient une <strong>frange</strong> (ou ouverte) des n&oelig;uds engendr&eacute;s mais non encore d&eacute;velopp&eacute;s, et un ensemble <strong>ferm&eacute;</strong> des &eacute;tats d&eacute;j&agrave; d&eacute;velopp&eacute;s. &Agrave; chaque tour, on extrait un n&oelig;ud de la frange, on teste s'il est but, sinon on le d&eacute;veloppe et on ins&egrave;re ses successeurs. <em>La seule chose qui change d'un algorithme &agrave; l'autre est la discipline d'extraction de la frange.</em></p>
+
+<div class="algo"><div class="algo-cap">Algorithme 3.1 &mdash; Sch&eacute;ma g&eacute;n&eacute;ral de recherche</div><div class="algo-io"><b>Entr&eacute;e :</b> un &eacute;tat initial \(s_0\), une fonction successeur \(\sigma\), un test de but \(\beta\), une frange \(\mathcal{F}\) munie de sa discipline<br><b>Sortie :</b> un chemin de \(s_0\) vers un &eacute;tat but, ou l'&eacute;chec</div><ol class="algo-corps"><li><i class="va">C</i> &larr; \(\varnothing\)          <span class="cm">// ensemble des etats deja developpes</span></li><li><span class="fn">Inserer</span>(<i class="va">F</i>, \((s_0,\ [s_0],\ 0)\))</li><li><b class="kw">tant que</b> <i class="va">F</i> \(\neq \varnothing\) <b class="kw">faire</b></li><li class="n1">\((s, p, g) \leftarrow\) <span class="fn">Extraire</span>(<i class="va">F</i>)          <span class="cm">// la discipline choisit</span></li><li class="n1"><b class="kw">si</b> \(\beta(s)\) <b class="kw">alors</b> <b class="kw">retourner</b> \((p, g)\)</li><li class="n1"><b class="kw">si</b> <i class="va">s</i> \(\in C\) <b class="kw">alors</b> <b class="kw">continuer</b></li><li class="n1"><i class="va">C</i> &larr; \(C \cup \{s\}\)</li><li class="n1"><b class="kw">pour tout</b> \((a, s', c) \in \sigma(s)\) <b class="kw">faire</b></li><li class="n2"><b class="kw">si</b> \(s' \notin C\) <b class="kw">alors</b> <span class="fn">Inserer</span>(<i class="va">F</i>, \((s',\ p \cdot s',\ g + c)\))</li><li><b class="kw">retourner</b> &eacute;chec</li></ol><p class="algo-note">Une seule ligne change d'un algorithme &agrave; l'autre : la discipline d'extraction de \(\mathcal{F}\). File : parcours en largeur. Pile : en profondeur. Tas min sur \(g\) : co&ucirc;t uniforme. Tas min sur \(g+h\) : A*.</p></div>
+
+<table>
+<thead><tr><th>Discipline de la frange</th><th>Algorithme obtenu</th><th>Ordre de sortie</th></tr></thead>
+<tbody>
+<tr><td>File (FIFO)</td><td>Parcours en largeur (BFS)</td><td>par profondeur croissante</td></tr>
+<tr><td>Pile (LIFO)</td><td>Parcours en profondeur (DFS)</td><td>le plus r&eacute;cent d'abord</td></tr>
+<tr><td>Tas min sur \(g\)</td><td>Co&ucirc;t uniforme (Dijkstra <a class="cite" href="#ref-dijkstra1959">[9]</a>)</td><td>par co&ucirc;t cumul&eacute; croissant</td></tr>
+<tr><td>Tas min sur \(h\)</td><td>Meilleur d'abord glouton</td><td>par proximit&eacute; estim&eacute;e du but</td></tr>
+<tr><td>Tas min sur \(g+h\)</td><td>A*</td><td>par co&ucirc;t total estim&eacute;</td></tr>
+</tbody></table>
+
+<h2>1.2 Recherche non inform&eacute;e</h2>
+
+<p>&laquo; Non inform&eacute;e &raquo; signifie que l'algorithme n'a aucune connaissance du probl&egrave;me au-del&agrave; de sa d&eacute;finition : il ne sait pas estimer si un &eacute;tat est proche du but.</p>
+
+<div class="box prop"><div class="box-title">Propri&eacute;t&eacute;s des strat&eacute;gies non inform&eacute;es</div>
+<p>Soit \(b\) le facteur de branchement, \(d\) la profondeur de la solution la moins profonde, \(m\) la profondeur maximale de l'arbre, \(C^*\) le co&ucirc;t optimal et \(\varepsilon\) le co&ucirc;t minimal d'une transition.</p>
+<table>
+<thead><tr><th>Strat&eacute;gie</th><th>Complet</th><th>Optimal</th><th>Temps</th><th>Espace</th></tr></thead>
+<tbody>
+<tr><td>Largeur (BFS)</td><td>oui si \(b\) fini</td><td>oui si co&ucirc;ts uniformes</td><td>\(O(b^{d})\)</td><td>\(O(b^{d})\)</td></tr>
+<tr><td>Profondeur (DFS)</td><td>non (graphe infini)</td><td>non</td><td>\(O(b^{m})\)</td><td>\(O(bm)\)</td></tr>
+<tr><td>Co&ucirc;t uniforme</td><td>oui</td><td>oui</td><td>\(O(b^{1+\lfloor C^*/\varepsilon\rfloor})\)</td><td>idem</td></tr>
+<tr><td>Approfondissement it&eacute;ratif</td><td>oui</td><td>oui si co&ucirc;ts uniformes</td><td>\(O(b^{d})\)</td><td>\(O(bd)\)</td></tr>
+</tbody></table></div>
+
+<p>Le contraste entre BFS et DFS est un <strong>&eacute;change temps-m&eacute;moire</strong>, et c'est la m&eacute;moire qui limite en pratique. Avec \(b = 10\) et un million de n&oelig;uds engendr&eacute;s par seconde &agrave; raison de 100 octets par n&oelig;ud, une recherche en largeur &agrave; profondeur 10 demande d&eacute;j&agrave; de l'ordre de 10 To : elle est irr&eacute;alisable bien avant d'&ecirc;tre trop lente. DFS, lui, ne stocke qu'une branche et ses fr&egrave;res, soit \(O(bm)\) n&oelig;uds &mdash; mais il perd la compl&eacute;tude et l'optimalit&eacute;.</p>
+
+<p>L'<strong>approfondissement it&eacute;ratif</strong> (IDDFS) r&eacute;concilie les deux : on lance une recherche en profondeur born&eacute;e &agrave; 0, puis &agrave; 1, puis &agrave; 2, etc. On refait le travail des niveaux pr&eacute;c&eacute;dents, mais ce surco&ucirc;t est born&eacute;. Le nombre de n&oelig;uds engendr&eacute;s par IDDFS est \(\sum_{k=0}^{d} (d-k+1)b^{k}\), &agrave; comparer &agrave; \(\sum_{k=0}^{d} b^{k}\) pour BFS ; le rapport tend vers \(b/(b-1)\). Pour \(b = 10\), c'est <strong>11 % de travail suppl&eacute;mentaire</strong> pour une m&eacute;moire divis&eacute;e par \(b^{d-1}\) <a class="cite" href="#ref-korf1985">[2]</a>.</p>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Choisissez la strat&eacute;gie avec le curseur du haut, puis avancez le curseur d'&eacute;tape. Les sommets se colorent dans l'ordre o&ugrave; ils sont <em>d&eacute;velopp&eacute;s</em> ; le contenu de la frange est affich&eacute; sous le graphe.</p>
+<div id="jxg2" class="viz-board" style="height:480px;"></div>
+<p class="viz-caption"><strong>Figure 3.2.</strong> Le m&ecirc;me graphe pond&eacute;r&eacute;, quatre disciplines de frange. Observez que la profondeur d'abord atteint le but \(G\) tr&egrave;s vite mais par un chemin de co&ucirc;t 13, l&agrave; o&ugrave; le co&ucirc;t uniforme d&eacute;veloppe davantage de sommets pour garantir le co&ucirc;t 9. A* atteint le m&ecirc;me co&ucirc;t 9 en d&eacute;veloppant moins de sommets que le co&ucirc;t uniforme : c'est exactement ce que l'heuristique ach&egrave;te.</p></div>
+
+<h2>1.3 Recherche inform&eacute;e : l'algorithme A*</h2>
+
+<p>Une <strong>heuristique</strong> \(h : S \to \mathbb{R}^{+}\) estime le co&ucirc;t restant pour atteindre un but depuis un &eacute;tat, avec \(h(s) = 0\) pour tout &eacute;tat but. Elle encode une connaissance du domaine que la d&eacute;finition formelle du probl&egrave;me ne contient pas : la distance &agrave; vol d'oiseau pour un itin&eacute;raire, le nombre de pi&egrave;ces mal plac&eacute;es pour un taquin.</p>
+
+<p>La recherche gloutonne d&eacute;veloppe le n&oelig;ud minimisant \(h\). Elle est souvent rapide et souvent fausse : elle ignore compl&egrave;tement ce qui a d&eacute;j&agrave; &eacute;t&eacute; d&eacute;pens&eacute;. A*, introduit par Hart, Nilsson et Raphael en 1968 <a class="cite" href="#ref-hart1968">[3]</a>, corrige cela en ordonnant la frange sur</p>
+
+<div class="eq">\[f(n) = g(n) + h(n)\]</div>
+
+<p>o&ugrave; \(g(n)\) est le co&ucirc;t r&eacute;ellement pay&eacute; pour atteindre \(n\) et \(h(n)\) l'estimation de ce qu'il reste &agrave; payer : \(f(n)\) est donc une estimation du co&ucirc;t total d'une solution passant par \(n\).</p>
+
+<div class="box def"><div class="box-title">D&eacute;finition &mdash; Admissibilit&eacute; et coh&eacute;rence</div>
+<p>Notons \(h^{*}(n)\) le co&ucirc;t optimal r&eacute;el de \(n\) &agrave; un but.</p>
+<ul>
+<li>\(h\) est <strong>admissible</strong> si \(h(n) \le h^{*}(n)\) pour tout \(n\) : elle ne surestime jamais. Une heuristique admissible est <em>optimiste</em>.</li>
+<li>\(h\) est <strong>coh&eacute;rente</strong> (ou monotone) si pour toute transition de \(n\) vers \(n'\) de co&ucirc;t \(c\) on a \(h(n) \le c + h(n')\), et \(h(b) = 0\) pour tout but \(b\). C'est une in&eacute;galit&eacute; triangulaire.</li>
+</ul>
+<p>La coh&eacute;rence implique l'admissibilit&eacute; ; la r&eacute;ciproque est fausse.</p></div>
+
+<div class="box thm"><div class="box-title">Th&eacute;or&egrave;me &mdash; Optimalit&eacute; de A*</div>
+<p><strong>(a)</strong> Si \(h\) est admissible et si A* est employ&eacute; sur un arbre de recherche (sans ensemble ferm&eacute;), la premi&egrave;re solution extraite de la frange est optimale.</p>
+<p><strong>(b)</strong> Si \(h\) est coh&eacute;rente, la suite des \(f\) le long de tout chemin est croissante ; A* d&eacute;veloppe alors les n&oelig;uds par valeurs de \(f\) croissantes, et le \(g\) du premier d&eacute;veloppement d'un &eacute;tat est d&eacute;j&agrave; optimal &mdash; l'ensemble ferm&eacute; est donc s&ucirc;r <a class="cite" href="#ref-hart1968">[3]</a>.</p>
+<p><strong>(c)</strong> A* est <em>optimalement efficace</em> : tout algorithme qui utilise la m&ecirc;me heuristique et garantit l'optimalit&eacute; doit d&eacute;velopper au moins tous les n&oelig;uds v&eacute;rifiant \(f(n) \lt C^{*}\) <a class="cite" href="#ref-dechter1985">[4]</a>.</p></div>
+
+<div class="box proof"><div class="box-title">Preuve de (a)</div>
+<p>Supposons qu'un n&oelig;ud but sous-optimal \(b_2\), de co&ucirc;t \(g(b_2) \gt C^{*}\), soit extrait de la frange. Comme \(h(b_2)=0\), on a \(f(b_2) = g(b_2) \gt C^{*}\). Soit \(n\) un n&oelig;ud de la frange situ&eacute; sur un chemin optimal vers un but optimal &mdash; il en existe un, sinon le chemin optimal n'aurait pas &eacute;t&eacute; engendr&eacute;. Par admissibilit&eacute;, \(f(n) = g(n) + h(n) \le g(n) + h^{*}(n) = C^{*}\). Donc \(f(n) \le C^{*} \lt f(b_2)\) : l'extraction du minimum aurait choisi \(n\) et non \(b_2\), contradiction. \(\square\)</p></div>
+
+<div class="box warn"><div class="box-title">Le pi&egrave;ge classique de l'ensemble ferm&eacute;</div>
+Avec une heuristique <em>admissible mais non coh&eacute;rente</em>, un &eacute;tat peut &ecirc;tre atteint une seconde fois par un chemin strictement meilleur, apr&egrave;s avoir &eacute;t&eacute; ferm&eacute;. Refuser de le r&eacute;ouvrir co&ucirc;te alors l'optimalit&eacute;. Deux rem&egrave;des : rendre \(h\) coh&eacute;rente, ou autoriser la <em>r&eacute;ouverture</em> d'un &eacute;tat ferm&eacute; lorsqu'on lui d&eacute;couvre un \(g\) plus petit.</div>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">D&eacute;placez le d&eacute;part (vert) et l'arriv&eacute;e (rouge) &agrave; la souris. Le curseur \(w\) pond&egrave;re l'heuristique dans \(f = g + w\,h\) : \(w = 0\) donne le co&ucirc;t uniforme, \(w = 1\) donne A*, \(w\) grand donne la recherche gloutonne.</p>
+<div id="jxg1" class="viz-board" style="height:520px;"></div>
+<p class="viz-caption"><strong>Figure 3.3.</strong> Recherche sur une grille &agrave; obstacles, d&eacute;placements orthogonaux de co&ucirc;t 1, heuristique de Manhattan. Les cellules bleu p&acirc;le ont &eacute;t&eacute; d&eacute;velopp&eacute;es, la cha&icirc;ne fonc&eacute;e est le chemin retenu. En \(w=0\) la zone explor&eacute;e est un disque centr&eacute; sur le d&eacute;part ; en \(w=1\) elle s'&eacute;tire vers le but ; au-del&agrave; elle devient un mince couloir &mdash; mais le chemin peut cesser d'&ecirc;tre le plus court. L'indicateur signale les cas o&ugrave; le co&ucirc;t d&eacute;passe l'optimum.</p></div>
+
+<h2>1.4 Choisir et comparer les heuristiques</h2>
+
+<p>Deux heuristiques admissibles ne se valent pas. On dit que \(h_2\) <strong>domine</strong> \(h_1\) si \(h_2(n) \ge h_1(n)\) pour tout \(n\). Comme A* d&eacute;veloppe tous les n&oelig;uds tels que \(f(n) \lt C^{*}\), c'est-&agrave;-dire \(h(n) \lt C^{*} - g(n)\), une heuristique plus grande &eacute;limine davantage de n&oelig;uds : &agrave; admissibilit&eacute; &eacute;gale, <strong>plus grand vaut mieux</strong>. Le maximum de deux heuristiques admissibles est admissible et domine les deux.</p>
+
+<p>Sur le taquin \(3\times 3\), les deux heuristiques classiques sont le nombre de pi&egrave;ces mal plac&eacute;es \(h_1\) et la somme des distances de Manhattan \(h_2\). On a toujours \(h_1 \le h_2 \le h^{*}\) : d&eacute;placer une pi&egrave;ce mal plac&eacute;e demande au moins un coup, et au moins sa distance de Manhattan. Les mesures publi&eacute;es sur des instances al&eacute;atoires donnent l'ordre de grandeur suivant <a class="cite" href="#ref-korf1985">[2]</a><a class="cite" href="#ref-russell2020">[8]</a> :</p>
+
+<table>
+<thead><tr><th>Profondeur de la solution</th><th>N&oelig;uds engendr&eacute;s, IDDFS</th><th>A* avec \(h_1\)</th><th>A* avec \(h_2\)</th></tr></thead>
+<tbody>
+<tr><td>8</td><td>\(\approx 6\,400\)</td><td>\(\approx 39\)</td><td>\(\approx 25\)</td></tr>
+<tr><td>12</td><td>\(\approx 3{,}6\times 10^{5}\)</td><td>\(\approx 227\)</td><td>\(\approx 73\)</td></tr>
+<tr><td>16</td><td>\(\approx 2{,}1\times 10^{7}\)</td><td>\(\approx 1\,301\)</td><td>\(\approx 211\)</td></tr>
+<tr><td>20</td><td>\(\approx 1{,}2\times 10^{9}\)</td><td>\(\approx 7\,276\)</td><td>\(\approx 676\)</td></tr>
+<tr><td>24</td><td>hors de port&eacute;e</td><td>\(\approx 39\,135\)</td><td>\(\approx 1\,641\)</td></tr>
+</tbody></table>
+
+<p>D'o&ugrave; viennent les bonnes heuristiques ? Le proc&eacute;d&eacute; le plus fiable est la <strong>relaxation</strong> : on supprime des contraintes du probl&egrave;me, et le co&ucirc;t optimal du probl&egrave;me relax&eacute; est une heuristique admissible et coh&eacute;rente du probl&egrave;me d'origine <a class="cite" href="#ref-pearl1984">[5]</a>. Autoriser une pi&egrave;ce du taquin &agrave; se t&eacute;l&eacute;porter sur n'importe quelle case donne \(h_1\) ; l'autoriser &agrave; glisser sur une case occup&eacute;e donne \(h_2\). Une seconde source est la <strong>base de donn&eacute;es de motifs</strong> : on r&eacute;sout exactement, hors ligne, des sous-probl&egrave;mes ne portant que sur quelques pi&egrave;ces, et on stocke leurs co&ucirc;ts <a class="cite" href="#ref-culberson1998">[6]</a>.</p>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Le curseur d&eacute;place le point de mesure le long de l'axe \(w\). Les deux courbes sont recalcul&eacute;es sur la grille de la figure pr&eacute;c&eacute;dente, avec le d&eacute;part et l'arriv&eacute;e que vous y avez plac&eacute;s.</p>
+<div id="jxg3" class="viz-board" style="height:460px;"></div>
+<p class="viz-caption"><strong>Figure 3.4.</strong> Nombre de cellules d&eacute;velopp&eacute;es (bleu, &eacute;chelle de gauche) et longueur du chemin trouv&eacute; (orange) en fonction du poids \(w\). Le travail chute fortement d&egrave;s que \(w\) d&eacute;passe 0, puis se stabilise ; la longueur du chemin reste optimale tant que \(w \le 1\) et peut ensuite se d&eacute;grader. On d&eacute;montre que A* pond&eacute;r&eacute; avec \(w \ge 1\) retourne un chemin de co&ucirc;t au plus \(w\,C^{*}\) : l'erreur est born&eacute;e, ce qui rend le compromis exploitable <a class="cite" href="#ref-pohl1970">[7]</a>.</p></div>
+
+<h2>1.5 Quand la m&eacute;moire manque : IDA*</h2>
+
+<p>A* stocke toute la frange : sa consommation m&eacute;moire cro&icirc;t comme le nombre de n&oelig;uds de \(f\) inf&eacute;rieur &agrave; \(C^{*}\), donc exponentiellement. C'est la m&eacute;moire, et non le temps, qui fait &eacute;chouer A* sur les grandes instances. <strong>IDA*</strong> transpose l'approfondissement it&eacute;ratif &agrave; A* : au lieu d'une borne sur la profondeur, on utilise une borne sur \(f\) <a class="cite" href="#ref-korf1985">[2]</a>.</p>
+
+<div class="algo"><div class="algo-cap">Algorithme 3.2 &mdash; A* &agrave; approfondissement it&eacute;ratif (IDA*)</div><div class="algo-io"><b>Entr&eacute;e :</b> un &eacute;tat initial \(s_0\), un test de but \(\beta\), une heuristique admissible \(h\)<br><b>Sortie :</b> un chemin de co&ucirc;t minimal, avec une m&eacute;moire en \(O(d)\)</div><ol class="algo-corps"><li>\(\theta \leftarrow h(s_0)\)          <span class="cm">// plafond initial sur f</span></li><li>\(P \leftarrow [s_0]\)          <span class="cm">// branche courante, seule chose en memoire</span></li><li><b class="kw">r&eacute;p&eacute;ter</b></li><li class="n1">\(r \leftarrow\) <span class="fn">Explorer</span>\((0, \theta)\)</li><li class="n1"><b class="kw">si</b> \(r = \mathrm{TROUVE}\) <b class="kw">alors</b> <b class="kw">retourner</b> <i class="va">P</i></li><li class="n1"><b class="kw">si</b> \(r = +\infty\) <b class="kw">alors</b> <b class="kw">retourner</b> &eacute;chec</li><li class="n1">\(\theta \leftarrow r\)          <span class="cm">// plus petite valeur de f rejetee</span></li><li>&nbsp;</li><li><b class="kw">fonction</b> <span class="fn">Explorer</span>\((g, \theta)\)</li><li class="n1">\(s \leftarrow\) dernier &eacute;l&eacute;ment de <i class="va">P</i> ; \(f \leftarrow g + h(s)\)</li><li class="n1"><b class="kw">si</b> \(f \gt \theta\) <b class="kw">alors</b> <b class="kw">retourner</b> <i class="va">f</i></li><li class="n1"><b class="kw">si</b> \(\beta(s)\) <b class="kw">alors</b> <b class="kw">retourner</b> \(\mathrm{TROUVE}\)</li><li class="n1">\(m \leftarrow +\infty\)</li><li class="n1"><b class="kw">pour tout</b> \((a, s', c) \in \sigma(s)\) <b class="kw">tel que</b> \(s' \notin P\) <b class="kw">faire</b></li><li class="n2">empiler \(s'\) sur <i class="va">P</i></li><li class="n2">\(r \leftarrow\) <span class="fn">Explorer</span>\((g + c,\ \theta)\) ; d&eacute;piler <i class="va">P</i></li><li class="n2"><b class="kw">si</b> \(r = \mathrm{TROUVE}\) <b class="kw">alors</b> <b class="kw">retourner</b> \(\mathrm{TROUVE}\)</li><li class="n2">\(m \leftarrow \min(m, r)\)</li><li class="n1"><b class="kw">retourner</b> <i class="va">m</i></li></ol><p class="algo-note">La m&eacute;moire tombe de \(O(b^{d})\) &agrave; \(O(d)\). Le prix est la r&eacute;p&eacute;tition du travail : il reste faible si \(f\) prend peu de valeurs distinctes, prohibitif sinon.</p></div>
+
+<p>La m&eacute;moire tombe &agrave; \(O(d)\) : seule la branche courante est conserv&eacute;e. Le prix est la r&eacute;p&eacute;tition du travail des it&eacute;rations pr&eacute;c&eacute;dentes. Ce prix reste mod&eacute;r&eacute; si le nombre de valeurs distinctes de \(f\) est petit &mdash; ce qui est le cas du taquin, o&ugrave; \(f\) est enti&egrave;re et de m&ecirc;me parit&eacute; que \(d\). Il devient prohibitif quand presque chaque n&oelig;ud a un \(f\) diff&eacute;rent, par exemple avec des co&ucirc;ts r&eacute;els : chaque it&eacute;ration n'ajoute alors qu'un seul n&oelig;ud, et IDA* d&eacute;g&eacute;n&egrave;re en \(O(N^{2})\) d&eacute;veloppements.</p>
+
+<div class="box tip"><div class="box-title">Rep&egrave;re de d&eacute;cision</div>
+Si la frange tient en m&eacute;moire, employer A*. Sinon, employer IDA* &mdash; mais seulement si \(f\) prend peu de valeurs distinctes. Si les co&ucirc;ts sont r&eacute;els et vari&eacute;s, pr&eacute;f&eacute;rer une variante de A* &agrave; m&eacute;moire born&eacute;e, ou augmenter la borne d'un pas fixe plut&ocirc;t que jusqu'au minimum d&eacute;pass&eacute;.</div>
+
+<h2>1.6 Une mise en &oelig;uvre compl&egrave;te de A*</h2>
+
+<p>Trois d&eacute;tails d'impl&eacute;mentation font la diff&eacute;rence entre un A* correct et un A* subtilement faux. D'abord, le tas doit &ecirc;tre ordonn&eacute; sur \(f\) avec un <strong>d&eacute;partage d&eacute;terministe</strong> : &agrave; \(f\) &eacute;gal, pr&eacute;f&eacute;rer le plus grand \(g\) rapproche du but et &eacute;vite d'errer sur un plateau. Ensuite, les &eacute;tats doivent &ecirc;tre <strong>hachables</strong> (tuples, cha&icirc;nes) pour servir de cl&eacute;s. Enfin, Python n'offre pas de d&eacute;cr&eacute;mentation de cl&eacute; : on ins&egrave;re un doublon et on ignore &agrave; l'extraction toute entr&eacute;e p&eacute;rim&eacute;e.</p>
+
+<div class="algo"><div class="algo-cap">Algorithme 3.3 &mdash; A*</div><div class="algo-io"><b>Entr&eacute;e :</b> un graphe \((S, c)\) &agrave; co&ucirc;ts positifs, \(s_0 \in S\), un ensemble de buts \(B\), une heuristique \(h\) coh&eacute;rente<br><b>Sortie :</b> un chemin de co&ucirc;t minimal de \(s_0\) &agrave; \(B\), et le nombre de sommets d&eacute;velopp&eacute;s</div><ol class="algo-corps"><li>\(g[s] \leftarrow +\infty\) <b class="kw">pour tout</b> \(s \in S\) ; \(g[s_0] \leftarrow 0\) ; \(\pi[s_0] \leftarrow \mathrm{nil}\)</li><li>\(O \leftarrow \{s_0\}\) ; \(C \leftarrow \varnothing\) ; \(k \leftarrow 0\)</li><li><b class="kw">tant que</b> \(O \neq \varnothing\) <b class="kw">faire</b></li><li class="n1">\(n \leftarrow \operatorname*{argmin}_{x \in O}\ \big(g[x] + h(x)\big)\)          <span class="cm">// a f egal, plus grand g</span></li><li class="n1"><b class="kw">si</b> \(n \in C\) <b class="kw">alors</b> <b class="kw">continuer</b>          <span class="cm">// entree perimee</span></li><li class="n1">\(C \leftarrow C \cup \{n\}\) ; \(k \leftarrow k + 1\)</li><li class="n1"><b class="kw">si</b> \(n \in B\) <b class="kw">alors</b> <b class="kw">retourner</b> \(\big(\mathrm{Remonter}(\pi, n),\ g[n],\ k\big)\)</li><li class="n1"><b class="kw">pour tout</b> \(m\) <b class="kw">voisin de</b> \(n\) <b class="kw">faire</b></li><li class="n2"><b class="kw">si</b> \(g[n] + c(n,m) \lt g[m]\) <b class="kw">alors</b></li><li class="n3">\(g[m] \leftarrow g[n] + c(n,m)\) ; \(\pi[m] \leftarrow n\)</li><li class="n3">\(O \leftarrow O \cup \{m\}\)</li><li><b class="kw">retourner</b> &eacute;chec</li></ol><p class="algo-note"><strong>Invariant.</strong> &Agrave; chaque extraction, \(g[n]\) est le co&ucirc;t d'un chemin optimal de \(s_0\) &agrave; \(n\), pourvu que \(h\) soit coh&eacute;rente. <strong>Variant.</strong> \(|S \setminus C|\), entier positif strictement d&eacute;croissant &agrave; chaque d&eacute;veloppement. <strong>Co&ucirc;t.</strong> \(O(|E|\log|S|)\) op&eacute;rations de tas, mais \(|S|\) est lui-m&ecirc;me exponentiel en la profondeur.</p></div>
+
+<div class="box method"><div class="box-title">Analyse &mdash; correction, terminaison, complexit&eacute;</div>
+<p><strong>Invariant.</strong> &Agrave; chaque tour de boucle, pour tout &eacute;tat \(s\) de l'ensemble ferm&eacute;, \(g[s]\) est le co&ucirc;t d'un chemin optimal de \(s_0\) &agrave; \(s\) ; et tout &eacute;tat atteignable non ferm&eacute; par un chemin dont tous les sommets interm&eacute;diaires sont ferm&eacute;s figure dans le tas avec la meilleure valeur \(g\) connue. La coh&eacute;rence de \(h\) garantit que le n&oelig;ud extrait a d&eacute;j&agrave; son \(g\) optimal.</p>
+<p><strong>Terminaison.</strong> Variant : le nombre d'&eacute;tats atteignables non encore ferm&eacute;s, entier positif qui d&eacute;cro&icirc;t strictement &agrave; chaque d&eacute;veloppement. Les extractions p&eacute;rim&eacute;es ne le font pas d&eacute;cro&icirc;tre, mais le tas est fini et ne re&ccedil;oit d'insertions que lors des d&eacute;veloppements : la boucle s'arr&ecirc;te.</p>
+<p><strong>Complexit&eacute;.</strong> Avec \(N\) &eacute;tats atteignables et \(M\) transitions, au plus \(M\) insertions dans le tas, soit \(O(M\log M)\) op&eacute;rations de tas, plus \(N\) &eacute;valuations de \(h\). Mais \(N\) est lui-m&ecirc;me exponentiel en la profondeur : c'est la qualit&eacute; de \(h\), non la structure de donn&eacute;es, qui d&eacute;termine le temps r&eacute;el.</p></div>
+
+<h2>Synth&egrave;se</h2>
+<ul>
+<li>Un probl&egrave;me de recherche est un graphe d'&eacute;tats que l'on n'observe qu'&agrave; travers un test de but et une fonction successeur ; l'enjeu est d'en explorer le moins possible.</li>
+<li>Un unique squelette engendre BFS, DFS, co&ucirc;t uniforme, glouton et A* : seule la discipline de la frange change.</li>
+<li>A* ordonne la frange sur \(f = g + h\) ; il est optimal si \(h\) est admissible, et s&ucirc;r avec un ensemble ferm&eacute; si \(h\) est coh&eacute;rente <a class="cite" href="#ref-hart1968">[3]</a>.</li>
+<li>&Agrave; admissibilit&eacute; &eacute;gale, une heuristique plus grande domine ; les relaxations en fournissent syst&eacute;matiquement <a class="cite" href="#ref-pearl1984">[5]</a>.</li>
+<li>La m&eacute;moire est le mur ; IDA* le contourne au prix d'un travail r&eacute;p&eacute;t&eacute;, acceptable quand \(f\) prend peu de valeurs <a class="cite" href="#ref-korf1985">[2]</a>.</li>
+</ul>
+
+<h2>R&eacute;f&eacute;rences</h2>
+<ol class="reflist">
+<li id="ref-newell1959">Newell, A., Shaw, J. C. &amp; Simon, H. A. (1959). Report on a general problem-solving program. <em>Proceedings of the International Conference on Information Processing</em>, UNESCO, Paris, 256&ndash;264. <a href="https://exhibits.stanford.edu/feigenbaum/catalog/my698gc9130">https://exhibits.stanford.edu/feigenbaum/catalog/my698gc9130</a></li>
+<li id="ref-korf1985">Korf, R. E. (1985). Depth-first iterative-deepening: an optimal admissible tree search. <em>Artificial Intelligence</em>, 27(1), 97&ndash;109. DOI&nbsp;: 10.1016/0004-3702(85)90084-0. <a href="https://doi.org/10.1016/0004-3702(85)90084-0">https://doi.org/10.1016/0004-3702(85)90084-0</a></li>
+<li id="ref-hart1968">Hart, P. E., Nilsson, N. J. &amp; Raphael, B. (1968). A formal basis for the heuristic determination of minimum cost paths. <em>IEEE Transactions on Systems Science and Cybernetics</em>, 4(2), 100&ndash;107. DOI&nbsp;: 10.1109/TSSC.1968.300136. <a href="https://doi.org/10.1109/TSSC.1968.300136">https://doi.org/10.1109/TSSC.1968.300136</a></li>
+<li id="ref-dechter1985">Dechter, R. &amp; Pearl, J. (1985). Generalized best-first search strategies and the optimality of A*. <em>Journal of the ACM</em>, 32(3), 505&ndash;536. DOI&nbsp;: 10.1145/3828.3830. <a href="https://doi.org/10.1145/3828.3830">https://doi.org/10.1145/3828.3830</a></li>
+<li id="ref-pearl1984">Pearl, J. (1984). <em>Heuristics: Intelligent Search Strategies for Computer Problem Solving</em>. Addison-Wesley. ISBN 0-201-05594-5. <a href="https://archive.org/details/heuristicsintell00pear">https://archive.org/details/heuristicsintell00pear</a></li>
+<li id="ref-culberson1998">Culberson, J. C. &amp; Schaeffer, J. (1998). Pattern databases. <em>Computational Intelligence</em>, 14(3), 318&ndash;334. DOI&nbsp;: 10.1111/0824-7935.00065. <a href="https://doi.org/10.1111/0824-7935.00065">https://doi.org/10.1111/0824-7935.00065</a></li>
+<li id="ref-pohl1970">Pohl, I. (1970). Heuristic search viewed as path finding in a graph. <em>Artificial Intelligence</em>, 1(3&ndash;4), 193&ndash;204. DOI&nbsp;: 10.1016/0004-3702(70)90007-X. <a href="https://doi.org/10.1016/0004-3702(70)90007-X">https://doi.org/10.1016/0004-3702(70)90007-X</a></li>
+<li id="ref-russell2020">Russell, S. &amp; Norvig, P. (2020). <em>Artificial Intelligence: A Modern Approach</em> (4e &eacute;dition). Pearson. ISBN 978-0-13-461099-3. <a href="https://aima.cs.berkeley.edu/">https://aima.cs.berkeley.edu/</a></li>
+<li id="ref-dijkstra1959">Dijkstra, E. W. (1959). A note on two problems in connexion with graphs. <em>Numerische Mathematik</em>, 1(1), 269&ndash;271. DOI&nbsp;: 10.1007/BF01386390. <a href="https://doi.org/10.1007/BF01386390">https://doi.org/10.1007/BF01386390</a></li>
+</ol>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../02-agents/page.html">\(\leftarrow\) Chapitre 2 &mdash; Agents</a>
+<a href="algorithms.html">Annexe algorithmique</a>
+<a href="../../index.html">Sommaire du manuel</a>
+<a href="../04-metaheuristiques/page.html">Chapitre 4 &mdash; M&eacute;taheuristiques \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">La figure interactive n\'a pas pu etre chargee. Verifiez votre connexion reseau.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ------------------------------------------------------------------ Grille */
+var GW = 15, GH = 10;
+var WALLS = {};
+(function(){
+  var spec = [
+    [3,0],[3,1],[3,2],[3,3],[3,4],[3,5],
+    [6,9],[6,8],[6,7],[6,6],[6,5],[6,4],
+    [9,0],[9,1],[9,2],[9,3],[9,4],[9,7],[9,8],[9,9],
+    [12,2],[12,3],[12,4],[12,5],[12,6],[12,7],
+    [4,7],[5,7],[7,2],[8,2],[10,5],[11,5]
+  ];
+  for (var i=0;i<spec.length;i++){ WALLS[spec[i][0]+','+spec[i][1]] = true; }
+})();
+function libre(x,y){ return x>=0 && y>=0 && x<GW && y<GH && !WALLS[x+','+y]; }
+
+/* A* pondere sur la grille : f = g + w*h, h = distance de Manhattan.
+   Departage a f egal : plus grand g d'abord (on se rapproche du but). */
+function chercheGrille(sx, sy, gx, gy, w){
+  var res = { dev: [], chemin: [], cout: Infinity, nb: 0 };
+  if (!libre(sx,sy) || !libre(gx,gy)) { return res; }
+  var g = {}, parent = {}, ferme = {}, ouvert = [];
+  function h(x,y){ return Math.abs(x-gx) + Math.abs(y-gy); }
+  var cle = sx+','+sy;
+  g[cle] = 0; parent[cle] = null;
+  ouvert.push({k:cle, x:sx, y:sy, f:w*h(sx,sy), g:0});
+  var DX = [1,-1,0,0], DY = [0,0,1,-1];
+  while (ouvert.length){
+    var best = 0;
+    for (var i=1;i<ouvert.length;i++){
+      if (ouvert[i].f < ouvert[best].f ||
+         (ouvert[i].f === ouvert[best].f && ouvert[i].g > ouvert[best].g)) { best = i; }
+    }
+    var n = ouvert.splice(best,1)[0];
+    if (ferme[n.k]) { continue; }
+    ferme[n.k] = true;
+    res.dev.push([n.x, n.y]);
+    if (n.x === gx && n.y === gy){
+      res.cout = n.g; res.nb = res.dev.length;
+      var c = n.k;
+      while (c !== null){ var p = c.split(','); res.chemin.push([+p[0], +p[1]]); c = parent[c]; }
+      res.chemin.reverse();
+      return res;
+    }
+    for (var d=0; d<4; d++){
+      var vx = n.x + DX[d], vy = n.y + DY[d];
+      if (!libre(vx,vy)) { continue; }
+      var vk = vx+','+vy, ng = n.g + 1;
+      if (!(vk in g) || ng < g[vk]){
+        g[vk] = ng; parent[vk] = n.k;
+        ouvert.push({k:vk, x:vx, y:vy, f:ng + w*h(vx,vy), g:ng});
+      }
+    }
+  }
+  res.nb = res.dev.length;
+  return res;
+}
+
+/* Memoisation : les figures 1.3 et 1.4 partagent le meme calcul. */
+var ETAT1 = { sx:1, sy:1, gx:13, gy:8, w:1, res:null, sig:'' };
+function calcul1(){
+  var sig = [ETAT1.sx,ETAT1.sy,ETAT1.gx,ETAT1.gy,ETAT1.w].join('|');
+  if (sig !== ETAT1.sig || ETAT1.res === null){
+    ETAT1.sig = sig;
+    ETAT1.res = chercheGrille(ETAT1.sx, ETAT1.sy, ETAT1.gx, ETAT1.gy, ETAT1.w);
+  }
+  return ETAT1.res;
+}
+function coutOptimal(){
+  var r = chercheGrille(ETAT1.sx, ETAT1.sy, ETAT1.gx, ETAT1.gy, 0);
+  return r.cout;
+}
+
+/* ------------------------------------------------ Figure 1.3 : grille A* */
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-1.2, GH + 1.6, GW + 1.2, -2.2], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: true
+});
+
+function carres(liste){
+  var d = [[],[]];
+  for (var i=0;i<liste.length;i++){
+    var x = liste[i][0], y = liste[i][1];
+    d[0].push(x-0.46, x+0.46, x+0.46, x-0.46, x-0.46, NaN);
+    d[1].push(y-0.46, y-0.46, y+0.46, y+0.46, y-0.46, NaN);
+  }
+  return d;
+}
+
+var murs = [];
+for (var k in WALLS){ var p = k.split(','); murs.push([+p[0], +p[1]]); }
+
+var cMurs = b1.create('curve', carres(murs), {
+  strokeWidth: 0, fillColor: PAL.muted, fillOpacity: 0.55, highlight: false, fixed: true
+});
+var cDev = b1.create('curve', [[0],[0]], {
+  strokeWidth: 0, fillColor: function(){ return cssv('--viz-blue', '#2563eb'); },
+  fillOpacity: 0.22, highlight: false, fixed: true
+});
+cDev.updateDataArray = function(){ var d = carres(calcul1().dev); this.dataX = d[0]; this.dataY = d[1]; };
+
+var cChemin = b1.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--primary', '#026573'); },
+  strokeWidth: 5, highlight: false, fixed: true
+});
+cChemin.updateDataArray = function(){
+  var c = calcul1().chemin, X = [], Y = [];
+  for (var i=0;i<c.length;i++){ X.push(c[i][0]); Y.push(c[i][1]); }
+  this.dataX = X; this.dataY = Y;
+};
+
+/* grille de fond */
+var cGrille = b1.create('curve', [[0],[0]], {
+  strokeColor: PAL.grid, strokeWidth: 1, highlight: false, fixed: true
+});
+(function(){
+  var X = [], Y = [];
+  for (var x=0; x<=GW; x++){ X.push(x-0.5, x-0.5, NaN); Y.push(-0.5, GH-0.5, NaN); }
+  for (var y=0; y<=GH; y++){ X.push(-0.5, GW-0.5, NaN); Y.push(y-0.5, y-0.5, NaN); }
+  cGrille.dataX = X; cGrille.dataY = Y;
+})();
+
+var pDepart = b1.create('point', [1,1], {
+  name: 'depart', size: 7, face: 'o', fillColor: '#16a34a', strokeColor: '#14532d',
+  strokeWidth: 2, label: {offset: [8, 12], strokeColor: PAL.text},
+  snapToGrid: true, snapSizeX: 1, snapSizeY: 1
+});
+var pArrivee = b1.create('point', [13,8], {
+  name: 'arrivee', size: 7, face: 'o', fillColor: '#dc2626', strokeColor: '#7f1d1d',
+  strokeWidth: 2, label: {offset: [8, 12], strokeColor: PAL.text},
+  snapToGrid: true, snapSizeX: 1, snapSizeY: 1
+});
+
+var sW = b1.create('slider', [[0, -1.5], [GW - 1, -1.5], [0, 1, 2.5]], {
+  name: 'w', snapWidth: 0.1, precision: 1,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+
+function majEtat1(){
+  var sx = Math.max(0, Math.min(GW-1, Math.round(pDepart.X())));
+  var sy = Math.max(0, Math.min(GH-1, Math.round(pDepart.Y())));
+  var gx = Math.max(0, Math.min(GW-1, Math.round(pArrivee.X())));
+  var gy = Math.max(0, Math.min(GH-1, Math.round(pArrivee.Y())));
+  ETAT1.sx = sx; ETAT1.sy = sy; ETAT1.gx = gx; ETAT1.gy = gy;
+  ETAT1.w = Math.round(sW.Value() * 10) / 10;
+}
+
+b1.create('text', [-1.0, GH + 1.0, function(){
+  majEtat1();
+  var r = calcul1();
+  if (r.cout === Infinity){
+    return 'Depart ou arrivee sur un obstacle, ou but inatteignable.';
+  }
+  var opt = coutOptimal();
+  var verdict = (r.cout === opt)
+      ? 'chemin optimal'
+      : 'chemin plus long que l’optimum (' + opt + ') de ' + (r.cout - opt);
+  return 'w = ' + ETAT1.w.toFixed(1) + '   |   cellules developpees : ' + r.nb
+       + '   |   longueur du chemin : ' + r.cout + '   |   ' + verdict;
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+
+/* ------------------------------------ Figure 1.2 : disciplines de la frange */
+var NOMS = ['S','A','B','C','D','E','F','G'];
+var POS = {S:[0,2], A:[2,3.4], B:[2,0.6], C:[4,4.2], D:[4,2], E:[4,0], F:[6,3.2], G:[8,2]};
+var ARETES = [['S','A',2],['S','B',3],['A','C',3],['A','D',2],['B','D',4],['B','E',3],
+              ['C','F',2],['D','F',3],['D','G',6],['E','G',5],['F','G',2]];
+var HEUR = {S:7, A:5, B:6, C:3, D:4, E:4, F:2, G:0};
+var ADJ = {};
+for (var i=0;i<NOMS.length;i++){ ADJ[NOMS[i]] = []; }
+for (var i=0;i<ARETES.length;i++){
+  var u = ARETES[i][0], v = ARETES[i][1], w = ARETES[i][2];
+  ADJ[u].push([v,w]); ADJ[v].push([u,w]);
+}
+for (var i=0;i<NOMS.length;i++){ ADJ[NOMS[i]].sort(function(a,b){ return a[0] < b[0] ? -1 : 1; }); }
+
+/* Renvoie l'ordre de developpement, le chemin trouve, son cout, et la frange
+   apres chaque etape. mode : 0 largeur, 1 profondeur, 2 cout uniforme, 3 A*. */
+function parcours(mode){
+  var frange = [{s:'S', p:['S'], g:0}], vus = {}, ordre = [], franges = [], fin = null;
+  function priorite(n){
+    if (mode === 2) { return n.g; }
+    return n.g + HEUR[n.s];
+  }
+  while (frange.length){
+    var idx;
+    if (mode === 0) { idx = 0; }
+    else if (mode === 1) { idx = frange.length - 1; }
+    else {
+      idx = 0;
+      for (var i=1;i<frange.length;i++){
+        var a = priorite(frange[i]), b = priorite(frange[idx]);
+        if (a < b || (a === b && frange[i].g > frange[idx].g)) { idx = i; }
+      }
+    }
+    var n = frange.splice(idx,1)[0];
+    if (vus[n.s]) { continue; }
+    vus[n.s] = true;
+    ordre.push(n.s);
+    franges.push(frange.map(function(m){ return m.s; }));
+    if (n.s === 'G'){ fin = n; break; }
+    for (var i=0;i<ADJ[n.s].length;i++){
+      var v = ADJ[n.s][i][0], c = ADJ[n.s][i][1];
+      if (!vus[v]) { frange.push({s:v, p:n.p.concat([v]), g:n.g + c}); }
+    }
+  }
+  return {ordre: ordre, franges: franges,
+          chemin: fin ? fin.p : [], cout: fin ? fin.g : Infinity};
+}
+var PARCOURS = [parcours(0), parcours(1), parcours(2), parcours(3)];
+var LIB = ['largeur (file)', 'profondeur (pile)', 'cout uniforme (tas sur g)', 'A* (tas sur g + h)'];
+
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-1.6, 6.4, 9.6, -2.6], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sMode = b2.create('slider', [[-1.0, -1.3], [3.4, -1.3], [0, 3, 3]], {
+  name: 'strategie', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sEtape = b2.create('slider', [[4.6, -1.3], [9.0, -1.3], [0, 8, 8]], {
+  name: 'etape', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function modeCourant(){ return Math.round(sMode.Value()); }
+function etapeCourante(){
+  var p = PARCOURS[modeCourant()];
+  return Math.min(Math.round(sEtape.Value()), p.ordre.length);
+}
+function rangDev(nom){
+  var p = PARCOURS[modeCourant()], e = etapeCourante();
+  for (var i=0;i<e;i++){ if (p.ordre[i] === nom) { return i; } }
+  return -1;
+}
+
+for (var i=0;i<ARETES.length;i++){
+  (function(a){
+    var u = POS[a[0]], v = POS[a[1]];
+    b2.create('segment', [u, v], {
+      strokeColor: function(){
+        var p = PARCOURS[modeCourant()];
+        var c = p.chemin, e = etapeCourante();
+        if (e >= p.ordre.length){
+          for (var j=0;j+1<c.length;j++){
+            if ((c[j] === a[0] && c[j+1] === a[1]) || (c[j] === a[1] && c[j+1] === a[0])){
+              return cssv('--primary', '#026573');
+            }
+          }
+        }
+        return PAL.ref();
+      },
+      strokeWidth: function(){
+        var p = PARCOURS[modeCourant()], c = p.chemin, e = etapeCourante();
+        if (e >= p.ordre.length){
+          for (var j=0;j+1<c.length;j++){
+            if ((c[j] === a[0] && c[j+1] === a[1]) || (c[j] === a[1] && c[j+1] === a[0])){ return 5; }
+          }
+        }
+        return 2;
+      },
+      highlight: false, fixed: true
+    });
+    b2.create('text', [(u[0]+v[0])/2, (u[1]+v[1])/2 + 0.18, String(a[2])],
+      {fontSize: 13, strokeColor: PAL.muted, anchorX: 'middle', fixed: true, highlight: false});
+  })(ARETES[i]);
+}
+for (var i=0;i<NOMS.length;i++){
+  (function(nom){
+    b2.create('point', POS[nom], {
+      name: '', size: 15, face: 'o', fixed: true, highlight: false, strokeWidth: 2,
+      strokeColor: function(){ return rangDev(nom) >= 0 ? cssv('--primary','#026573') : PAL.axis(); },
+      fillColor: function(){ return rangDev(nom) >= 0 ? cssv('--primary','#026573') : PAL.bg(); },
+      fillOpacity: 1
+    });
+    b2.create('text', [POS[nom][0], POS[nom][1] - 0.12, function(){
+      return nom;
+    }], {fontSize: 15, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+         strokeColor: function(){ return rangDev(nom) >= 0 ? PAL.bg() : PAL.text(); }});
+    b2.create('text', [POS[nom][0], POS[nom][1] + 0.55, function(){
+      var r = rangDev(nom);
+      return (r >= 0 ? (r+1) + '. ' : '') + 'h=' + HEUR[nom];
+    }], {fontSize: 12, anchorX: 'middle', fixed: true, highlight: false, strokeColor: PAL.muted});
+  })(NOMS[i]);
+}
+b2.create('text', [-1.5, 5.8, function(){
+  var m = modeCourant(), p = PARCOURS[m], e = etapeCourante();
+  var s = 'Strategie : ' + LIB[m] + '   |   sommets developpes : '
+        + p.ordre.slice(0, e).join(', ');
+  return s;
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-1.5, 5.2, function(){
+  var m = modeCourant(), p = PARCOURS[m], e = etapeCourante();
+  if (e === 0) { return 'Frange : S'; }
+  return 'Frange apres cette etape : ' + (p.franges[e-1].length ? p.franges[e-1].join(', ') : 'vide');
+}], {fontSize: 14, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-1.5, -2.2, function(){
+  var m = modeCourant(), p = PARCOURS[m], e = etapeCourante();
+  if (e < p.ordre.length) { return 'Recherche en cours...'; }
+  return 'Termine : chemin ' + p.chemin.join(' - ') + '   |   cout ' + p.cout
+       + '   |   ' + p.ordre.length + ' sommets developpes';
+}], {fontSize: 15, strokeColor: function(){ return cssv('--primary','#026573'); },
+     fixed: true, highlight: false});
+
+/* ------------------------- Figure 1.4 : effet du poids w sur la recherche */
+var b3 = JXG.JSXGraph.initBoard('jxg3', {
+  boundingbox: [-0.35, 1.12, 2.6, -0.28], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var WS = [];
+for (var i=0;i<=20;i++){ WS.push(i/10); }
+function serie(){
+  majEtat1();
+  var dev = [], lon = [], maxd = 1, maxl = 1;
+  for (var i=0;i<WS.length;i++){
+    var r = chercheGrille(ETAT1.sx, ETAT1.sy, ETAT1.gx, ETAT1.gy, WS[i]);
+    var d = (r.cout === Infinity) ? 0 : r.nb;
+    var l = (r.cout === Infinity) ? 0 : r.cout;
+    dev.push(d); lon.push(l);
+    if (d > maxd) { maxd = d; }
+    if (l > maxl) { maxl = l; }
+  }
+  return {dev: dev, lon: lon, maxd: maxd, maxl: maxl};
+}
+var CACHE3 = {sig: '', val: null};
+function serie3(){
+  majEtat1();
+  var sig = [ETAT1.sx, ETAT1.sy, ETAT1.gx, ETAT1.gy].join('|');
+  if (sig !== CACHE3.sig){ CACHE3.sig = sig; CACHE3.val = serie(); }
+  return CACHE3.val;
+}
+b3.create('segment', [[0,0],[2.15,0]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  highlight: false, fixed: true, straightFirst: false, straightLast: false});
+b3.create('segment', [[0,0],[0,1.02]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  highlight: false, fixed: true, straightFirst: false, straightLast: false});
+for (var i=0;i<=4;i++){
+  (function(v){
+    b3.create('text', [v/2, -0.12, String(v/2)], {fontSize: 12, anchorX: 'middle',
+      strokeColor: PAL.muted, fixed: true, highlight: false});
+  })(i);
+}
+b3.create('text', [1.05, -0.24, 'poids w de l’heuristique'], {fontSize: 13,
+  anchorX: 'middle', strokeColor: PAL.muted, fixed: true, highlight: false});
+
+var cDevW = b3.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--viz-blue', '#2563eb'); },
+  strokeWidth: 3, highlight: false, fixed: true});
+cDevW.updateDataArray = function(){
+  var s = serie3(), X = [], Y = [];
+  for (var i=0;i<WS.length;i++){ X.push(WS[i]); Y.push(s.dev[i]/s.maxd); }
+  this.dataX = X; this.dataY = Y;
+};
+var cLonW = b3.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--accent', '#f59e0b'); },
+  strokeWidth: 3, highlight: false, fixed: true});
+cLonW.updateDataArray = function(){
+  var s = serie3(), X = [], Y = [];
+  for (var i=0;i<WS.length;i++){ X.push(WS[i]); Y.push(s.lon[i]/s.maxl); }
+  this.dataX = X; this.dataY = Y;
+};
+var sW3 = b3.create('slider', [[0.15, 1.06], [2.0, 1.06], [0, 1, 2.0]], {
+  name: 'w', snapWidth: 0.1, precision: 1,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+b3.create('segment', [
+  function(){ return [Math.round(sW3.Value()*10)/10, 0]; },
+  function(){ return [Math.round(sW3.Value()*10)/10, 1]; }
+], {strokeColor: PAL.ref, strokeWidth: 1.6, dash: 2, highlight: false, fixed: true});
+b3.create('text', [0.02, -0.24, function(){
+  var s = serie3(), i = Math.round(Math.round(sW3.Value()*10)/10 * 10);
+  if (i < 0) { i = 0; } if (i >= WS.length) { i = WS.length - 1; }
+  return 'w = ' + WS[i].toFixed(1) + '  :  ' + s.dev[i] + ' cellules developpees, chemin de longueur '
+       + s.lon[i] + ' (optimum ' + s.lon[0] + ')';
+}], {fontSize: 14, strokeColor: PAL.text, fixed: true, highlight: false});
+b3.create('text', [2.2, 0.86, 'cellules developpees'], {fontSize: 13, anchorX: 'right',
+  strokeColor: function(){ return cssv('--viz-blue', '#2563eb'); }, fixed: true, highlight: false});
+b3.create('text', [2.2, 0.74, 'longueur du chemin'], {fontSize: 13, anchorX: 'right',
+  strokeColor: function(){ return cssv('--accent', '#f59e0b'); }, fixed: true, highlight: false});
+
+b1.update(); b2.update(); b3.update();
+
+})();
+</script>
+</body></html>

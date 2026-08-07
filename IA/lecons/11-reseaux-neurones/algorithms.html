@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 11 &mdash; Annexe algorithmique</title>
+<meta name="description" content="Neurone, regle du perceptron, retropropagation, mini-lots.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Chapitre 11 &middot; Annexe</div>
+<h1>Les r&eacute;seaux de neurones, pas &agrave; pas</h1>
+<div class="lesson-sub">Quatre proc&eacute;dures d&eacute;crites en fran&ccedil;ais, avec un exemple chiffr&eacute; v&eacute;rifiable &agrave; la calculatrice pour chacune.</div>
+</div></section>
+<main class="lesson-content">
+<div class="box tip"><div class="box-title">Comment lire cette annexe</div>Aucune ligne de programme, aucune formule inutile : chaque proc&eacute;dure est pr&eacute;sent&eacute;e comme on l'ex&eacute;cuterait &agrave; la main. <a href="page.html">Retour au chapitre</a>.</div>
+<div class="annex-toc">
+<a href="#k1">1. Le neurone formel</a>
+<a href="#k2">2. R&egrave;gle du perceptron</a>
+<a href="#k3">3. R&eacute;tropropagation</a>
+<a href="#k4">4. Descente par mini-lots</a>
+</div>
+<p>Les quatre proc&eacute;dures se lisent dans l'ordre : le calcul d'une unit&eacute;, la premi&egrave;re r&egrave;gle d'apprentissage historique, le proc&eacute;d&eacute; qui a rendu les couches internes ajustables, et l'organisation pratique de l'entra&icirc;nement. Les exemples sont volontairement minuscules : ils permettent de voir &agrave; la main le gradient s'&eacute;vanouir d&egrave;s deux couches.</p>
+<figure class="viz"><div class="viz-title">Le mini-r&eacute;seau et ses deux d&eacute;riv&eacute;es</div><svg viewBox="0 0 760 256" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Le gradient qui s'&eacute;vanouit, visible sur deux couches</text><circle cx="120" cy="130" r="30" style="fill:var(--viz-ref);fill-opacity:0.9;stroke:var(--color-bg);stroke-width:2;"/><text x="120" y="135" text-anchor="middle" style="fill:var(--color-bg);font-size:12.5px;font-weight:700;font-family:inherit;">x = 1</text><circle cx="350" cy="130" r="30" style="fill:var(--primary);fill-opacity:0.9;stroke:var(--color-bg);stroke-width:2;"/><text x="350" y="135" text-anchor="middle" style="fill:var(--color-bg);font-size:12.5px;font-weight:700;font-family:inherit;">cach&eacute;</text><circle cx="580" cy="130" r="30" style="fill:var(--primary);fill-opacity:0.9;stroke:var(--color-bg);stroke-width:2;"/><text x="580" y="135" text-anchor="middle" style="fill:var(--color-bg);font-size:12.5px;font-weight:700;font-family:inherit;">sortie</text><path d="M 152 130 L 318 130" style="fill:none;stroke:var(--viz-axis);stroke-width:2.5;"/><path d="M 310 124 L 320 130 L 310 136 Z" style="fill:var(--viz-axis);"/><text x="235" y="112" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">w1 = 0,5</text><text x="235" y="166" text-anchor="middle" style="fill:var(--viz-bad);font-size:13px;font-weight:700;font-family:inherit;">d&eacute;riv&eacute;e 0,0678</text><path d="M 382 130 L 548 130" style="fill:none;stroke:var(--viz-axis);stroke-width:2.5;"/><path d="M 540 124 L 550 130 L 540 136 Z" style="fill:var(--viz-axis);"/><text x="465" y="112" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">w2 = 0,5</text><text x="465" y="166" text-anchor="middle" style="fill:var(--viz-bad);font-size:13px;font-weight:700;font-family:inherit;">d&eacute;riv&eacute;e 0,3593</text><path d="M 640 130 L 700 130" style="fill:none;stroke:var(--viz-axis);stroke-width:2.5;"/><text x="700" y="112" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0,5772</text><path d="M 700 196 L 130 196" style="fill:none;stroke:var(--viz-bad);stroke-width:2.5;"/><path d="M 138 190 L 124 196 L 138 202 Z" style="fill:var(--viz-bad);"/><text x="415" y="216" text-anchor="middle" style="fill:var(--viz-bad);font-size:12.5px;font-weight:700;font-family:inherit;">passe arri&egrave;re : la d&eacute;riv&eacute;e est divis&eacute;e par 5,3 en une seule couche</text><text x="380" y="242" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Avec une sigmo&iuml;de, chaque couche multiplie la d&eacute;riv&eacute;e par au plus 0,25. Sur dix couches, le facteur tombe &agrave; \(10^{-6}\) .</text></svg><figcaption class="viz-caption"><strong>Figure A.1.</strong> Le r&eacute;seau du troisi&egrave;me d&eacute;roul&eacute;. La d&eacute;riv&eacute;e par rapport au poids d'entr&eacute;e est cinq fois plus petite que celle du poids de sortie, alors qu'il n'y a que deux couches.</figcaption></figure>
+<h2 id="k1">1. Le calcul d'un neurone formel</h2>
+<div class="algo-tag">brique &eacute;l&eacute;mentaire &middot; combinaison puis seuil</div>
+<p><strong>But.</strong> Transformer plusieurs nombres en un seul, de fa&ccedil;on ajustable, et non lin&eacute;aire.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : un vecteur de nombres, un poids par entr&eacute;e, un biais, et une fonction d'activation.<br>
+<strong>Sortie</strong> : un nombre, l'activation du neurone.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Multiplier chaque entr&eacute;e par son poids</strong> et faire la somme. Un poids positif rend l'entr&eacute;e excitatrice, un poids n&eacute;gatif inhibitrice, un poids nul la rend invisible.</li>
+<li><strong>Ajouter le biais.</strong> Il d&eacute;place le seuil de d&eacute;clenchement : sans lui, la fronti&egrave;re de d&eacute;cision passerait forc&eacute;ment par l'origine.</li>
+<li><strong>Appliquer la fonction d'activation</strong> &agrave; ce total. Sans elle, empiler des couches ne servirait &agrave; rien : une composition de fonctions affines reste affine.</li>
+<li><strong>Transmettre le r&eacute;sultat</strong> aux neurones de la couche suivante.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Un neurone &agrave; deux entr&eacute;es, de poids 2 et 1, de biais \(-2\), avec la fonction marche : il calcule le ET logique.</p>
+<table><thead><tr><th>Entr&eacute;es</th><th>Somme pond&eacute;r&eacute;e</th><th>Avec le biais</th><th>Sortie apr&egrave;s la marche</th></tr></thead><tbody>
+<tr><td>(0 ; 0)</td><td>0</td><td>&minus;2</td><td>0</td></tr>
+<tr><td>(0 ; 1)</td><td>1</td><td>&minus;1</td><td>0</td></tr>
+<tr><td>(1 ; 0)</td><td>2</td><td>0</td><td>0</td></tr>
+<tr><td>(1 ; 1)</td><td>3</td><td>1</td><td><strong>1</strong></td></tr>
+</tbody></table>
+<p>Un seul neurone calcule le ET. Avec les poids 1 et 1 et le biais 0, il calcule le OU. Aucun choix de poids ne lui fait calculer le OU exclusif, et le chapitre en donne la d&eacute;monstration en quatre lignes.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Le calcul est exact : ce n'est qu'une somme et une comparaison. La question de correction porte ailleurs &mdash; sur ce que le neurone peut repr&eacute;senter. La r&eacute;ponse est nette : les fonctions dont les deux classes sont s&eacute;parables par un hyperplan, et elles seules.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Un nombre fini d'op&eacute;rations arithm&eacute;tiques, sans boucle.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Une multiplication et une addition par entr&eacute;e. Sur une couche enti&egrave;re, c'est un produit matrice-vecteur : c'est pr&eacute;cis&eacute;ment ce que les processeurs graphiques savent faire des milliers de fois en parall&egrave;le, et c'est toute l'explication mat&eacute;rielle du renouveau de 2012.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Oublier le biais, ce qui contraint la fronti&egrave;re &agrave; passer par l'origine. Choisir une activation de d&eacute;riv&eacute;e nulle, ce qui interdit tout apprentissage par gradient. Ne pas normaliser les entr&eacute;es, ce qui rend certains poids mille fois plus influents que d'autres avant m&ecirc;me le premier ajustement.</p>
+<h2 id="k2">2. La r&egrave;gle d'apprentissage du perceptron</h2>
+<div class="algo-tag">m&eacute;thode it&eacute;rative &middot; correction sur erreur</div>
+<p><strong>But.</strong> Trouver automatiquement des poids qui classent correctement tous les exemples, quand une telle solution existe.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : des exemples &eacute;tiquet&eacute;s 0 ou 1, et un nombre maximal de passages sur les donn&eacute;es.<br>
+<strong>Sortie</strong> : des poids et un biais qui classent tous les exemples, ou un &eacute;chec.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Partir de poids nuls.</strong></li>
+<li><strong>Parcourir les exemples un par un</strong> et calculer la sortie du neurone.</li>
+<li><strong>Si la sortie est correcte, ne rien changer.</strong> C'est ce qui distingue cette r&egrave;gle d'une descente de gradient : elle ne touche &agrave; rien tant que tout va bien.</li>
+<li><strong>Si la sortie est trop basse, ajouter l'exemple aux poids</strong> ; si elle est trop haute, le retrancher. La fronti&egrave;re se d&eacute;place vers l'exemple mal class&eacute;, juste ce qu'il faut.</li>
+<li><strong>Ajuster le biais de la m&ecirc;me quantit&eacute;.</strong></li>
+<li><strong>Recommencer</strong> tant qu'il reste au moins une erreur, ou jusqu'au nombre maximal de passages.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Apprentissage du ET logique, poids initiaux nuls, exemples pr&eacute;sent&eacute;s dans l'ordre (0;0), (0;1), (1;0), (1;1).</p>
+<table><thead><tr><th>Passage</th><th>Exemple</th><th>Sortie calcul&eacute;e</th><th>Attendu</th><th>Correction</th><th>Nouveaux poids et biais</th></tr></thead><tbody>
+<tr><td>1</td><td>(0;0)</td><td>1 (car 0 n'est pas positif&hellip; on convient que 0 donne 0)</td><td>0</td><td>aucune</td><td>(0 ; 0), b = 0</td></tr>
+<tr><td>1</td><td>(0;1)</td><td>0</td><td>0</td><td>aucune</td><td>(0 ; 0), b = 0</td></tr>
+<tr><td>1</td><td>(1;0)</td><td>0</td><td>0</td><td>aucune</td><td>(0 ; 0), b = 0</td></tr>
+<tr><td>1</td><td>(1;1)</td><td>0</td><td>1</td><td>+ exemple</td><td>(1 ; 1), b = 1</td></tr>
+<tr><td>2</td><td>(0;0)</td><td>1</td><td>0</td><td>&minus; exemple</td><td>(1 ; 1), b = 0</td></tr>
+<tr><td>2</td><td>(0;1)</td><td>1</td><td>0</td><td>&minus; exemple</td><td>(1 ; 0), b = &minus;1</td></tr>
+<tr><td>&hellip;</td><td>&hellip;</td><td>&hellip;</td><td>&hellip;</td><td>&hellip;</td><td>convergence en 6 passages : (2 ; 1), b = &minus;2</td></tr>
+</tbody></table>
+<p>Six passages suffisent, et l'on retrouve exactement les poids de l'exemple pr&eacute;c&eacute;dent. Sur le OU exclusif, en revanche, la m&ecirc;me proc&eacute;dure oscille ind&eacute;finiment : elle corrige un exemple en cassant un autre, sans jamais converger.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Si les exemples sont s&eacute;parables par un hyperplan avec une marge \(\gamma\) et que tous ont une norme au plus \(R\), le nombre de corrections est born&eacute; par \(R^{2}/\gamma^{2}\) &mdash; ind&eacute;pendamment du nombre d'exemples, de la dimension et de l'ordre de pr&eacute;sentation. La contrapos&eacute;e est tout aussi utile : si la proc&eacute;dure ne converge pas, les donn&eacute;es ne sont pas s&eacute;parables.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Garantie uniquement dans le cas s&eacute;parable, par la borne ci-dessus. Dans le cas non s&eacute;parable, il n'existe aucun variant et l'on doit imposer un nombre maximal de passages.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Chaque passage co&ucirc;te le produit du nombre d'exemples par le nombre d'entr&eacute;es. Le nombre de passages est born&eacute; par le carr&eacute; de l'inverse de la marge : si les deux classes se fr&ocirc;lent, la convergence est tr&egrave;s lente.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Appliquer la r&egrave;gle &agrave; des donn&eacute;es non s&eacute;parables et attendre : elle ne converge jamais et ne le signale pas. Ne pas m&eacute;langer les exemples entre les passages, ce qui peut cr&eacute;er des cycles. Et croire que la solution trouv&eacute;e est &laquo; la meilleure &raquo; : la r&egrave;gle s'arr&ecirc;te &agrave; la premi&egrave;re fronti&egrave;re correcte, qui peut passer &agrave; un cheveu des exemples et g&eacute;n&eacute;raliser mal.</p>
+<h2 id="k3">3. La r&eacute;tropropagation</h2>
+<div class="algo-tag">calcul de gradient &middot; de la sortie vers l'entr&eacute;e</div>
+<p><strong>But.</strong> Savoir de combien modifier chaque poids d'un r&eacute;seau &agrave; plusieurs couches, alors qu'aucune bonne r&eacute;ponse n'est connue pour les couches internes.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : un r&eacute;seau, un exemple ou un lot d'exemples, et une mesure d'erreur.<br>
+<strong>Sortie</strong> : la d&eacute;riv&eacute;e de l'erreur par rapport &agrave; chaque poids.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Passe avant.</strong> Calculer, couche apr&egrave;s couche, les sorties du r&eacute;seau, en <em>m&eacute;morisant</em> les valeurs interm&eacute;diaires. Cette m&eacute;morisation est ce qui rend l'ensemble efficace, et c'est aussi ce qui consomme la m&eacute;moire.</li>
+<li><strong>Calculer l'erreur</strong> entre la sortie obtenue et la sortie attendue.</li>
+<li><strong>Calculer la sensibilit&eacute; de la derni&egrave;re couche</strong> : de combien l'erreur change si l'on modifie l&eacute;g&egrave;rement son entr&eacute;e. Avec l'entropie crois&eacute;e et la sigmo&iuml;de, cette quantit&eacute; se simplifie en la simple diff&eacute;rence entre la pr&eacute;diction et la cible.</li>
+<li><strong>Remonter d'une couche</strong> : la sensibilit&eacute; d'une couche s'obtient en renvoyant celle de la couche suivante &agrave; travers les poids, puis en la multipliant par la d&eacute;riv&eacute;e de l'activation. C'est la r&egrave;gle de d&eacute;rivation des fonctions compos&eacute;es, rien de plus.</li>
+<li><strong>En d&eacute;duire la d&eacute;riv&eacute;e de chaque poids</strong> : sensibilit&eacute; de la couche multipli&eacute;e par l'activation qui entre dans ce poids.</li>
+<li><strong>R&eacute;p&eacute;ter jusqu'&agrave; la premi&egrave;re couche</strong>, puis mettre &agrave; jour tous les poids dans le sens oppos&eacute; &agrave; leur d&eacute;riv&eacute;e.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Un r&eacute;seau minuscule : une entr&eacute;e, un neurone cach&eacute; sigmo&iuml;de, une sortie sigmo&iuml;de. Poids initiaux \(w_1 = 0{,}5\), \(w_2 = 0{,}5\), biais nuls. Exemple : entr&eacute;e 1, cible 0.</p>
+<table><thead><tr><th>Grandeur</th><th>Formule</th><th>Valeur</th></tr></thead><tbody>
+<tr><td>Entr&eacute;e du neurone cach&eacute;</td><td>0,5 &times; 1 + 0</td><td>0,500</td></tr>
+<tr><td>Sortie du neurone cach&eacute;</td><td>sigmo&iuml;de(0,5)</td><td>0,6225</td></tr>
+<tr><td>Entr&eacute;e du neurone de sortie</td><td>0,5 &times; 0,6225</td><td>0,3112</td></tr>
+<tr><td>Sortie du r&eacute;seau</td><td>sigmo&iuml;de(0,3112)</td><td>0,5772</td></tr>
+<tr><td>Sensibilit&eacute; de la sortie</td><td>pr&eacute;diction moins cible</td><td>0,5772</td></tr>
+<tr><td>D&eacute;riv&eacute;e par rapport &agrave; \(w_2\)</td><td>0,5772 &times; 0,6225</td><td><strong>0,3593</strong></td></tr>
+<tr><td>Sensibilit&eacute; du neurone cach&eacute;</td><td>0,5772 &times; 0,5 &times; 0,6225 &times; (1 &minus; 0,6225)</td><td>0,0678</td></tr>
+<tr><td>D&eacute;riv&eacute;e par rapport &agrave; \(w_1\)</td><td>0,0678 &times; 1</td><td><strong>0,0678</strong></td></tr>
+</tbody></table>
+<p>La d&eacute;riv&eacute;e par rapport au poids d'entr&eacute;e est cinq fois plus petite que celle du poids de sortie, alors que le r&eacute;seau ne compte que deux couches. C'est le gradient qui s'&eacute;vanouit, visible d&egrave;s cette taille minuscule : sur dix couches, le facteur devient un millioni&egrave;me.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> La proc&eacute;dure calcule <em>exactement</em> le gradient : c'est un th&eacute;or&egrave;me d'analyse, pas une approximation. On peut le v&eacute;rifier num&eacute;riquement en perturbant un poids d'une petite quantit&eacute; et en comparant &mdash; c'est le test que tout d&eacute;veloppeur devrait &eacute;crire avant de faire confiance &agrave; son code.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Un parcours avant et un parcours arri&egrave;re, chacun sur un nombre fini de couches. C'est la boucle d'apprentissage qui l'englobe qui n'a pas de crit&egrave;re d'arr&ecirc;t naturel.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Environ deux fois le co&ucirc;t de la passe avant, ind&eacute;pendamment du nombre de poids. C'est l&agrave; tout le g&eacute;nie de la m&eacute;thode : estimer chaque d&eacute;riv&eacute;e par diff&eacute;rence finie co&ucirc;terait une passe avant <em>par poids</em>, soit des millions de fois plus. La m&eacute;moire, en revanche, cro&icirc;t avec la profondeur, puisqu'il faut conserver toutes les activations.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Oublier de m&eacute;moriser les valeurs interm&eacute;diaires et les recalculer. Confondre la d&eacute;riv&eacute;e de l'activation &eacute;valu&eacute;e avant et apr&egrave;s la fonction. Initialiser tous les poids &agrave; la m&ecirc;me valeur, ce qui rend tous les neurones d'une couche identiques &agrave; jamais &mdash; ils re&ccedil;oivent le m&ecirc;me gradient. Et employer une activation qui sature, ce qui annule le gradient bien avant la premi&egrave;re couche.</p>
+<h2 id="k4">4. La descente de gradient par mini-lots</h2>
+<div class="algo-tag">organisation de l'entra&icirc;nement &middot; compromis bruit et co&ucirc;t</div>
+<p><strong>But.</strong> Entra&icirc;ner un r&eacute;seau sur des millions d'exemples sans jamais les charger tous &agrave; la fois, et en tirant parti du bruit plut&ocirc;t qu'en le subissant.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : un jeu de donn&eacute;es, une taille de lot, un pas d'apprentissage, un nombre d'&eacute;poques.<br>
+<strong>Sortie</strong> : un r&eacute;seau entra&icirc;n&eacute;.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>M&eacute;langer les exemples</strong> au d&eacute;but de chaque &eacute;poque. Sans m&eacute;lange, un jeu de donn&eacute;es tri&eacute; par classe fait voir au r&eacute;seau mille exemples de la m&ecirc;me classe d'affil&eacute;e, et il oublie les autres.</li>
+<li><strong>D&eacute;couper en lots</strong> de quelques dizaines &agrave; quelques centaines d'exemples.</li>
+<li><strong>Pour chaque lot, calculer le gradient moyen</strong> par r&eacute;tropropagation et mettre &agrave; jour les poids.</li>
+<li><strong>Recommencer sur le lot suivant</strong>, jusqu'&agrave; avoir parcouru tout le jeu : c'est une &eacute;poque.</li>
+<li><strong>Mesurer la performance sur des donn&eacute;es mises de c&ocirc;t&eacute;</strong> apr&egrave;s chaque &eacute;poque, et arr&ecirc;ter quand elle cesse de progresser &mdash; jamais quand l'erreur d'apprentissage cesse de progresser.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Un jeu de 60 000 exemples, avec trois tailles de lot. Chaque ligne repr&eacute;sente une &eacute;poque compl&egrave;te.</p>
+<table><thead><tr><th>Taille du lot</th><th>Mises &agrave; jour par &eacute;poque</th><th>Bruit du gradient</th><th>Parall&eacute;lisme</th><th>Effet observ&eacute;</th></tr></thead><tbody>
+<tr><td>1</td><td>60 000</td><td>tr&egrave;s fort</td><td>aucun</td><td>progresse vite au d&eacute;but, oscille beaucoup</td></tr>
+<tr><td>64</td><td>938</td><td>mod&eacute;r&eacute;</td><td>bon</td><td>compromis usuel</td></tr>
+<tr><td>60 000</td><td>1</td><td>nul</td><td>maximal</td><td>chaque pas est exact mais on n'en fait presque aucun</td></tr>
+</tbody></table>
+<p>Le bruit n'est pas seulement un d&eacute;faut &agrave; subir : il aide &agrave; s'&eacute;chapper des points selle et des minima locaux peu profonds, exactement comme la temp&eacute;rature du recuit simul&eacute; au chapitre 4. Une taille de lot trop grande peut donc <em>d&eacute;grader</em> la solution trouv&eacute;e, alors qu'elle rend chaque pas plus exact.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Le gradient d'un lot est un estimateur sans biais du gradient complet : son esp&eacute;rance est le bon gradient. La convergence est garantie sous les conditions de Robbins et Monro sur la suite des pas, mais seulement vers un point o&ugrave; le gradient s'annule &mdash; rien n'assure que ce soit un minimum global, la fonction n'&eacute;tant pas convexe.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Le nombre d'&eacute;poques est fix&eacute;, ou l'on s'arr&ecirc;te quand la performance sur les donn&eacute;es de validation cesse de progresser. Il n'existe aucun crit&egrave;re intrins&egrave;que.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Une &eacute;poque co&ucirc;te un passage complet sur les donn&eacute;es, quelle que soit la taille des lots. Ce qui change est le nombre de mises &agrave; jour et le degr&eacute; de parall&eacute;lisme : les grands lots exploitent mieux le mat&eacute;riel, les petits explorent mieux.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Ne pas m&eacute;langer. Choisir un pas trop grand, ce qui fait diverger, ou trop petit, ce qui fait ramper. Arr&ecirc;ter sur l'erreur d'apprentissage plut&ocirc;t que sur celle de validation, ce qui garantit le sur-apprentissage. Et calculer la normalisation des donn&eacute;es sur l'ensemble du jeu avant de le d&eacute;couper : c'est exactement la fuite de donn&eacute;es du chapitre 9, et elle est tout aussi fatale ici.</p>
+<nav class="lesson-nav"><div class="container">
+<a href="page.html">&larr; Retour au chapitre 11</a>
+<a href="../../index.html">Sommaire du manuel</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+</body></html>

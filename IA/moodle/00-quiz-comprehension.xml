@@ -1,0 +1,2562 @@
+<?xml version="1.0" encoding="utf-8"?>
+<quiz>
+  <question type="category">
+    <category>
+      <text>$course$/Intelligence artificielle/Comprehension</text>
+    </category>
+    <info format="html">
+      <text/>
+    </info>
+    <idnumber/>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C3-1 Discipline de la frange</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Dans le squelette commun de recherche, quelle structure de donnees faut-il employer pour obtenir l'algorithme A* ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Seule la discipline d'extraction de la frange distingue ces algorithmes.&lt;/p&gt;</text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un tas min ordonne sur \(g(n) + h(n)\)&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est la definition meme de A*.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Une file d'attente&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Une file donne le parcours en largeur.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Une pile&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Une pile donne le parcours en profondeur.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un tas min ordonne sur \(h(n)\) seul&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est la recherche gloutonne, qui n'est pas optimale.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C3-2 Coherence et admissibilite</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Toute heuristique coherente est admissible.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;En sommant l'inegalite triangulaire le long d'un chemin optimal vers un but, on obtient bien \(h(n) \le h^{*}(n)\).&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La reciproque est fausse, mais cette implication-ci est vraie.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C3-3 Largeur et cout</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le parcours en largeur rend toujours un chemin de cout minimal.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il rend un chemin comportant le moins d'aretes. Avec des couts non uniformes, ce chemin peut etre plus couteux qu'un autre : c'est le cas dans le graphe de reference du chapitre, ou il rend un chemin de cout 10 alors que l'optimum vaut 9.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="numerical">
+    <name>
+      <text>C3-4 Cout optimal</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Dans le graphe de reference du chapitre 3 (aretes S-A 2, S-B 3, A-C 3, A-D 2, B-D 4, B-E 3, C-F 2, D-F 3, D-G 6, E-G 5, F-G 2), quel est le cout du plus court chemin de S a G ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le chemin S-A-C-F-G, comme S-A-D-F-G, coute 9.&lt;/p&gt;</text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>9</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+      <tolerance>0</tolerance>
+    </answer>
+    <unitgradingtype>0</unitgradingtype>
+    <unitpenalty>0.1000000</unitpenalty>
+    <showunits>3</showunits>
+    <unitsleft>0</unitsleft>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C3-5 Interet d IDA*</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Quel est l'interet principal d'IDA* par rapport a A* ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il n'occupe qu'une memoire proportionnelle a la longueur de la solution&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est exactement le probleme que resout IDA*.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il trouve des solutions meilleures que A*&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Les deux rendent une solution optimale si l'heuristique est admissible.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il ne demande aucune heuristique&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il en demande une, tout comme A*.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il developpe toujours moins de noeuds que A*&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il en developpe en general davantage, a cause du travail repete.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C3-6 Dominance</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;\(h_1\) et \(h_2\) sont admissibles et \(h_2(n) \ge h_1(n)\) pour tout \(n\). Que peut-on affirmer ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;A* avec \(h_2\) ne developpe jamais plus de noeuds que A* avec \(h_1\), aux egalites pres&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;A* developpe tous les noeuds tels que \(f(n) \lt C^{*}\) ; une heuristique plus grande en elimine davantage.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;\(h_2\) risque de ne plus etre admissible&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'enonce la suppose admissible.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Les deux developpent exactement les memes noeuds&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Non : c'est tout l'interet de la dominance.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;\(h_1\) donne un chemin plus court&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Les deux donnent un chemin optimal.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C5-1 Valeur et elagage</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'elagage alpha-beta peut rendre une valeur differente de celle de min-max.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il rend toujours exactement la meme valeur a la racine. S'il en rend une autre, c'est qu'il y a une erreur d'implementation, pas une approximation.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="numerical">
+    <name>
+      <text>C5-2 Feuilles evaluees</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Sur l'arbre de feuilles 3, 12, 8 | 2, 4, 6 | 14, 5, 2 (racine MAX, trois coups de trois reponses, fils examines de gauche a droite), combien de feuilles l'elagage alpha-beta evalue-t-il ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Les feuilles 6 (apres 2 et 4) et la derniere 2 ne sont pas lues : 7 feuilles sur 9.&lt;/p&gt;</text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>7</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+      <tolerance>0</tolerance>
+    </answer>
+    <unitgradingtype>0</unitgradingtype>
+    <unitpenalty>0.1000000</unitpenalty>
+    <showunits>3</showunits>
+    <unitsleft>0</unitsleft>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C5-3 Ordre parfait</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Sous un ordre d'examen parfait, le nombre de feuilles evaluees par alpha-beta est de l'ordre de :&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;\(b^{d/2}\)&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;On double la profondeur atteignable a temps egal.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;\(b^{d}\)&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est le cout de min-max, sans elagage.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;\(b^{3d/4}\)&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est l'ordre de grandeur pour un ordre quelconque.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;\(d^{b}\)&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Les roles de la base et de l'exposant sont inverses.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C5-4 Effet d horizon</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Qu'appelle-t-on effet d'horizon ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Une consequence facheuse est repoussee juste au-dela de la profondeur exploree, donc invisible&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Remede usuel : la recherche de quiescence, qui prolonge l'exploration sur les positions agitees.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La fonction d'evaluation devient imprecise loin de la racine&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est un autre probleme, distinct de l'effet d'horizon.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le nombre de coups legaux croit avec la profondeur&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Sans rapport.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La table de transpositions sature la memoire&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Sans rapport.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C5-5 Choix final en MCTS</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;A la fin d'une exploration arborescente par echantillonnage, on joue le coup dont le taux de victoire observe est le plus eleve.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;On joue le coup le PLUS VISITE. Un taux calcule sur peu de visites est peu fiable ; c'est d'ailleurs pourquoi le critere de selection en cours de recherche et le critere de decision finale sont differents.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C6-1 Choix de variable</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'heuristique du domaine minimal consiste a affecter d'abord la variable qui a le moins de valeurs possibles. Pourquoi ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Pour decouvrir un echec le plus haut possible dans l'arbre de recherche&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Si elle doit echouer, autant l'apprendre avant d'avoir developpe un sous-arbre entier.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Pour maximiser les chances de trouver une solution a ce noeud&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est la logique du choix de VALEUR, pas de celui de variable.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Parce que le calcul est plus rapide&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elle coute au contraire un balayage supplementaire.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Pour respecter l'ordre alphabetique&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Sans rapport.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C6-2 Portee de la coherence d arc</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un reseau de contraintes coherent d'arc possede toujours au moins une solution.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La coherence d'arc est necessaire, pas suffisante. Trois variables formant un triangle avec deux valeurs et la contrainte de difference sont coherentes d'arc et pourtant insolubles.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="numerical">
+    <name>
+      <text>C6-3 Complexite d AC-3</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le cout d'AC-3 sur un reseau binaire a \(e\) contraintes et des domaines de taille au plus \(d\) est en \(O(e\,d^{k})\). Que vaut \(k\) ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Chaque arc peut etre remis en file \(d\) fois, et chaque revision coute \(d^{2}\).&lt;/p&gt;</text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>3</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+      <tolerance>0</tolerance>
+    </answer>
+    <unitgradingtype>0</unitgradingtype>
+    <unitpenalty>0.1000000</unitpenalty>
+    <showunits>3</showunits>
+    <unitsleft>0</unitsleft>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C6-4 Graphe acyclique</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Si le graphe de contraintes d'un CSP est un arbre, la resolution se fait en :&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;temps polynomial, en \(O(n\,d^{2})\)&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;On rend coherent chaque arc des feuilles vers la racine, puis on affecte en descendant, sans aucun retour sur trace.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;temps exponentiel, comme dans le cas general&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La structure change la complexite.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;temps constant&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il faut au minimum parcourir les donnees.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;temps \(O(d^{n})\)&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est le cout du cas general.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C6-5 Portee de la reparation locale</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un echec de la reparation par minimum de conflits prouve que le probleme n'a pas de solution.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il peut simplement signifier que la recherche s'est enlisee dans un minimum local. Cette methode ne prouve jamais l'incoherence.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C6-6 Ou sont les instances difficiles</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Pour une famille d'instances aleatoires, ou se situe le cout de resolution maximal ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Au voisinage du seuil ou la probabilite d'avoir une solution bascule de 1 a 0&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Loin du seuil, les instances sont soit faciles a resoudre, soit faciles a refuter.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Pour les instances tres peu contraintes&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Une solution s'y trouve presque immediatement.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Pour les instances tres fortement contraintes&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La propagation y prouve l'echec tout de suite.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le cout ne depend pas du rapport contraintes sur variables&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il en depend fortement, et de facon non monotone.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C9-1 Decomposition</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Dans la decomposition biais-variance de l'erreur quadratique attendue, que devient la variance quand on enrichit la classe de modeles ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elle augmente, tandis que le biais diminue&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Leur somme, augmentee du bruit irreductible, forme la courbe en U de l'erreur de test.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elle diminue, tandis que le biais augmente&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est l'inverse.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Les deux diminuent&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Ce serait un repas gratuit ; il n'y en a pas.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Les deux augmentent&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le biais diminue quand la classe s'enrichit.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C9-2 Normalisation et voisins</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Pour les k plus proches voisins, la moyenne et l'ecart-type servant a normaliser doivent etre calcules sur l'ensemble des donnees disponibles, apprentissage et test reunis.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Ce serait une fuite de donnees. Ils se calculent sur la seule portion d'apprentissage, et sont ensuite appliques telles quelles aux donnees de test.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="numerical">
+    <name>
+      <text>C9-3 Rappel</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un depistage donne 42 vrais positifs, 27 faux positifs, 18 faux negatifs et 913 vrais negatifs. Quel est le rappel, en pourcentage ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Rappel = 42 / (42 + 18) = 70 %. La precision, elle, ne vaut que 60,9 %.&lt;/p&gt;</text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>70</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+      <tolerance>0.5</tolerance>
+    </answer>
+    <unitgradingtype>0</unitgradingtype>
+    <unitpenalty>0.1000000</unitpenalty>
+    <showunits>3</showunits>
+    <unitsleft>0</unitsleft>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C9-4 Exactitude trompeuse</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Sur 1 000 patients dont 60 sont malades, un classifieur qui repond toujours 'non malade' atteint 94 % d'exactitude. Que conclure ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'exactitude seule est inutilisable sur des classes desequilibrees&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Son rappel est nul : il ne detecte aucun malade. Il faut rapporter precision et rappel.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est un bon classifieur&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il ne detecte aucun cas positif.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il faut augmenter la taille de l'echantillon&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le probleme est la metrique, pas la taille.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il faut passer a un modele lineaire&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le choix du modele n'est pas en cause ici.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C9-5 Sur-apprentissage d un arbre</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un arbre de decision dont la profondeur n'est pas limitee atteint en general une erreur nulle sur les donnees d'apprentissage.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Et c'est precisement le symptome du sur-apprentissage : il memorise le bruit de l'echantillon. Remedes : arret precoce, elagage, ou agregation de plusieurs arbres.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C9-6 Role du pipeline</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Pourquoi enchainer normalisation et modele dans un pipeline plutot que normaliser le jeu de donnees avant l'appel a la validation croisee ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Parce que la normalisation doit etre ajustee a l'interieur de chaque bloc, sur la seule portion d'apprentissage&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Sinon de l'information du bloc de validation entre dans le modele et les scores deviennent optimistes.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Parce que c'est plus rapide&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est au contraire legerement plus couteux.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Parce que la normalisation globale change les unites&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Ce n'est pas la raison.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Pour pouvoir utiliser plusieurs modeles a la fois&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Ce n'est pas l'objet.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="numerical">
+    <name>
+      <text>C9-7 Nombre de blocs</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Dans une validation croisee a \(K\) blocs, combien de fois chaque exemple sert-il a l'evaluation ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Exactement une fois : c'est tout l'interet de la methode. Il sert en revanche K-1 fois a l'apprentissage, ce qui evite de gaspiller des donnees.&lt;/p&gt;</text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>1</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+      <tolerance>0</tolerance>
+    </answer>
+    <unitgradingtype>0</unitgradingtype>
+    <unitpenalty>0.1000000</unitpenalty>
+    <showunits>3</showunits>
+    <unitsleft>0</unitsleft>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C1-1 Les quatre definitions</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Croiser deux questions &amp;mdash; reproduire le processus ou le comportement, prendre pour critere l'humain ou la rationalite &amp;mdash; donne quatre programmes de recherche. Lequel ce manuel adopte-t-il ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Agir rationnellement : maximiser une mesure de performance&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est le seul des quatre qui soit mesurable et qui ne prejuge rien du mecanisme interne.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Penser humainement : reproduire le raisonnement humain&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est la modelisation cognitive, abandonnee par le domaine des les annees 1970.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Agir humainement : passer pour un humain&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est le jeu de l'imitation ; il recompense la ressemblance, pas la competence.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Penser rationnellement : appliquer des regles d'inference correctes&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est la tradition des lois de la pensee, trop etroite pour la perception et l'action.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C1-2 Portee du jeu de l imitation</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Reussir le jeu de l'imitation demontre qu'une machine pense.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Turing lui-meme presente son test comme un critere conventionnel, apres avoir declare la question originelle trop depourvue de sens pour meriter discussion. ELIZA, en 1966, trompait des utilisateurs avec quelques centaines de lignes de reformulation.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C1-3 Le paradoxe de Moravec</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Qu'affirme le paradoxe de Moravec ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Ce qu'un enfant fait sans effort resiste aux machines, alors que le raisonnement abstrait leur est accessible&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Explication proposee : la perception et la motricite sont le produit de centaines de millions d'annees de selection.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Plus un probleme est ancien, plus il est facile a resoudre&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Sans rapport.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Les machines progressent plus vite que prevu sur toutes les taches&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est l'inverse de ce que le paradoxe constate.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un programme ne peut pas depasser son programmeur&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est l'objection de Lady Lovelace, a laquelle Turing repond des 1950.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="numerical">
+    <name>
+      <text>C1-4 Naissance du terme</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;En quelle annee s'est tenue la conference qui a donne son nom au domaine ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'atelier d'ete de Dartmouth ; la demande de financement, ou McCarthy forge l'expression, date de 1955.&lt;/p&gt;</text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>1956</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+      <tolerance>0</tolerance>
+    </answer>
+    <unitgradingtype>0</unitgradingtype>
+    <unitpenalty>0.1000000</unitpenalty>
+    <showunits>3</showunits>
+    <unitsleft>0</unitsleft>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C2-1 Sur quoi porte la mesure de performance</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La mesure de performance d'un agent doit etre definie sur :&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;les etats de l'environnement&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un aspirateur note sur la poussiere aspiree a interet a rejeter la poussiere pour la reaspirer.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;les etats internes de l'agent&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est precisement ce qui permet de tricher.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;le nombre d'actions executees&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;On mesurerait l'activite, pas le resultat.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;la satisfaction declaree par l'agent&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un agent ne declare rien.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C2-2 Rationnel et omniscient</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un agent rationnel est un agent qui obtient toujours le meilleur resultat possible.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La rationalite maximise la performance ATTENDUE, pas la performance realisee : elle n'exige pas de connaitre l'avenir. Traverser une rue apres avoir regarde des deux cotes reste rationnel meme si une porte d'avion tombe du ciel.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C2-3 Environnement partiellement observable</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Quelle architecture d'agent devient necessaire des que l'environnement est partiellement observable ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un agent maintenant un etat interne&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Deux etats du monde differents peuvent produire la meme perception ; sans memoire, l'agent y repond identiquement.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un agent reflexe simple&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il ne peut pas distinguer deux situations qui se percoivent pareil.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un agent apprenant&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'apprentissage repond a une autre difficulte.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Aucune : il suffit d'ajouter des regles&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le nombre de regles ne compense pas l'absence de memoire.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C2-4 Le generateur de problemes</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Dans un agent apprenant, le generateur de problemes propose des actions dont l'interet immediat est nul mais qui apportent de l'information.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Sans lui, l'agent reste enferme dans ce qu'il sait deja faire et ne decouvre jamais qu'une autre strategie etait meilleure.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C4-1 Ce que garantit la montee stricte</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Que garantit une montee stricte a la fin de son execution ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La solution rendue est un optimum local&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Aucun voisin ne fait mieux ; rien n'est garanti au-dela.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La solution rendue est un optimum global&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est faux des que le paysage a plusieurs sommets.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La solution rendue est a moins de 10 % de l'optimum&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Aucune borne de ce type n'existe.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elle s'arrete en un nombre de pas borne par la dimension&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le nombre de pas depend de l'etendue des valeurs, pas de la dimension.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="numerical">
+    <name>
+      <text>C4-2 Probabilite de succes</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Une montee isolee reussit une fois sur sept sur le probleme des huit reines. En moyenne, combien d'essais independants faut-il pour reussir au moins une fois ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le nombre d'essais suit une loi geometrique d'esperance 1/p.&lt;/p&gt;</text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>7</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+      <tolerance>0.5</tolerance>
+    </answer>
+    <unitgradingtype>0</unitgradingtype>
+    <unitpenalty>0.1000000</unitpenalty>
+    <showunits>3</showunits>
+    <unitsleft>0</unitsleft>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C4-3 Convergence du recuit</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La convergence demontree du recuit simule en fait une methode fiable en pratique.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le theoreme exige un refroidissement en 1/ln(k), qui demande un nombre d'iterations comparable a l'enumeration exhaustive. Tous les recuits reels emploient un refroidissement geometrique, qui ne garantit rien.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C4-4 Croisement et mutation</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Dans un algorithme genetique, quel operateur peut reintroduire une valeur que toute la population a perdue ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La mutation seule&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le croisement ne fait que recombiner ce qui existe deja quelque part dans la population.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le croisement seul&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il ne cree aucune valeur nouvelle.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La selection&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elle ne fait que choisir parmi les individus existants.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'elitisme&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il preserve le meilleur individu, il n'innove pas.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C7-1 Correction et completude</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un systeme d'inference qui demontre des enonces faux est dit :&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;incorrect &amp;mdash; et il est inutilisable&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un systeme incomplet, lui, reste utilisable : il se tait parfois.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;incomplet &amp;mdash; et il est inutilisable&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'incompletude signifie qu'il ne demontre pas tout, pas qu'il ment.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;indecidable&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'indecidabilite porte sur l'existence d'un algorithme de decision.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;non monotone&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Sans rapport avec la question.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C7-2 Reduction a la satisfiabilite</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Verifier qu'un enonce decoule d'une base revient a verifier que la base augmentee de la negation de cet enonce est insatisfiable.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est le theoreme pivot du chapitre : il ramene une question portant sur une infinite de mondes a une recherche de modele.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C7-3 Le role de la propagation unitaire</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Pourquoi la propagation unitaire accelere-t-elle autant DPLL ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elle affecte des variables sans faire de choix, donc sans creer de branche&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Sur l'exemple du chapitre, elle fait passer de 17 noeuds explores a 2.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elle choisit mieux la variable de branchement&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elle ne choisit rien.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elle supprime des clauses redondantes&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Ce n'est pas son role.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elle transforme la formule en forme normale disjonctive&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Sans rapport.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C7-4 Logique des predicats</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La logique des predicats est complete mais indecidable.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Godel a demontre la completude en 1930, Church et Turing l'indecidabilite en 1936. Une recherche de preuve trouve toute preuve existante, mais peut chercher indefiniment quand il n'y en a pas.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+  </question>
+  <question type="numerical">
+    <name>
+      <text>C8-1 Depistage</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un test a 99 % de sensibilite et 95 % de specificite est applique a une maladie touchant une personne sur mille. Un test positif donne quelle probabilite d'etre malade, en pourcentage ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Sur 100 000 personnes : 99 vrais positifs contre 4 995 faux positifs.&lt;/p&gt;</text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>1.9</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+      <tolerance>0.2</tolerance>
+    </answer>
+    <unitgradingtype>0</unitgradingtype>
+    <unitpenalty>0.1000000</unitpenalty>
+    <showunits>3</showunits>
+    <unitsleft>0</unitsleft>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C8-2 Ce que porte l absence d arc</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Dans un reseau bayesien, quelle information porte l'ABSENCE d'un arc entre deux variables ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Une affirmation d'independance conditionnelle&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est elle qui fait passer le nombre de parametres de 2 puissance n a une quantite lineaire.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Que les deux variables ne sont jamais correlees&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elles peuvent l'etre : l'independance est conditionnelle, pas absolue.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Que l'une des deux est inobservable&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Sans rapport.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Rien : seuls les arcs presents comptent&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est l'inverse : les arcs absents portent l'essentiel de l'economie.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C8-3 Le classifieur naif</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Les probabilites produites par un classifieur naif de Bayes peuvent etre lues comme des degres de confiance.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elles sont gravement mal calibrees et saturent a 0 ou 1, parce que l'hypothese d'independance multiplie l'effet des caracteristiques redondantes. Le classement, lui, reste souvent correct : seul compte quel produit est le plus grand.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C8-4 Filtrage</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Dans une chaine de Markov, le filtrage se fait en deux temps. Lesquels, et dans quel ordre ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Predire par la matrice de transition, puis corriger par la vraisemblance de l'observation&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Puis normaliser. C'est la version quantitative de la mise a jour d'etat du chapitre 2.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Corriger puis predire&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'estimation serait decalee d'un pas.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Predire deux fois de suite&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'observation ne serait jamais utilisee.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Moyenner toutes les observations passees&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Inutile : la croyance courante resume deja tout le passe.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C10-1 Ce que supposent les k-moyennes</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;En minimisant la somme des carres des distances aux centres, les k-moyennes supposent implicitement que les groupes sont :&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;spheriques et de tailles comparables&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Deux croissants imbriques ou un petit groupe dense a cote d'un grand groupe diffus sont systematiquement mal partitionnes.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;de formes quelconques&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le critere optimise l'interdit.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;separes par des frontieres lineaires apprises&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il n'y a aucun apprentissage de frontiere : c'est du partitionnement.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;de densites tres differentes&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est justement le cas qui echoue.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C10-2 Terminaison des k-moyennes</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'algorithme des k-moyennes s'arrete toujours en un nombre fini d'etapes.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'inertie decroit au sens large a chaque etape et le nombre de partitions est fini : on ne peut donc pas repasser deux fois par la meme partition. Cela ne dit rien de l'optimalite du resultat.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C10-3 Ce que ne fait pas l ACP</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'analyse en composantes principales cherche les directions de variance maximale. Que ne fait-elle PAS ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Chercher les directions qui separent les classes&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elle ignore completement les etiquettes ; si l'information discriminante est dans une direction de faible variance, c'est celle qu'elle supprime.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Minimiser l'erreur de reconstruction&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elle le fait : c'est la meme chose que maximiser la variance, par Pythagore.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Produire des axes orthogonaux&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Ils le sont par construction.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Reduire la dimension&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est son objet meme.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="numerical">
+    <name>
+      <text>C10-4 Choix du nombre de groupes</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Sur des donnees engendrees par trois groupes gaussiens bien separes, ou se situe le coude de la courbe d'inertie ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Passer de 2 a 3 divise l'inertie par trois ; passer de 3 a 4 ne gagne presque rien.&lt;/p&gt;</text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>3</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+      <tolerance>0</tolerance>
+    </answer>
+    <unitgradingtype>0</unitgradingtype>
+    <unitpenalty>0.1000000</unitpenalty>
+    <showunits>3</showunits>
+    <unitsleft>0</unitsleft>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C11-1 Pourquoi une non-linearite</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Sans fonction d'activation non lineaire, empiler cent couches produit la meme classe de fonctions qu'une seule couche.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La composition de deux applications affines est affine. Toute la puissance des reseaux profonds vient de la fonction inseree entre les couches.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C11-2 Ce que dit le theoreme de convergence du perceptron</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le theoreme de convergence du perceptron garantit un nombre borne de corrections. Sous quelle condition ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Les deux classes sont separables par un hyperplan avec une marge strictement positive&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La borne vaut alors R au carre divise par le carre de la marge, independamment du nombre d'exemples.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Les donnees sont normalisees&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Utile en pratique, mais ce n'est pas la condition.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le pas d'apprentissage est assez petit&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La regle du perceptron n'a pas de pas.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Les exemples sont presentes dans un ordre aleatoire&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La borne ne depend justement pas de l'ordre.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C11-3 Ce que le theoreme d approximation ne dit pas</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Une couche cachee suffit a approcher toute fonction continue sur un compact. Que ce theoreme ne dit-il PAS ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Combien d'unites sont necessaires, ni comment trouver les parametres&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le nombre d'unites peut croitre exponentiellement avec la dimension, et l'existence n'est pas une methode.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Que l'activation doit etre non polynomiale&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il le dit : c'est son hypothese.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Que l'approximation est uniforme&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il le dit aussi.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Que le domaine doit etre compact&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est egalement dans l'enonce.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="numerical">
+    <name>
+      <text>C11-4 Gradient qui s evanouit</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La derivee de la sigmoide vaut au plus 0,25. Apres dix couches, par quel facteur au plus le gradient est-il multiplie ? Repondre par l'exposant de 10, en valeur absolue (0,25 puissance 10 vaut environ 10 puissance moins 6).&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;0,25 puissance 10 vaut environ 9,5 fois 10 puissance moins 7.&lt;/p&gt;</text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>6</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+      <tolerance>0.3</tolerance>
+    </answer>
+    <unitgradingtype>0</unitgradingtype>
+    <unitpenalty>0.1000000</unitpenalty>
+    <showunits>3</showunits>
+    <unitsleft>0</unitsleft>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C12-1 Pourquoi l equation de Bellman a une solution unique</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Pourquoi l'iteration sur les valeurs converge-t-elle, quel que soit le point de depart ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'operateur de Bellman est une contraction de rapport gamma&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le theoreme du point fixe donne existence, unicite et convergence geometrique.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La fonction de valeur est convexe&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elle ne l'est pas en general.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le nombre d'etats est fini&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Necessaire pour le calcul, mais ce n'est pas ce qui donne la convergence.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Les recompenses sont bornees&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Utile, mais l'argument decisif est la contraction.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C12-2 Le caractere hors politique</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le Q-apprentissage converge vers la politique optimale meme si l'agent agit au hasard pendant l'apprentissage, pourvu qu'il visite suffisamment chaque couple etat-action.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est ce qu'on appelle apprendre hors politique : la cible utilise le maximum de Q sur l'etat atteint, quelle que soit l'action reellement jouee ensuite.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C12-3 Exploration et exploitation</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Dans l'experience du chapitre, l'agent sans exploration obtient le meilleur gain moyen mais une politique correcte sur 7 cases seulement, contre 9 avec 30 % d'exploration. Que faut-il en conclure ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le gain pendant l'apprentissage et la qualite de ce qui est appris sont deux objectifs distincts&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il faut donc savoir lequel on mesure avant de comparer deux methodes.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'exploration est toujours nuisible&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elle degrade le gain immediat et ameliore la politique.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'exploration est toujours benefique&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Au-dela d'un certain taux, le gain s'effondre sans gain de qualite.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le Q-apprentissage est mal adapte a ce probleme&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Il retrouve la politique optimale : c'est bien le compromis qui est en cause.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C12-4 La triade mortelle</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Combiner approximation de fonction, apprentissage hors politique et mise a jour a partir de sa propre estimation peut faire diverger l'apprentissage.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est ce qu'on appelle la triade mortelle, et le Q-apprentissage profond reunit precisement les trois. Rejouer des transitions passees et figer periodiquement le reseau cible le stabilisent en pratique, sans garantie.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C13-1 Discriminatif ou generatif</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Qu'apprend un modele generatif que n'apprend pas un modele discriminatif ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;La distribution des donnees elle-meme, ce qui permet d'engendrer et de detecter l'anormal&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Cette souplesse se paie : sur les taches purement discriminatives, un modele discriminatif l'emporte generalement.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Une frontiere de decision plus precise&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est ce que fait le modele discriminatif.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Une representation de dimension reduite&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Ce n'est pas la difference definitionnelle.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Rien : les deux sont equivalents&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Ils optimisent des objectifs differents.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C13-2 La temperature</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Augmenter la temperature d'echantillonnage modifie le modele de langue.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elle ne modifie que la facon de LIRE ses probabilites, apres coup. Le meme modele peut produire un texte repetitif ou desagrege selon ce seul reglage.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C13-3 Cartes d attention</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Les poids d'attention d'un transformeur peuvent-ils etre lus comme l'explication du raisonnement du modele ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Non : on peut les modifier substantiellement sans changer la prediction&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Ce qui interdit d'y voir la cause de celle-ci. L'attention est un mecanisme de calcul.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Oui : ils indiquent exactement les mots utilises&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est precisement l'abus a eviter.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Oui, mais seulement pour les modeles de petite taille&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;L'objection ne depend pas de la taille.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Non, parce qu'ils ne sont pas calculables&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Ils le sont parfaitement.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C13-4 Lois d echelle</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Les lois d'echelle des grands modeles de langue sont des theoremes.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Ce sont des regularites empiriques, valables sur les plages observees. Elles ont deja ete corrigees une fois, lorsqu'il est apparu que les modeles de l'epoque etaient nettement sous-entraines en donnees pour leur taille.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C14-1 Supprimer l attribut sensible</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Retirer l'attribut sensible des donnees d'entrainement supprime la discrimination.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Dans des donnees riches, il se reconstitue a partir des autres variables : code postal, prenom, vocabulaire. On perd en outre la possibilite de MESURER l'ecart, donc de le corriger.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C14-2 Le theoreme d impossibilite</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Parite demographique, egalite des chances et calibration :&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;ne peuvent pas etre satisfaites simultanement des que les taux de base different&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;C'est une contrainte algebrique, pas une limite technique : il faut choisir et justifier le choix.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;sont equivalentes entre elles&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elles sont incompatibles deux a trois.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;se satisfont toutes en ajustant les seuils par groupe&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un balayage exhaustif des seuils n'en trouve aucun qui satisfasse les trois.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;ne concernent que les modeles lineaires&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Le resultat est independant du modele.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name>
+      <text>C14-3 Explications a posteriori</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Une explication produite par une methode locale a posteriori explique :&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <showstandardinstruction>1</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>&lt;p&gt;Bonne reponse.&lt;/p&gt;</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse partiellement correcte.&lt;/p&gt;</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>&lt;p&gt;Reponse incorrecte.&lt;/p&gt;</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;un modele simple ajuste au voisinage du point, pas le modele lui-meme&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Deux methodes differentes peuvent donner deux explications contradictoires sans qu'aucune soit fausse.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;exactement la decision du modele&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Seuls les modeles intrinsequement lisibles le permettent.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;la cause reelle du phenomene dans le monde&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;On explique le modele, jamais le monde.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;la structure interne du reseau&lt;/p&gt;</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Elle n'y accede pas.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+  </question>
+  <question type="truefalse">
+    <name>
+      <text>C14-4 Effet d une explication</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Fournir une explication a cote d'une prediction fausse rend l'utilisateur plus susceptible de la suivre.&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Une explication plausible augmente la confiance independamment de sa justesse : c'est aussi un dispositif de persuasion, et il faut l'evaluer comme tel.&lt;/p&gt;</text>
+      </feedback>
+    </answer>
+    <answer fraction="0.0000000" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+    </answer>
+  </question>
+  <question type="numerical">
+    <name>
+      <text>C14-5 Ecart de precision</text>
+    </name>
+    <questiontext format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;Un systeme detecte 80 % des cas positifs et se trompe sur 20 % des negatifs, dans deux groupes de 1 000 personnes dont l'un compte 300 positifs et l'autre 100. Quelle est la precision, en pourcentage, dans le groupe a 100 positifs ?&lt;/p&gt;</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text>&lt;p style=&quot;font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;&quot;&gt;80 vrais positifs sur 260 selectionnes. Dans l'autre groupe, 240 sur 380, soit 63,2 % : le meme avis favorable n'a pas la meme valeur.&lt;/p&gt;</text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <answer fraction="100.0000000" format="moodle_auto_format">
+      <text>30.8</text>
+      <feedback format="html">
+        <text/>
+      </feedback>
+      <tolerance>0.5</tolerance>
+    </answer>
+    <unitgradingtype>0</unitgradingtype>
+    <unitpenalty>0.1000000</unitpenalty>
+    <showunits>3</showunits>
+    <unitsleft>0</unitsleft>
+  </question>
+</quiz>

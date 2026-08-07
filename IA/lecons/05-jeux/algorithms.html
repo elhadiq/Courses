@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 5 &mdash; Annexe algorithmique</title>
+<meta name="description" content="Min-max, elagage alpha-beta, profondeur croissante et exploration par echantillonnage, pas a pas.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Chapitre 5 &middot; Annexe</div>
+<h1>Les algorithmes de jeu, pas &agrave; pas</h1>
+<div class="lesson-sub">Quatre proc&eacute;dures d&eacute;crites en fran&ccedil;ais, avec un arbre d&eacute;roul&eacute; &agrave; la main que l'on peut v&eacute;rifier de t&ecirc;te.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box tip"><div class="box-title">Comment lire cette annexe</div>
+Aucune ligne de programme. <a href="page.html">Retour au chapitre</a>.</div>
+
+<div class="annex-toc">
+<a href="#b1">1. Min-max</a>
+<a href="#b2">2. &Eacute;lagage alpha-b&ecirc;ta</a>
+<a href="#b3">3. Profondeur croissante et table de transpositions</a>
+<a href="#b4">4. Exploration arborescente par &eacute;chantillonnage</a>
+</div>
+
+<p><strong>L'arbre de r&eacute;f&eacute;rence.</strong> Racine MAX, trois coups possibles ; sous chacun, MIN dispose de deux ou trois r&eacute;ponses. Les huit feuilles portent, de gauche &agrave; droite, les valeurs <strong>3, 12, 8, 2, 4, 6, 14, 5</strong>, r&eacute;parties ainsi : le premier coup de MAX m&egrave;ne aux feuilles 3 et 12, le deuxi&egrave;me aux feuilles 8, 2 et 4, le troisi&egrave;me aux feuilles 6, 14 et 5.</p>
+
+<figure class="viz"><div class="viz-title">L'arbre de r&eacute;f&eacute;rence</div><svg viewBox="0 0 760 358" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">L'arbre de r&eacute;f&eacute;rence : valeurs remont&eacute;es et feuille &eacute;lagu&eacute;e</text><path d="M 380 63 L 399 95 L 361 95 Z" style="fill:var(--primary);"/><text x="380" y="90" text-anchor="middle" style="fill:var(--color-bg);font-size:12.5px;font-weight:700;font-family:inherit;">5</text><text x="380" y="52" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">MAX</text><path d="M 380 97 L 130 151" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 130 185 L 147 155 L 113 155 Z" style="fill:var(--accent);"/><text x="130" y="172" text-anchor="middle" style="fill:var(--color-bg);font-size:12.5px;font-weight:700;font-family:inherit;">3</text><text x="130" y="146" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">MIN</text><path d="M 130 186 L 97 246" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><rect x="77" y="246" width="40" height="32" rx="5" style="fill:var(--viz-ref);stroke:var(--viz-axis);stroke-width:2;"/><text x="97" y="267" text-anchor="middle" style="fill:var(--color-text);font-size:14px;font-family:inherit;">3</text><path d="M 130 186 L 163 246" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><rect x="143" y="246" width="40" height="32" rx="5" style="fill:var(--viz-ref);stroke:var(--viz-axis);stroke-width:2;"/><text x="163" y="267" text-anchor="middle" style="fill:var(--color-text);font-size:14px;font-family:inherit;">12</text><path d="M 380 97 L 380 151" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 380 185 L 397 155 L 363 155 Z" style="fill:var(--accent);"/><text x="380" y="172" text-anchor="middle" style="fill:var(--color-bg);font-size:12.5px;font-weight:700;font-family:inherit;">2</text><text x="380" y="146" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">MIN</text><path d="M 380 186 L 314 246" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><rect x="294" y="246" width="40" height="32" rx="5" style="fill:var(--viz-ref);stroke:var(--viz-axis);stroke-width:2;"/><text x="314" y="267" text-anchor="middle" style="fill:var(--color-text);font-size:14px;font-family:inherit;">8</text><path d="M 380 186 L 380 246" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><rect x="360" y="246" width="40" height="32" rx="5" style="fill:var(--viz-ref);stroke:var(--viz-axis);stroke-width:2;"/><text x="380" y="267" text-anchor="middle" style="fill:var(--color-text);font-size:14px;font-family:inherit;">2</text><path d="M 380 186 L 446 246" style="fill:none;stroke:var(--viz-bad);stroke-width:1.8;stroke-dasharray:4 4;"/><rect x="426" y="246" width="40" height="32" rx="5" style="fill:var(--color-bg);stroke:var(--viz-bad);stroke-width:2;"/><text x="446" y="267" text-anchor="middle" style="fill:var(--viz-bad);font-size:14px;font-family:inherit;">4</text><text x="446" y="294" text-anchor="middle" style="fill:var(--viz-bad);font-size:10.5px;font-family:inherit;">coup&eacute;e</text><path d="M 380 97 L 630 151" style="fill:none;stroke:var(--primary);stroke-width:4;"/><path d="M 630 185 L 647 155 L 613 155 Z" style="fill:var(--accent);"/><text x="630" y="172" text-anchor="middle" style="fill:var(--color-bg);font-size:12.5px;font-weight:700;font-family:inherit;">5</text><text x="630" y="146" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">MIN</text><path d="M 630 186 L 564 246" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><rect x="544" y="246" width="40" height="32" rx="5" style="fill:var(--viz-ref);stroke:var(--viz-axis);stroke-width:2;"/><text x="564" y="267" text-anchor="middle" style="fill:var(--color-text);font-size:14px;font-family:inherit;">6</text><path d="M 630 186 L 630 246" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><rect x="610" y="246" width="40" height="32" rx="5" style="fill:var(--viz-ref);stroke:var(--viz-axis);stroke-width:2;"/><text x="630" y="267" text-anchor="middle" style="fill:var(--color-text);font-size:14px;font-family:inherit;">14</text><path d="M 630 186 L 696 246" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><rect x="676" y="246" width="40" height="32" rx="5" style="fill:var(--viz-ref);stroke:var(--viz-axis);stroke-width:2;"/><text x="696" y="267" text-anchor="middle" style="fill:var(--color-text);font-size:14px;font-family:inherit;">5</text><text x="380" y="326" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Sept feuilles lues sur huit, et la m&ecirc;me valeur 5 par le coup de droite. La feuille en pointill&eacute; n'a jamais &eacute;t&eacute; &eacute;valu&eacute;e : MIN</text><text x="380" y="344" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">garantit d&eacute;j&agrave; 2, or MAX a 3 ailleurs.</text></svg><figcaption class="viz-caption"><strong>Figure A.1.</strong> Les triangles pointe en haut sont les n&oelig;uds MAX, pointe en bas les n&oelig;uds MIN. La feuille en pointill&eacute; est celle que l'&eacute;lagage ne lit jamais : c'est tout le sujet de la deuxi&egrave;me proc&eacute;dure.</figcaption></figure>
+
+<h2 id="b1">1. Min-max</h2>
+<div class="algo-tag">m&eacute;thode exacte &middot; parcours complet de l'arbre</div>
+<p><strong>But.</strong> Conna&icirc;tre le r&eacute;sultat qu'un joueur peut se garantir face &agrave; un adversaire qui joue parfaitement, et le coup qui le r&eacute;alise.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div>
+<p><strong>Entr&eacute;e</strong> : une position, la liste des coups l&eacute;gaux dans toute position, un test de fin de partie et une valeur attribu&eacute;e &agrave; toute position finale, du point de vue du premier joueur.<br>
+<strong>Sortie</strong> : la valeur de la position, et le coup qui l'atteint.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div>
+<ol>
+<li><strong>Si la position est finale, rendre sa valeur.</strong> C'est le seul endroit o&ugrave; une valeur na&icirc;t ; toutes les autres en d&eacute;coulent.</li>
+<li><strong>Sinon, &eacute;num&eacute;rer les coups l&eacute;gaux</strong> et, pour chacun, appliquer la m&ecirc;me proc&eacute;dure &agrave; la position obtenue. Chaque appel descend d'un niveau, donc porte sur un probl&egrave;me strictement plus petit.</li>
+<li><strong>Si c'est &agrave; nous de jouer, rendre la plus grande des valeurs obtenues</strong> : nous choisissons, donc nous prenons le meilleur.</li>
+<li><strong>Si c'est &agrave; l'adversaire de jouer, rendre la plus petite</strong> : il choisit, et ses int&eacute;r&ecirc;ts sont exactement oppos&eacute;s aux n&ocirc;tres. C'est l'hypoth&egrave;se centrale, et elle est prudente : contre un adversaire imparfait, on fera au moins aussi bien.</li>
+<li><strong>&Agrave; la racine, retenir le coup</strong> qui a produit la valeur retenue.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute; sur l'arbre de r&eacute;f&eacute;rence :</strong></p>
+<table>
+<thead><tr><th>N&oelig;ud</th><th>Joueur</th><th>Valeurs des fils</th><th>Valeur remont&eacute;e</th></tr></thead>
+<tbody>
+<tr><td>coup 1 de MAX</td><td>MIN</td><td>3, 12</td><td>3</td></tr>
+<tr><td>coup 2 de MAX</td><td>MIN</td><td>8, 2, 4</td><td>2</td></tr>
+<tr><td>coup 3 de MAX</td><td>MIN</td><td>6, 14, 5</td><td>5</td></tr>
+<tr><td>racine</td><td>MAX</td><td>3, 2, 5</td><td><strong>5</strong>, par le coup 3</td></tr>
+</tbody></table>
+<p>Remarquez que la feuille 14, la plus grande de tout l'arbre, ne joue aucun r&ocirc;le : MIN ne laissera jamais MAX l'atteindre. Une valeur &eacute;lev&eacute;e dans l'arbre ne signifie rien tant qu'elle n'est pas <em>garantie</em>.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> R&eacute;currence bien fond&eacute;e sur la hauteur. Le cas de base est exact par d&eacute;finition. Pour un n&oelig;ud interne, chaque fils rend, par hypoth&egrave;se de r&eacute;currence, la valeur exacte de son sous-arbre ; prendre le maximum ou le minimum reproduit exactement la d&eacute;finition de la valeur d'une position.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Mesure : la hauteur restante de l'arbre, entier positif qui d&eacute;cro&icirc;t strictement &agrave; chaque descente et atteint z&eacute;ro sur les positions finales. Cela suppose l'arbre fini &mdash; aux &eacute;checs, la r&egrave;gle de r&eacute;p&eacute;tition de position est pr&eacute;cis&eacute;ment ce qui assure cette finitude.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Toutes les feuilles sont visit&eacute;es : le travail est le nombre de coups possibles &eacute;lev&eacute; &agrave; la puissance de la profondeur. Avec trente-cinq coups par position, un doublement de la profondeur multiplie le travail par plus de mille. La m&eacute;moire, elle, reste modeste : une seule branche &agrave; la fois.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> M&eacute;langer les points de vue &mdash; une valeur exprim&eacute;e tant&ocirc;t du point de vue de MAX, tant&ocirc;t du joueur au trait &mdash; produit un joueur qui se sabote un coup sur deux. Oublier de traiter le cas d'une position finale rencontr&eacute;e avant la profondeur voulue. Croire que la valeur de la racine dit quelque chose de la partie r&eacute;elle si l'adversaire n'est pas parfait : elle en donne seulement une garantie inf&eacute;rieure.</p>
+
+<h2 id="b2">2. &Eacute;lagage alpha-b&ecirc;ta</h2>
+<div class="algo-tag">m&eacute;thode exacte &middot; m&ecirc;me r&eacute;sultat, moins de travail</div>
+<p><strong>But.</strong> Obtenir exactement la valeur de min-max sans visiter les sous-arbres qui, quoi qu'ils contiennent, ne peuvent plus changer la d&eacute;cision.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div>
+<p><strong>Entr&eacute;e</strong> : celle de min-max, plus deux bornes transport&eacute;es le long de la branche courante &mdash; le meilleur r&eacute;sultat d&eacute;j&agrave; assur&eacute; &agrave; MAX, et celui d&eacute;j&agrave; assur&eacute; &agrave; MIN.<br>
+<strong>Sortie</strong> : la m&ecirc;me valeur que min-max, toujours.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div>
+<ol>
+<li><strong>Partir avec des bornes ouvertes</strong> : moins l'infini pour MAX, plus l'infini pour MIN. Rien n'est encore assur&eacute;.</li>
+<li><strong>Descendre comme min-max</strong>, mais transmettre les deux bornes aux appels r&eacute;cursifs. Elles r&eacute;sument tout ce que l'on sait des branches d&eacute;j&agrave; explor&eacute;es ailleurs dans l'arbre.</li>
+<li><strong>Sur un n&oelig;ud o&ugrave; c'est &agrave; nous de jouer</strong>, chaque fils qui am&eacute;liore le r&eacute;sultat rel&egrave;ve la borne de MAX : c'est un acquis nouveau.</li>
+<li><strong>Sur un n&oelig;ud o&ugrave; c'est &agrave; l'adversaire de jouer</strong>, chaque fils qui d&eacute;grade le r&eacute;sultat abaisse la borne de MIN.</li>
+<li><strong>D&egrave;s que la borne de MAX rattrape ou d&eacute;passe celle de MIN, abandonner imm&eacute;diatement les fils restants.</strong> C'est la coupure. Le raisonnement : le joueur du niveau sup&eacute;rieur dispose d&eacute;j&agrave; ailleurs d'un r&eacute;sultat au moins aussi bon, donc il ne choisira jamais de venir ici, quelle que soit la suite.</li>
+<li><strong>Remonter la valeur</strong> comme dans min-max.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute; sur l'arbre de r&eacute;f&eacute;rence</strong> (coups examin&eacute;s de gauche &agrave; droite) :</p>
+<table>
+<thead><tr><th>&Eacute;tape</th><th>Ce que l'on regarde</th><th>Bornes MAX / MIN</th><th>D&eacute;cision</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>feuilles 3 puis 12, sous le coup 1</td><td>\(-\infty\) / \(+\infty\)</td><td>le coup 1 vaut 3 ; MAX s'assure 3</td></tr>
+<tr><td>2</td><td>feuille 8, sous le coup 2</td><td>3 / 8</td><td>on continue : 8 est encore au-dessus de 3</td></tr>
+<tr><td>3</td><td>feuille 2, sous le coup 2</td><td>3 / 2</td><td><strong>coupure</strong> : la feuille 4 n'est jamais lue</td></tr>
+<tr><td>4</td><td>feuille 6, sous le coup 3</td><td>3 / 6</td><td>on continue</td></tr>
+<tr><td>5</td><td>feuille 14, sous le coup 3</td><td>3 / 6</td><td>MIN garde 6, on continue</td></tr>
+<tr><td>6</td><td>feuille 5, sous le coup 3</td><td>3 / 5</td><td>le coup 3 vaut 5 ; MAX passe &agrave; 5</td></tr>
+</tbody></table>
+<p>Sept feuilles lues au lieu de huit, et la m&ecirc;me r&eacute;ponse : valeur 5 par le coup 3. Sur un arbre r&eacute;el, cette &eacute;conomie se compose &agrave; chaque niveau et divise l'exposant par deux.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Invariant : &agrave; tout instant, la valeur exacte du n&oelig;ud courant est ou bien comprise entre les deux bornes, ou bien sans influence sur la racine. Une coupure ne survient que dans le second cas, o&ugrave; l'ignorer ne change rien. La valeur rendue &agrave; la racine, o&ugrave; les bornes sont ouvertes, est donc exactement celle de min-max.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> M&ecirc;me mesure que min-max : la hauteur restante. Les coupures ne font qu'abr&eacute;ger, jamais prolonger.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Dans le meilleur cas &mdash; le meilleur coup examin&eacute; en premier &agrave; chaque n&oelig;ud &mdash; le nombre de feuilles lues est de l'ordre de la racine carr&eacute;e de celui de min-max : &agrave; temps &eacute;gal, on voit deux fois plus loin. Dans un ordre quelconque, le gain est d'environ la puissance trois quarts. Dans le pire ordre, il n'y a aucun gain.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Modifier les bornes d'un n&oelig;ud &agrave; partir de la valeur d'un fr&egrave;re plut&ocirc;t que d'un fils. Utiliser une comparaison stricte au lieu d'une comparaison large, ce qui fait manquer les coupures sur valeurs &eacute;gales. Et surtout : croire que l'&eacute;lagage change le r&eacute;sultat &mdash; s'il le change, c'est qu'il y a une erreur, pas une approximation.</p>
+
+<h2 id="b3">3. Profondeur croissante et table de transpositions</h2>
+<div class="algo-tag">organisation de la recherche &middot; gestion du temps</div>
+<p><strong>But.</strong> Rendre toujours un coup jouable dans le temps imparti, et am&eacute;liorer l'ordre d'examen des coups pour que les coupures soient plus nombreuses.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div>
+<p><strong>Entr&eacute;e</strong> : une position, un budget de temps.<br>
+<strong>Sortie</strong> : le meilleur coup connu au moment o&ugrave; le budget est &eacute;puis&eacute;.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div>
+<ol>
+<li><strong>Chercher &agrave; profondeur 1</strong> et retenir le meilleur coup trouv&eacute;. On dispose d&eacute;j&agrave; d'une r&eacute;ponse, si mauvaise soit-elle.</li>
+<li><strong>Chercher &agrave; profondeur 2, en examinant d'abord le coup retenu &agrave; l'&eacute;tape pr&eacute;c&eacute;dente.</strong> C'est le point cl&eacute; : ce coup est probablement encore bon, et l'examiner en premier &eacute;l&egrave;ve imm&eacute;diatement la borne de MAX, donc provoque davantage de coupures.</li>
+<li><strong>Continuer &agrave; profondeur 3, 4, 5</strong>&hellip; en r&eacute;utilisant &agrave; chaque fois l'ordre issu de l'it&eacute;ration pr&eacute;c&eacute;dente.</li>
+<li><strong>M&eacute;moriser dans une table les valeurs d&eacute;j&agrave; calcul&eacute;es</strong>, index&eacute;es par la position, la profondeur restante et le joueur au trait. Une m&ecirc;me position est souvent atteinte par des ordres de coups diff&eacute;rents ; la retrouver dans la table &eacute;vite de recalculer tout son sous-arbre.</li>
+<li><strong>S'arr&ecirc;ter quand le temps est &eacute;puis&eacute;</strong> et jouer le dernier coup complet retenu &mdash; jamais celui d'une it&eacute;ration interrompue au milieu, qui n'a pas &eacute;t&eacute; compar&eacute; &agrave; tous ses concurrents.</li>
+</ol></div>
+<p><strong>Exemple chiffr&eacute;.</strong> Sur une position avec trente coups l&eacute;gaux, l'ordre naturel et l'ordre issu de l'it&eacute;ration pr&eacute;c&eacute;dente donnent typiquement :</p>
+<table>
+<thead><tr><th>Profondeur</th><th>Feuilles lues, ordre naturel</th><th>Feuilles lues, ordre h&eacute;rit&eacute;</th><th>Rapport</th></tr></thead>
+<tbody>
+<tr><td>2</td><td>900</td><td>59</td><td>15</td></tr>
+<tr><td>4</td><td>\(8{,}1\times 10^{5}\)</td><td>\(1{,}8\times 10^{3}\)</td><td>450</td></tr>
+<tr><td>6</td><td>\(7{,}3\times 10^{8}\)</td><td>\(5{,}4\times 10^{4}\)</td><td>13&nbsp;500</td></tr>
+</tbody></table>
+<p>La colonne de droite suppose l'ordre parfait, o&ugrave; le nombre de feuilles vaut deux fois trente puissance la moiti&eacute; de la profondeur, moins un. Le co&ucirc;t des it&eacute;rations pr&eacute;c&eacute;dentes est n&eacute;gligeable devant celui de la derni&egrave;re.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Chaque it&eacute;ration est une recherche compl&egrave;te &agrave; sa profondeur ; l'ordre d'examen ne change pas la valeur rendue, seulement le travail fourni. La r&eacute;ponse finale est donc celle d'une recherche &agrave; profondeur fixe, correcte par ce qui pr&eacute;c&egrave;de.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Chaque it&eacute;ration se termine (mesure : la profondeur restante) et le budget de temps born&eacute; limite le nombre d'it&eacute;rations.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Le travail refait est born&eacute; par la somme des it&eacute;rations pr&eacute;c&eacute;dentes, n&eacute;gligeable devant la derni&egrave;re d&egrave;s que le facteur de branchement d&eacute;passe deux ou trois. La table de transpositions co&ucirc;te de la m&eacute;moire, que l'on borne en rempla&ccedil;ant les entr&eacute;es les moins profondes.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Indexer la table sur la seule position, sans la profondeur restante : une valeur obtenue par une recherche superficielle est alors r&eacute;utilis&eacute;e comme si elle &eacute;tait profonde, et le joueur devient incoh&eacute;rent. Oublier le joueur au trait dans la cl&eacute;. Jouer le coup d'une it&eacute;ration interrompue.</p>
+
+<h2 id="b4">4. Exploration arborescente par &eacute;chantillonnage</h2>
+<div class="algo-tag">m&eacute;thode approch&eacute;e &middot; &eacute;chantillonnage guid&eacute;</div>
+<p><strong>But.</strong> Choisir un bon coup lorsqu'on ne sait pas &eacute;crire de fonction d'&eacute;valuation fiable, en estimant la valeur d'une position par des parties simul&eacute;es plut&ocirc;t qu'en la calculant.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div>
+<p><strong>Entr&eacute;e</strong> : une position, une fa&ccedil;on de jouer une partie al&eacute;atoire jusqu'&agrave; son terme, un budget de simulations.<br>
+<strong>Sortie</strong> : le coup le plus visit&eacute; depuis la racine.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div>
+<ol>
+<li><strong>Partir d'un arbre r&eacute;duit &agrave; la position courante</strong>, chaque n&oelig;ud portant deux compteurs : nombre de visites et nombre de victoires observ&eacute;es.</li>
+<li><strong>Descendre</strong> depuis la racine en choisissant &agrave; chaque n&oelig;ud le fils qui maximise la somme de deux termes : son taux de victoire observ&eacute;, et un bonus qui cro&icirc;t quand un fils est peu visit&eacute; par rapport &agrave; son p&egrave;re. Le premier terme exploite ce qui marche, le second oblige &agrave; ne jamais abandonner d&eacute;finitivement une branche mal connue.</li>
+<li><strong>S'arr&ecirc;ter au premier n&oelig;ud dont tous les fils ne sont pas encore dans l'arbre, et en ajouter un.</strong> L'arbre grandit ainsi pr&eacute;f&eacute;rentiellement dans les r&eacute;gions prometteuses.</li>
+<li><strong>Simuler une partie compl&egrave;te depuis ce nouveau n&oelig;ud</strong>, avec une politique rapide, &eacute;ventuellement al&eacute;atoire. Le r&eacute;sultat est une victoire, une d&eacute;faite ou une nulle.</li>
+<li><strong>Remonter ce r&eacute;sultat</strong> en incr&eacute;mentant les compteurs de tous les n&oelig;uds du chemin parcouru, en veillant &agrave; compter la victoire du point de vue du joueur au trait dans chaque n&oelig;ud.</li>
+<li><strong>R&eacute;p&eacute;ter</strong> jusqu'&agrave; &eacute;puisement du budget, puis jouer le coup <em>le plus visit&eacute;</em> &mdash; et non le mieux not&eacute;, car un taux de victoire calcul&eacute; sur peu de visites est peu fiable.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute; sur trois coups possibles, apr&egrave;s 100 simulations :</strong></p>
+<table>
+<thead><tr><th>Coup</th><th>Visites</th><th>Victoires</th><th>Taux observ&eacute;</th><th>Bonus d'exploration</th><th>Score de s&eacute;lection</th></tr></thead>
+<tbody>
+<tr><td>A</td><td>70</td><td>42</td><td>0,600</td><td>0,256</td><td>0,856</td></tr>
+<tr><td>B</td><td>20</td><td>11</td><td>0,550</td><td>0,480</td><td>1,030</td></tr>
+<tr><td>C</td><td>10</td><td>4</td><td>0,400</td><td>0,679</td><td>1,079</td></tr>
+</tbody></table>
+<p>Le bonus vaut la racine carr&eacute;e du rapport entre le logarithme du nombre total de visites et le nombre de visites du fils. La 101<sup>e</sup> simulation ira donc explorer <em>C</em>, le coup le plus mal not&eacute; &mdash; parce qu'il est aussi le plus mal connu. Mais si l'on devait jouer maintenant, on jouerait <em>A</em>, le plus visit&eacute;. Ces deux crit&egrave;res sont distincts et les confondre est l'erreur la plus courante.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> La correction n'est ici qu'asymptotique : on d&eacute;montre que le nombre de visites de chaque branche cro&icirc;t de telle sorte que l'estimation &agrave; la racine converge vers la valeur exacte du jeu quand le budget tend vers l'infini. &Agrave; budget fini, aucune garantie n'est offerte &mdash; c'est le prix de la m&eacute;thode.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Le budget de simulations est fix&eacute; d'avance ; chaque simulation se termine parce qu'une partie al&eacute;atoire dans un jeu fini se termine. C'est le seul algorithme de cette annexe dont la terminaison est impos&eacute;e de l'ext&eacute;rieur plut&ocirc;t que d&eacute;montr&eacute;e.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Proportionnel au budget multipli&eacute; par la longueur d'une partie simul&eacute;e. La m&eacute;moire est celle de l'arbre construit, qui ne grandit que d'un n&oelig;ud par simulation &mdash; d'o&ugrave; son emploi l&agrave; o&ugrave; les autres m&eacute;thodes saturent.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Oublier d'alterner le point de vue lors de la remont&eacute;e : les compteurs deviennent alors incoh&eacute;rents et le joueur choisit ses pires coups. Choisir &agrave; la fin le fils au meilleur taux plut&ocirc;t que le plus visit&eacute;. R&eacute;gler la constante d'exploration &agrave; z&eacute;ro, ce qui fige la recherche sur la premi&egrave;re branche chanceuse. Enfin, une politique de simulation trop na&iuml;ve donne des estimations sans rapport avec le jeu r&eacute;el.</p>
+
+<nav class="lesson-nav"><div class="container">
+<a href="page.html">&larr; Retour au chapitre 5</a>
+<a href="../../index.html">Sommaire du manuel</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+</body></html>

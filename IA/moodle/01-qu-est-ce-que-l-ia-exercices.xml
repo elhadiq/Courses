@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Moteur de regles a chainage avant</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;SYSTEME EXPERT&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Un systeme expert deduit de nouveaux faits en appliquant des regles ecrites par un specialiste, jusqu'a saturation.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;chainage_avant(faits, regles)&lt;/code&gt;&lt;/strong&gt; qui renvoie le couple &lt;code&gt;(faits_finaux, trace)&lt;/code&gt;. &lt;code&gt;faits&lt;/code&gt; est un ensemble de chaines, &lt;code&gt;regles&lt;/code&gt; une liste de couples &lt;code&gt;(conditions, conclusion)&lt;/code&gt; ou &lt;code&gt;conditions&lt;/code&gt; est un ensemble. A chaque tour, appliquer la &lt;em&gt;premiere&lt;/em&gt; regle declenchable dont la conclusion n'est pas deja connue, et l'ajouter a la trace. &lt;code&gt;faits_finaux&lt;/code&gt; est trie alphabetiquement.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;chainage_avant({'fievre','toux'}, [({'fievre','toux'}, 'infection')])
+&amp;rarr; (['fievre', 'infection', 'toux'], ['infection'])&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def chainage_avant(faits, regles):
+    # tant qu une regle est declenchable et apporte un fait NOUVEAU :
+    # ajouter sa conclusion et la noter dans la trace
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def chainage_avant(faits, regles):
+    connus = set(faits)
+    trace = []
+    while True:
+        declenchee = None
+        for conditions, conclusion in regles:
+            if conclusion in connus:
+                continue
+            if set(conditions) &lt;= connus:
+                declenchee = conclusion
+                break
+        if declenchee is None:
+            return (sorted(connus), trace)
+        connus.add(declenchee)
+        trace.append(declenchee)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(chainage_avant({'fievre','toux'}, [({'fievre','toux'}, 'infection')]))
+</text></testcode><stdin><text /></stdin><expected><text>(['fievre', 'infection', 'toux'], ['infection'])
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>R = [({'fievre','toux'}, 'infection'),
+     ({'infection','contact'}, 'contagieux'),
+     ({'contagieux'}, 'isolement'),
+     ({'fievre','eruption'}, 'eruptive')]
+print(chainage_avant({'fievre','toux','contact'}, R))
+</text></testcode><stdin><text /></stdin><expected><text>(['contact', 'contagieux', 'fievre', 'infection', 'isolement', 'toux'], ['infection', 'contagieux', 'isolement'])
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(chainage_avant({'a'}, [({'b'}, 'c')]))
+</text></testcode><stdin><text /></stdin><expected><text>(['a'], [])
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(chainage_avant({'a'}, [({'a'}, 'b'), ({'b'}, 'a')]))
+</text></testcode><stdin><text /></stdin><expected><text>(['a', 'b'], ['b'])
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(chainage_avant(set(), []))
+</text></testcode><stdin><text /></stdin><expected><text>([], [])
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Depouiller un jeu de l'imitation</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;TEST DE TURING&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Le test ne se juge pas sur une partie : il faut comparer la frequence de bonnes designations au hasard.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;depouiller(designations)&lt;/code&gt;&lt;/strong&gt; ou &lt;code&gt;designations&lt;/code&gt; est une liste de booleens (&lt;code&gt;True&lt;/code&gt; = l'interrogateur a correctement identifie la machine). Renvoyer le dictionnaire de cles &lt;code&gt;'parties'&lt;/code&gt;, &lt;code&gt;'correctes'&lt;/code&gt;, &lt;code&gt;'taux'&lt;/code&gt; (arrondi a 4 decimales) et &lt;code&gt;'reussit'&lt;/code&gt; : la machine reussit si le taux ne depasse pas 0.5. Ecrire aussi &lt;strong&gt;&lt;code&gt;marge(n)&lt;/code&gt;&lt;/strong&gt; qui renvoie l'ecart-type du taux sous l'hypothese du hasard, soit &lt;code&gt;sqrt(0.25 / n)&lt;/code&gt;, arrondi a 4 decimales ; &lt;code&gt;0.0&lt;/code&gt; si &lt;code&gt;n&lt;/code&gt; vaut 0.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;depouiller([True, False, False, True, False])['taux'] &amp;rarr; 0.4&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>from math import sqrt
+
+def depouiller(designations):
+    # compter, calculer le taux, decider
+    ...
+
+def marge(n):
+    # ecart-type du taux sous l hypothese du hasard
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>from math import sqrt
+
+def depouiller(designations):
+    n = len(designations)
+    c = sum(1 for d in designations if d)
+    taux = round(c / n, 4) if n else 0.0
+    return {'parties': n, 'correctes': c, 'taux': taux, 'reussit': taux &lt;= 0.5}
+
+def marge(n):
+    if n == 0:
+        return 0.0
+    return round(sqrt(0.25 / n), 4)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>d = depouiller([True, False, False, True, False])
+print(d['parties'], d['correctes'], d['taux'], d['reussit'])
+</text></testcode><stdin><text /></stdin><expected><text>5 2 0.4 True
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(marge(25), marge(100), marge(0))
+</text></testcode><stdin><text /></stdin><expected><text>0.1 0.05 0.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>d = depouiller([True] * 40 + [False] * 10)
+print(d['taux'], d['reussit'])
+</text></testcode><stdin><text /></stdin><expected><text>0.8 False
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(depouiller([]))
+</text></testcode><stdin><text /></stdin><expected><text>{'parties': 0, 'correctes': 0, 'taux': 0.0, 'reussit': True}
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>d = depouiller([True, False])
+print(d['taux'], d['reussit'], marge(2))
+</text></testcode><stdin><text /></stdin><expected><text>0.5 True 0.3536
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — Datation des jalons</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;HISTOIRE DU DOMAINE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;L'histoire du domaine alterne periodes d'expansion et hivers. Situer un jalon dans sa periode suppose de comparer des intervalles.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;periode(annee, periodes)&lt;/code&gt;&lt;/strong&gt; qui renvoie le nom de la periode contenant &lt;code&gt;annee&lt;/code&gt;, ou &lt;code&gt;None&lt;/code&gt;. Une periode est un triplet &lt;code&gt;(debut, fin, nom)&lt;/code&gt; et contient &lt;code&gt;annee&lt;/code&gt; si &lt;code&gt;debut &amp;lt;= annee &amp;lt; fin&lt;/code&gt;. Ecrire ensuite &lt;strong&gt;&lt;code&gt;jalon_proche(annee, jalons)&lt;/code&gt;&lt;/strong&gt; qui renvoie le nom du jalon d'annee la plus proche ; a distance egale, le plus ancien. &lt;code&gt;jalons&lt;/code&gt; est une liste de couples &lt;code&gt;(annee, nom)&lt;/code&gt;.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;periode(1976, [(1956,1974,'printemps'), (1974,1980,'hiver')]) &amp;rarr; 'hiver'&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def periode(annee, periodes):
+    # intervalle ferme a gauche, ouvert a droite
+    ...
+
+def jalon_proche(annee, jalons):
+    # trier par annee pour que l egalite favorise le plus ancien
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def periode(annee, periodes):
+    for debut, fin, nom in periodes:
+        if debut &lt;= annee &lt; fin:
+            return nom
+    return None
+
+def jalon_proche(annee, jalons):
+    meilleur = None
+    for a, nom in sorted(jalons):
+        if meilleur is None or abs(a - annee) &lt; abs(meilleur[0] - annee):
+            meilleur = (a, nom)
+    return meilleur[1] if meilleur else None
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>P = [(1956,1974,'printemps'), (1974,1980,'hiver'), (1980,1987,'experts')]
+print(periode(1976, P), periode(1956, P), periode(1990, P))
+</text></testcode><stdin><text /></stdin><expected><text>hiver printemps None
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>J = [(1950,'Turing'), (1956,'Dartmouth'), (1969,'Perceptrons'), (2012,'AlexNet')]
+print(jalon_proche(1955, J), jalon_proche(2000, J))
+</text></testcode><stdin><text /></stdin><expected><text>Dartmouth AlexNet
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>J = [(1950,'Turing'), (1956,'Dartmouth')]
+print(jalon_proche(1953, J))
+</text></testcode><stdin><text /></stdin><expected><text>Turing
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(periode(1974, [(1956,1974,'a'), (1974,1980,'b')]))
+</text></testcode><stdin><text /></stdin><expected><text>b
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(jalon_proche(1900, []), periode(2000, []))
+</text></testcode><stdin><text /></stdin><expected><text>None None
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

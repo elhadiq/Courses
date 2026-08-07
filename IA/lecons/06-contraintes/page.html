@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 6 &mdash; Satisfaction de contraintes</title>
+<meta name="description" content="CSP, retour sur trace, heuristiques, coherence d arc AC-3, structure, reparation locale.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Partie II &middot; Chapitre 6</div>
+<h1>Chapitre 6 &mdash; Probl&egrave;mes de satisfaction de contraintes</h1>
+<div class="lesson-sub">Variables, domaines et contraintes, recherche avec retour sur trace, coh&eacute;rence d'arc, heuristiques d'ordonnancement, structure du graphe de contraintes et r&eacute;paration locale.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">Annexe compagnon</div><p>Le retour sur trace, la v&eacute;rification en avant, la coh&eacute;rence d'arc et la r&eacute;paration locale sont d&eacute;taill&eacute;s <strong><a href="algorithms.html">pas &agrave; pas dans l'annexe</a></strong>, avec des exemples chiffr&eacute;s v&eacute;rifiables &agrave; la main.</p></div>
+
+<h2>3.1 Le mod&egrave;le</h2>
+
+<p>Au chapitre 3, un &eacute;tat &eacute;tait une bo&icirc;te noire : on ne savait rien de lui sinon qu'il avait des successeurs. Beaucoup de probl&egrave;mes r&eacute;els ont pourtant une <em>structure</em> visible &mdash; l'&eacute;tat est un assemblage de d&eacute;cisions ind&eacute;pendantes soumises &agrave; des contraintes locales. Exploiter cette structure change tout : au lieu d'explorer, on peut <strong>d&eacute;duire</strong>.</p>
+
+<div class="box def"><div class="box-title">D&eacute;finition &mdash; Probl&egrave;me de satisfaction de contraintes</div>
+<p>Un CSP est un triplet \((X, D, C)\) o&ugrave; \(X = \{x_1,\dots,x_n\}\) est un ensemble de <strong>variables</strong>, \(D = \{D_1,\dots,D_n\}\) l'ensemble de leurs <strong>domaines</strong> (les valeurs autoris&eacute;es), et \(C\) un ensemble de <strong>contraintes</strong>. Chaque contrainte porte sur un sous-ensemble de variables, sa <em>port&eacute;e</em>, et sp&eacute;cifie les combinaisons de valeurs admises. Une <strong>solution</strong> est une affectation compl&egrave;te satisfaisant toutes les contraintes.</p>
+<p>Une contrainte de port&eacute;e 2 est dite <strong>binaire</strong> ; un CSP binaire se repr&eacute;sente par un <strong>graphe de contraintes</strong> dont les sommets sont les variables et les ar&ecirc;tes les contraintes.</p></div>
+
+<table>
+<thead><tr><th>Probl&egrave;me</th><th>Variables</th><th>Domaines</th><th>Contraintes</th></tr></thead>
+<tbody>
+<tr><td>Coloration de carte</td><td>les r&eacute;gions</td><td>les couleurs</td><td>deux r&eacute;gions voisines diff&egrave;rent</td></tr>
+<tr><td>\(n\) reines</td><td>une par colonne</td><td>les lignes \(1..n\)</td><td>ni m&ecirc;me ligne ni m&ecirc;me diagonale</td></tr>
+<tr><td>Sudoku</td><td>les 81 cases</td><td>\(\{1,\dots,9\}\)</td><td>27 contraintes &laquo; tous diff&eacute;rents &raquo;</td></tr>
+<tr><td>Emploi du temps</td><td>les cours</td><td>les cr&eacute;neaux</td><td>salles, enseignants, groupes disjoints</td></tr>
+<tr><td>Cryptarithme</td><td>les lettres</td><td>\(\{0,\dots,9\}\)</td><td>tous diff&eacute;rents, addition exacte</td></tr>
+</tbody></table>
+
+<p>Le probl&egrave;me de d&eacute;cision associ&eacute; &mdash; ce CSP a-t-il une solution ? &mdash; est NP-complet d&egrave;s que les domaines ont au moins trois valeurs : la 3-coloration de graphe, qui en est un cas particulier, figure d&eacute;j&agrave; dans la liste fondatrice de Karp <a class="cite" href="#ref-karp1972">[1]</a>. On ne cherchera donc pas d'algorithme polynomial, mais des m&eacute;thodes qui &eacute;vitent en pratique la quasi-totalit&eacute; de l'espace de recherche.</p>
+
+<h2>3.2 Recherche avec retour sur trace</h2>
+
+<p>Un CSP &agrave; \(n\) variables et \(d\) valeurs par domaine admet \(d^{n}\) affectations compl&egrave;tes. Deux observations r&eacute;duisent imm&eacute;diatement ce chiffre. D'abord, l'ordre dans lequel on affecte les variables est indiff&eacute;rent : on peut donc n'explorer qu'un arbre o&ugrave; chaque niveau fixe une variable, ce qui ram&egrave;ne \(n!\,d^{n}\) &agrave; \(d^{n}\). Ensuite et surtout, une affectation partielle qui viole d&eacute;j&agrave; une contrainte ne peut &ecirc;tre compl&eacute;t&eacute;e : on coupe la branche imm&eacute;diatement. C'est le <strong>retour sur trace</strong>.</p>
+
+<div class="algo"><div class="algo-cap">Algorithme 6.1 &mdash; Recherche avec retour sur trace</div><div class="algo-io"><b>Entr&eacute;e :</b> un CSP \((X, D, C)\)<br><b>Sortie :</b> une affectation totale \(\mathcal{A}\) satisfaisant \(C\), ou l'&eacute;chec</div><ol class="algo-corps"><li><b class="kw">fonction</b> <span class="fn">Explorer</span>\((\mathcal{A})\)</li><li class="n1"><b class="kw">si</b> \(|\mathcal{A}| = |X|\) <b class="kw">alors</b> <b class="kw">retourner</b> \(\mathcal{A}\)</li><li class="n1">\(x \leftarrow\) une variable de \(X \setminus \operatorname{dom}\mathcal{A}\)</li><li class="n1"><b class="kw">pour tout</b> \(v \in D_x\) <b class="kw">faire</b></li><li class="n2"><b class="kw">si</b> \(\mathcal{A} \cup \{x = v\}\) satisfait toute contrainte enti&egrave;rement affect&eacute;e <b class="kw">alors</b></li><li class="n3">\(r \leftarrow\) <span class="fn">Explorer</span>\((\mathcal{A} \cup \{x = v\})\)</li><li class="n3"><b class="kw">si</b> \(r \neq\) &eacute;chec <b class="kw">alors</b> <b class="kw">retourner</b> <i class="va">r</i></li><li class="n1"><b class="kw">retourner</b> &eacute;chec          <span class="cm">// retour sur trace</span></li></ol><p class="algo-note"><strong>Invariant.</strong> \(\mathcal{A}\) satisfait toute contrainte dont la port&eacute;e est incluse dans \(\operatorname{dom}\mathcal{A}\). <strong>Variant.</strong> \(|X| - |\mathcal{A}|\). <strong>Co&ucirc;t.</strong> \(O(d^{n})\) au pire, espace \(O(n)\).</p></div>
+
+<div class="box method"><div class="box-title">Analyse &mdash; correction, terminaison, complexit&eacute;</div>
+<p><strong>Invariant.</strong> &Agrave; tout appel de <em>explorer</em>, l'affectation partielle courante satisfait toutes les contraintes dont la port&eacute;e est enti&egrave;rement affect&eacute;e. Il est &eacute;tabli &agrave; l'entr&eacute;e (affectation vide) et conserv&eacute; par le test de compatibilit&eacute; avant chaque extension.</p>
+<p><strong>Correction.</strong> Compl&eacute;tude : toute affectation compl&egrave;te coh&eacute;rente est atteignable, puisqu'on n'&eacute;limine une valeur que si elle viole d&eacute;j&agrave; une contrainte, ce qui rendrait toute extension invalide. Validit&eacute; : l'affectation rendue est compl&egrave;te et v&eacute;rifie l'invariant, donc satisfait toutes les contraintes.</p>
+<p><strong>Terminaison.</strong> Mesure : le nombre de variables non affect&eacute;es, entier positif qui d&eacute;cro&icirc;t strictement &agrave; chaque appel r&eacute;cursif. Chaque boucle est finie car les domaines le sont.</p>
+<p><strong>Complexit&eacute;.</strong> \(O(d^{n})\) dans le pire cas &mdash; on ne peut pas mieux, le probl&egrave;me &eacute;tant NP-complet. Espace \(O(n)\) : seule l'affectation courante est conserv&eacute;e.</p></div>
+
+<h2>3.3 Trois heuristiques qui changent tout</h2>
+
+<p>Le squelette pr&eacute;c&eacute;dent laisse deux choix libres : quelle variable affecter ensuite, et dans quel ordre essayer ses valeurs. Ces choix ne changent ni la correction ni la complexit&eacute; au pire cas, mais font varier le temps r&eacute;el de plusieurs ordres de grandeur <a class="cite" href="#ref-haralick1980">[2]</a>.</p>
+
+<div class="box prop"><div class="box-title">Les trois heuristiques standard</div>
+<ul>
+<li><strong>Variable la plus contrainte</strong> (domaine restant minimal) : affecter d'abord la variable qui a le moins de valeurs possibles. Motivation : si elle doit &eacute;chouer, autant l'apprendre tout de suite, en haut de l'arbre, plut&ocirc;t qu'apr&egrave;s avoir d&eacute;velopp&eacute; un sous-arbre entier.</li>
+<li><strong>Variable de plus haut degr&eacute;</strong>, pour d&eacute;partager la pr&eacute;c&eacute;dente : celle qui appara&icirc;t dans le plus de contraintes avec des variables non affect&eacute;es. Elle contraint le plus le reste du probl&egrave;me.</li>
+<li><strong>Valeur la moins contraignante</strong> : parmi les valeurs d'une variable, essayer d'abord celle qui &eacute;limine le moins d'options chez les voisines. Ici on cherche &agrave; <em>r&eacute;ussir</em>, donc &agrave; garder le plus de portes ouvertes &mdash; logique oppos&eacute;e &agrave; celle du choix de variable, et c'est normal : une seule valeur suffit, alors que toutes les variables devront &ecirc;tre affect&eacute;es.</li>
+</ul></div>
+
+<p>&Agrave; ces heuristiques s'ajoute la <strong>v&eacute;rification en avant</strong> : d&egrave;s qu'une variable re&ccedil;oit une valeur, on retire cette valeur des domaines de ses voisines non affect&eacute;es. Si un domaine devient vide, on rebrousse chemin imm&eacute;diatement, sans attendre d'atteindre la variable concern&eacute;e. C'est aussi elle qui alimente l'heuristique du domaine minimal en information fra&icirc;che.</p>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Le premier curseur choisit la strat&eacute;gie, le second d&eacute;roule la r&eacute;solution. Sous chaque r&eacute;gion non colori&eacute;e figurent les initiales des couleurs encore possibles.</p>
+<div id="jxg1" class="viz-board" style="height:500px;"></div>
+<p class="viz-caption"><strong>Figure 6.1.</strong> Coloration &agrave; trois couleurs d'une carte &agrave; sept r&eacute;gions. Avec un ordre fixe volontairement m&eacute;diocre, la r&eacute;solution demande <strong>47 essais et 9 retours sur trace</strong>. L'heuristique du domaine minimal les ram&egrave;ne &agrave; <strong>15 essais sans aucun retour</strong> ; en y ajoutant la v&eacute;rification en avant, il ne reste que <strong>7 essais</strong>, soit un par r&eacute;gion : le probl&egrave;me est r&eacute;solu sans jamais se tromper. Les trois strat&eacute;gies aboutissent &agrave; une coloration valide, mais pas &agrave; la m&ecirc;me.</p></div>
+
+<h2>3.4 Propagation de contraintes : la coh&eacute;rence d'arc</h2>
+
+<p>La v&eacute;rification en avant ne propage qu'&agrave; un pas. On peut aller plus loin et rendre le r&eacute;seau <em>coh&eacute;rent</em> avant m&ecirc;me de commencer la recherche.</p>
+
+<div class="box def"><div class="box-title">D&eacute;finition &mdash; Coh&eacute;rence d'arc</div>
+<p>L'arc \((x_i, x_j)\) est <strong>coh&eacute;rent</strong> si pour toute valeur \(a \in D_i\) il existe au moins une valeur \(b \in D_j\) telle que le couple \((a,b)\) satisfasse la contrainte entre \(x_i\) et \(x_j\). Un r&eacute;seau est coh&eacute;rent d'arc si tous ses arcs le sont, dans les deux sens.</p>
+<p>Rendre un arc coh&eacute;rent consiste &agrave; supprimer de \(D_i\) toute valeur sans support dans \(D_j\). Cette suppression peut rendre incoh&eacute;rents d'autres arcs pointant vers \(x_i\) : il faut les remettre en file. C'est l'algorithme <strong>AC-3</strong> de Mackworth <a class="cite" href="#ref-mackworth1977">[3]</a>.</p></div>
+
+<div class="algo"><div class="algo-cap">Algorithme 6.2 &mdash; Coh&eacute;rence d'arc (AC-3)</div><div class="algo-io"><b>Entr&eacute;e :</b> un r&eacute;seau binaire \((X, D, C)\)<br><b>Sortie :</b> les domaines r&eacute;duits ; faux si un domaine devient vide</div><ol class="algo-corps"><li>\(Q \leftarrow \{(x_i, x_j) : (x_i, x_j) \text{ port&eacute;e d'une contrainte}\}\)          <span class="cm">// les deux sens</span></li><li><b class="kw">tant que</b> \(Q \neq \varnothing\) <b class="kw">faire</b></li><li class="n1">\((x_i, x_j) \leftarrow\) <span class="fn">Defiler</span>\((Q)\)</li><li class="n1"><b class="kw">si</b> <span class="fn">Reviser</span>\((D, x_i, x_j)\) <b class="kw">alors</b></li><li class="n2"><b class="kw">si</b> \(D_i = \varnothing\) <b class="kw">alors</b> <b class="kw">retourner</b> faux          <span class="cm">// incoherence prouvee</span></li><li class="n2">\(Q \leftarrow Q \cup \{(x_k, x_i) : k \neq j,\ (x_k, x_i) \in C\}\)</li><li><b class="kw">retourner</b> vrai</li><li>&nbsp;</li><li><b class="kw">fonction</b> <span class="fn">Reviser</span>\((D, x_i, x_j)\)</li><li class="n1">\(D_i' \leftarrow \{a \in D_i\ :\ \exists\, b \in D_j,\ (a,b) \text{ autoris&eacute;}\}\)</li><li class="n1">\(\mathrm{modifi\acute{e}} \leftarrow (D_i' \neq D_i)\) ; \(D_i \leftarrow D_i'\)</li><li class="n1"><b class="kw">retourner</b> \(\mathrm{modifi\acute{e}}\)</li></ol><p class="algo-note"><strong>Variant.</strong> \(\sum_i |D_i|\), entier positif : une r&eacute;vision effective le fait d&eacute;cro&icirc;tre, et un arc n'est remis en file qu'apr&egrave;s une telle d&eacute;croissance. <strong>Co&ucirc;t.</strong> \(O(e\,d^{3})\). La coh&eacute;rence d'arc est n&eacute;cessaire, jamais suffisante.</p></div>
+
+<figure class="viz"><div class="viz-title">Propagation sur une cha&icirc;ne de contraintes</div>
+<svg viewBox="0 0 760 330" role="img" style="width:100%;height:auto;display:block;"><text x="20" y="24" style="fill:var(--color-text);font-size:13px;font-family:inherit;">avant</text><circle cx="42" cy="70" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="42" y="75" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">X</text><text x="72" y="75" style="fill:var(--color-text);font-size:14px;font-family:inherit;">{1,2,3}</text><path d="M 42 91 L 42 129" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><text x="34" y="114" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">X &lt; Y</text><circle cx="42" cy="150" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="42" y="155" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">Y</text><text x="72" y="155" style="fill:var(--color-text);font-size:14px;font-family:inherit;">{1,2,3}</text><path d="M 42 171 L 42 209" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><text x="34" y="194" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">Y &lt; Z</text><circle cx="42" cy="230" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="42" y="235" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">Z</text><text x="72" y="235" style="fill:var(--color-text);font-size:14px;font-family:inherit;">{1,2,3}</text><path d="M 170 160 L 230 160" style="fill:none;stroke:var(--primary);stroke-width:2.5;" marker-end=""/><path d="M 225 154 L 236 160 L 225 166 Z" style="fill:var(--primary);"/><text x="270" y="24" style="fill:var(--color-text);font-size:13px;font-family:inherit;">apr&egrave;s X &lt; Y</text><circle cx="292" cy="70" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="292" y="75" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">X</text><text x="322" y="75" style="fill:var(--viz-bad);font-size:14px;font-family:inherit;">{1,2}</text><path d="M 292 91 L 292 129" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><text x="284" y="114" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">X &lt; Y</text><circle cx="292" cy="150" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="292" y="155" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">Y</text><text x="322" y="155" style="fill:var(--viz-bad);font-size:14px;font-family:inherit;">{2,3}</text><path d="M 292 171 L 292 209" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><text x="284" y="194" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">Y &lt; Z</text><circle cx="292" cy="230" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="292" y="235" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">Z</text><text x="322" y="235" style="fill:var(--color-text);font-size:14px;font-family:inherit;">{1,2,3}</text><path d="M 420 160 L 480 160" style="fill:none;stroke:var(--primary);stroke-width:2.5;" marker-end=""/><path d="M 475 154 L 486 160 L 475 166 Z" style="fill:var(--primary);"/><text x="520" y="24" style="fill:var(--color-text);font-size:13px;font-family:inherit;">apr&egrave;s Y &lt; Z</text><circle cx="542" cy="70" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="542" y="75" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">X</text><text x="572" y="75" style="fill:var(--viz-bad);font-size:14px;font-family:inherit;">{1}</text><path d="M 542 91 L 542 129" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><text x="534" y="114" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">X &lt; Y</text><circle cx="542" cy="150" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="542" y="155" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">Y</text><text x="572" y="155" style="fill:var(--viz-bad);font-size:14px;font-family:inherit;">{2}</text><path d="M 542 171 L 542 209" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><text x="534" y="194" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">Y &lt; Z</text><circle cx="542" cy="230" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="542" y="235" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">Z</text><text x="572" y="235" style="fill:var(--viz-bad);font-size:14px;font-family:inherit;">{3}</text><text x="380" y="316" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">un domaine r&eacute;duit propage la r&eacute;duction &agrave; ses voisins : la solution appara&icirc;t sans aucune &eacute;num&eacute;ration</text></svg>
+<figcaption class="viz-caption"><strong>Figure 6.2.</strong> Trois variables de domaine \(\{1,2,3\}\) li&eacute;es par \(X \lt Y\) et \(Y \lt Z\). La r&eacute;vision du premier arc retire 3 de \(D_X\) et 1 de \(D_Y\) ; celle du second retire 3 de \(D_Y\), ce qui remet en cause l'arc pr&eacute;c&eacute;dent et retire 2 de \(D_X\). L'unique solution \((1,2,3)\) est atteinte <em>par d&eacute;duction</em>, sans le moindre essai.</figcaption></figure>
+
+<div class="box thm"><div class="box-title">Th&eacute;or&egrave;me &mdash; Co&ucirc;t et port&eacute;e d'AC-3</div>
+<p>Sur un r&eacute;seau binaire &agrave; \(e\) contraintes et des domaines de taille au plus \(d\), AC-3 s'ex&eacute;cute en \(O(e\,d^{3})\) et en espace \(O(e)\) <a class="cite" href="#ref-mackworth1985">[4]</a>.</p>
+<p><strong>Terminaison.</strong> Variant : la somme des tailles des domaines, entier positif. Chaque r&eacute;vision effective la fait d&eacute;cro&icirc;tre d'au moins un, et un arc n'est remis en file qu'apr&egrave;s une telle d&eacute;croissance ; le nombre total d'insertions est donc born&eacute; par \(e\,d\).</p>
+<p><strong>Port&eacute;e.</strong> La coh&eacute;rence d'arc est une condition <em>n&eacute;cessaire</em>, non suffisante : un r&eacute;seau coh&eacute;rent d'arc peut n'avoir aucune solution. Le triangle &agrave; trois variables et deux couleurs, avec la contrainte de diff&eacute;rence sur chaque ar&ecirc;te, est coh&eacute;rent d'arc et pourtant insoluble.</p></div>
+
+<div class="box tip"><div class="box-title">MAC : la combinaison qui gagne</div>
+En pratique on ex&eacute;cute AC-3 une fois avant la recherche, puis apr&egrave;s chaque affectation en ne remettant en file que les arcs touch&eacute;s. Cette combinaison, appel&eacute;e <em>maintien de la coh&eacute;rence d'arc</em>, domine syst&eacute;matiquement la v&eacute;rification en avant seule. C'est ce que fait tout solveur de sudoku digne de ce nom : les grilles de difficult&eacute; moyenne sont r&eacute;solues par pure propagation, sans un seul essai.</div>
+
+<h2>3.5 Ce que la structure apporte</h2>
+
+<p>La complexit&eacute; au pire cas d&eacute;pend de la <em>forme</em> du graphe de contraintes, pas seulement de sa taille.</p>
+
+<div class="box thm"><div class="box-title">Th&eacute;or&egrave;me &mdash; CSP &agrave; graphe acyclique</div>
+<p>Si le graphe de contraintes est un arbre, le CSP se r&eacute;sout en \(O(n\,d^{2})\), donc en temps polynomial. Proc&eacute;d&eacute; : enraciner l'arbre, ordonner les variables du p&egrave;re vers les fils, rendre coh&eacute;rent chaque arc en remontant des feuilles vers la racine, puis affecter en descendant. Aucun retour sur trace ne survient <a class="cite" href="#ref-freuder1982">[5]</a>.</p>
+<p>Plus g&eacute;n&eacute;ralement, un CSP dont le graphe a une <strong>largeur d'arbre</strong> \(w\) se r&eacute;sout en \(O(n\,d^{w+1})\) <a class="cite" href="#ref-dechter1989">[6]</a>. Deux techniques exploitent ce r&eacute;sultat : la <em>coupe de cycle</em>, qui &eacute;num&egrave;re les valeurs d'un petit ensemble de variables dont la suppression rend le graphe acyclique, et la <em>d&eacute;composition arborescente</em>.</p></div>
+
+<p>Une autre r&eacute;gularit&eacute; frappante concerne la difficult&eacute; <em>moyenne</em>. Pour une famille d'instances al&eacute;atoires, la probabilit&eacute; d'avoir une solution passe brutalement de 1 &agrave; 0 lorsque le rapport du nombre de contraintes au nombre de variables franchit un seuil, et c'est <em>exactement l&agrave;</em> que le co&ucirc;t de r&eacute;solution culmine <a class="cite" href="#ref-cheeseman1991">[7]</a>. Loin du seuil, les instances sont faciles : soit tr&egrave;s peu contraintes et l'on trouve une solution sans effort, soit tr&egrave;s contraintes et la propagation prouve l'&eacute;chec imm&eacute;diatement.</p>
+
+<figure class="viz"><div class="viz-title">Transition de phase</div>
+<svg viewBox="0 0 720 330" role="img" style="width:100%;height:auto;display:block;"><path d="M 80 40 L 80 285 L 680 285" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 80 40.007 L 85 40.0087 L 90 40.0107 L 95 40.0133 L 100 40.0164 L 105 40.0203 L 110 40.0252 L 115 40.0311 L 120 40.0385 L 125 40.0477 L 130 40.059 L 135 40.0731 L 140 40.0904 L 145 40.1119 L 150 40.1385 L 155 40.1715 L 160 40.2122 L 165 40.2626 L 170 40.325 L 175 40.4021 L 180 40.4975 L 185 40.6155 L 190 40.7615 L 195 40.9418 L 200 41.1647 L 205 41.4401 L 210 41.78 L 215 42.1995 L 220 42.7168 L 225 43.354 L 230 44.138 L 235 45.1016 L 240 46.2836 L 245 47.7307 L 250 49.4977 L 255 51.6489 L 260 54.2578 L 265 57.4073 L 270 61.1887 L 275 65.6988 L 280 71.0358 L 285 77.2927 L 290 84.5483 L 295 92.8563 L 300 102.233 L 305 112.644 L 310 123.996 L 315 136.132 L 320 148.837 L 325 161.847 L 330 174.871 L 335 187.619 L 340 199.823 L 345 211.262 L 350 221.772 L 355 231.254 L 360 239.669 L 365 247.028 L 370 253.381 L 375 258.806 L 380 263.395 L 385 267.245 L 390 270.453 L 395 273.112 L 400 275.306 L 405 277.108 L 410 278.584 L 415 279.791 L 420 280.774 L 425 281.575 L 430 282.225 L 435 282.753 L 440 283.182 L 445 283.529 L 450 283.81 L 455 284.038 L 460 284.222 L 465 284.371 L 470 284.492 L 475 284.589 L 480 284.668 L 485 284.732 L 490 284.783 L 495 284.825 L 500 284.858 L 505 284.886 L 510 284.908 L 515 284.925 L 520 284.94 L 525 284.951 L 530 284.961 L 535 284.968 L 540 284.974 L 545 284.979 L 550 284.983 L 555 284.986 L 560 284.989 L 565 284.991 L 570 284.993 L 575 284.994 L 580 284.995 L 585 284.996 L 590 284.997 L 595 284.998 L 600 284.998 L 605 284.998 L 610 284.999 L 615 284.999 L 620 284.999 L 625 284.999 L 630 284.999 L 635 285 L 640 285 L 645 285 L 650 285 L 655 285 L 660 285 L 665 285 L 670 285 L 675 285 L 680 285" style="fill:none;stroke:var(--primary);stroke-width:3;"/><path d="M 80 284.998 L 85 284.997 L 90 284.996 L 95 284.994 L 100 284.99 L 105 284.984 L 110 284.976 L 115 284.963 L 120 284.945 L 125 284.917 L 130 284.878 L 135 284.821 L 140 284.741 L 145 284.628 L 150 284.472 L 155 284.257 L 160 283.965 L 165 283.572 L 170 283.05 L 175 282.364 L 180 281.47 L 185 280.32 L 190 278.857 L 195 277.015 L 200 274.723 L 205 271.903 L 210 268.473 L 215 264.351 L 220 259.453 L 225 253.704 L 230 247.038 L 235 239.406 L 240 230.776 L 245 221.147 L 250 210.548 L 255 199.042 L 260 186.733 L 265 173.766 L 270 160.325 L 275 146.633 L 280 132.947 L 285 119.549 L 290 106.74 L 295 94.827 L 300 84.1117 L 305 74.8782 L 310 67.3803 L 315 61.8299 L 320 58.3871 L 325 57.1528 L 330 58.1632 L 335 61.3886 L 340 66.7345 L 345 74.0464 L 350 83.1172 L 355 93.6967 L 360 105.503 L 365 118.237 L 370 131.589 L 375 145.26 L 380 158.963 L 385 172.44 L 390 185.463 L 395 197.845 L 400 209.437 L 405 220.13 L 410 229.858 L 415 238.588 L 420 246.319 L 425 253.08 L 430 258.917 L 435 263.897 L 440 268.094 L 445 271.589 L 450 274.466 L 455 276.807 L 460 278.691 L 465 280.189 L 470 281.368 L 475 282.284 L 480 282.99 L 485 283.526 L 490 283.93 L 495 284.231 L 500 284.453 L 505 284.615 L 510 284.731 L 515 284.814 L 520 284.873 L 525 284.914 L 530 284.942 L 535 284.962 L 540 284.975 L 545 284.984 L 550 284.989 L 555 284.993 L 560 284.996 L 565 284.997 L 570 284.998 L 575 284.999 L 580 284.999 L 585 285 L 590 285 L 595 285 L 600 285 L 605 285 L 610 285 L 615 285 L 620 285 L 625 285 L 630 285 L 635 285 L 640 285 L 645 285 L 650 285 L 655 285 L 660 285 L 665 285 L 670 285 L 675 285 L 680 285" style="fill:none;stroke:var(--viz-bad);stroke-width:3;stroke-dasharray:7 5;"/><path d="M 325.25 285 L 325.25 40" style="fill:none;stroke:var(--accent);stroke-width:2;stroke-dasharray:4 4;"/><text x="325.25" y="32" text-anchor="middle" style="fill:var(--accent);font-size:12.5px;font-weight:700;font-family:inherit;">seuil</text><text x="80" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">1</text><text x="155" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">2</text><text x="230" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">3</text><text x="305" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">4</text><text x="380" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">5</text><text x="455" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">6</text><text x="530" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">7</text><text x="605" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">8</text><text x="680" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">9</text><text x="380" y="327" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">rapport nombre de contraintes / nombre de variables</text><text x="94" y="64" style="fill:var(--primary);font-size:13px;font-weight:700;font-family:inherit;">probabilit&eacute; d'avoir une solution</text><text x="674" y="64" text-anchor="end" style="fill:var(--viz-bad);font-size:13px;font-weight:700;font-family:inherit;">co&ucirc;t de r&eacute;solution</text></svg>
+<figcaption class="viz-caption"><strong>Figure 6.3.</strong> Allure typique du ph&eacute;nom&egrave;ne pour des formules al&eacute;atoires &agrave; trois litt&eacute;raux : la probabilit&eacute; de satisfiabilit&eacute; bascule autour d'un rapport voisin de 4,27 et le co&ucirc;t de r&eacute;solution y pr&eacute;sente un pic marqu&eacute; <a class="cite" href="#ref-mitchell1992">[8]</a>. Les courbes trac&eacute;es sont des mod&egrave;les lisses de cette allure, non des mesures : la position exacte du seuil et la hauteur du pic d&eacute;pendent du solveur et de la taille des instances.</figcaption></figure>
+
+<h2>3.6 R&eacute;paration locale</h2>
+
+<p>Le retour sur trace construit une solution en partant de rien. L'approche inverse part d'une affectation compl&egrave;te, probablement fausse, et la <em>r&eacute;pare</em> : tant qu'il reste des conflits, on choisit une variable en conflit et on lui donne la valeur qui en cr&eacute;e le moins. C'est l'heuristique du <strong>minimum de conflits</strong> <a class="cite" href="#ref-minton1992">[9]</a>.</p>
+
+<div class="algo"><div class="algo-cap">Algorithme 6.3 &mdash; R&eacute;paration par minimum de conflits</div><div class="algo-io"><b>Entr&eacute;e :</b> un CSP, une affectation totale initiale \(\mathcal{A}_0\), un budget \(t_{\max}\)<br><b>Sortie :</b> une affectation sans conflit, ou l'&eacute;chec &mdash; qui ne prouve rien</div><ol class="algo-corps"><li>\(\mathcal{A} \leftarrow \mathcal{A}_0\)          <span class="cm">// complete, mais fausse</span></li><li><b class="kw">pour</b> \(t = 1\) <b class="kw">jusqu'&agrave;</b> \(t_{\max}\) <b class="kw">faire</b></li><li class="n1">\(K \leftarrow \{x \in X\ :\ x \text{ viole au moins une contrainte}\}\)</li><li class="n1"><b class="kw">si</b> \(K = \varnothing\) <b class="kw">alors</b> <b class="kw">retourner</b> \(\mathcal{A}\)</li><li class="n1">\(x \sim \mathcal{U}(K)\)          <span class="cm">// tirage uniforme : indispensable</span></li><li class="n1">\(m \leftarrow \displaystyle\min_{v \in D_x} \mathrm{conf}(\mathcal{A}, x, v)\)</li><li class="n1">\(\mathcal{A}[x] \sim \mathcal{U}\big(\{v \in D_x : \mathrm{conf}(\mathcal{A},x,v) = m\}\big)\)</li><li><b class="kw">retourner</b> &eacute;chec</li></ol><p class="algo-note">Les deux tirages uniformes ne sont pas cosm&eacute;tiques : sans le premier, la recherche oscille entre deux configurations ; sans le second, elle se bloque au premier plateau. <strong>Aucun variant :</strong> le nombre de conflits peut remonter, et la terminaison est impos&eacute;e par \(t_{\max}\).</p></div>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Le premier curseur fixe la taille du plateau, le second avance dans la suite des r&eacute;parations. Les reines en rouge participent &agrave; au moins un conflit ; les traits pointill&eacute;s montrent quelles paires s'attaquent.</p>
+<div id="jxg2" class="viz-board" style="height:540px;"></div>
+<p class="viz-caption"><strong>Figure 6.4.</strong> Les traits rouges relient explicitement les paires de reines qui s'attaquent : on voit ce que l'algorithme cherche &agrave; supprimer. La bande verticale orange marque la colonne d&eacute;plac&eacute;e &agrave; l'&eacute;tape courante, et l'histogramme de droite donne le nombre de conflits au fil des r&eacute;parations &mdash; il ne d&eacute;cro&icirc;t pas de fa&ccedil;on monotone, ce qui est normal : la m&eacute;thode accepte de passer par des configurations pires. Le nombre de r&eacute;parations n&eacute;cessaires ne cro&icirc;t pratiquement pas avec \(n\) : c'est la propri&eacute;t&eacute; remarquable de cette famille d'instances, tr&egrave;s peu contrainte et donc situ&eacute;e loin du seuil de la figure pr&eacute;c&eacute;dente. Le tirage est fix&eacute; pour rendre la figure reproductible ; d'autres tirages donnent des trajectoires de longueur comparable.</p></div>
+
+<div class="box warn"><div class="box-title">Ce que la r&eacute;paration locale ne sait pas faire</div>
+Elle ne prouve <em>jamais</em> l'absence de solution : un &eacute;chec peut signifier qu'il n'y en a pas, ou simplement que l'exploration s'est enlis&eacute;e dans un minimum local. Elle est donc inutilisable telle quelle sur les probl&egrave;mes o&ugrave; l'on cherche &agrave; d&eacute;montrer l'incoh&eacute;rence, et il faut la doter de m&eacute;canismes d'&eacute;chappement &mdash; red&eacute;marrages al&eacute;atoires, mouvements lat&eacute;raux, m&eacute;moire des configurations r&eacute;cemment visit&eacute;es.</div>
+
+<h2>Synth&egrave;se</h2>
+<ul>
+<li>Un CSP rend visible la structure interne des &eacute;tats : on peut alors d&eacute;duire au lieu d'explorer.</li>
+<li>Le retour sur trace ram&egrave;ne \(d^{n}\) affectations &agrave; un arbre &eacute;lagu&eacute; d&egrave;s la premi&egrave;re violation ; il reste exponentiel au pire cas, le probl&egrave;me &eacute;tant NP-complet <a class="cite" href="#ref-karp1972">[1]</a>.</li>
+<li>Domaine minimal, plus haut degr&eacute;, valeur la moins contraignante et v&eacute;rification en avant divisent le travail r&eacute;el par plusieurs ordres de grandeur <a class="cite" href="#ref-haralick1980">[2]</a>.</li>
+<li>La coh&eacute;rence d'arc &eacute;limine par d&eacute;duction, en \(O(e\,d^{3})\) ; elle est n&eacute;cessaire mais non suffisante <a class="cite" href="#ref-mackworth1977">[3]</a>.</li>
+<li>Un graphe de contraintes acyclique rend le probl&egrave;me polynomial ; la largeur d'arbre g&eacute;n&eacute;ralise ce r&eacute;sultat <a class="cite" href="#ref-dechter1989">[6]</a>.</li>
+<li>La r&eacute;paration locale r&eacute;sout tr&egrave;s vite les instances peu contraintes, mais ne prouve jamais l'absence de solution <a class="cite" href="#ref-minton1992">[9]</a>.</li>
+</ul>
+
+<h2>R&eacute;f&eacute;rences</h2>
+<ol class="reflist">
+<li id="ref-karp1972">Karp, R. M. (1972). Reducibility among combinatorial problems. Dans <em>Complexity of Computer Computations</em>, Plenum Press, 85&ndash;103. DOI&nbsp;: 10.1007/978-1-4684-2001-2_9. <a href="https://doi.org/10.1007/978-1-4684-2001-2_9">https://doi.org/10.1007/978-1-4684-2001-2_9</a></li>
+<li id="ref-haralick1980">Haralick, R. M. &amp; Elliott, G. L. (1980). Increasing tree search efficiency for constraint satisfaction problems. <em>Artificial Intelligence</em>, 14(3), 263&ndash;313. DOI&nbsp;: 10.1016/0004-3702(80)90051-X. <a href="https://doi.org/10.1016/0004-3702(80)90051-X">https://doi.org/10.1016/0004-3702(80)90051-X</a></li>
+<li id="ref-mackworth1977">Mackworth, A. K. (1977). Consistency in networks of relations. <em>Artificial Intelligence</em>, 8(1), 99&ndash;118. DOI&nbsp;: 10.1016/0004-3702(77)90007-8. <a href="https://doi.org/10.1016/0004-3702(77)90007-8">https://doi.org/10.1016/0004-3702(77)90007-8</a></li>
+<li id="ref-mackworth1985">Mackworth, A. K. &amp; Freuder, E. C. (1985). The complexity of some polynomial network consistency algorithms for constraint satisfaction problems. <em>Artificial Intelligence</em>, 25(1), 65&ndash;74. DOI&nbsp;: 10.1016/0004-3702(85)90041-4. <a href="https://doi.org/10.1016/0004-3702(85)90041-4">https://doi.org/10.1016/0004-3702(85)90041-4</a></li>
+<li id="ref-freuder1982">Freuder, E. C. (1982). A sufficient condition for backtrack-free search. <em>Journal of the ACM</em>, 29(1), 24&ndash;32. DOI&nbsp;: 10.1145/322290.322292. <a href="https://doi.org/10.1145/322290.322292">https://doi.org/10.1145/322290.322292</a></li>
+<li id="ref-dechter1989">Dechter, R. &amp; Pearl, J. (1989). Tree clustering for constraint networks. <em>Artificial Intelligence</em>, 38(3), 353&ndash;366. DOI&nbsp;: 10.1016/0004-3702(89)90037-4. <a href="https://doi.org/10.1016/0004-3702(89)90037-4">https://doi.org/10.1016/0004-3702(89)90037-4</a></li>
+<li id="ref-cheeseman1991">Cheeseman, P., Kanefsky, B. &amp; Taylor, W. M. (1991). Where the really hard problems are. <em>Proceedings of IJCAI-91</em>, 331&ndash;337. <a href="https://www.ijcai.org/Proceedings/91-1/Papers/052.pdf">https://www.ijcai.org/Proceedings/91-1/Papers/052.pdf</a></li>
+<li id="ref-mitchell1992">Mitchell, D., Selman, B. &amp; Levesque, H. (1992). Hard and easy distributions of SAT problems. <em>Proceedings of AAAI-92</em>, 459&ndash;465. <a href="https://cdn.aaai.org/AAAI/1992/AAAI92-071.pdf">https://cdn.aaai.org/AAAI/1992/AAAI92-071.pdf</a></li>
+<li id="ref-minton1992">Minton, S., Johnston, M. D., Philips, A. B. &amp; Laird, P. (1992). Minimizing conflicts: a heuristic repair method for constraint satisfaction and scheduling problems. <em>Artificial Intelligence</em>, 58(1&ndash;3), 161&ndash;205. DOI&nbsp;: 10.1016/0004-3702(92)90007-K. <a href="https://doi.org/10.1016/0004-3702(92)90007-K">https://doi.org/10.1016/0004-3702(92)90007-K</a></li>
+</ol>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../05-jeux/page.html">\(\leftarrow\) Chapitre 5 &mdash; Jeux</a>
+<a href="algorithms.html">Annexe algorithmique</a>
+<a href="../../index.html">Sommaire du manuel</a>
+<a href="../07-logique/page.html">Chapitre 7 &mdash; Logique \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">La figure interactive n\'a pas pu etre chargee. Verifiez votre connexion reseau.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ============ Figure 3.x : coloration d'un graphe par retour sur trace ==== */
+var REGIONS = ['T','WA','NSW','NT','Q','V','SA'];   /* ordre fixe volontairement mediocre */
+var RPOS = {WA:[1.0,3.2], NT:[2.7,4.3], SA:[2.9,2.4], Q:[4.6,4.2],
+            NSW:[5.2,2.6], V:[4.6,1.2], T:[5.0,-0.4]};
+var RARETES = [['WA','NT'],['WA','SA'],['NT','SA'],['NT','Q'],['SA','Q'],
+               ['SA','NSW'],['SA','V'],['Q','NSW'],['NSW','V']];
+var COUL = ['rouge','vert','bleu'];
+var COULHEX = ['#dc2626', '#16a34a', '#2563eb'];
+var VOISINS = {};
+for (var i=0;i<REGIONS.length;i++){ VOISINS[REGIONS[i]] = []; }
+for (var i=0;i<RARETES.length;i++){
+  VOISINS[RARETES[i][0]].push(RARETES[i][1]);
+  VOISINS[RARETES[i][1]].push(RARETES[i][0]);
+}
+
+/* strategie : 0 = ordre fixe, 1 = + variable la plus contrainte,
+   2 = + verification en avant (et variable la plus contrainte) */
+function resoudre(strategie){
+  var evts = [], retours = 0, aff = {};
+  var dom = {};
+  for (var i=0;i<REGIONS.length;i++){ dom[REGIONS[i]] = [0,1,2]; }
+
+  function libre(){
+    var r = [];
+    for (var i=0;i<REGIONS.length;i++){ if (!(REGIONS[i] in aff)) { r.push(REGIONS[i]); } }
+    return r;
+  }
+  function choisir(){
+    var l = libre();
+    if (!l.length) { return null; }
+    if (strategie === 0) { return l[0]; }
+    var best = l[0];
+    for (var i=1;i<l.length;i++){
+      if (dom[l[i]].length < dom[best].length) { best = l[i]; }
+      else if (dom[l[i]].length === dom[best].length &&
+               VOISINS[l[i]].length > VOISINS[best].length) { best = l[i]; }
+    }
+    return best;
+  }
+  function compatible(v, c){
+    for (var i=0;i<VOISINS[v].length;i++){
+      var u = VOISINS[v][i];
+      if (u in aff && aff[u] === c) { return false; }
+    }
+    return true;
+  }
+  function retirer(v, c){
+    /* verification en avant : renvoie la liste des retraits effectues */
+    var retraits = [];
+    for (var i=0;i<VOISINS[v].length;i++){
+      var u = VOISINS[v][i];
+      if (u in aff) { continue; }
+      var j = dom[u].indexOf(c);
+      if (j >= 0){ dom[u].splice(j,1); retraits.push(u); }
+    }
+    return retraits;
+  }
+  function remettre(retraits, c){
+    for (var i=0;i<retraits.length;i++){ dom[retraits[i]].push(c); dom[retraits[i]].sort(); }
+  }
+  function bt(){
+    if (libre().length === 0) { return true; }
+    var v = choisir();
+    var valeurs = dom[v].slice();
+    for (var k=0;k<valeurs.length;k++){
+      var c = valeurs[k];
+      if (!compatible(v, c)) {
+        evts.push({v:v, c:c, ok:false, aff:copie(aff), dom:copieDom(dom)});
+        continue;
+      }
+      aff[v] = c;
+      var retraits = [];
+      var echec = false;
+      if (strategie === 2){
+        retraits = retirer(v, c);
+        for (var i=0;i<REGIONS.length;i++){
+          var u = REGIONS[i];
+          if (!(u in aff) && dom[u].length === 0) { echec = true; }
+        }
+      }
+      evts.push({v:v, c:c, ok:!echec, aff:copie(aff), dom:copieDom(dom)});
+      if (!echec && bt()) { return true; }
+      if (strategie === 2) { remettre(retraits, c); }
+      delete aff[v];
+      retours++;
+      evts.push({v:v, c:null, ok:false, retour:true, aff:copie(aff), dom:copieDom(dom)});
+    }
+    return false;
+  }
+  function copie(o){ var r = {}; for (var k in o){ r[k] = o[k]; } return r; }
+  function copieDom(o){ var r = {}; for (var k in o){ r[k] = o[k].slice(); } return r; }
+  var succes = bt();
+  return {evts: evts, retours: retours, succes: succes, final: copie(aff)};
+}
+var SOLS = [resoudre(0), resoudre(1), resoudre(2)];
+var STRAT = ['ordre fixe', 'variable la plus contrainte', 'plus contrainte + verification en avant'];
+
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-0.6, 6.4, 9.4, -2.2], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sStrat = b1.create('slider', [[0.0, -1.2], [3.4, -1.2], [0, 0, 2]], {
+  name: 'strategie', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sEt = b1.create('slider', [[4.6, -1.2], [9.0, -1.2], [0, 30, 30]], {
+  name: 'etape', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function strat(){ return Math.round(sStrat.Value()); }
+function sol(){ return SOLS[strat()]; }
+function etape(){ return Math.min(Math.round(sEt.Value()), sol().evts.length); }
+function affCourante(){
+  var e = etape(), s = sol();
+  if (e === 0) { return {}; }
+  return s.evts[e-1].aff;
+}
+function domCourant(){
+  var e = etape(), s = sol();
+  if (e === 0) { var d = {}; for (var i=0;i<REGIONS.length;i++){ d[REGIONS[i]] = [0,1,2]; } return d; }
+  return s.evts[e-1].dom;
+}
+for (var i=0;i<RARETES.length;i++){
+  (function(a){
+    b1.create('segment', [RPOS[a[0]], RPOS[a[1]]], {
+      strokeColor: PAL.ref, strokeWidth: 2, highlight: false, fixed: true,
+      straightFirst: false, straightLast: false});
+  })(RARETES[i]);
+}
+for (var i=0;i<REGIONS.length;i++){
+  (function(r){
+    b1.create('point', RPOS[r], {
+      name: '', size: 17, face: 'o', fixed: true, highlight: false, strokeWidth: 2,
+      strokeColor: function(){
+        var a = affCourante();
+        return (r in a) ? COULHEX[a[r]] : PAL.axis();
+      },
+      fillColor: function(){
+        var a = affCourante();
+        return (r in a) ? COULHEX[a[r]] : PAL.bg();
+      }, fillOpacity: 1
+    });
+    b1.create('text', [RPOS[r][0], RPOS[r][1], r], {
+      fontSize: 13, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+      strokeColor: function(){ var a = affCourante(); return (r in a) ? '#ffffff' : PAL.text(); }});
+    b1.create('text', [RPOS[r][0], RPOS[r][1] + 0.55, function(){
+      var a = affCourante(), d = domCourant();
+      if (r in a) { return ''; }
+      var n = d[r].map(function(c){ return COUL[c].charAt(0); }).join('');
+      return n.length ? n : 'vide';
+    }], {fontSize: 12, anchorX: 'middle', fixed: true, highlight: false,
+         strokeColor: function(){
+           var d = domCourant(), a = affCourante();
+           return (!(r in a) && d[r].length === 0) ? cssv('--viz-bad','#dc2626') : PAL.muted();
+         }});
+  })(REGIONS[i]);
+}
+b1.create('text', [-0.5, 6.1, function(){
+  var s = sol(), e = etape();
+  var rt = 0;
+  for (var i=0;i<e;i++){ if (s.evts[i].retour) { rt++; } }
+  return 'Strategie : ' + STRAT[strat()] + '   |   etape ' + e + ' sur ' + s.evts.length
+       + '   |   retours sur trace effectues : ' + rt;
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-0.5, 5.7, function(){
+  var s = sol(), e = etape();
+  if (e === 0) { return 'Aucune region coloriee. Les lettres indiquent les couleurs encore possibles.'; }
+  var ev = s.evts[e-1];
+  if (ev.retour) { return 'Retour sur trace : ' + ev.v + ' est desaffectee.'; }
+  if (!ev.ok) { return ev.v + ' = ' + COUL[ev.c] + ' est rejete.'; }
+  return ev.v + ' recoit la couleur ' + COUL[ev.c] + '.';
+}], {fontSize: 14, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-0.5, -1.9, function(){
+  var s = sol();
+  if (etape() < s.evts.length) { return 'Resolution en cours...'; }
+  return 'Termine : ' + (s.succes ? 'coloration trouvee' : 'aucune solution')
+       + '   |   ' + s.evts.length + ' essais, ' + s.retours + ' retours sur trace';
+}], {fontSize: 15, strokeColor: function(){ return cssv('--primary','#026573'); },
+     fixed: true, highlight: false});
+
+/* ====== Figure 6.4 : n reines par reparation locale, avec les conflits ==== */
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-2.2, 14.6, 15.8, -3.6], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: true
+});
+var sN = b2.create('slider', [[-1.8, -1.6], [3.6, -1.6], [4, 8, 12]], {
+  name: 'n', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sIt = b2.create('slider', [[5.2, -1.6], [15.4, -1.6], [0, 0, 40]], {
+  name: 'reparations', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function alea(graine){
+  var s = graine;
+  return function(){ s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648; };
+}
+function conflits(pos, col){
+  var n = pos.length, c = 0;
+  for (var j = 0; j < n; j++){
+    if (j === col) { continue; }
+    if (pos[j] === pos[col]) { c++; }
+    else if (Math.abs(pos[j] - pos[col]) === Math.abs(j - col)) { c++; }
+  }
+  return c;
+}
+function total(pos){
+  var t = 0;
+  for (var j = 0; j < pos.length; j++){ t += conflits(pos, j); }
+  return t / 2;
+}
+/* Les paires en conflit, pour les tracer explicitement. */
+function paires(pos){
+  var res = [], n = pos.length;
+  for (var i = 0; i < n; i++){
+    for (var j = i + 1; j < n; j++){
+      if (pos[i] === pos[j] || Math.abs(pos[i] - pos[j]) === Math.abs(i - j)){
+        res.push([i, j]);
+      }
+    }
+  }
+  return res;
+}
+function trajectoire(n, graine){
+  var rnd = alea(graine * 977 + n), pos = [], j;
+  for (j = 0; j < n; j++){ pos.push(Math.floor(rnd() * n)); }
+  var etats = [{pos: pos.slice(), col: -1, avant: -1}];
+  for (var it = 0; it < 400 && total(pos) > 0; it++){
+    var candidats = [];
+    for (j = 0; j < n; j++){ if (conflits(pos, j) > 0) { candidats.push(j); } }
+    if (!candidats.length) { break; }
+    var col = candidats[Math.floor(rnd() * candidats.length)];
+    var meilleures = [], bestc = Infinity, ancien = pos[col];
+    for (var l = 0; l < n; l++){
+      pos[col] = l;
+      var c = conflits(pos, col);
+      if (c < bestc){ bestc = c; meilleures = [l]; }
+      else if (c === bestc){ meilleures.push(l); }
+    }
+    pos[col] = meilleures[Math.floor(rnd() * meilleures.length)];
+    etats.push({pos: pos.slice(), col: col, avant: ancien});
+  }
+  return etats;
+}
+var CACHE_N = {};
+function reines(n){
+  if (n in CACHE_N) { return CACHE_N[n]; }
+  var etats = null;
+  for (var graine = 1; graine <= 60 && etats === null; graine++){
+    var essai = trajectoire(n, graine);
+    if (essai.length - 1 <= 40 && total(essai[essai.length - 1].pos) === 0) { etats = essai; }
+  }
+  if (etats === null) { etats = trajectoire(n, 1); }
+  CACHE_N[n] = etats;
+  return etats;
+}
+function nCourant(){ return Math.round(sN.Value()); }
+function etatReines(){
+  var e = reines(nCourant());
+  var i = Math.min(Math.round(sIt.Value()), e.length - 1);
+  return {e: e[i], i: i, max: e.length - 1};
+}
+/* damier a cases alternees */
+var cCasesSombres = b2.create('curve', [[0],[0]], {
+  strokeWidth: 0, fillColor: PAL.ref, fillOpacity: 0.5, highlight: false, fixed: true});
+cCasesSombres.updateDataArray = function(){
+  var n = nCourant(), X = [], Y = [];
+  for (var i = 0; i < n; i++){
+    for (var j = 0; j < n; j++){
+      if ((i + j) % 2 === 0) { continue; }
+      X.push(i, i + 1, i + 1, i, i, NaN);
+      Y.push(j, j, j + 1, j + 1, j, NaN);
+    }
+  }
+  this.dataX = X; this.dataY = Y;
+};
+b2.create('curve', [[0],[0]], {strokeColor: PAL.axis, strokeWidth: 1.4,
+  highlight: false, fixed: true}).updateDataArray = function(){
+  var n = nCourant(), X = [], Y = [];
+  for (var i = 0; i <= n; i++){ X.push(i, i, NaN); Y.push(0, n, NaN); }
+  for (var j = 0; j <= n; j++){ X.push(0, n, NaN); Y.push(j, j, NaN); }
+  this.dataX = X; this.dataY = Y;
+};
+/* segments reliant les paires en conflit : on VOIT pourquoi c est faux */
+var cConflitsLignes = b2.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); },
+  strokeWidth: 2, dash: 2, highlight: false, fixed: true});
+cConflitsLignes.updateDataArray = function(){
+  var pos = etatReines().e.pos, P = paires(pos), X = [], Y = [];
+  for (var k = 0; k < P.length; k++){
+    X.push(P[k][0] + 0.5, P[k][1] + 0.5, NaN);
+    Y.push(pos[P[k][0]] + 0.5, pos[P[k][1]] + 0.5, NaN);
+  }
+  this.dataX = X; this.dataY = Y;
+};
+/* colonne deplacee a cette etape */
+var cColonne = b2.create('curve', [[0],[0]], {
+  strokeWidth: 0, fillColor: function(){ return cssv('--accent', '#f59e0b'); },
+  fillOpacity: 0.20, highlight: false, fixed: true});
+cColonne.updateDataArray = function(){
+  var e = etatReines().e, n = nCourant();
+  if (e.col < 0) { this.dataX = []; this.dataY = []; return; }
+  this.dataX = [e.col, e.col + 1, e.col + 1, e.col, e.col];
+  this.dataY = [0, 0, n, n, 0];
+};
+function disques(enConflit){
+  var c = b2.create('curve', [[0],[0]], {
+    strokeWidth: 0, highlight: false, fixed: true,
+    fillColor: function(){
+      return enConflit ? cssv('--viz-bad', '#dc2626') : cssv('--primary', '#026573'); },
+    fillOpacity: 0.92});
+  c.updateDataArray = function(){
+    var pos = etatReines().e.pos, X = [], Y = [];
+    for (var j = 0; j < pos.length; j++){
+      if ((conflits(pos, j) > 0) !== enConflit) { continue; }
+      var cx = j + 0.5, cy = pos[j] + 0.5;
+      for (var t = 0; t <= 18; t++){
+        X.push(cx + 0.34 * Math.cos(t / 18 * 2 * Math.PI));
+        Y.push(cy + 0.34 * Math.sin(t / 18 * 2 * Math.PI));
+      }
+      X.push(NaN); Y.push(NaN);
+    }
+    this.dataX = X; this.dataY = Y;
+  };
+}
+disques(false); disques(true);
+/* jauge du nombre de conflits */
+b2.create('curve', [[0],[0]], {strokeWidth: 0,
+  fillColor: function(){ return cssv('--viz-bad', '#dc2626'); }, fillOpacity: 0.25,
+  highlight: false, fixed: true}).updateDataArray = function(){
+  var e = reines(nCourant()), n = nCourant();
+  var X = [], Y = [];
+  for (var i = 0; i < e.length; i++){
+    var t = total(e[i].pos);
+    var x = n + 0.8 + i * (5.4 / Math.max(1, e.length - 1));
+    var h = t * 0.5;
+    X.push(x, x + 0.16, x + 0.16, x, x, NaN);
+    Y.push(0, 0, h, h, 0, NaN);
+  }
+  this.dataX = X; this.dataY = Y;
+};
+b2.create('text', [function(){ return nCourant() + 0.8; }, -0.7,
+  'conflits au fil des reparations'], {fontSize: 11, anchorX: 'left',
+  strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('segment', [
+  function(){ var e = etatReines(), n = nCourant();
+    return [n + 0.8 + e.i * (5.4 / Math.max(1, e.max)), 0]; },
+  function(){ var e = etatReines(), n = nCourant();
+    return [n + 0.8 + e.i * (5.4 / Math.max(1, e.max)), 5.6]; }], {
+  strokeColor: function(){ return cssv('--accent', '#f59e0b'); }, strokeWidth: 1.8,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+
+b2.create('text', [-2.1, 14.2, function(){
+  var e = etatReines();
+  return 'n = ' + nCourant() + '   |   reparation ' + e.i + ' sur ' + e.max
+       + '   |   paires en conflit : ' + total(e.e.pos);
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-2.1, 13.4, function(){
+  var e = etatReines();
+  if (e.e.col < 0) { return 'Placement initial tire au hasard, avant toute reparation.'; }
+  return 'Colonne ' + (e.e.col + 1) + ' deplacee de la ligne ' + (e.e.avant + 1)
+       + ' a la ligne ' + (e.e.pos[e.e.col] + 1) + ' : celle qui minimise ses conflits.';
+}], {fontSize: 13, strokeColor: function(){ return cssv('--accent','#f59e0b'); },
+     fixed: true, highlight: false});
+b2.create('text', [-2.1, 12.6, function(){
+  var e = etatReines();
+  if (total(e.e.pos) === 0) { return 'Aucune reine n’en attaque une autre : solution atteinte.'; }
+  return 'Les traits rouges relient les paires qui s’attaquent ; une seule colonne bouge par etape.';
+}], {fontSize: 12.5, fixed: true, highlight: false,
+     strokeColor: function(){
+       return total(etatReines().e.pos) === 0 ? cssv('--viz-ok','#16a34a') : PAL.muted(); }});
+b2.create('text', [-2.1, -2.9, function(){
+  var r = [];
+  for (var n = 4; n <= 12; n += 2){ r.push(n + ' : ' + (reines(n).length - 1)); }
+  return 'Reparations necessaires selon n  -  ' + r.join('   ')
+       + '   -  le nombre ne croit pratiquement pas avec la taille du plateau.';
+}], {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

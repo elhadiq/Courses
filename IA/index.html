@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intelligence artificielle &mdash; manuel complet</title>
+<meta name="description" content="Manuel d intelligence artificielle en quatorze chapitres : definitions et histoire, agents, recherche, metaheuristiques, jeux, contraintes, logique, probabilites, apprentissage supervise et non supervise, reseaux de neurones, renforcement, modeles generatifs, ethique.">
+<link href="assets/style.css" rel="stylesheet">
+<script src="assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">14 chapitres</span></div></header>
+<section class="hero"><div class="container"><h1>Intelligence artificielle</h1><p class="subtitle">Chercher &middot; Raisonner &middot; Apprendre &mdash; de la d&eacute;finition du mot aux mod&egrave;les d'aujourd'hui</p><a class="cta" href="lecons/00-introduction/page.html">Commencer par l'introduction</a></div></section>
+<section class="section"><h2 class="section-title">Acc&egrave;s rapide</h2><p class="section-subtitle">Quatre portes d'entr&eacute;e selon ce que vous cherchez</p><div class="quick-access"><a class="qa-card" href="lecons/00-introduction/page.html"><span class="qa-label">D&eacute;marrer</span><span class="qa-title">Introduction g&eacute;n&eacute;rale</span><span class="qa-sub">Comment le manuel est b&acirc;ti et comment le travailler</span></a><a class="qa-card" href="lecons/01-qu-est-ce-que-l-ia/page.html"><span class="qa-label">De quoi parle-t-on ?</span><span class="qa-title">Qu'est-ce que l'IA ?</span><span class="qa-sub">Quatre d&eacute;finitions, soixante-dix ans d'histoire</span></a><a class="qa-card" href="lecons/09-apprentissage/page.html"><span class="qa-label">Le c&oelig;ur actuel</span><span class="qa-title">Apprendre par l'exemple</span><span class="qa-sub">Risque, sur-apprentissage, &eacute;valuation honn&ecirc;te</span></a><a class="qa-card" href="lecons/14-ethique/page.html"><span class="qa-label">Ce qui se joue</span><span class="qa-title">Biais et responsabilit&eacute;</span><span class="qa-sub">Un th&eacute;or&egrave;me d'impossibilit&eacute; &agrave; conna&icirc;tre</span></a></div></section>
+<div id="sommaire"></div>
+<section class="section"><h2 class="section-title">Ouverture</h2>
+<p class="section-subtitle">Ouverture du manuel</p><div class="sequences">
+<div class="seq-card"><div class="seq-meta">Introduction</div><h3>Introduction g&eacute;n&eacute;rale</h3><p class="seq-topics">Ce que recouvre le mot &laquo; intelligence artificielle &raquo;, comment ce manuel est organis&eacute;, et par quel bout le prendre.</p><p class="seq-topics">1 figure interactive &middot; 2 images &middot; aucune annexe</p><div class="seq-actions"><a class="btn primary" href="lecons/00-introduction/page.html">Ouvrir</a>
+</div></div>
+</div></section>
+<section class="section"><h2 class="section-title">Partie I &middot; Fondements</h2>
+<p class="section-subtitle">Chapitres de cours, annexes sans code et exercices auto-not&eacute;s</p><div class="sequences">
+<div class="seq-card"><div class="seq-meta">Chapitre 1</div><h3>Qu'est-ce que l'intelligence artificielle ?</h3><p class="seq-topics">Quatre d&eacute;finitions concurrentes, le jeu de l'imitation et ses critiques, soixante-dix ans d'alternance entre printemps et hivers, symbolique contre connexionniste.</p><p class="seq-topics">2 figures interactives &middot; 2 images &middot; 4 proc&eacute;dures en annexe</p><div class="seq-actions"><a class="btn primary" href="lecons/01-qu-est-ce-que-l-ia/page.html">Ouvrir</a>
+<a class="btn" href="lecons/01-qu-est-ce-que-l-ia/algorithms.html">Annexe</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">Chapitre 2</div><h3>Agents rationnels et environnements</h3><p class="seq-topics">Percepts, actions, mesure de performance, propri&eacute;t&eacute;s d'un environnement et cinq architectures d'agent, du r&eacute;flexe pur &agrave; l'agent apprenant.</p><p class="seq-topics">2 figures interactives &middot; 2 images &middot; 4 proc&eacute;dures en annexe</p><div class="seq-actions"><a class="btn primary" href="lecons/02-agents/page.html">Ouvrir</a>
+<a class="btn" href="lecons/02-agents/algorithms.html">Annexe</a>
+</div></div>
+</div></section>
+<section class="section"><h2 class="section-title">Partie II &middot; R&eacute;soudre en cherchant</h2>
+<p class="section-subtitle">Chapitres de cours, annexes sans code et exercices auto-not&eacute;s</p><div class="sequences">
+<div class="seq-card"><div class="seq-meta">Chapitre 3</div><h3>R&eacute;solution de probl&egrave;mes par recherche dans un espace d'&eacute;tats</h3><p class="seq-topics">Largeur, profondeur, co&ucirc;t uniforme, heuristiques admissibles et coh&eacute;rentes, A* et IDA*.</p><p class="seq-topics">3 figures interactives &middot; 1 image &middot; 5 algorithmes en annexe</p><div class="seq-actions"><a class="btn primary" href="lecons/03-recherche/page.html">Ouvrir</a>
+<a class="btn" href="lecons/03-recherche/algorithms.html">Annexe</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">Chapitre 4</div><h3>Recherche locale et m&eacute;taheuristiques</h3><p class="seq-topics">Mont&eacute;e de gradient, recuit simul&eacute;, recherche tabou, algorithmes &eacute;volutionnaires : quand l'espace est trop grand pour &ecirc;tre parcouru.</p><p class="seq-topics">2 figures interactives &middot; 2 images &middot; 4 algorithmes en annexe</p><div class="seq-actions"><a class="btn primary" href="lecons/04-metaheuristiques/page.html">Ouvrir</a>
+<a class="btn" href="lecons/04-metaheuristiques/algorithms.html">Annexe</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">Chapitre 5</div><h3>Jeux &agrave; deux joueurs et adversaire optimal</h3><p class="seq-topics">Arbre de jeu, min-max, &eacute;lagage alpha-b&ecirc;ta, fonction d'&eacute;valuation, effet d'horizon, recherche par &eacute;chantillonnage.</p><p class="seq-topics">2 figures interactives &middot; 2 images &middot; 4 algorithmes en annexe</p><div class="seq-actions"><a class="btn primary" href="lecons/05-jeux/page.html">Ouvrir</a>
+<a class="btn" href="lecons/05-jeux/algorithms.html">Annexe</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">Chapitre 6</div><h3>Probl&egrave;mes de satisfaction de contraintes</h3><p class="seq-topics">Variables, domaines, contraintes, retour sur trace, coh&eacute;rence d'arc, structure du graphe et r&eacute;paration locale.</p><p class="seq-topics">2 figures interactives &middot; 2 images &middot; 4 algorithmes en annexe</p><div class="seq-actions"><a class="btn primary" href="lecons/06-contraintes/page.html">Ouvrir</a>
+<a class="btn" href="lecons/06-contraintes/algorithms.html">Annexe</a>
+</div></div>
+</div></section>
+<section class="section"><h2 class="section-title">Partie III &middot; Repr&eacute;senter et raisonner</h2>
+<p class="section-subtitle">Chapitres de cours, annexes sans code et exercices auto-not&eacute;s</p><div class="sequences">
+<div class="seq-card"><div class="seq-meta">Chapitre 7</div><h3>Repr&eacute;senter des connaissances et raisonner</h3><p class="seq-topics">Logique propositionnelle, mod&egrave;les et cons&eacute;quence, r&eacute;solution, DPLL, logique des pr&eacute;dicats et limites de l'approche symbolique.</p><p class="seq-topics">2 figures interactives &middot; 2 images &middot; 4 algorithmes en annexe</p><div class="seq-actions"><a class="btn primary" href="lecons/07-logique/page.html">Ouvrir</a>
+<a class="btn" href="lecons/07-logique/algorithms.html">Annexe</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">Chapitre 8</div><h3>Raisonner quand l'information est incertaine</h3><p class="seq-topics">Probabilit&eacute;s, r&egrave;gle de Bayes, ind&eacute;pendance conditionnelle, classifieur na&iuml;f, r&eacute;seaux bay&eacute;siens et cha&icirc;nes de Markov.</p><p class="seq-topics">2 figures interactives &middot; 2 images &middot; 4 algorithmes en annexe</p><div class="seq-actions"><a class="btn primary" href="lecons/08-probabiliste/page.html">Ouvrir</a>
+<a class="btn" href="lecons/08-probabiliste/algorithms.html">Annexe</a>
+</div></div>
+</div></section>
+<section class="section"><h2 class="section-title">Partie IV &middot; Apprendre</h2>
+<p class="section-subtitle">Chapitres de cours, annexes sans code et exercices auto-not&eacute;s</p><div class="sequences">
+<div class="seq-card"><div class="seq-meta">Chapitre 9</div><h3>Apprendre &agrave; partir d'exemples</h3><p class="seq-topics">Risque empirique, plus proches voisins, r&eacute;gression, arbres de d&eacute;cision, sur-apprentissage et &eacute;valuation honn&ecirc;te.</p><p class="seq-topics">2 figures interactives &middot; 2 images &middot; 4 algorithmes en annexe</p><div class="seq-actions"><a class="btn primary" href="lecons/09-apprentissage/page.html">Ouvrir</a>
+<a class="btn" href="lecons/09-apprentissage/algorithms.html">Annexe</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">Chapitre 10</div><h3>Trouver de la structure sans &eacute;tiquettes</h3><p class="seq-topics">Partitionnement par k-moyennes, classification hi&eacute;rarchique, analyse en composantes principales et &eacute;valuation d'un partitionnement.</p><p class="seq-topics">2 figures interactives &middot; 2 images &middot; 4 algorithmes en annexe</p><div class="seq-actions"><a class="btn primary" href="lecons/10-non-supervise/page.html">Ouvrir</a>
+<a class="btn" href="lecons/10-non-supervise/algorithms.html">Annexe</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">Chapitre 11</div><h3>Du perceptron &agrave; l&#39;apprentissage profond</h3><p class="seq-topics">Neurone formel, perceptron et ses limites, r&eacute;seau multicouche, r&eacute;tropropagation, th&eacute;or&egrave;me d'approximation universelle, convolutions.</p><p class="seq-topics">2 figures interactives &middot; 2 images &middot; 4 algorithmes en annexe</p><div class="seq-actions"><a class="btn primary" href="lecons/11-reseaux-neurones/page.html">Ouvrir</a>
+<a class="btn" href="lecons/11-reseaux-neurones/algorithms.html">Annexe</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">Chapitre 12</div><h3>Apprendre en agissant</h3><p class="seq-topics">Processus de d&eacute;cision markovien, &eacute;quation de Bellman, it&eacute;ration sur les valeurs, Q-apprentissage, exploration contre exploitation.</p><p class="seq-topics">2 figures interactives &middot; 2 images &middot; 4 algorithmes en annexe</p><div class="seq-actions"><a class="btn primary" href="lecons/12-renforcement/page.html">Ouvrir</a>
+<a class="btn" href="lecons/12-renforcement/algorithms.html">Annexe</a>
+</div></div>
+</div></section>
+<section class="section"><h2 class="section-title">Partie V &middot; Aujourd&#39;hui</h2>
+<p class="section-subtitle">Chapitres de cours, annexes sans code et exercices auto-not&eacute;s</p><div class="sequences">
+<div class="seq-card"><div class="seq-meta">Chapitre 13</div><h3>Mod&egrave;les g&eacute;n&eacute;ratifs et grands mod&egrave;les de langue</h3><p class="seq-topics">Mod&eacute;liser une distribution, autoencodeurs variationnels, mod&egrave;les adverses, diffusion, attention et transformeurs.</p><p class="seq-topics">2 figures interactives &middot; 2 images &middot; 4 algorithmes en annexe</p><div class="seq-actions"><a class="btn primary" href="lecons/13-generative/page.html">Ouvrir</a>
+<a class="btn" href="lecons/13-generative/algorithms.html">Annexe</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">Chapitre 14</div><h3>Biais, explicabilit&eacute; et responsabilit&eacute;</h3><p class="seq-topics">D'o&ugrave; viennent les biais, quelles d&eacute;finitions d'&eacute;quit&eacute; sont incompatibles, comment expliquer une d&eacute;cision, quel co&ucirc;t environnemental, quelle r&eacute;gulation.</p><p class="seq-topics">2 figures interactives &middot; 2 images &middot; 4 proc&eacute;dures en annexe</p><div class="seq-actions"><a class="btn primary" href="lecons/14-ethique/page.html">Ouvrir</a>
+<a class="btn" href="lecons/14-ethique/algorithms.html">Annexe</a>
+</div></div>
+</div></section>
+<section class="section"><h2 class="section-title">Comment travailler ce manuel</h2><p class="section-subtitle">Trois passages successifs sur chaque chapitre</p><div class="quick-access"><a class="qa-card" href="lecons/00-introduction/page.html"><span class="qa-label">1</span><span class="qa-title">Lire</span><span class="qa-sub">manipuler chaque figure interactive avant de passer &agrave; la suite</span></a><a class="qa-card" href="lecons/03-recherche/algorithms.html"><span class="qa-label">2</span><span class="qa-title">D&eacute;rouler &agrave; la main</span><span class="qa-sub">refaire les tableaux de l'annexe sur papier, sans regarder</span></a><a class="qa-card" href="lecons/09-apprentissage/page.html"><span class="qa-label">3</span><span class="qa-title">Programmer</span><span class="qa-sub">traiter les exercices auto-not&eacute;s du chapitre</span></a></div><p class="section-subtitle">Les chapitres de cours ne contiennent aucun programme : les algorithmes y sont donn&eacute;s en pseudo-code, ind&eacute;pendant de tout langage. La programmation effective a lieu dans les exercices.</p></section>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+</body></html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 13 &mdash; Annexe algorithmique</title>
+<meta name="description" content="Echantillonnage, attention, entrainement adverse, perplexite.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Chapitre 13 &middot; Annexe</div>
+<h1>Les mod&egrave;les g&eacute;n&eacute;ratifs, pas &agrave; pas</h1>
+<div class="lesson-sub">Quatre proc&eacute;dures d&eacute;crites en fran&ccedil;ais, avec un exemple chiffr&eacute; v&eacute;rifiable pour chacune.</div>
+</div></section>
+<main class="lesson-content">
+<div class="box tip"><div class="box-title">Comment lire cette annexe</div>Aucune ligne de programme, aucune formule inutile : chaque proc&eacute;dure est pr&eacute;sent&eacute;e comme on l'ex&eacute;cuterait &agrave; la main. <a href="page.html">Retour au chapitre</a>.</div>
+<div class="annex-toc">
+<a href="#m1">1. &Eacute;chantillonnage autor&eacute;gressif</a>
+<a href="#m2">2. Le calcul de l'attention</a>
+<a href="#m3">3. Entra&icirc;nement adverse</a>
+<a href="#m4">4. Mesurer la perplexit&eacute;</a>
+</div>
+<p>Les deux premi&egrave;res proc&eacute;dures d&eacute;crivent comment un mod&egrave;le de s&eacute;quence produit et comment il regarde son contexte ; la troisi&egrave;me expose une fa&ccedil;on radicalement diff&eacute;rente d'apprendre &agrave; produire ; la quatri&egrave;me donne la seule mesure objective dont on dispose. Toutes sont ind&eacute;pendantes de la taille du mod&egrave;le : elles valent pour un mod&egrave;le de 260 caract&egrave;res comme pour un mod&egrave;le de plusieurs centaines de milliards de param&egrave;tres.</p>
+<figure class="viz"><div class="viz-title">L'attention, calcul&eacute;e ligne &agrave; ligne</div><svg viewBox="0 0 760 298" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">L'attention, calcul&eacute;e sur trois positions</text><text x="90" y="58" style="fill:var(--color-text);font-size:13px;font-family:inherit;">requ&ecirc;te (1 ; 0)</text><text x="230" y="58" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">cl&eacute;</text><text x="350" y="58" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">produit scalaire</text><text x="480" y="58" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">divis&eacute; par \(\sqrt{2}\)</text><text x="600" y="58" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">exponentielle</text><text x="700" y="58" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">poids</text><text x="90" y="92" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">position 1</text><text x="230" y="92" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">(1 ; 0)</text><text x="350" y="92" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">1.00</text><text x="480" y="92" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0.707</text><text x="600" y="92" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">2.028</text><text x="700" y="92" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0.434</text><rect x="30" y="80" width="47.74" height="14" rx="3" style="fill:var(--primary);fill-opacity:0.75;"/><text x="90" y="138" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">position 2</text><text x="230" y="138" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">(0 ; 1)</text><text x="350" y="138" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0.00</text><text x="480" y="138" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0.000</text><text x="600" y="138" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">1.000</text><text x="700" y="138" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0.214</text><rect x="30" y="126" width="23.54" height="14" rx="3" style="fill:var(--primary);fill-opacity:0.75;"/><text x="90" y="184" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">position 3</text><text x="230" y="184" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">(0,7 ; 0,7)</text><text x="350" y="184" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0.70</text><text x="480" y="184" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0.495</text><text x="600" y="184" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">1.640</text><text x="700" y="184" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0.351</text><rect x="30" y="172" width="38.61" height="14" rx="3" style="fill:var(--primary);fill-opacity:0.75;"/><path d="M 24 68 L 736 68" style="fill:none;stroke:var(--color-rule);stroke-width:1.4;"/><text x="700" y="230" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;font-family:inherit;">total 1,000</text><text x="380" y="266" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">La division par \(\sqrt{d_k}\) emp&ecirc;che l'exponentielle de saturer : sans elle, les poids seraient 0,474, 0,174 et 0,351,</text><text x="380" y="284" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">nettement plus tranch&eacute;s.</text></svg><figcaption class="viz-caption"><strong>Figure A.1.</strong> Le d&eacute;roul&eacute; complet du deuxi&egrave;me algorithme. La barre de gauche donne le poids final ; leur somme vaut exactement 1, ce qui justifie le mot &laquo; attention &raquo;.</figcaption></figure>
+<h2 id="m1">1. Engendrer &eacute;l&eacute;ment par &eacute;l&eacute;ment</h2>
+<div class="algo-tag">m&eacute;thode s&eacute;quentielle &middot; une d&eacute;cision &agrave; la fois</div>
+<p><strong>But.</strong> Produire une s&eacute;quence nouvelle et plausible, en ne sachant faire qu'une seule chose : pr&eacute;dire l'&eacute;l&eacute;ment qui vient apr&egrave;s.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : un mod&egrave;le qui, &agrave; partir de ce qui pr&eacute;c&egrave;de, donne une probabilit&eacute; &agrave; chaque &eacute;l&eacute;ment possible ; un d&eacute;but de s&eacute;quence ; une longueur ; une temp&eacute;rature.<br>
+<strong>Sortie</strong> : une s&eacute;quence compl&egrave;te.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Partir du d&eacute;but fourni</strong>, &eacute;ventuellement vide.</li>
+<li><strong>Demander au mod&egrave;le la probabilit&eacute; de chaque &eacute;l&eacute;ment suivant</strong>, compte tenu de tout ce qui pr&eacute;c&egrave;de.</li>
+<li><strong>Modifier ces probabilit&eacute;s par la temp&eacute;rature</strong> : diviser les scores par elle avant de normaliser. Une temp&eacute;rature basse creuse les &eacute;carts, une temp&eacute;rature haute les aplatit.</li>
+<li><strong>Tirer un &eacute;l&eacute;ment au hasard</strong> selon cette r&eacute;partition &mdash; et non prendre le plus probable, sauf si l'on veut un texte r&eacute;p&eacute;titif.</li>
+<li><strong>L'ajouter &agrave; la s&eacute;quence</strong> et recommencer &agrave; l'&eacute;tape 2. Le mod&egrave;le conditionne d&eacute;sormais sur sa propre production : c'est ce qui fait qu'une erreur pr&eacute;coce se propage.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Un mod&egrave;le donne quatre continuations possibles avec les probabilit&eacute;s 0,50 ; 0,30 ; 0,15 et 0,05. Voici ce que la temp&eacute;rature en fait.</p>
+<table><thead><tr><th>Temp&eacute;rature</th><th>Probabilit&eacute;s recalcul&eacute;es</th><th>Effet</th></tr></thead><tbody>
+<tr><td>0,5</td><td>0,68 &middot; 0,25 &middot; 0,06 &middot; 0,01</td><td>presque toujours le premier choix</td></tr>
+<tr><td>1,0</td><td>0,50 &middot; 0,30 &middot; 0,15 &middot; 0,05</td><td>distribution inchang&eacute;e</td></tr>
+<tr><td>2,0</td><td>0,38 &middot; 0,29 &middot; 0,21 &middot; 0,12</td><td>les choix rares deviennent fr&eacute;quents</td></tr>
+<tr><td>tendant vers 0</td><td>1 &middot; 0 &middot; 0 &middot; 0</td><td>choix d&eacute;terministe du maximum</td></tr>
+</tbody></table>
+<p>Les valeurs de la troisi&egrave;me ligne s'obtiennent en &eacute;levant chaque probabilit&eacute; &agrave; la puissance un demi puis en renormalisant. Notez que la temp&eacute;rature ne change <em>rien</em> au mod&egrave;le : c'est un r&eacute;glage de lecture, appliqu&eacute; apr&egrave;s coup. Deux textes tr&egrave;s diff&eacute;rents peuvent venir du m&ecirc;me mod&egrave;le.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Il n'y a pas de correction &agrave; d&eacute;montrer : la proc&eacute;dure &eacute;chantillonne exactement la distribution que le mod&egrave;le d&eacute;finit, &agrave; la temp&eacute;rature pr&egrave;s. La question de qualit&eacute; porte enti&egrave;rement sur le mod&egrave;le, jamais sur l'&eacute;chantillonnage. La d&eacute;composition en cha&icirc;ne qui la fonde est une identit&eacute; exacte, sans aucune approximation.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> La longueur est fix&eacute;e d'avance, ou l'on s'arr&ecirc;te sur un &eacute;l&eacute;ment de fin. Sans crit&egrave;re d'arr&ecirc;t, la proc&eacute;dure ne se termine pas.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Une &eacute;valuation du mod&egrave;le par &eacute;l&eacute;ment produit. C'est le d&eacute;faut central : la production est <em>s&eacute;quentielle</em> et ne se parall&eacute;lise pas, alors que l'entra&icirc;nement, lui, traite toute la s&eacute;quence d'un coup.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Prendre syst&eacute;matiquement l'&eacute;l&eacute;ment le plus probable : le texte tombe dans des boucles r&eacute;p&eacute;titives. Une temp&eacute;rature trop haute : la s&eacute;quence se d&eacute;sagr&egrave;ge. Oublier que le mod&egrave;le conditionne sur sa propre production, ce qui fait qu'une d&eacute;rive pr&eacute;coce ne se rattrape jamais. Et attribuer au mod&egrave;le une intention : il &eacute;value une vraisemblance, il ne vise rien.</p>
+<h2 id="m2">2. Le calcul de l'attention</h2>
+<div class="algo-tag">m&eacute;canisme de calcul &middot; moyenne pond&eacute;r&eacute;e</div>
+<p><strong>But.</strong> Permettre &agrave; chaque position d'une s&eacute;quence d'aller chercher l'information dont elle a besoin dans n'importe quelle autre position, quelle que soit la distance.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : une repr&eacute;sentation num&eacute;rique de chaque position de la s&eacute;quence.<br>
+<strong>Sortie</strong> : une nouvelle repr&eacute;sentation de chaque position, enrichie du contexte.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Produire trois vecteurs par position</strong> : ce qu'elle cherche, ce par quoi on peut la trouver, et ce qu'elle transmet. Les trois s'obtiennent par trois transformations lin&eacute;aires apprises de la m&ecirc;me repr&eacute;sentation.</li>
+<li><strong>Mesurer la pertinence de chaque position pour chaque autre</strong> par le produit scalaire entre ce que l'une cherche et ce par quoi l'autre se trouve.</li>
+<li><strong>Diviser par la racine carr&eacute;e de la dimension.</strong> Sans cette division, les produits scalaires croissent avec la dimension et l'exponentielle normalis&eacute;e sature : toute l'attention se porterait sur une seule position.</li>
+<li><strong>Normaliser par l'exponentielle</strong> pour obtenir une r&eacute;partition qui somme &agrave; un : c'est ce qui justifie le mot &laquo; attention &raquo;.</li>
+<li><strong>Faire la moyenne des vecteurs transmis</strong>, pond&eacute;r&eacute;e par ces poids.</li>
+<li><strong>R&eacute;p&eacute;ter avec plusieurs jeux de transformations en parall&egrave;le</strong> : chaque &laquo; t&ecirc;te &raquo; peut alors se sp&eacute;cialiser sur un type de relation diff&eacute;rent.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Trois positions, des vecteurs &agrave; deux composantes. La position 2 cherche (1 ; 0). Les cl&eacute;s sont (1 ; 0), (0 ; 1) et (0,7 ; 0,7).</p>
+<table><thead><tr><th>Position</th><th>Cl&eacute;</th><th>Produit scalaire</th><th>Divis&eacute; par racine de 2</th><th>Exponentielle</th><th>Poids</th></tr></thead><tbody>
+<tr><td>1</td><td>(1 ; 0)</td><td>1,00</td><td>0,707</td><td>2,028</td><td>0,434</td></tr>
+<tr><td>2</td><td>(0 ; 1)</td><td>0,00</td><td>0,000</td><td>1,000</td><td>0,214</td></tr>
+<tr><td>3</td><td>(0,7 ; 0,7)</td><td>0,70</td><td>0,495</td><td>1,640</td><td>0,351</td></tr>
+<tr><td><strong>Total</strong></td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>4,669</td><td><strong>1,000</strong></td></tr>
+</tbody></table>
+<p>La sortie est la moyenne des trois vecteurs transmis, pond&eacute;r&eacute;e par 0,434, 0,214 et 0,351. Sans la division par la racine de 2, les poids seraient 0,474, 0,174 et 0,351 : plus tranch&eacute;s. En dimension 512, l'&eacute;cart devient &eacute;norme et l'attention d&eacute;g&eacute;n&egrave;re en s&eacute;lection dure.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Le calcul est exact et sans hypoth&egrave;se : c'est une moyenne pond&eacute;r&eacute;e. La question de correction ne se pose pas ; celle d'interpr&eacute;tation, si. Les poids d'attention sont souvent lus comme une explication du raisonnement du mod&egrave;le, et cette lecture est abusive : on peut modifier substantiellement les poids sans changer la pr&eacute;diction, ce qui interdit d'y voir la cause de celle-ci.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Un nombre fini d'op&eacute;rations matricielles.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Le carr&eacute; de la longueur de la s&eacute;quence, en temps comme en m&eacute;moire : chaque position est compar&eacute;e &agrave; toutes les autres. C'est la limite structurelle des transformeurs, et la raison pour laquelle doubler la longueur de contexte quadruple le co&ucirc;t.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Oublier la division par la racine de la dimension. Oublier le masquage sur une t&acirc;che de production : le mod&egrave;le verrait alors les positions futures et apprendrait &agrave; tricher, avec des r&eacute;sultats d'entra&icirc;nement excellents et une production inutilisable. Et pr&eacute;senter les cartes d'attention comme des explications.</p>
+<h2 id="m3">3. L'entra&icirc;nement adverse</h2>
+<div class="algo-tag">m&eacute;thode &agrave; deux joueurs &middot; &eacute;quilibre plut&ocirc;t que minimum</div>
+<p><strong>But.</strong> Apprendre &agrave; produire des exemples indiscernables des vrais, sans jamais d&eacute;finir explicitement ce que &laquo; ressembler &agrave; un vrai &raquo; veut dire.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : un jeu d'exemples r&eacute;els, deux r&eacute;seaux &mdash; un producteur et un juge.<br>
+<strong>Sortie</strong> : un producteur capable d'engendrer des exemples nouveaux.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Tirer du bruit au hasard</strong> et le faire transformer par le producteur : on obtient un faux.</li>
+<li><strong>Pr&eacute;senter au juge un m&eacute;lange de vrais et de faux</strong>, et l'entra&icirc;ner &agrave; les distinguer. C'est un simple probl&egrave;me de classification, du chapitre 9.</li>
+<li><strong>Entra&icirc;ner le producteur &agrave; tromper le juge</strong>, en propageant le gradient &agrave; travers le juge. Le producteur ne voit jamais un seul exemple r&eacute;el : il n'apprend qu'&agrave; travers les r&eacute;actions du juge.</li>
+<li><strong>Alterner les deux</strong>, sans jamais laisser l'un l'emporter trop nettement. Un juge parfait ne transmet plus aucun gradient utile ; un juge nul n'apprend rien au producteur.</li>
+<li><strong>S'arr&ecirc;ter &agrave; l'&oelig;il</strong> : il n'existe pas de mesure fiable de convergence, puisque la fonction optimis&eacute;e change &agrave; chaque pas.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Quatre situations typiques, et ce que la valeur produite par le juge indique.</p>
+<table><thead><tr><th>Situation</th><th>Le juge dit des faux</th><th>Diagnostic</th><th>Que faire</th></tr></thead><tbody>
+<tr><td>d&eacute;but normal</td><td>0,2 &agrave; 0,4</td><td>le juge distingue, le producteur apprend</td><td>continuer</td></tr>
+<tr><td>juge trop fort</td><td>moins de 0,05</td><td>gradient nul, le producteur n'apprend plus</td><td>ralentir le juge ou lisser ses cibles</td></tr>
+<tr><td>juge trop faible</td><td>environ 0,5 d&egrave;s le d&eacute;but</td><td>il ne distingue rien, aucun signal</td><td>renforcer le juge</td></tr>
+<tr><td>effondrement des modes</td><td>environ 0,5 mais sorties identiques</td><td>le producteur a trouv&eacute; une sortie qui trompe et s'y tient</td><td>diversifier le bruit, p&eacute;naliser la ressemblance entre sorties</td></tr>
+</tbody></table>
+<p>La quatri&egrave;me ligne est le mode d'&eacute;chec le plus caract&eacute;ristique, et le plus trompeur : toutes les mesures num&eacute;riques semblent bonnes, et le producteur produit dix fois la m&ecirc;me image. Aucun indicateur scalaire ne le d&eacute;tecte ; il faut regarder les sorties.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> On d&eacute;montre qu'&agrave; l'&eacute;quilibre th&eacute;orique, avec un juge optimal et une capacit&eacute; infinie, la distribution produite co&iuml;ncide exactement avec la vraie. Cet &eacute;quilibre est un <em>point selle</em>, et non un minimum : les m&eacute;thodes de gradient n'y convergent pas en g&eacute;n&eacute;ral. La th&eacute;orie dit o&ugrave; l'on voudrait aller, pas qu'on y arrive.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Aucune. On fixe un nombre d'it&eacute;rations et l'on inspecte les sorties. C'est l'une des rares m&eacute;thodes de ce manuel dont on ne sait pas mesurer le succ&egrave;s autrement qu'en regardant.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Deux r&eacute;seaux entra&icirc;n&eacute;s simultan&eacute;ment, donc environ le double d'un entra&icirc;nement ordinaire, avec une sensibilit&eacute; extr&ecirc;me aux r&eacute;glages.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> D&eacute;s&eacute;quilibrer les deux r&eacute;seaux dans un sens ou dans l'autre. Juger la qualit&eacute; sur la valeur de la perte, qui ne veut rien dire ici puisque l'objectif bouge. Ne regarder que quelques sorties, ce qui masque l'effondrement des modes. Et supposer qu'un mod&egrave;le adverse permet de calculer une vraisemblance : il ne le permet pas, et ne peut donc pas servir &agrave; d&eacute;tecter l'anormal.</p>
+<h2 id="m4">4. Mesurer la perplexit&eacute; d'un mod&egrave;le de langue</h2>
+<div class="algo-tag">proc&eacute;dure d'&eacute;valuation &middot; une mesure interpr&eacute;table</div>
+<p><strong>But.</strong> Comparer objectivement deux mod&egrave;les de langue, sans juger la qualit&eacute; des textes &agrave; l'&oelig;il.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : un mod&egrave;le et un corpus de test qu'il n'a jamais vu.<br>
+<strong>Sortie</strong> : un nombre, interpr&eacute;table comme un nombre moyen de choix &eacute;quiprobables.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Parcourir le corpus de test</strong> &eacute;l&eacute;ment par &eacute;l&eacute;ment.</li>
+<li><strong>Pour chacun, relever la probabilit&eacute; que le mod&egrave;le lui attribuait</strong> avant de le voir, compte tenu de ce qui pr&eacute;c&eacute;dait.</li>
+<li><strong>Prendre le logarithme de cette probabilit&eacute;</strong> et en faire la moyenne sur tout le corpus. On travaille en logarithmes pour &eacute;viter que le produit de milliers de probabilit&eacute;s ne s'annule num&eacute;riquement.</li>
+<li><strong>Prendre l'exponentielle de l'oppos&eacute; de cette moyenne.</strong> Le r&eacute;sultat se lit comme un nombre de choix : une perplexit&eacute; de 4 signifie que le mod&egrave;le h&eacute;site en moyenne comme s'il avait 4 possibilit&eacute;s &eacute;quiprobables.</li>
+<li><strong>Comparer &agrave; deux rep&egrave;res</strong> : la taille de l'alphabet, qui est la perplexit&eacute; d'un mod&egrave;le qui ne sait rien, et la perplexit&eacute; d'un mod&egrave;le plus simple.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Un mod&egrave;le &agrave; deux caract&egrave;res sur un alphabet de 22 symboles. On &eacute;value quatre variantes sur le m&ecirc;me corpus, en faisant varier le lissage.</p>
+<table><thead><tr><th>Lissage</th><th>Perplexit&eacute;</th><th>Interpr&eacute;tation</th></tr></thead><tbody>
+<tr><td>0,05</td><td>4,11</td><td>le mod&egrave;le h&eacute;site comme entre 4 choix, au lieu de 22</td></tr>
+<tr><td>0,10</td><td>4,36</td><td>l&eacute;g&egrave;rement moins s&ucirc;r, mais plus robuste aux mots inconnus</td></tr>
+<tr><td>0,50</td><td>5,87</td><td>le lissage commence &agrave; effacer ce qui a &eacute;t&eacute; appris</td></tr>
+<tr><td>2,00</td><td>9,22</td><td>le mod&egrave;le a presque oubli&eacute; le corpus</td></tr>
+<tr><td>mod&egrave;le uniforme</td><td>22,00</td><td>aucune connaissance : la perplexit&eacute; vaut la taille de l'alphabet</td></tr>
+</tbody></table>
+<p>Un lissage trop faible donne la meilleure perplexit&eacute; sur le corpus d'entra&icirc;nement et la pire sur un texte nouveau, o&ugrave; le moindre encha&icirc;nement jamais vu donne une probabilit&eacute; nulle, donc une perplexit&eacute; infinie. C'est exactement le sur-apprentissage du chapitre 9, sous une autre mesure.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> La perplexit&eacute; est l'exponentielle de l'entropie crois&eacute;e : elle mesure combien de bits il faudrait en moyenne pour coder le corpus avec le mod&egrave;le. C'est une quantit&eacute; bien d&eacute;finie et comparable, &agrave; condition que le d&eacute;coupage en &eacute;l&eacute;ments soit identique &mdash; comparer une perplexit&eacute; par caract&egrave;re et une perplexit&eacute; par mot n'a aucun sens.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Un parcours du corpus de test.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Une &eacute;valuation du mod&egrave;le par &eacute;l&eacute;ment du corpus.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Comparer des perplexit&eacute;s calcul&eacute;es sur des d&eacute;coupages ou des corpus diff&eacute;rents. &Eacute;valuer sur un corpus qui figure dans les donn&eacute;es d'entra&icirc;nement, ce qui est devenu tr&egrave;s difficile &agrave; exclure pour les grands mod&egrave;les. Et surtout, conclure d'une bonne perplexit&eacute; que le mod&egrave;le dit vrai : elle mesure la capacit&eacute; &agrave; pr&eacute;voir le texte, pas sa v&eacute;racit&eacute;. Un mod&egrave;le entra&icirc;n&eacute; sur des textes faux obtiendra une excellente perplexit&eacute; sur d'autres textes faux.</p>
+<nav class="lesson-nav"><div class="container">
+<a href="page.html">&larr; Retour au chapitre 13</a>
+<a href="../../index.html">Sommaire du manuel</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+</body></html>

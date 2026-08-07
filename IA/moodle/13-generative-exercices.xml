@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Temperature et echantillonnage</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;ECHANTILLONNAGE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;La temperature ne change rien au modele : c'est un reglage de lecture applique apres coup sur ses probabilites.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;temperer(p, T)&lt;/code&gt;&lt;/strong&gt; qui renvoie la liste des probabilites obtenues en elevant chaque valeur a la puissance &lt;code&gt;1/T&lt;/code&gt; puis en normalisant, arrondies a 4 decimales. Si &lt;code&gt;T&lt;/code&gt; vaut 0, renvoyer une distribution qui met 1 sur le maximum (plus petit indice a egalite) et 0 ailleurs. Ecrire &lt;strong&gt;&lt;code&gt;tirer(p, u)&lt;/code&gt;&lt;/strong&gt; qui renvoie l'indice tire par la methode de la fonction de repartition : le plus petit &lt;code&gt;i&lt;/code&gt; tel que la somme cumulee des &lt;code&gt;p[0..i]&lt;/code&gt; soit superieure ou egale a &lt;code&gt;u&lt;/code&gt;.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;temperer([0.5, 0.3, 0.15, 0.05], 0.5) &amp;rarr; [0.6849, 0.2466, 0.0616, 0.0068]&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def temperer(p, T):
+    # T = 0 : distribution deterministe sur le maximum
+    # sinon : elever a la puissance 1/T, puis normaliser
+    ...
+
+def tirer(p, u):
+    # parcourir en cumulant jusqu a depasser u
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def temperer(p, T):
+    if T == 0:
+        best = 0
+        for i in range(1, len(p)):
+            if p[i] &gt; p[best]:
+                best = i
+        return [1.0 if i == best else 0.0 for i in range(len(p))]
+    q = [x ** (1.0 / T) for x in p]
+    s = sum(q)
+    return [round(x / s, 4) for x in q]
+
+def tirer(p, u):
+    cumul = 0.0
+    for i, x in enumerate(p):
+        cumul += x
+        if u &lt;= cumul:
+            return i
+    return len(p) - 1
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(temperer([0.5, 0.3, 0.15, 0.05], 0.5))
+</text></testcode><stdin><text /></stdin><expected><text>[0.6849, 0.2466, 0.0616, 0.0068]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(temperer([0.5, 0.3, 0.15, 0.05], 1.0))
+print(temperer([0.5, 0.3, 0.15, 0.05], 2.0))
+</text></testcode><stdin><text /></stdin><expected><text>[0.5, 0.3, 0.15, 0.05]
+[0.379, 0.2936, 0.2076, 0.1198]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(temperer([0.5, 0.3, 0.15, 0.05], 0))
+</text></testcode><stdin><text /></stdin><expected><text>[1.0, 0.0, 0.0, 0.0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>p = [0.5, 0.3, 0.2]
+print([tirer(p, u) for u in (0.0, 0.4, 0.5, 0.7, 0.9, 1.0)])
+</text></testcode><stdin><text /></stdin><expected><text>[0, 0, 0, 1, 2, 2]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(temperer([0.25, 0.25, 0.25, 0.25], 0), temperer([1.0], 1.0))
+</text></testcode><stdin><text /></stdin><expected><text>[1.0, 0.0, 0.0, 0.0] [1.0]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Attention par produit scalaire</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;ATTENTION&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Produit scalaire, mise a l'echelle par la racine de la dimension, exponentielle normalisee, moyenne ponderee.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Avec NumPy, ecrire &lt;strong&gt;&lt;code&gt;attention(Q, K, V)&lt;/code&gt;&lt;/strong&gt; qui renvoie le couple &lt;code&gt;(sortie, poids)&lt;/code&gt;. &lt;code&gt;poids&lt;/code&gt; est la matrice des poids d'attention, chaque ligne sommant a 1. Diviser les produits scalaires par la racine carree de la dimension des cles avant l'exponentielle. Retrancher le maximum de chaque ligne avant l'exponentielle pour eviter tout debordement.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;Trois positions, une requete (1;0) : les poids valent [0.4344, 0.2142, 0.3514].&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def attention(Q, K, V):
+    # scores = Q . K transposee, divises par la racine de la dimension
+    # retrancher le maximum par ligne AVANT l exponentielle
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def attention(Q, K, V):
+    d = K.shape[-1]
+    scores = (Q @ K.T) / np.sqrt(d)
+    scores = scores - scores.max(axis=-1, keepdims=True)
+    e = np.exp(scores)
+    poids = e / e.sum(axis=-1, keepdims=True)
+    return (poids @ V, poids)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+Q = np.array([[1.0, 0.0]])
+K = np.array([[1.0, 0.0], [0.0, 1.0], [0.7, 0.7]])
+V = np.eye(3)
+s, p = attention(Q, K, V)
+print(np.round(p.ravel(), 4))
+</text></testcode><stdin><text /></stdin><expected><text>[0.4344 0.2142 0.3514]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+Q = np.eye(3); K = np.eye(3); V = np.arange(9.0).reshape(3, 3)
+s, p = attention(Q, K, V)
+print(np.round(p.sum(axis=1), 6))
+</text></testcode><stdin><text /></stdin><expected><text>[1. 1. 1.]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+Q = np.zeros((1, 4)); K = np.zeros((5, 4)); V = np.ones((5, 2))
+s, p = attention(Q, K, V)
+print(np.round(p.ravel(), 4), np.round(s.ravel(), 4))
+</text></testcode><stdin><text /></stdin><expected><text>[0.2 0.2 0.2 0.2 0.2] [1. 1.]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+Q = np.array([[1000.0, 0.0]])
+K = np.array([[1000.0, 0.0], [0.0, 1000.0]])
+V = np.array([[1.0], [0.0]])
+s, p = attention(Q, K, V)
+print(np.isfinite(p).all(), np.round(s.ravel(), 4))
+</text></testcode><stdin><text /></stdin><expected><text>True [1.]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+Q = np.array([[1.0]]); K = np.array([[1.0]]); V = np.array([[7.0]])
+print(np.round(attention(Q, K, V)[0].ravel(), 4))
+</text></testcode><stdin><text /></stdin><expected><text>[7.]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — Modele bigramme et perplexite</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;PERPLEXITE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;La perplexite est l'exponentielle de l'entropie croisee : elle se lit comme un nombre moyen de choix equiprobables.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;apprendre(corpus, lissage)&lt;/code&gt;&lt;/strong&gt; qui renvoie le couple &lt;code&gt;(alphabet, table)&lt;/code&gt;, ou &lt;code&gt;alphabet&lt;/code&gt; est la liste triee des caracteres et &lt;code&gt;table[a][b]&lt;/code&gt; la probabilite lissee de &lt;code&gt;b&lt;/code&gt; apres &lt;code&gt;a&lt;/code&gt;. Si aucune transition n'a ete observee depuis &lt;code&gt;a&lt;/code&gt; et que le lissage est nul, prendre la loi uniforme. Ecrire &lt;strong&gt;&lt;code&gt;perplexite(texte, alphabet, table)&lt;/code&gt;&lt;/strong&gt; qui renvoie la perplexite sur les transitions de &lt;code&gt;texte&lt;/code&gt;, arrondie a 4 decimales ; renvoyer &lt;code&gt;0.0&lt;/code&gt; si le texte compte moins de deux caracteres.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;Un modele sans connaissance sur un alphabet de 22 caracteres a une perplexite de 22.&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>from math import exp, log
+
+def apprendre(corpus, lissage):
+    # compter les transitions, ajouter le lissage, normaliser par ligne
+    ...
+
+def perplexite(texte, alphabet, table):
+    # moyenne des moins logarithmes, puis exponentielle
+    # une probabilite nulle donne une perplexite infinie
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>from math import exp, log
+
+def apprendre(corpus, lissage):
+    alphabet = sorted(set(corpus))
+    n = len(alphabet)
+    comptes = {a: {b: 0 for b in alphabet} for a in alphabet}
+    for i in range(len(corpus) - 1):
+        comptes[corpus[i]][corpus[i + 1]] += 1
+    table = {}
+    for a in alphabet:
+        total = sum(comptes[a].values()) + lissage * n
+        if total == 0:
+            table[a] = {b: 1.0 / n for b in alphabet}   # aucune transition observee
+        else:
+            table[a] = {b: (comptes[a][b] + lissage) / total for b in alphabet}
+    return (alphabet, table)
+
+def perplexite(texte, alphabet, table):
+    if len(texte) &lt; 2:
+        return 0.0
+    somme, n = 0.0, 0
+    for i in range(len(texte) - 1):
+        a, b = texte[i], texte[i + 1]
+        p = table.get(a, {}).get(b, 0.0)
+        if p &lt;= 0:
+            return float('inf')
+        somme += -log(p)
+        n += 1
+    return round(exp(somme / n), 4)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>alpha, T = apprendre('abab', 1.0)
+print(alpha, round(T['a']['b'], 4), round(T['a']['a'], 4))
+</text></testcode><stdin><text /></stdin><expected><text>['a', 'b'] 0.75 0.25
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>alpha, T = apprendre('abab', 0.0)
+print(perplexite('abab', alpha, T))
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>alpha, T = apprendre('abcd' * 5, 1.0)
+print(perplexite('abcd', alpha, T))
+</text></testcode><stdin><text /></stdin><expected><text>1.5
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>alpha, T = apprendre('ab', 0.0)
+print(perplexite('ba', alpha, T))
+</text></testcode><stdin><text /></stdin><expected><text>2.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>alpha, T = apprendre('abcd', 1.0)
+print(perplexite('a', alpha, T))
+</text></testcode><stdin><text /></stdin><expected><text>0.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

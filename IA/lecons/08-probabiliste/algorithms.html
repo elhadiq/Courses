@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 8 &mdash; Annexe algorithmique</title>
+<meta name="description" content="Bayes, inference par enumeration, classifieur naif, filtrage.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Chapitre 8 &middot; Annexe</div>
+<h1>Le raisonnement probabiliste, pas &agrave; pas</h1>
+<div class="lesson-sub">Quatre proc&eacute;dures d&eacute;crites en fran&ccedil;ais, avec un exemple chiffr&eacute; v&eacute;rifiable &agrave; la calculatrice pour chacune.</div>
+</div></section>
+<main class="lesson-content">
+<div class="box tip"><div class="box-title">Comment lire cette annexe</div>Aucune ligne de programme, aucune formule inutile : chaque proc&eacute;dure est pr&eacute;sent&eacute;e comme on l'ex&eacute;cuterait &agrave; la main. <a href="page.html">Retour au chapitre</a>.</div>
+<div class="annex-toc">
+<a href="#i1">1. R&eacute;viser une croyance</a>
+<a href="#i2">2. Inf&eacute;rence par &eacute;num&eacute;ration</a>
+<a href="#i3">3. Classifieur na&iuml;f</a>
+<a href="#i4">4. Filtrage dans une cha&icirc;ne</a>
+</div>
+<p>Ces quatre proc&eacute;dures r&eacute;pondent &agrave; la m&ecirc;me question sous des formes de plus en plus riches : que dois-je croire, maintenant que j'ai observ&eacute; ceci ? La premi&egrave;re traite une hypoth&egrave;se et une observation ; la deuxi&egrave;me un r&eacute;seau entier ; la troisi&egrave;me des milliers de caract&eacute;ristiques au prix d'une hypoth&egrave;se fausse ; la quatri&egrave;me ajoute le temps.</p>
+<figure class="viz"><div class="viz-title">Le d&eacute;pistage, en effectifs</div><svg viewBox="0 0 760 330" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Le d&eacute;pistage, en effectifs plut&ocirc;t qu'en pourcentages</text><path d="M 146 150 L 274 92" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><text x="210" y="116" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">0,1 %</text><path d="M 146 150 L 274 216" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><text x="210" y="178" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">99,9 %</text><path d="M 386 92 L 524 60" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><text x="455" y="71" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">99 %</text><path d="M 386 92 L 524 124" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><text x="455" y="103" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">1 %</text><path d="M 386 216 L 524 190" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><text x="455" y="198" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">5 %</text><path d="M 386 216 L 524 254" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><text x="455" y="230" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">95 %</text><rect x="34" y="127" width="112" height="46" rx="7" style="fill:var(--primary);fill-opacity:0.18;stroke:var(--primary);stroke-width:2;"/><text x="90" y="147" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">100 000</text><text x="90" y="163" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">personnes</text><rect x="274" y="69" width="112" height="46" rx="7" style="fill:var(--viz-bad);fill-opacity:0.18;stroke:var(--viz-bad);stroke-width:2;"/><text x="330" y="89" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">100</text><text x="330" y="105" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">malades</text><rect x="274" y="193" width="112" height="46" rx="7" style="fill:var(--viz-ref);fill-opacity:0.18;stroke:var(--viz-ref);stroke-width:2;"/><text x="330" y="213" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">99 900</text><text x="330" y="229" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">sains</text><rect x="524" y="37" width="112" height="46" rx="7" style="fill:var(--viz-ok);fill-opacity:0.18;stroke:var(--viz-ok);stroke-width:2;"/><text x="580" y="57" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">99</text><text x="580" y="73" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">test positif</text><rect x="524" y="101" width="112" height="46" rx="7" style="fill:var(--viz-ref);fill-opacity:0.18;stroke:var(--viz-ref);stroke-width:2;"/><text x="580" y="121" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">1</text><text x="580" y="137" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">test n&eacute;gatif</text><rect x="524" y="167" width="112" height="46" rx="7" style="fill:var(--viz-bad);fill-opacity:0.18;stroke:var(--viz-bad);stroke-width:2;"/><text x="580" y="187" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">4 995</text><text x="580" y="203" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">test positif</text><rect x="524" y="231" width="112" height="46" rx="7" style="fill:var(--viz-ref);fill-opacity:0.18;stroke:var(--viz-ref);stroke-width:2;"/><text x="580" y="251" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">94 905</text><text x="580" y="267" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">test n&eacute;gatif</text><text x="380" y="300" text-anchor="middle" style="fill:var(--viz-bad);font-size:13px;font-weight:700;font-family:inherit;">Parmi les 5 094 tests positifs, 99 seulement sont vrais : 1,9 %</text><text x="380" y="316" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Raisonner sur des effectifs supprime &agrave; lui seul la quasi-totalit&eacute; des erreurs de fr&eacute;quence de base.</text></svg><figcaption class="viz-caption"><strong>Figure A.1.</strong> Le m&ecirc;me calcul que la r&egrave;gle de Bayes, &eacute;crit sans fractions. Les 4 995 faux positifs &eacute;crasent les 99 vrais : c'est la fr&eacute;quence de base qui domine, pas la qualit&eacute; du test.</figcaption></figure>
+<h2 id="i1">1. R&eacute;viser une croyance par la r&egrave;gle de Bayes</h2>
+<div class="algo-tag">r&egrave;gle de mise &agrave; jour &middot; une observation &agrave; la fois</div>
+<p><strong>But.</strong> Passer de ce que l'on croyait avant une observation &agrave; ce que l'on doit croire apr&egrave;s, sans se laisser abuser par un test qui para&icirc;t fiable.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : une croyance initiale sur l'hypoth&egrave;se, la probabilit&eacute; de l'observation si l'hypoth&egrave;se est vraie, et la probabilit&eacute; de la m&ecirc;me observation si elle est fausse.<br>
+<strong>Sortie</strong> : la croyance r&eacute;vis&eacute;e.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Choisir un effectif de r&eacute;f&eacute;rence</strong>, par exemple cent mille personnes. Raisonner sur des effectifs plut&ocirc;t que sur des pourcentages supprime &agrave; lui seul la quasi-totalit&eacute; des erreurs.</li>
+<li><strong>R&eacute;partir cet effectif selon l'hypoth&egrave;se</strong> : combien v&eacute;rifient l'hypoth&egrave;se, combien ne la v&eacute;rifient pas. C'est la fr&eacute;quence de base, celle que l'on oublie.</li>
+<li><strong>Dans chacun des deux groupes, compter combien pr&eacute;sentent l'observation.</strong> On obtient quatre effectifs.</li>
+<li><strong>Ne garder que ceux qui pr&eacute;sentent l'observation</strong> : c'est ce que l'on sait d&eacute;sormais du cas trait&eacute;.</li>
+<li><strong>Faire le rapport</strong> entre ceux qui v&eacute;rifient l'hypoth&egrave;se et le total de ce sous-groupe.</li>
+<li><strong>Pour plusieurs observations ind&eacute;pendantes sachant l'hypoth&egrave;se</strong>, recommencer en prenant comme croyance initiale la croyance r&eacute;vis&eacute;e pr&eacute;c&eacute;dente.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Un d&eacute;pistage &agrave; 99 % de sensibilit&eacute; et 95 % de sp&eacute;cificit&eacute;, sur cent mille personnes, pour une maladie touchant une personne sur mille.</p>
+<table><thead><tr><th>Groupe</th><th>Effectif</th><th>Test positif</th><th>Test n&eacute;gatif</th></tr></thead><tbody>
+<tr><td>Malades</td><td>100</td><td>99</td><td>1</td></tr>
+<tr><td>Non malades</td><td>99 900</td><td>4 995</td><td>94 905</td></tr>
+<tr><td><strong>Total</strong></td><td>100 000</td><td><strong>5 094</strong></td><td>94 906</td></tr>
+</tbody></table>
+<p>Parmi les 5 094 personnes au test positif, 99 seulement sont malades, soit <strong>1,9 %</strong>. Le test n'est pas mauvais : il multiplie la croyance par dix-neuf, de 0,1 % &agrave; 1,9 %. Mais partir de si bas rend le r&eacute;sultat d&eacute;cevant. Refaites le calcul avec une sp&eacute;cificit&eacute; de 99,9 % : les faux positifs tombent &agrave; 100 et la r&eacute;ponse passe &agrave; 50 %.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Le proc&eacute;d&eacute; par effectifs est exactement la r&egrave;gle de Bayes, &eacute;crite sans fractions : le rapport de l'&eacute;tape 5 est le quotient du produit de la vraisemblance par la fr&eacute;quence de base, divis&eacute; par la probabilit&eacute; totale de l'observation. Aucune approximation n'est faite.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Cinq &eacute;tapes de calcul, sans boucle.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> N&eacute;gligeable pour une hypoth&egrave;se binaire. Avec \(k\) hypoth&egrave;ses concurrentes, il faut \(k\) vraisemblances et une normalisation : toujours lin&eacute;aire.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Confondre la probabilit&eacute; de l'observation sachant l'hypoth&egrave;se avec celle de l'hypoth&egrave;se sachant l'observation &mdash; c'est l'erreur la plus fr&eacute;quente, et elle a co&ucirc;t&eacute; des condamnations judiciaires. Oublier la fr&eacute;quence de base. Encha&icirc;ner plusieurs observations en les supposant ind&eacute;pendantes alors qu'elles ne le sont pas, ce qui multiplie artificiellement la confiance.</p>
+<h2 id="i2">2. L'inf&eacute;rence exacte par &eacute;num&eacute;ration</h2>
+<div class="algo-tag">m&eacute;thode exacte &middot; somme sur les variables cach&eacute;es</div>
+<p><strong>But.</strong> Calculer la probabilit&eacute; d'une variable quelconque d'un r&eacute;seau, sachant les valeurs de certaines autres, sans construire la table jointe compl&egrave;te.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : un r&eacute;seau bay&eacute;sien, une variable dont on veut la loi, et les valeurs observ&eacute;es de quelques variables.<br>
+<strong>Sortie</strong> : la loi de probabilit&eacute; de la variable demand&eacute;e, sachant les observations.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Ranger les variables</strong> de sorte que chaque parent pr&eacute;c&egrave;de ses enfants. Sans cet ordre, on lirait une probabilit&eacute; conditionnelle avant de conna&icirc;tre ce qui la conditionne.</li>
+<li><strong>Pour chaque valeur possible de la variable demand&eacute;e</strong>, calculer la somme des probabilit&eacute;s de tous les mondes compatibles avec cette valeur et avec les observations.</li>
+<li><strong>La probabilit&eacute; d'un monde est le produit</strong>, sur toutes les variables, de la probabilit&eacute; de sa valeur sachant ses parents. C'est la factorisation du r&eacute;seau, appliqu&eacute;e litt&eacute;ralement.</li>
+<li><strong>Les variables ni observ&eacute;es ni demand&eacute;es sont dites cach&eacute;es</strong> : on somme sur toutes leurs valeurs. C'est cette somme qui co&ucirc;te cher.</li>
+<li><strong>Normaliser</strong> pour que les valeurs obtenues somment &agrave; un. On peut donc ignorer tout facteur commun en cours de route.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Un r&eacute;seau &agrave; trois variables : Pluie, puis Arrosage automatique &mdash; moins probable s'il pleut &mdash; puis Herbe mouill&eacute;e, qui d&eacute;pend des deux. On observe l'herbe mouill&eacute;e et l'on veut la probabilit&eacute; de pluie.</p>
+<table><thead><tr><th>Monde (pluie, arrosage, herbe)</th><th>Produit des trois probabilit&eacute;s</th><th>Valeur</th><th>Compte pour</th></tr></thead><tbody>
+<tr><td>pluie, arrosage, mouill&eacute;e</td><td>0,20 &times; 0,01 &times; 0,99</td><td>0,00198</td><td>pluie</td></tr>
+<tr><td>pluie, pas d'arrosage, mouill&eacute;e</td><td>0,20 &times; 0,99 &times; 0,80</td><td>0,15840</td><td>pluie</td></tr>
+<tr><td>pas de pluie, arrosage, mouill&eacute;e</td><td>0,80 &times; 0,40 &times; 0,90</td><td>0,28800</td><td>pas de pluie</td></tr>
+<tr><td>pas de pluie, pas d'arrosage, mouill&eacute;e</td><td>0,80 &times; 0,60 &times; 0,00</td><td>0,00000</td><td>pas de pluie</td></tr>
+<tr><td><strong>Totaux</strong></td><td>&mdash;</td><td>0,44838</td><td>pluie : 0,16038  |  pas de pluie : 0,28800</td></tr>
+</tbody></table>
+<p>Apr&egrave;s normalisation : la probabilit&eacute; de pluie sachant l'herbe mouill&eacute;e vaut 0,16038 / 0,44838, soit <strong>35,8 %</strong>, contre 20 % avant l'observation. La derni&egrave;re ligne du tableau vaut z&eacute;ro parce que dans ce mod&egrave;le, sans pluie ni arrosage, l'herbe n'est jamais mouill&eacute;e : ce monde est impossible.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> La somme calcul&eacute;e est exactement la probabilit&eacute; jointe de la valeur demand&eacute;e et des observations, par d&eacute;finition de la loi marginale. La normalisation produit la loi conditionnelle. Aucune approximation.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> La r&eacute;cursion parcourt une liste finie de variables et, pour chacune, un nombre fini de valeurs. Mesure : le nombre de variables restantes.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Dans le pire cas, le produit des tailles des domaines des variables cach&eacute;es : c'est exponentiel, et le probl&egrave;me est effectivement NP-difficile en g&eacute;n&eacute;ral. L'&eacute;limination de variables am&eacute;liore beaucoup les choses en mettant en facteur les sous-expressions r&eacute;p&eacute;t&eacute;es, mais ne change pas le pire cas.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> &Eacute;num&eacute;rer les variables dans un ordre o&ugrave; un enfant pr&eacute;c&egrave;de son parent. Oublier de normaliser, ce qui donne une probabilit&eacute; jointe et non conditionnelle. Sommer aussi sur les variables observ&eacute;es, ce qui revient &agrave; ignorer l'observation. Et recalculer les m&ecirc;mes sous-produits des milliers de fois faute de les mettre en facteur.</p>
+<h2 id="i3">3. Le classifieur na&iuml;f de Bayes</h2>
+<div class="algo-tag">m&eacute;thode approch&eacute;e &middot; hypoth&egrave;se d'ind&eacute;pendance</div>
+<p><strong>But.</strong> Classer un objet d&eacute;crit par de nombreuses caract&eacute;ristiques, en supposant qu'elles sont ind&eacute;pendantes une fois la classe connue.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : des exemples &eacute;tiquet&eacute;s, et un objet nouveau &agrave; classer.<br>
+<strong>Sortie</strong> : la classe la plus probable pour cet objet.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Compter, pour chaque classe, la proportion d'exemples qui en rel&egrave;vent.</strong> C'est la croyance initiale.</li>
+<li><strong>Compter, pour chaque classe et chaque caract&eacute;ristique, la fr&eacute;quence d'apparition.</strong></li>
+<li><strong>Lisser ces fr&eacute;quences</strong> en ajoutant une unit&eacute; &agrave; chaque compte. Sans ce lissage, une caract&eacute;ristique jamais observ&eacute;e dans une classe lui donne une probabilit&eacute; nulle, qui annule tout le produit : un seul mot inconnu suffirait &agrave; &eacute;liminer une classe.</li>
+<li><strong>Pour classer, additionner les logarithmes</strong> de la croyance initiale et des fr&eacute;quences des caract&eacute;ristiques observ&eacute;es. On additionne des logarithmes plut&ocirc;t que de multiplier des probabilit&eacute;s, car le produit de milliers de nombres inf&eacute;rieurs &agrave; un devient num&eacute;riquement nul.</li>
+<li><strong>Rendre la classe de plus grande somme.</strong></li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Filtrage de courriels. Huit messages d'apprentissage, dont trois ind&eacute;sirables. On classe un message contenant les mots &laquo; gratuit &raquo; et &laquo; r&eacute;union &raquo;. Les probabilit&eacute;s sont liss&eacute;es en ajoutant 1 &agrave; chaque compte, avec un vocabulaire de 10 mots.</p>
+<table><thead><tr><th></th><th>Ind&eacute;sirable</th><th>L&eacute;gitime</th></tr></thead><tbody>
+<tr><td>Croyance initiale</td><td>3 / 8 = 0,375</td><td>5 / 8 = 0,625</td></tr>
+<tr><td>&laquo; gratuit &raquo; : occurrences sur total de mots</td><td>(6 + 1) / (20 + 10) = 0,233</td><td>(1 + 1) / (40 + 10) = 0,040</td></tr>
+<tr><td>&laquo; r&eacute;union &raquo;</td><td>(0 + 1) / (20 + 10) = 0,033</td><td>(8 + 1) / (40 + 10) = 0,180</td></tr>
+<tr><td>Produit</td><td>0,375 &times; 0,233 &times; 0,033 = 0,00292</td><td>0,625 &times; 0,040 &times; 0,180 = 0,00450</td></tr>
+<tr><td><strong>D&eacute;cision</strong></td><td>&mdash;</td><td><strong>l&eacute;gitime</strong></td></tr>
+</tbody></table>
+<p>Le mot &laquo; r&eacute;union &raquo; n'appara&icirc;t jamais dans les ind&eacute;sirables : sans lissage, sa probabilit&eacute; serait nulle et la classe ind&eacute;sirable serait &eacute;limin&eacute;e d'office, quelle que soit la force de &laquo; gratuit &raquo;. Le lissage lui laisse une chance, et c'est le rapport global qui tranche.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> L'hypoth&egrave;se d'ind&eacute;pendance conditionnelle est fausse sur presque toutes les donn&eacute;es r&eacute;elles, et le classifieur reste pourtant tr&egrave;s performant. La raison est &eacute;tablie : pour d&eacute;cider quelle classe l'emporte, seul compte le signe de la diff&eacute;rence entre les scores, et celui-ci reste souvent correct m&ecirc;me quand les valeurs sont tr&egrave;s fausses. En revanche, les probabilit&eacute;s produites sont gravement mal calibr&eacute;es et ne doivent jamais &ecirc;tre pr&eacute;sent&eacute;es comme des degr&eacute;s de confiance.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Deux balayages : un sur les exemples pour l'apprentissage, un sur les caract&eacute;ristiques de l'objet pour la d&eacute;cision.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Apprentissage lin&eacute;aire en la taille du jeu de donn&eacute;es, d&eacute;cision lin&eacute;aire en le nombre de caract&eacute;ristiques observ&eacute;es. C'est le classifieur le moins co&ucirc;teux qui existe, ce qui explique sa longue carri&egrave;re en filtrage de courrier.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Absence de lissage : une seule caract&eacute;ristique inconnue &eacute;limine une classe. Multiplication directe au lieu de la somme des logarithmes : d&eacute;bordement vers z&eacute;ro d&egrave;s quelques centaines de termes. Caract&eacute;ristiques fortement redondantes, comme un m&ecirc;me mot compt&eacute; sous plusieurs formes : leur effet est multipli&eacute; autant de fois qu'elles apparaissent, et la confiance devient absurde. Et classes tr&egrave;s d&eacute;s&eacute;quilibr&eacute;es, o&ugrave; la croyance initiale &eacute;crase tout le reste.</p>
+<h2 id="i4">4. Le filtrage dans une cha&icirc;ne de Markov</h2>
+<div class="algo-tag">m&eacute;thode r&eacute;cursive &middot; estimation en temps r&eacute;el</div>
+<p><strong>But.</strong> Estimer l'&eacute;tat courant d'un syst&egrave;me que l'on n'observe qu'indirectement, en utilisant tout l'historique des observations sans jamais le conserver.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : une loi initiale sur l'&eacute;tat, une matrice de transition, une matrice d'&eacute;mission, et une suite d'observations.<br>
+<strong>Sortie</strong> : apr&egrave;s chaque observation, la loi de probabilit&eacute; de l'&eacute;tat courant.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Partir de la croyance initiale</strong> sur l'&eacute;tat.</li>
+<li><strong>Pr&eacute;dire</strong> : propager cette croyance d'un pas de temps en la faisant passer par les probabilit&eacute;s de transition. On obtient ce que l'on croirait sans rien observer.</li>
+<li><strong>Corriger</strong> : multiplier, &eacute;tat par &eacute;tat, cette pr&eacute;diction par la probabilit&eacute; d'observer ce que l'on vient d'observer si l'on &eacute;tait dans cet &eacute;tat.</li>
+<li><strong>Normaliser</strong> pour retrouver une loi de probabilit&eacute;.</li>
+<li><strong>Recommencer &agrave; l'&eacute;tape 2</strong> &agrave; chaque nouvelle observation. La croyance obtenue r&eacute;sume tout le pass&eacute; : on n'a jamais besoin de conserver l'historique.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Un gardien enferm&eacute; sans fen&ecirc;tre observe chaque jour si son coll&egrave;gue apporte un parapluie. Il pleut le lendemain d'un jour de pluie avec probabilit&eacute; 0,7, et le lendemain d'un jour sec avec probabilit&eacute; 0,3. Le parapluie appara&icirc;t avec probabilit&eacute; 0,9 s'il pleut, 0,2 sinon. Croyance initiale : une chance sur deux.</p>
+<table><thead><tr><th>Jour</th><th>Observation</th><th>Pr&eacute;diction P(pluie)</th><th>Apr&egrave;s correction, avant normalisation</th><th>P(pluie) finale</th></tr></thead><tbody>
+<tr><td>1</td><td>parapluie</td><td>0,500</td><td>0,500 &times; 0,9 = 0,450 contre 0,500 &times; 0,2 = 0,100</td><td><strong>0,818</strong></td></tr>
+<tr><td>2</td><td>parapluie</td><td>0,818 &times; 0,7 + 0,182 &times; 0,3 = 0,627</td><td>0,627 &times; 0,9 = 0,565 contre 0,373 &times; 0,2 = 0,075</td><td><strong>0,883</strong></td></tr>
+<tr><td>3</td><td>pas de parapluie</td><td>0,883 &times; 0,7 + 0,117 &times; 0,3 = 0,653</td><td>0,653 &times; 0,1 = 0,065 contre 0,347 &times; 0,8 = 0,278</td><td><strong>0,191</strong></td></tr>
+</tbody></table>
+<p>Le troisi&egrave;me jour est le plus parlant : une seule absence de parapluie fait chuter la croyance de 88 % &agrave; 19 %. Le mod&egrave;le donne beaucoup de poids &agrave; cette observation parce qu'un parapluie oubli&eacute; un jour de pluie est rare. Remarquez aussi que l'on n'a jamais conserv&eacute; les observations pass&eacute;es : la croyance courante les r&eacute;sume enti&egrave;rement.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Les deux &eacute;tapes appliquent respectivement la loi des probabilit&eacute;s totales et la r&egrave;gle de Bayes ; leur composition donne exactement la loi de l'&eacute;tat courant sachant toutes les observations. La correction repose enti&egrave;rement sur les deux hypoth&egrave;ses du mod&egrave;le : l'&eacute;tat pr&eacute;c&eacute;dent r&eacute;sume le pass&eacute;, et l'observation ne d&eacute;pend que de l'&eacute;tat courant. Si l'une des deux est fausse, le r&eacute;sultat l'est aussi.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Une it&eacute;ration par observation ; la proc&eacute;dure est en ligne et ne s'arr&ecirc;te que lorsque les observations cessent.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Chaque pas co&ucirc;te le carr&eacute; du nombre d'&eacute;tats, et la m&eacute;moire se limite &agrave; la croyance courante &mdash; ind&eacute;pendamment de la longueur de l'historique. C'est cette propri&eacute;t&eacute; qui rend la m&eacute;thode utilisable en temps r&eacute;el.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Oublier la normalisation, ce qui fait d&eacute;river num&eacute;riquement les valeurs vers z&eacute;ro au bout de quelques centaines de pas. Inverser l'ordre des deux &eacute;tapes : corriger avant de pr&eacute;dire donne une estimation d&eacute;cal&eacute;e d'un pas. Employer le filtrage pour estimer un &eacute;tat <em>pass&eacute;</em> : c'est le r&ocirc;le du lissage, qui exploite aussi les observations post&eacute;rieures et donne une estimation nettement meilleure.</p>
+<nav class="lesson-nav"><div class="container">
+<a href="page.html">&larr; Retour au chapitre 8</a>
+<a href="../../index.html">Sommaire du manuel</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+</body></html>

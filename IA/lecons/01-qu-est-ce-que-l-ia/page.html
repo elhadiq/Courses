@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 1 &mdash; Qu'est-ce que l'IA ?</title>
+<meta name="description" content="Definitions de l IA, test de Turing, chambre chinoise, histoire, paradigmes.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Partie I &middot; Chapitre 1</div>
+<h1>Chapitre 1 &mdash; Qu'est-ce que l'intelligence artificielle ?</h1>
+<div class="lesson-sub">Quatre d&eacute;finitions concurrentes, le jeu de l'imitation et ses critiques, soixante-dix ans d'alternance entre printemps et hivers, symbolique contre connexionniste.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">Annexe compagnon</div><p>Les quatre proc&eacute;dures historiques cit&eacute;es dans ce chapitre &mdash; le jeu de l'imitation, la recherche par analyse des moyens et des fins, le moteur de r&egrave;gles d'un syst&egrave;me expert et l'&eacute;valuation d'un rep&egrave;re de r&eacute;f&eacute;rence &mdash; sont d&eacute;taill&eacute;es <strong><a href="algorithms.html">pas &agrave; pas dans l'annexe</a></strong>.</p></div>
+
+<h2>1.1 Une expression qui d&eacute;signe quatre choses diff&eacute;rentes</h2>
+
+<p>Le terme a &eacute;t&eacute; forg&eacute; en 1955 par John McCarthy dans la demande de financement d'un atelier d'&eacute;t&eacute; &agrave; Dartmouth, autour d'une conjecture explicite : <em>tout aspect de l'apprentissage, ou toute autre caract&eacute;ristique de l'intelligence, peut en principe &ecirc;tre d&eacute;crit assez pr&eacute;cis&eacute;ment pour qu'une machine puisse le simuler</em> <a class="cite" href="#ref-dartmouth1955">[1]</a>. Le choix du mot &laquo; intelligence &raquo; &eacute;tait d&eacute;lib&eacute;r&eacute;ment ambitieux : il s'agissait de se d&eacute;marquer de la cybern&eacute;tique et de la th&eacute;orie des automates, alors dominantes <a class="cite" href="#ref-nilsson2009">[2]</a>.</p>
+
+<p>Soixante-dix ans plus tard, l'expression recouvre encore quatre programmes de recherche distincts, que l'on obtient en croisant deux questions : cherche-t-on &agrave; reproduire le <em>processus</em> de la pens&eacute;e ou seulement le <em>comportement</em> ? Et prend-on pour crit&egrave;re l'humain, ou une norme id&eacute;ale de rationalit&eacute; ?</p>
+
+<table>
+<thead><tr><th></th><th>Crit&egrave;re : l'humain</th><th>Crit&egrave;re : la rationalit&eacute;</th></tr></thead>
+<tbody>
+<tr><td><strong>Penser</strong> (le processus)</td><td>Mod&eacute;lisation cognitive : le programme doit raisonner comme un humain, et on le v&eacute;rifie exp&eacute;rimentalement</td><td>Lois de la pens&eacute;e : le programme applique des r&egrave;gles d'inf&eacute;rence correctes</td></tr>
+<tr><td><strong>Agir</strong> (le comportement)</td><td>Jeu de l'imitation : le programme doit &ecirc;tre indiscernable d'un humain dans un &eacute;change</td><td>Agent rationnel : le programme choisit l'action qui maximise sa mesure de performance</td></tr>
+</tbody></table>
+
+<p>Ces quatre cases ne sont pas des nuances : elles produisent des critiques, des m&eacute;thodes exp&eacute;rimentales et des crit&egrave;res de succ&egrave;s incompatibles. Un programme excellent selon l'une peut &ecirc;tre nul selon l'autre. C'est ce que la figure suivante permet de v&eacute;rifier sur des syst&egrave;mes r&eacute;els.</p>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Le curseur choisit un syst&egrave;me c&eacute;l&egrave;bre. Le point se place dans le quadrant qui correspond &agrave; l'objectif r&eacute;ellement poursuivi par ses concepteurs, et non &agrave; l'impression qu'il produit.</p>
+<div id="jxg2" class="viz-board" style="height:520px;"></div>
+<p class="viz-caption"><strong>Figure 1.1.</strong> Deux enseignements. D'abord, aucun syst&egrave;me c&eacute;l&egrave;bre n'occupe la case &laquo; penser humainement &raquo;, sauf ceux des ann&eacute;es 1950-60, qui &eacute;taient explicitement des mod&egrave;les de psychologie exp&eacute;rimentale. Ensuite, la case dominante aujourd'hui est &laquo; agir rationnellement &raquo; : c'est celle qui se pr&ecirc;te &agrave; une d&eacute;finition math&eacute;matique et &agrave; une mesure. C'est aussi celle qu'adopte ce manuel, et le chapitre 2 en donne la formulation pr&eacute;cise.</p></div>
+
+<div class="box def"><div class="box-title">D&eacute;finition de travail retenue dans ce manuel</div>
+<p>L'intelligence artificielle est l'&eacute;tude et la construction d'<strong>agents rationnels</strong> : des syst&egrave;mes qui, &agrave; partir d'une suite de perceptions, choisissent l'action maximisant l'esp&eacute;rance d'une mesure de performance donn&eacute;e.</p>
+<p>Cette d&eacute;finition a trois vertus : elle est <em>op&eacute;ratoire</em> (on peut mesurer), elle ne pr&eacute;juge <em>rien</em> du m&eacute;canisme interne, et elle n'exige pas de d&eacute;finir l'intelligence &mdash; question philosophique dont soixante-dix ans de d&eacute;bat n'ont pas fait sortir de crit&egrave;re utilisable.</p></div>
+
+<h2>1.2 Le jeu de l'imitation et ses critiques</h2>
+
+<p>En 1950, Turing ouvre son article par &laquo; Je propose d'examiner la question : les machines peuvent-elles penser ? &raquo;, puis d&eacute;clare aussit&ocirc;t la question trop d&eacute;pourvue de sens pour m&eacute;riter discussion, et la remplace par un dispositif observable <a class="cite" href="#ref-turing1950">[3]</a>.</p>
+
+<div class="box def"><div class="box-title">Le jeu de l'imitation</div>
+<p>Un interrogateur humain dialogue par &eacute;crit avec deux interlocuteurs invisibles, l'un humain et l'autre machine, et doit dire lequel est lequel. Si l'interrogateur ne fait pas mieux que le hasard, la machine a r&eacute;ussi le test. Turing pr&eacute;disait qu'en l'an 2000 une machine dot&eacute;e de \(10^{9}\) bits de m&eacute;moire tromperait un interrogateur moyen plus de 30 % du temps apr&egrave;s cinq minutes d'&eacute;change.</p></div>
+
+<p>Le d&eacute;placement op&eacute;r&eacute; par Turing est plus radical qu'il n'y para&icirc;t : il substitue &agrave; une question m&eacute;taphysique un protocole exp&eacute;rimental. C'est aussi ce qui fonde les trois critiques principales.</p>
+
+<div class="box warn"><div class="box-title">Trois objections, de nature diff&eacute;rente</div>
+<p><strong>Le test mesure la tromperie, pas la pens&eacute;e.</strong> ELIZA, &eacute;crit par Weizenbaum en 1966, tenait en quelques centaines de lignes et se contentait de reformuler les phrases de son interlocuteur en questions. Des utilisateurs avertis lui pr&ecirc;taient pourtant une compr&eacute;hension et une empathie, au point que Weizenbaum en con&ccedil;ut une inqui&eacute;tude durable <a class="cite" href="#ref-weizenbaum1966">[4]</a>. R&eacute;ussir le test peut r&eacute;compenser l'imitation superficielle.</p>
+<p><strong>La chambre chinoise.</strong> Searle imagine un homme enferm&eacute; dans une pi&egrave;ce, manipulant des id&eacute;ogrammes chinois &agrave; l'aide d'un manuel de r&egrave;gles &eacute;crit dans sa langue. De l'ext&eacute;rieur, ses r&eacute;ponses sont indiscernables de celles d'un locuteur natif ; de l'int&eacute;rieur, il ne comprend pas un mot de chinois. Searle en conclut que la manipulation formelle de symboles ne suffit jamais &agrave; la compr&eacute;hension <a class="cite" href="#ref-searle1980">[5]</a>. La r&eacute;ponse la plus courante, dite &laquo; du syst&egrave;me &raquo;, objecte que ce n'est pas l'homme qui comprend, mais l'ensemble form&eacute; par l'homme, le manuel et la pi&egrave;ce &mdash; ce qui ne convainc pas Searle et n'a jamais &eacute;t&eacute; tranch&eacute;.</p>
+<p><strong>Le test est trop &eacute;troit et trop large.</strong> Trop &eacute;troit : il ignore la perception, l'action physique, la cr&eacute;ativit&eacute; math&eacute;matique. Trop large : il exige de la machine qu'elle simule des faiblesses humaines &mdash; se tromper en arithm&eacute;tique, mettre du temps &agrave; r&eacute;pondre &mdash; qui n'ont rien &agrave; voir avec l'intelligence. C'est pourquoi la recherche contemporaine ne cherche plus &agrave; le passer.</p></div>
+
+<h2>1.3 Soixante-dix ans d'alternance</h2>
+
+<p>L'histoire du domaine n'est pas une progression : c'est une succession de vagues d'enthousiasme suivies d'effondrements du financement, que la litt&eacute;rature appelle des <em>hivers</em>. Deux m&eacute;canismes reviennent &agrave; chaque cycle : des promesses formul&eacute;es publiquement bien au-del&agrave; des r&eacute;sultats, et une sous-estimation syst&eacute;matique de la difficult&eacute; des t&acirc;ches que les humains accomplissent sans y penser.</p>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">D&eacute;placez le curseur d'ann&eacute;e le long de la frise. Le jalon le plus proche s'affiche, ainsi que la p&eacute;riode dans laquelle se trouvait alors le domaine.</p>
+<div id="jxg1" class="viz-board" style="height:480px;"></div>
+<p class="viz-caption"><strong>Figure 1.2.</strong> Vingt et un jalons dat&eacute;s, et sept p&eacute;riodes. La hauteur des bandes traduit l'intensit&eacute; qualitative de l'attention et du financement telle que la d&eacute;crivent les historiens du domaine <a class="cite" href="#ref-nilsson2009">[2]</a><a class="cite" href="#ref-crevier1993">[6]</a> : ce n'est pas une mesure, et elle ne doit pas &ecirc;tre lue comme telle. Le fait notable est le motif, pas les valeurs.</p></div>
+
+<p>Deux dates m&eacute;ritent d'&ecirc;tre isol&eacute;es, parce qu'elles ont &agrave; chaque fois &eacute;t&eacute; d&eacute;clench&eacute;es par un r&eacute;sultat n&eacute;gatif rigoureux, non par une d&eacute;ception vague.</p>
+
+<p><strong>1969.</strong> Minsky et Papert d&eacute;montrent qu'un perceptron &agrave; une seule couche ne peut pas repr&eacute;senter la fonction &laquo; ou exclusif &raquo;, ni aucune fonction non lin&eacute;airement s&eacute;parable <a class="cite" href="#ref-minsky1969">[7]</a>. Le r&eacute;sultat est exact et le chapitre 11 le d&eacute;montre. Sa port&eacute;e fut cependant largement surinterpr&eacute;t&eacute;e : il ne dit rien des r&eacute;seaux &agrave; plusieurs couches, dont on ne savait simplement pas encore ajuster les poids. Il fallut attendre 1986 <a class="cite" href="#ref-rumelhart1986">[8]</a>.</p>
+
+<p><strong>1973.</strong> Le rapport command&eacute; par le gouvernement britannique &agrave; James Lighthill conclut qu'aucun r&eacute;sultat du domaine n'a tenu ses promesses en dehors de probl&egrave;mes-jouets, et pointe l'<em>explosion combinatoire</em> : les m&eacute;thodes qui marchent sur dix objets deviennent inutilisables sur mille <a class="cite" href="#ref-lighthill1973">[9]</a>. Le diagnostic &eacute;tait juste, et c'est exactement le probl&egrave;me que traitent les chapitres 3 &agrave; 6 de ce manuel.</p>
+
+<div class="box example"><div class="box-title">Le paradoxe de Moravec</div>
+Ce que les humains trouvent difficile &mdash; d&eacute;montrer un th&eacute;or&egrave;me, jouer aux &eacute;checs &mdash; s'est av&eacute;r&eacute; relativement facile &agrave; automatiser ; ce qu'un enfant de deux ans fait sans effort &mdash; reconna&icirc;tre un visage, saisir un objet, comprendre une phrase en contexte &mdash; a r&eacute;sist&eacute; pendant cinquante ans. Moravec en propose une explication &eacute;volutive : la perception et la motricit&eacute; sont le produit de centaines de millions d'ann&eacute;es de s&eacute;lection et sont massivement optimis&eacute;es, tandis que le raisonnement abstrait est un acquis r&eacute;cent et fragile <a class="cite" href="#ref-moravec1988">[10]</a>. Ce paradoxe explique &agrave; lui seul une grande partie des erreurs de pr&eacute;vision du domaine.</div>
+
+<h2>1.4 Deux paradigmes</h2>
+
+<p>Sous les cycles historiques court une opposition de fond sur la question : <em>o&ugrave; est la connaissance dans la machine ?</em></p>
+
+<figure class="viz"><div class="viz-title">Symbolique et connexionniste</div>
+<svg viewBox="0 0 760 350" role="img" style="width:100%;height:auto;display:block;"><rect x="20" y="46" width="340" height="270" rx="10" style="fill:var(--primary);fill-opacity:0.08;stroke:var(--primary);stroke-width:2.2;"/><text x="190" y="76" text-anchor="middle" style="fill:var(--primary);font-size:15px;font-weight:700;font-family:inherit;">Approche symbolique</text><circle cx="46" cy="102" r="3.5" style="fill:var(--primary);"/><text x="60" y="106" style="fill:var(--color-text);font-size:13px;font-family:inherit;">la connaissance est explicite</text><circle cx="46" cy="136" r="3.5" style="fill:var(--primary);"/><text x="60" y="140" style="fill:var(--color-text);font-size:13px;font-family:inherit;">des symboles et des r&egrave;gles</text><circle cx="46" cy="170" r="3.5" style="fill:var(--primary);"/><text x="60" y="174" style="fill:var(--color-text);font-size:13px;font-family:inherit;">on programme ce que l'on sait</text><circle cx="46" cy="204" r="3.5" style="fill:var(--primary);"/><text x="60" y="208" style="fill:var(--color-text);font-size:13px;font-family:inherit;">la trace est une explication</text><circle cx="46" cy="238" r="3.5" style="fill:var(--primary);"/><text x="60" y="242" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">&eacute;chec : le bon sens, la perception</text><circle cx="46" cy="272" r="3.5" style="fill:var(--primary);"/><text x="60" y="276" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">1956 &ndash; 1990</text><rect x="400" y="46" width="340" height="270" rx="10" style="fill:var(--accent);fill-opacity:0.08;stroke:var(--accent);stroke-width:2.2;"/><text x="570" y="76" text-anchor="middle" style="fill:var(--accent);font-size:15px;font-weight:700;font-family:inherit;">Approche connexionniste</text><circle cx="426" cy="102" r="3.5" style="fill:var(--accent);"/><text x="440" y="106" style="fill:var(--color-text);font-size:13px;font-family:inherit;">la connaissance est implicite</text><circle cx="426" cy="136" r="3.5" style="fill:var(--accent);"/><text x="440" y="140" style="fill:var(--color-text);font-size:13px;font-family:inherit;">des poids num&eacute;riques ajust&eacute;s</text><circle cx="426" cy="170" r="3.5" style="fill:var(--accent);"/><text x="440" y="174" style="fill:var(--color-text);font-size:13px;font-family:inherit;">on apprend &agrave; partir d'exemples</text><circle cx="426" cy="204" r="3.5" style="fill:var(--accent);"/><text x="440" y="208" style="fill:var(--color-text);font-size:13px;font-family:inherit;">la trace n'explique rien</text><circle cx="426" cy="238" r="3.5" style="fill:var(--accent);"/><text x="440" y="242" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">&eacute;chec : le raisonnement s&ucirc;r, la garantie</text><circle cx="426" cy="272" r="3.5" style="fill:var(--accent);"/><text x="440" y="276" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">1943, 1986, 2012 &ndash; ...</text><text x="380" y="28" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Deux fa&ccedil;ons oppos&eacute;es de mettre la connaissance dans une machine</text><text x="380" y="340" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Les syst&egrave;mes actuels les plus performants combinent les deux : un module appris &agrave; l'int&eacute;rieur d'une recherche symbolique.</text></svg>
+<figcaption class="viz-caption"><strong>Figure 1.3.</strong> L'approche symbolique met la connaissance dans des &eacute;nonc&eacute;s que l'on peut lire, discuter et corriger un par un ; l'approche connexionniste la dilue dans des millions de coefficients num&eacute;riques qu'aucun humain ne peut interpr&eacute;ter individuellement. Ce n'est pas une question de go&ucirc;t : les deux approches ont des domaines de comp&eacute;tence disjoints, et &eacute;chouent l&agrave; o&ugrave; l'autre r&eacute;ussit.</figcaption></figure>
+
+<div class="box thm"><div class="box-title">Hypoth&egrave;se du syst&egrave;me de symboles physiques</div>
+<p>Newell et Simon, dans leur discours de r&eacute;ception du prix Turing, formulent la th&egrave;se centrale de l'approche symbolique : <em>un syst&egrave;me de symboles physiques poss&egrave;de les moyens n&eacute;cessaires et suffisants d'une action intelligente g&eacute;n&eacute;rale</em> <a class="cite" href="#ref-newell1976">[11]</a>. Ils la pr&eacute;sentent explicitement comme une <strong>hypoth&egrave;se empirique</strong>, r&eacute;futable, et non comme un th&eacute;or&egrave;me. Un demi-si&egrave;cle plus tard, elle n'est ni d&eacute;montr&eacute;e ni r&eacute;fut&eacute;e : les syst&egrave;mes les plus performants manipulent bien des symboles, mais ceux-ci &eacute;mergent de coefficients appris plut&ocirc;t que d'&ecirc;tre pos&eacute;s par un programmeur.</p></div>
+
+<p>La bascule de 2012 n'a pas trait &agrave; un argument philosophique mais une accumulation de trois facteurs mesurables : des jeux de donn&eacute;es annot&eacute;s de plusieurs millions d'exemples, un mat&eacute;riel graphique offrant deux ordres de grandeur de calcul suppl&eacute;mentaire, et quelques am&eacute;liorations techniques d'entra&icirc;nement. Aucun de ces trois facteurs n'est une id&eacute;e nouvelle sur l'intelligence.</p>
+
+<h2>1.5 IA faible, IA forte, et ce que &laquo; g&eacute;n&eacute;ral &raquo; veut dire</h2>
+
+<div class="box def"><div class="box-title">Trois distinctions &agrave; ne pas confondre</div>
+<ul>
+<li><strong>IA faible et IA forte</strong> (Searle). L'IA faible affirme qu'une machine peut <em>se comporter</em> comme si elle &eacute;tait intelligente. L'IA forte affirme qu'une machine convenablement programm&eacute;e <em>a</em> un esprit, au sens plein. La premi&egrave;re est une question technique ; la seconde est une th&egrave;se philosophique, et c'est elle seule que vise la chambre chinoise.</li>
+<li><strong>IA sp&eacute;cialis&eacute;e et IA g&eacute;n&eacute;rale</strong>. Une IA sp&eacute;cialis&eacute;e excelle sur une t&acirc;che d&eacute;finie ; une IA g&eacute;n&eacute;rale transf&eacute;rerait ses comp&eacute;tences &agrave; des t&acirc;ches nouvelles, comme un humain. Tous les syst&egrave;mes existants sont sp&eacute;cialis&eacute;s, m&ecirc;me lorsque leur domaine est tr&egrave;s large.</li>
+<li><strong>Performance et compr&eacute;hension</strong>. Un syst&egrave;me peut atteindre un score surhumain sur un rep&egrave;re de r&eacute;f&eacute;rence tout en &eacute;chouant sur une variante triviale du m&ecirc;me probl&egrave;me. C'est le sympt&ocirc;me le plus fiable d'une comp&eacute;tence obtenue par corr&eacute;lation superficielle plut&ocirc;t que par mod&eacute;lisation.</li>
+</ul></div>
+
+<figure class="viz"><div class="viz-title">L'effet IA</div>
+<svg viewBox="0 0 760 340" role="img" style="width:100%;height:auto;display:block;"><path d="M 40 268 L 720 268" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><rect x="14" y="210" width="96" height="58" rx="5" style="fill:var(--primary);fill-opacity:0.10;stroke:var(--primary);stroke-width:1.6;"/><text x="62" y="200" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">1958</text><text x="62" y="288" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">jouer aux dames</text><text x="62" y="304" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">apprentissage</text><rect x="132" y="180" width="96" height="88" rx="5" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.6;"/><text x="180" y="170" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">1997</text><text x="180" y="288" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">jouer aux &eacute;checs</text><text x="180" y="304" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">arbre de recherche</text><rect x="250" y="150" width="96" height="118" rx="5" style="fill:var(--primary);fill-opacity:0.18;stroke:var(--primary);stroke-width:1.6;"/><text x="298" y="140" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">2011</text><text x="298" y="288" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">culture g&eacute;n&eacute;rale</text><text x="298" y="304" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">recherche de texte</text><rect x="368" y="120" width="96" height="148" rx="5" style="fill:var(--primary);fill-opacity:0.22;stroke:var(--primary);stroke-width:1.6;"/><text x="416" y="110" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">2016</text><text x="416" y="288" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">jouer au go</text><text x="416" y="304" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">&eacute;chantillonnage</text><rect x="486" y="90" width="96" height="178" rx="5" style="fill:var(--primary);fill-opacity:0.26;stroke:var(--primary);stroke-width:1.6;"/><text x="534" y="80" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">2020</text><text x="534" y="288" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">replier une prot&eacute;ine</text><text x="534" y="304" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">r&eacute;seau profond</text><rect x="604" y="60" width="96" height="208" rx="5" style="fill:var(--primary);fill-opacity:0.30;stroke:var(--primary);stroke-width:1.6;"/><text x="652" y="50" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">2022</text><text x="652" y="288" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">&eacute;crire un texte</text><text x="652" y="304" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">mod&egrave;le de langue</text><path d="M 40 44 L 720 44" style="fill:none;stroke:var(--viz-bad);stroke-width:2.2;stroke-dasharray:8 6;"/><text x="46" y="36" style="fill:var(--viz-bad);font-size:12.5px;font-weight:700;font-family:inherit;">&laquo; ce serait de la vraie intelligence &raquo; &mdash; la fronti&egrave;re, toujours un peu plus loin</text><text x="380" y="330" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Sous chaque barre : la t&acirc;che tomb&eacute;e, puis la m&eacute;thode qui l'a fait tomber.</text></svg>
+<figcaption class="viz-caption"><strong>Figure 1.4.</strong> &Agrave; chaque fois qu'une t&acirc;che tombe, elle cesse d'&ecirc;tre consid&eacute;r&eacute;e comme relevant de l'intelligence : elle devient &laquo; juste de la recherche arborescente &raquo;, &laquo; juste de la statistique &raquo;. McCorduck a nomm&eacute; ce ph&eacute;nom&egrave;ne l'<em>effet IA</em> <a class="cite" href="#ref-mccorduck2004">[12]</a>. Il a un c&ocirc;t&eacute; injuste, mais aussi un fond de v&eacute;rit&eacute; : comprendre comment une t&acirc;che se r&eacute;sout r&eacute;v&egrave;le presque toujours qu'elle ne demandait pas ce que l'on croyait.</figcaption></figure>
+
+<h2>1.6 Quatre id&eacute;es fausses courantes</h2>
+
+<div class="box warn"><div class="box-title">&laquo; L'IA, c'est l'apprentissage automatique &raquo;</div>
+L'apprentissage automatique est un sous-domaine de l'IA, aujourd'hui dominant, mais les chapitres 3 &agrave; 8 de ce manuel n'en rel&egrave;vent pas. Un solveur de contraintes qui construit un emploi du temps, un d&eacute;monstrateur qui v&eacute;rifie un circuit &eacute;lectronique, un planificateur de trajectoire : ce sont des syst&egrave;mes d'IA sans une once d'apprentissage.</div>
+
+<div class="box warn"><div class="box-title">&laquo; Le r&eacute;seau apprend tout seul &raquo;</div>
+Un syst&egrave;me apprenant n'apprend que ce que sa fonction objectif r&eacute;compense, sur les donn&eacute;es qu'on lui fournit, dans la classe de fonctions qu'on lui impose. Ces trois choix sont faits par des humains et d&eacute;terminent enti&egrave;rement ce qui est appris. Le chapitre 9 le montre formellement : sans hypoth&egrave;se pr&eacute;alable, aucun apprentissage n'est possible.</div>
+
+<div class="box warn"><div class="box-title">&laquo; Il suffit de plus de donn&eacute;es et de plus de calcul &raquo;</div>
+C'est vrai jusqu'&agrave; un certain point, et faux ensuite. Les progr&egrave;s de la derni&egrave;re d&eacute;cennie doivent beaucoup &agrave; l'&eacute;chelle, mais un mod&egrave;le entra&icirc;n&eacute; sur des donn&eacute;es biais&eacute;es reste biais&eacute; quelle que soit leur quantit&eacute; ; et certaines classes de probl&egrave;mes sont NP-difficiles, ce qui est une barri&egrave;re math&eacute;matique et non un manque de moyens.</div>
+
+<div class="box warn"><div class="box-title">&laquo; Une machine ne fait que ce qu'on lui a dit de faire &raquo;</div>
+L'objection est celle de Lady Lovelace, et Turing y r&eacute;pond d&egrave;s 1950 <a class="cite" href="#ref-turing1950">[3]</a>. Elle est litt&eacute;ralement vraie et pratiquement fausse : un programme d'apprentissage produit r&eacute;guli&egrave;rement des comportements que son auteur n'avait ni pr&eacute;vus ni souhait&eacute;s. C'est pr&eacute;cis&eacute;ment ce qui rend le chapitre 14 n&eacute;cessaire.</div>
+
+<h2>Synth&egrave;se</h2>
+<ul>
+<li>Le terme recouvre quatre programmes de recherche distincts ; ce manuel adopte celui de l'<strong>agent rationnel</strong>, parce qu'il est le seul mesurable <a class="cite" href="#ref-russell2020">[13]</a>.</li>
+<li>Le jeu de l'imitation a chang&eacute; la question mais mesure la ressemblance, pas la pens&eacute;e ; ses critiques restent ouvertes <a class="cite" href="#ref-turing1950">[3]</a><a class="cite" href="#ref-searle1980">[5]</a>.</li>
+<li>L'histoire alterne printemps et hivers, ces derniers d&eacute;clench&eacute;s par des r&eacute;sultats n&eacute;gatifs rigoureux autant que par des promesses excessives <a class="cite" href="#ref-lighthill1973">[9]</a>.</li>
+<li>Symbolique et connexionniste ne s'excluent pas : ils ont des domaines de comp&eacute;tence disjoints, et les meilleurs syst&egrave;mes les combinent.</li>
+<li>Ce que les humains trouvent facile est ce que les machines trouvent difficile <a class="cite" href="#ref-moravec1988">[10]</a>, et toute t&acirc;che r&eacute;solue cesse aussit&ocirc;t d'&ecirc;tre appel&eacute;e intelligence <a class="cite" href="#ref-mccorduck2004">[12]</a>.</li>
+</ul>
+
+<h2>R&eacute;f&eacute;rences</h2>
+<ol class="reflist">
+<li id="ref-dartmouth1955">McCarthy, J., Minsky, M. L., Rochester, N. &amp; Shannon, C. E. (1955). A proposal for the Dartmouth summer research project on artificial intelligence. R&eacute;imprim&eacute; dans <em>AI Magazine</em>, 27(4), 12&ndash;14 (2006). DOI&nbsp;: 10.1609/aimag.v27i4.1904. <a href="https://doi.org/10.1609/aimag.v27i4.1904">https://doi.org/10.1609/aimag.v27i4.1904</a></li>
+<li id="ref-nilsson2009">Nilsson, N. J. (2009). <em>The Quest for Artificial Intelligence</em>. Cambridge University Press. DOI&nbsp;: 10.1017/CBO9780511819346. <a href="https://doi.org/10.1017/CBO9780511819346">https://doi.org/10.1017/CBO9780511819346</a></li>
+<li id="ref-turing1950">Turing, A. M. (1950). Computing machinery and intelligence. <em>Mind</em>, LIX(236), 433&ndash;460. DOI&nbsp;: 10.1093/mind/LIX.236.433. <a href="https://doi.org/10.1093/mind/LIX.236.433">https://doi.org/10.1093/mind/LIX.236.433</a></li>
+<li id="ref-weizenbaum1966">Weizenbaum, J. (1966). ELIZA &mdash; a computer program for the study of natural language communication between man and machine. <em>Communications of the ACM</em>, 9(1), 36&ndash;45. DOI&nbsp;: 10.1145/365153.365168. <a href="https://doi.org/10.1145/365153.365168">https://doi.org/10.1145/365153.365168</a></li>
+<li id="ref-searle1980">Searle, J. R. (1980). Minds, brains, and programs. <em>Behavioral and Brain Sciences</em>, 3(3), 417&ndash;457. DOI&nbsp;: 10.1017/S0140525X00005756. <a href="https://doi.org/10.1017/S0140525X00005756">https://doi.org/10.1017/S0140525X00005756</a></li>
+<li id="ref-crevier1993">Crevier, D. (1993). <em>AI: The Tumultuous History of the Search for Artificial Intelligence</em>. Basic Books. ISBN 978-0-465-02997-6. <a href="https://archive.org/details/aitumultuoushist0000crev">https://archive.org/details/aitumultuoushist0000crev</a></li>
+<li id="ref-minsky1969">Minsky, M. &amp; Papert, S. (1969). <em>Perceptrons: An Introduction to Computational Geometry</em>. MIT Press. DOI&nbsp;: 10.7551/mitpress/11301.001.0001. <a href="https://doi.org/10.7551/mitpress/11301.001.0001">https://doi.org/10.7551/mitpress/11301.001.0001</a></li>
+<li id="ref-rumelhart1986">Rumelhart, D. E., Hinton, G. E. &amp; Williams, R. J. (1986). Learning representations by back-propagating errors. <em>Nature</em>, 323, 533&ndash;536. DOI&nbsp;: 10.1038/323533a0. <a href="https://doi.org/10.1038/323533a0">https://doi.org/10.1038/323533a0</a></li>
+<li id="ref-lighthill1973">Lighthill, J. (1973). Artificial intelligence: a general survey. Dans <em>Artificial Intelligence: A Paper Symposium</em>, Science Research Council, Londres. <a href="http://www.chilton-computing.org.uk/inf/literature/reports/lighthill_report/contents.htm">http://www.chilton-computing.org.uk/inf/literature/reports/lighthill_report/contents.htm</a></li>
+<li id="ref-moravec1988">Moravec, H. (1988). <em>Mind Children: The Future of Robot and Human Intelligence</em>. Harvard University Press. ISBN 978-0-674-57616-2. <a href="https://archive.org/details/mindchildrenfutu0000mora">https://archive.org/details/mindchildrenfutu0000mora</a></li>
+<li id="ref-newell1976">Newell, A. &amp; Simon, H. A. (1976). Computer science as empirical inquiry: symbols and search. <em>Communications of the ACM</em>, 19(3), 113&ndash;126. DOI&nbsp;: 10.1145/360018.360022. <a href="https://doi.org/10.1145/360018.360022">https://doi.org/10.1145/360018.360022</a></li>
+<li id="ref-mccorduck2004">McCorduck, P. (2004). <em>Machines Who Think</em> (2<sup>e</sup> &eacute;dition). A K Peters. DOI&nbsp;: 10.1201/9780429258985. <a href="https://doi.org/10.1201/9780429258985">https://doi.org/10.1201/9780429258985</a></li>
+<li id="ref-russell2020">Russell, S. &amp; Norvig, P. (2020). <em>Artificial Intelligence: A Modern Approach</em> (4<sup>e</sup> &eacute;dition). Pearson. ISBN 978-0-13-461099-3. <a href="https://aima.cs.berkeley.edu/">https://aima.cs.berkeley.edu/</a></li>
+</ol>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../00-introduction/page.html">\(\leftarrow\) Introduction g&eacute;n&eacute;rale</a>
+<a href="algorithms.html">Annexe algorithmique</a>
+<a href="../../index.html">Sommaire du manuel</a>
+<a href="../02-agents/page.html">Chapitre 2 &mdash; Agents et environnements \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">La figure interactive n\'a pas pu etre chargee. Verifiez votre connexion reseau.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* =============== Figure : frise chronologique de l'IA ==================== */
+var JALONS = [
+ {a:1943, t:'Neurone formel de McCulloch et Pitts', d:'Un modèle mathématique du neurone, avant tout ordinateur.'},
+ {a:1950, t:'Turing : le jeu de l’imitation', d:'La question « une machine peut-elle penser ? » est remplacée par un test observable.'},
+ {a:1956, t:'Conférence de Dartmouth', d:'Le terme « intelligence artificielle » est forgé ; le domaine naît officiellement.'},
+ {a:1957, t:'Perceptron de Rosenblatt', d:'Première machine apprenante, avec une règle de convergence démontrée.'},
+ {a:1958, t:'McCarthy crée Lisp', d:'Le langage des systèmes symboliques pour trente ans.'},
+ {a:1965, t:'Résolution de Robinson', d:'Une règle d’inférence unique et complète pour la logique des prédicats.'},
+ {a:1966, t:'ELIZA', d:'Un programme de 200 lignes que des utilisateurs prennent pour un thérapeute.'},
+ {a:1969, t:'Minsky et Papert : Perceptrons', d:'Le perceptron ne peut pas apprendre le OU exclusif. Le financement des réseaux s’effondre.'},
+ {a:1973, t:'Rapport Lighthill', d:'Le Royaume-Uni coupe les crédits : début du premier hiver.'},
+ {a:1980, t:'Systèmes experts', d:'MYCIN, XCON : des règles écrites à la main rendent l’IA rentable.'},
+ {a:1986, t:'Rétropropagation', d:'Rumelhart, Hinton et Williams relancent les réseaux multicouches.'},
+ {a:1987, t:'Effondrement des machines Lisp', d:'Second hiver : le marché du matériel spécialisé disparaît.'},
+ {a:1995, t:'Machines à vecteurs de support', d:'L’apprentissage statistique à fondement théorique domine la décennie.'},
+ {a:1997, t:'Deep Blue bat Kasparov', d:'Recherche arborescente et matériel dédié, sans apprentissage.'},
+ {a:2006, t:'Renaissance des réseaux profonds', d:'Pré-entraînement couche par couche ; le terme « apprentissage profond » s’impose.'},
+ {a:2011, t:'Watson gagne à Jeopardy', d:'Traitement de la langue à grande échelle, sur des textes non structurés.'},
+ {a:2012, t:'AlexNet', d:'La vision par ordinateur bascule entièrement vers les réseaux convolutifs.'},
+ {a:2016, t:'AlphaGo bat Lee Sedol', d:'Recherche par échantillonnage guidée par des réseaux appris.'},
+ {a:2017, t:'Le transformeur', d:'L’attention remplace la récurrence ; l’architecture des modèles actuels.'},
+ {a:2020, t:'AlphaFold 2', d:'La prédiction du repliement des protéines atteint la précision expérimentale.'},
+ {a:2022, t:'Grands modèles de langue grand public', d:'Le domaine devient un fait de société.'}
+];
+/* Periodes qualifiees par les historiens du domaine. */
+var PERIODES = [
+ {d:1943, f:1956, n:'prehistoire',        h:0.45},
+ {d:1956, f:1974, n:'premier printemps',  h:0.80},
+ {d:1974, f:1980, n:'premier hiver',      h:0.20},
+ {d:1980, f:1987, n:'second printemps',   h:0.70},
+ {d:1987, f:1993, n:'second hiver',       h:0.18},
+ {d:1993, f:2012, n:'reprise statistique', h:0.50},
+ {d:2012, f:2026, n:'age profond',        h:0.95}
+];
+var A0 = 1940, A1 = 2026;
+
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-0.06, 1.42, 1.06, -0.62], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+function ax(an){ return (an - A0) / (A1 - A0); }
+var sAn = b1.create('slider', [[0.02, -0.30], [0.98, -0.30], [A0, 1956, A1]], {
+  name: 'annee', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+function annee(){ return Math.round(sAn.Value()); }
+function periode(an){
+  for (var i = 0; i < PERIODES.length; i++){
+    if (an >= PERIODES[i].d && an < PERIODES[i].f) { return PERIODES[i]; }
+  }
+  return PERIODES[PERIODES.length - 1];
+}
+function jalonProche(an){
+  var best = JALONS[0];
+  for (var i = 0; i < JALONS.length; i++){
+    if (Math.abs(JALONS[i].a - an) < Math.abs(best.a - an)) { best = JALONS[i]; }
+  }
+  return best;
+}
+/* bandes de periode */
+for (var i = 0; i < PERIODES.length; i++){
+  (function(p){
+    b1.create('curve', [[ax(p.d), ax(p.f), ax(p.f), ax(p.d), ax(p.d)],
+                        [0, 0, p.h, p.h, 0]], {
+      strokeWidth: 0, highlight: false, fixed: true,
+      fillColor: function(){
+        return p.n.indexOf('hiver') >= 0 ? cssv('--viz-blue', '#2563eb')
+                                         : cssv('--primary', '#026573'); },
+      fillOpacity: function(){ return periode(annee()) === p ? 0.34 : 0.12; }});
+    b1.create('text', [(ax(p.d) + ax(p.f)) / 2, p.h + 0.045, p.n], {
+      fontSize: 10.5, anchorX: 'middle', fixed: true, highlight: false,
+      strokeColor: function(){ return periode(annee()) === p ? PAL.text() : PAL.muted(); }});
+  })(PERIODES[i]);
+}
+b1.create('segment', [[0, 0], [1, 0]], {strokeColor: PAL.axis, strokeWidth: 1.8,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+for (var an = 1950; an <= 2020; an += 10){
+  (function(v){
+    b1.create('text', [ax(v), -0.075, String(v)], {fontSize: 11, anchorX: 'middle',
+      strokeColor: PAL.muted, fixed: true, highlight: false});
+  })(an);
+}
+/* jalons */
+for (var i = 0; i < JALONS.length; i++){
+  (function(j){
+    b1.create('point', [ax(j.a), 0], {
+      name: '', size: 4, face: 'o', fixed: true, highlight: false, strokeWidth: 1.5,
+      strokeColor: function(){
+        return jalonProche(annee()) === j ? cssv('--accent', '#f59e0b') : PAL.axis(); },
+      fillColor: function(){
+        return jalonProche(annee()) === j ? cssv('--accent', '#f59e0b') : PAL.bg(); },
+      fillOpacity: 1});
+  })(JALONS[i]);
+}
+b1.create('segment', [function(){ return [ax(annee()), -0.02]; },
+                      function(){ return [ax(annee()), 1.05]; }], {
+  strokeColor: function(){ return cssv('--accent', '#f59e0b'); }, strokeWidth: 2,
+  dash: 2, straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b1.create('text', [-0.05, 1.36, function(){
+  var j = jalonProche(annee());
+  return String(j.a) + '  -  ' + j.t;
+}], {fontSize: 16, strokeColor: function(){ return cssv('--primary', '#026573'); },
+     fixed: true, highlight: false});
+b1.create('text', [-0.05, 1.26, function(){ return jalonProche(annee()).d; }],
+  {fontSize: 13, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-0.05, 1.16, function(){
+  var p = periode(annee());
+  return 'Periode : ' + p.n + ' (' + p.d + '-' + p.f + ')';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-0.05, -0.52,
+  'Hauteur des bandes : intensite qualitative de l’attention et du financement, non une mesure.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+/* =============== Figure : les quatre definitions ========================= */
+var SYSTEMES = [
+ {n:'ELIZA (1966)', x:0.72, y:-0.68,
+  d:'Imite la conversation d’un psychothérapeute par simple reformulation. Ne modélise aucun raisonnement et ne poursuit aucun but : il cherche seulement à passer pour humain.'},
+ {n:'Solveur général de problèmes (1959)', x:-0.70, y:0.62,
+  d:'Newell et Simon comparaient les traces du programme aux protocoles verbaux de sujets humains : l’objectif explicite était de reproduire la façon de penser, pas la performance.'},
+ {n:'Démonstrateur automatique', x:0.66, y:0.74,
+  d:'Applique des règles d’inférence correctes : ce qu’il produit découle logiquement de ses prémisses. C’est la tradition des « lois de la pensée ».'},
+ {n:'Deep Blue (1997)', x:-0.62, y:-0.72,
+  d:'Ne joue pas du tout comme un humain — 200 millions de positions par seconde — mais choisit le coup qui maximise sa mesure de performance.'},
+ {n:'Robot aspirateur', x:-0.80, y:-0.44,
+  d:'Aucune prétention à l’intelligence : il agit rationnellement au regard d’un objectif étroit, dans un environnement partiellement observable.'},
+ {n:'Grand modèle de langue', x:0.58, y:-0.34,
+  d:'Optimisé pour produire la suite de texte la plus vraisemblable : le critère d’entraînement est la ressemblance au discours humain, pas la vérité ni un but.'}
+];
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-1.55, 1.55, 1.55, -1.75], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sSys = b2.create('slider', [[-1.4, -1.42], [0.6, -1.42], [0, 0, SYSTEMES.length - 1]], {
+  name: 'systeme', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+function sys(){ return SYSTEMES[Math.round(sSys.Value())]; }
+b2.create('curve', [[-1.1, 1.1, 1.1, -1.1, -1.1], [-1.1, -1.1, 1.1, 1.1, -1.1]], {
+  strokeColor: PAL.axis, strokeWidth: 1.6, highlight: false, fixed: true});
+b2.create('segment', [[0, -1.1], [0, 1.1]], {strokeColor: PAL.axis, strokeWidth: 1.4,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b2.create('segment', [[-1.1, 0], [1.1, 0]], {strokeColor: PAL.axis, strokeWidth: 1.4,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+var QUADRANTS = [
+ {x:-0.55, y: 0.55, t:'Penser rationnellement', s:'lois de la pensee'},
+ {x: 0.55, y: 0.55, t:'Penser humainement',     s:'modele cognitif'},
+ {x:-0.55, y:-0.55, t:'Agir rationnellement',   s:'agent qui maximise'},
+ {x: 0.55, y:-0.55, t:'Agir humainement',       s:'jeu de l’imitation'}
+];
+/* Les axes : gauche/droite = rationnel/humain ; haut/bas = penser/agir. */
+for (var i = 0; i < 4; i++){
+  (function(q){
+    b2.create('text', [q.x, q.y + 0.14, q.t], {fontSize: 13.5, anchorX: 'middle',
+      fixed: true, highlight: false,
+      strokeColor: function(){
+        var s = sys();
+        var meme = (s.x > 0) === (q.x > 0) && (s.y > 0) === (q.y > 0);
+        return meme ? cssv('--primary', '#026573') : PAL.text(); }});
+    b2.create('text', [q.x, q.y - 0.02, q.s], {fontSize: 11.5, anchorX: 'middle',
+      strokeColor: PAL.muted, fixed: true, highlight: false});
+  })(QUADRANTS[i]);
+}
+b2.create('text', [0, 1.22, 'PENSER  -  reproduire le processus'], {fontSize: 12,
+  anchorX: 'middle', strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [0, -1.22, 'AGIR  -  reproduire seulement le comportement'], {fontSize: 12,
+  anchorX: 'middle', strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-1.5, 0, 'critere : la norme ideale'], {fontSize: 11.5, anchorX: 'left',
+  strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [1.5, 0, 'critere : l’humain'], {fontSize: 11.5, anchorX: 'right',
+  strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('point', [function(){ return sys().x; }, function(){ return sys().y; }], {
+  name: '', size: 8, face: 'o', fixed: true, highlight: false, strokeWidth: 2.5,
+  strokeColor: function(){ return cssv('--primary-dark', '#014a55'); },
+  fillColor: function(){ return cssv('--accent', '#f59e0b'); }, fillOpacity: 1});
+b2.create('text', [-1.5, 1.42, function(){ return sys().n; }], {fontSize: 16,
+  strokeColor: function(){ return cssv('--primary', '#026573'); }, fixed: true, highlight: false});
+b2.create('text', [-1.5, -1.62, function(){ return sys().d; }], {fontSize: 12.5,
+  strokeColor: PAL.text, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

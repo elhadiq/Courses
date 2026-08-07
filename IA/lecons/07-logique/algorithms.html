@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 7 &mdash; Annexe algorithmique</title>
+<meta name="description" content="Enumeration des modeles, forme clausale, resolution, DPLL.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Chapitre 7 &middot; Annexe</div>
+<h1>Les proc&eacute;dures logiques, pas &agrave; pas</h1>
+<div class="lesson-sub">Quatre m&eacute;thodes d&eacute;crites en fran&ccedil;ais, avec un exemple d&eacute;roul&eacute; &agrave; la main pour chacune.</div>
+</div></section>
+<main class="lesson-content">
+<div class="box tip"><div class="box-title">Comment lire cette annexe</div>Aucune ligne de programme, aucune formule inutile : chaque proc&eacute;dure est pr&eacute;sent&eacute;e comme on l'ex&eacute;cuterait &agrave; la main. <a href="page.html">Retour au chapitre</a>.</div>
+<div class="annex-toc">
+<a href="#h1">1. &Eacute;num&eacute;ration des mod&egrave;les</a>
+<a href="#h2">2. Mise en forme clausale</a>
+<a href="#h3">3. R&eacute;solution</a>
+<a href="#h4">4. DPLL</a>
+</div>
+<p>Les quatre proc&eacute;dures r&eacute;pondent &agrave; la m&ecirc;me question &mdash; cet &eacute;nonc&eacute; d&eacute;coule-t-il de ce que je sais ? &mdash; mais par des chemins tr&egrave;s diff&eacute;rents : en examinant tous les mondes, ou en manipulant des symboles jusqu'&agrave; l'absurde, ou en cherchant directement un monde. La premi&egrave;re est la d&eacute;finition m&ecirc;me ; les trois autres servent &agrave; ne jamais avoir &agrave; l'appliquer.</p>
+<figure class="viz"><div class="viz-title">Ce que la propagation unitaire &eacute;conomise</div><svg viewBox="0 0 760 328" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Ce que la propagation unitaire &eacute;conomise</text><text x="200" y="52" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Sans propagation : 17 n&oelig;uds</text><text x="560" y="52" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Avec propagation : 2 n&oelig;uds</text><circle cx="200" cy="78" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 200 87 L 125 111" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="125" cy="120" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 200 87 L 275 111" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="275" cy="120" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 125 129 L 87.5 153" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="87.5" cy="162" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 125 129 L 162.5 153" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="162.5" cy="162" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 275 129 L 237.5 153" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="237.5" cy="162" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 275 129 L 312.5 153" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="312.5" cy="162" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 87.5 171 L 68.75 195" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="68.75" cy="204" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 87.5 171 L 106.25 195" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="106.25" cy="204" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 162.5 171 L 143.75 195" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="143.75" cy="204" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 162.5 171 L 181.25 195" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="181.25" cy="204" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 237.5 171 L 218.75 195" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="218.75" cy="204" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 237.5 171 L 256.25 195" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="256.25" cy="204" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 312.5 171 L 293.75 195" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="293.75" cy="204" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 312.5 171 L 331.25 195" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="331.25" cy="204" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 68.75 213 L 59.375 237" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="59.375" cy="246" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 68.75 213 L 78.125 237" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="78.125" cy="246" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 106.25 213 L 96.875 237" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="96.875" cy="246" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 106.25 213 L 115.625 237" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="115.625" cy="246" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 143.75 213 L 134.375 237" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="134.375" cy="246" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 143.75 213 L 153.125 237" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="153.125" cy="246" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 181.25 213 L 171.875 237" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="171.875" cy="246" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 181.25 213 L 190.625 237" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="190.625" cy="246" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 218.75 213 L 209.375 237" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="209.375" cy="246" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 218.75 213 L 228.125 237" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="228.125" cy="246" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 256.25 213 L 246.875 237" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="246.875" cy="246" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 256.25 213 L 265.625 237" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="265.625" cy="246" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 293.75 213 L 284.375 237" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="284.375" cy="246" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 293.75 213 L 303.125 237" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="303.125" cy="246" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 331.25 213 L 321.875 237" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="321.875" cy="246" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 331.25 213 L 340.625 237" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="340.625" cy="246" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><circle cx="560" cy="78" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 560 87 L 485 111" style="fill:none;stroke:var(--primary);stroke-width:2;"/><circle cx="485" cy="120" r="8" style="fill:var(--primary);stroke:var(--primary);stroke-width:1.6;"/><path d="M 560 87 L 635 111" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="635" cy="120" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 485 129 L 447.5 153" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="447.5" cy="162" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 485 129 L 522.5 153" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="522.5" cy="162" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 635 129 L 597.5 153" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="597.5" cy="162" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 635 129 L 672.5 153" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="672.5" cy="162" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 447.5 171 L 428.75 195" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="428.75" cy="204" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 447.5 171 L 466.25 195" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="466.25" cy="204" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 522.5 171 L 503.75 195" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="503.75" cy="204" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 522.5 171 L 541.25 195" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="541.25" cy="204" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 597.5 171 L 578.75 195" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="578.75" cy="204" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 597.5 171 L 616.25 195" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="616.25" cy="204" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 672.5 171 L 653.75 195" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="653.75" cy="204" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 672.5 171 L 691.25 195" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="691.25" cy="204" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 428.75 213 L 419.375 237" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="419.375" cy="246" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 428.75 213 L 438.125 237" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="438.125" cy="246" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 466.25 213 L 456.875 237" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="456.875" cy="246" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 466.25 213 L 475.625 237" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="475.625" cy="246" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 503.75 213 L 494.375 237" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="494.375" cy="246" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 503.75 213 L 513.125 237" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="513.125" cy="246" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 541.25 213 L 531.875 237" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="531.875" cy="246" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 541.25 213 L 550.625 237" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="550.625" cy="246" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 578.75 213 L 569.375 237" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="569.375" cy="246" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 578.75 213 L 588.125 237" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="588.125" cy="246" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 616.25 213 L 606.875 237" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="606.875" cy="246" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 616.25 213 L 625.625 237" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="625.625" cy="246" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 653.75 213 L 644.375 237" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="644.375" cy="246" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 653.75 213 L 663.125 237" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="663.125" cy="246" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 691.25 213 L 681.875 237" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="681.875" cy="246" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><path d="M 691.25 213 L 700.625 237" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="700.625" cy="246" r="8" style="fill:var(--color-bg);stroke:var(--viz-ref);stroke-width:1.6;"/><text x="380" y="296" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">M&ecirc;me formule, m&ecirc;me r&eacute;ponse, m&ecirc;me mod&egrave;le. La propagation ne fait aucun choix : elle constate qu'il n'y en a pas, et</text><text x="380" y="314" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">l'arbre s'effondre.</text></svg><figcaption class="viz-caption"><strong>Figure A.1.</strong> Les deux arbres explor&eacute;s sur la m&ecirc;me formule. &Agrave; gauche, l'&eacute;num&eacute;ration descend jusqu'aux feuilles ; &agrave; droite, la propagation force les valeurs et l'arbre s'effondre &agrave; deux n&oelig;uds.</figcaption></figure>
+<h2 id="h1">1. L'&eacute;num&eacute;ration des mod&egrave;les</h2>
+<div class="algo-tag">m&eacute;thode exhaustive &middot; correcte et compl&egrave;te</div>
+<p><strong>But.</strong> D&eacute;cider si un &eacute;nonc&eacute; d&eacute;coule d'un ensemble de connaissances, en examinant tous les mondes possibles.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : une base de connaissances et une question, toutes deux &eacute;crites avec les m&ecirc;mes variables.<br>
+<strong>Sortie</strong> : oui si la question est cons&eacute;quence de la base, non sinon &mdash; et dans ce cas un contre-exemple.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Relever toutes les variables</strong> qui apparaissent dans la base ou dans la question.</li>
+<li><strong>&Eacute;num&eacute;rer toutes les fa&ccedil;ons de leur donner une valeur.</strong> Avec \(n\) variables, cela fait \(2^{n}\) lignes : c'est tout le probl&egrave;me de la m&eacute;thode.</li>
+<li><strong>Pour chaque ligne, calculer la valeur de chaque &eacute;nonc&eacute; de la base.</strong> Si l'un d'eux est faux, la ligne d&eacute;crit un monde incompatible avec ce que l'on sait : elle ne prouve ni ne r&eacute;fute rien, on l'ignore.</li>
+<li><strong>Si tous les &eacute;nonc&eacute;s de la base sont vrais, examiner la question.</strong> Si elle est fausse sur cette ligne, on tient un contre-exemple : la r&eacute;ponse est non, et l'on s'arr&ecirc;te.</li>
+<li><strong>Si toutes les lignes o&ugrave; la base est vraie rendent aussi la question vraie</strong>, la r&eacute;ponse est oui.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Base : &laquo; s'il pleut, la route est mouill&eacute;e &raquo; et &laquo; la route n'est pas mouill&eacute;e &raquo;. Question : &laquo; il ne pleut pas &raquo;. Deux variables, quatre lignes.</p>
+<table><thead><tr><th>\(p\) : il pleut</th><th>\(m\) : route mouill&eacute;e</th><th>\(p \Rightarrow m\)</th><th>\(\lnot m\)</th><th>Base vraie ?</th><th>Question \(\lnot p\)</th></tr></thead><tbody>
+<tr><td>vrai</td><td>vrai</td><td>vrai</td><td>faux</td><td>non</td><td>sans objet</td></tr>
+<tr><td>vrai</td><td>faux</td><td>faux</td><td>vrai</td><td>non</td><td>sans objet</td></tr>
+<tr><td>faux</td><td>vrai</td><td>vrai</td><td>faux</td><td>non</td><td>sans objet</td></tr>
+<tr><td>faux</td><td>faux</td><td>vrai</td><td>vrai</td><td><strong>oui</strong></td><td><strong>vrai</strong></td></tr>
+</tbody></table>
+<p>Une seule ligne rend la base vraie, et la question y est vraie : la r&eacute;ponse est oui. Remarquez qu'on ne d&eacute;montre rien au sens habituel &mdash; on constate. C'est exactement la d&eacute;finition s&eacute;mantique de la cons&eacute;quence, appliqu&eacute;e litt&eacute;ralement.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> La m&eacute;thode est correcte et compl&egrave;te par construction, puisqu'elle applique mot pour mot la d&eacute;finition : la question est cons&eacute;quence de la base si tout mod&egrave;le de la base est un mod&egrave;le de la question. Aucune ligne n'est oubli&eacute;e, aucune n'est compt&eacute;e deux fois.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Le nombre de lignes est \(2^{n}\), fini. Variant : le nombre de lignes non encore examin&eacute;es.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Temps proportionnel &agrave; \(2^{n}\) multipli&eacute; par la taille de la base. La m&eacute;moire, en revanche, reste minuscule : on n'a jamais besoin de garder plus d'une ligne &agrave; la fois. Vingt variables : un million de lignes, une seconde. Quarante variables : mille milliards de lignes, plusieurs semaines.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Oublier une variable qui n'appara&icirc;t que dans la question. Confondre &laquo; la base est fausse sur cette ligne &raquo; et &laquo; la question est fausse &raquo; : les lignes o&ugrave; la base est fausse ne comptent pas. Et surtout, croire que la m&eacute;thode passe &agrave; l'&eacute;chelle : c'est elle que tout le reste du chapitre sert &agrave; &eacute;viter.</p>
+<h2 id="h2">2. La mise en forme normale conjonctive</h2>
+<div class="algo-tag">transformation syntaxique &middot; pr&eacute;alable obligatoire</div>
+<p><strong>But.</strong> R&eacute;&eacute;crire n'importe quelle formule en une conjonction de disjonctions de litt&eacute;raux, seule forme accept&eacute;e par la r&eacute;solution et par les solveurs.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : une formule quelconque.<br>
+<strong>Sortie</strong> : un ensemble de clauses dont la conjonction est &eacute;quivalente &agrave; la formule de d&eacute;part.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>&Eacute;liminer les &eacute;quivalences</strong> : &laquo; A si et seulement si B &raquo; devient &laquo; si A alors B &raquo; et &laquo; si B alors A &raquo;.</li>
+<li><strong>&Eacute;liminer les implications</strong> : &laquo; si A alors B &raquo; devient &laquo; non A ou B &raquo;. Apr&egrave;s cette &eacute;tape, il ne reste que trois connecteurs.</li>
+<li><strong>Faire descendre les n&eacute;gations jusqu'aux variables</strong> par les lois de De Morgan : la n&eacute;gation d'une conjonction est la disjonction des n&eacute;gations, et r&eacute;ciproquement. Supprimer les doubles n&eacute;gations.</li>
+<li><strong>Distribuer les disjonctions sur les conjonctions</strong> : &laquo; A ou (B et C) &raquo; devient &laquo; (A ou B) et (A ou C) &raquo;. C'est ici que la taille peut exploser.</li>
+<li><strong>Aplatir</strong> : supprimer les litt&eacute;raux r&eacute;p&eacute;t&eacute;s dans une clause, et supprimer toute clause contenant &agrave; la fois une variable et sa n&eacute;gation, puisqu'elle est toujours vraie.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Transformons &laquo; si (p et q) alors r &raquo;, puis une formule dont la distribution fait doubler la taille.</p>
+<table><thead><tr><th>&Eacute;tape</th><th>Formule obtenue</th><th>Nombre de clauses</th></tr></thead><tbody>
+<tr><td>d&eacute;part</td><td>\((p \land q) \Rightarrow r\)</td><td>&mdash;</td></tr>
+<tr><td>&eacute;limination de l'implication</td><td>\(\lnot(p \land q) \lor r\)</td><td>&mdash;</td></tr>
+<tr><td>De Morgan</td><td>\(\lnot p \lor \lnot q \lor r\)</td><td>1</td></tr>
+<tr><td>autre d&eacute;part</td><td>\((p_1 \land q_1) \lor (p_2 \land q_2)\)</td><td>&mdash;</td></tr>
+<tr><td>distribution</td><td>\((p_1 \lor p_2) \land (p_1 \lor q_2) \land (q_1 \lor p_2) \land (q_1 \lor q_2)\)</td><td>4</td></tr>
+<tr><td>m&ecirc;me forme &agrave; \(n\) blocs</td><td>&mdash;</td><td>\(2^{n}\)</td></tr>
+</tbody></table>
+<p>La derni&egrave;re ligne est l'avertissement : avec dix blocs, on obtient 1024 clauses, avec vingt, plus d'un million. La transformation de Tseitin &eacute;vite cette explosion en nommant chaque sous-formule par une variable nouvelle ; la formule obtenue n'est plus &eacute;quivalente mais elle est satisfiable exactement quand l'originale l'est, ce qui suffit.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Chaque r&eacute;&eacute;criture est une &eacute;quivalence logique classique, v&eacute;rifiable par table de v&eacute;rit&eacute; sur deux ou trois variables. La composition d'&eacute;quivalences &eacute;tant une &eacute;quivalence, la formule finale a exactement les m&ecirc;mes mod&egrave;les que la formule initiale.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Chaque &eacute;tape fait strictement d&eacute;cro&icirc;tre une mesure syntaxique : le nombre d'&eacute;quivalences, puis d'implications, puis la profondeur des n&eacute;gations, puis le nombre de disjonctions plac&eacute;es au-dessus d'une conjonction. La proc&eacute;dure s'arr&ecirc;te donc, m&ecirc;me si le r&eacute;sultat peut &ecirc;tre gigantesque.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Les trois premi&egrave;res &eacute;tapes sont lin&eacute;aires. La quatri&egrave;me peut multiplier la taille par un facteur exponentiel. C'est la raison pour laquelle aucun solveur industriel n'emploie la distribution na&iuml;ve.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Distribuer dans le mauvais sens &mdash; la conjonction sur la disjonction &mdash; donne une forme normale <em>disjonctive</em>, qui r&eacute;pond &agrave; une tout autre question. Oublier que l'implication n'est pas sym&eacute;trique. Et appliquer la distribution na&iuml;ve &agrave; une grosse formule, ce qui produit un fichier de plusieurs gigaoctets l&agrave; o&ugrave; Tseitin aurait donn&eacute; quelques milliers de clauses.</p>
+<h2 id="h3">3. La r&eacute;solution</h2>
+<div class="algo-tag">m&eacute;thode d&eacute;ductive &middot; compl&egrave;te pour la r&eacute;futation</div>
+<p><strong>But.</strong> D&eacute;montrer qu'un &eacute;nonc&eacute; d&eacute;coule d'une base, en montrant que sa n&eacute;gation rend l'ensemble contradictoire.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : une base de connaissances, une question.<br>
+<strong>Sortie</strong> : la clause vide si la question est cons&eacute;quence de la base, ou la certitude qu'elle ne l'est pas.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Nier la question et l'ajouter &agrave; la base.</strong> On ne cherche pas &agrave; d&eacute;montrer la question directement, mais &agrave; rendre sa n&eacute;gation absurde.</li>
+<li><strong>Mettre le tout en clauses</strong> par la proc&eacute;dure pr&eacute;c&eacute;dente.</li>
+<li><strong>Chercher deux clauses opposables</strong> : l'une contenant un litt&eacute;ral, l'autre son oppos&eacute;.</li>
+<li><strong>Produire leur r&eacute;solvante</strong> : la r&eacute;union des deux clauses priv&eacute;e du litt&eacute;ral et de son oppos&eacute;. Elle est vraie dans tout mod&egrave;le des deux clauses de d&eacute;part, ce qui est la seule chose &agrave; v&eacute;rifier.</li>
+<li><strong>Si la r&eacute;solvante est vide, c'est gagn&eacute;</strong> : une clause vide est fausse partout, donc l'ensemble est contradictoire, donc la question d&eacute;coule de la base.</li>
+<li><strong>Sinon l'ajouter et recommencer.</strong> Si aucune paire ne produit de clause nouvelle, la question n'est pas cons&eacute;quence de la base.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Base : &laquo; s'il pleut alors la route est mouill&eacute;e &raquo;, &laquo; la route n'est pas mouill&eacute;e &raquo;. Question : &laquo; il ne pleut pas &raquo;.</p>
+<table><thead><tr><th>&Eacute;tape</th><th>Clauses en pr&eacute;sence</th><th>Paire choisie</th><th>R&eacute;solvante</th></tr></thead><tbody>
+<tr><td>1</td><td>\(\lnot p \lor m\) ; \(\lnot m\) ; \(p\) (n&eacute;gation de la question)</td><td>&mdash;</td><td>&mdash;</td></tr>
+<tr><td>2</td><td>les trois pr&eacute;c&eacute;dentes</td><td>\(\lnot p \lor m\) et \(p\)</td><td>\(m\)</td></tr>
+<tr><td>3</td><td>les quatre</td><td>\(m\) et \(\lnot m\)</td><td><strong>clause vide</strong></td></tr>
+</tbody></table>
+<p>Deux r&eacute;solutions suffisent. Notez que la question &laquo; il ne pleut pas &raquo; est ni&eacute;e en &laquo; il pleut &raquo;, donn&eacute;e comme clause &agrave; l'&eacute;tape 1 ; c'est elle qui d&eacute;clenche la contradiction. Sans le d&eacute;tour par la n&eacute;gation, la r&eacute;solution ne trouverait rien : elle ne sait produire que des clauses plus courtes, jamais plus longues.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> La r&eacute;solvante est cons&eacute;quence de ses deux parents : dans tout mod&egrave;le des deux clauses, le litt&eacute;ral &eacute;limin&eacute; est vrai dans l'une ou faux dans l'autre, et dans les deux cas un litt&eacute;ral de la r&eacute;solvante est vrai. La m&eacute;thode est donc correcte. Elle est de plus <em>compl&egrave;te pour la r&eacute;futation</em> : si l'ensemble est contradictoire, la clause vide finit par appara&icirc;tre. Elle n'est pas compl&egrave;te au sens ordinaire, ce qui est sans cons&eacute;quence gr&acirc;ce au d&eacute;tour par la n&eacute;gation.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Sur un nombre fini de variables, le nombre de clauses distinctes est fini : la saturation s'atteint. Variant : le nombre de clauses possibles non encore produites. En logique des pr&eacute;dicats, ce variant dispara&icirc;t et la proc&eacute;dure peut ne jamais s'arr&ecirc;ter.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Chaque tour confronte toutes les paires de clauses, et le nombre de clauses peut cro&icirc;tre tr&egrave;s vite. C'est le d&eacute;faut central : la r&eacute;solution produit &eacute;norm&eacute;ment de clauses interm&eacute;diaires inutiles, ce qui a conduit &agrave; lui pr&eacute;f&eacute;rer DPLL en pratique.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Oublier de nier la question : on cherche alors une contradiction dans une base coh&eacute;rente, et l'on ne trouve rien. R&eacute;soudre sur deux litt&eacute;raux &agrave; la fois, ce qui produit une clause qui n'est pas cons&eacute;quence des parents. Et se noyer sous les clauses redondantes faute de supprimer celles qui en subsument d'autres.</p>
+<h2 id="h4">4. DPLL</h2>
+<div class="algo-tag">recherche de mod&egrave;le &middot; retour sur trace et propagation</div>
+<p><strong>But.</strong> Trouver une affectation qui satisfait toutes les clauses, ou prouver qu'il n'en existe aucune, en ne faisant de choix que l&agrave; o&ugrave; il y en a r&eacute;ellement.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : un ensemble de clauses.<br>
+<strong>Sortie</strong> : une affectation qui les satisfait toutes, ou l'&eacute;chec.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Propager les clauses unitaires.</strong> Une clause dont un seul litt&eacute;ral reste ind&eacute;termin&eacute; et qui n'est pas encore satisfaite force la valeur de ce litt&eacute;ral. Ce n'est pas un choix, c'est une constatation, et il faut recommencer tant que la propagation en produit de nouvelles.</li>
+<li><strong>Si une clause est devenue fausse, &eacute;chouer</strong> : cette branche est morte.</li>
+<li><strong>Si toutes les clauses sont satisfaites, r&eacute;ussir</strong> et rendre l'affectation.</li>
+<li><strong>Sinon choisir une variable non affect&eacute;e</strong> et lui donner une valeur. C'est le seul endroit o&ugrave; l'on choisit, et le seul o&ugrave; l'on peut se tromper.</li>
+<li><strong>Recommencer sur le probl&egrave;me r&eacute;duit.</strong> En cas d'&eacute;chec, revenir et essayer l'autre valeur.</li>
+<li><strong>Si les deux valeurs &eacute;chouent, &eacute;chouer</strong> &agrave; ce niveau.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Cinq clauses : \(a \lor b\), \(\lnot a \lor c\), \(\lnot c\), \(\lnot b \lor d\), \(\lnot d \lor a\).</p>
+<table><thead><tr><th>&Eacute;tape</th><th>Ce qui d&eacute;clenche</th><th>Affectation forc&eacute;e ou choisie</th><th>&Eacute;tat des clauses</th></tr></thead><tbody>
+<tr><td>1</td><td>\(\lnot c\) est unitaire</td><td>\(c\) = faux</td><td>\(\lnot a \lor c\) devient unitaire</td></tr>
+<tr><td>2</td><td>propagation</td><td>\(a\) = faux</td><td>\(a \lor b\) devient unitaire, \(\lnot d \lor a\) aussi</td></tr>
+<tr><td>3</td><td>propagation</td><td>\(b\) = vrai puis \(d\) = faux</td><td>\(\lnot b \lor d\) devient fausse</td></tr>
+<tr><td>4</td><td>conflit</td><td>&mdash;</td><td><strong>&eacute;chec sans avoir fait le moindre choix</strong></td></tr>
+</tbody></table>
+<p>Cet exemple est instructif parce qu'aucune d&eacute;cision n'a &eacute;t&eacute; prise : la seule propagation unitaire suffit &agrave; prouver que la formule est insatisfiable. Sur la figure interactive du chapitre, la m&ecirc;me formule vue sans propagation demande dix-sept n&oelig;uds l&agrave; o&ugrave; deux suffisent avec.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> La propagation unitaire ne perd aucun mod&egrave;le : si une clause n'a qu'un litt&eacute;ral ind&eacute;termin&eacute; et n'est pas satisfaite, tout mod&egrave;le doit rendre ce litt&eacute;ral vrai. Le retour sur trace explore les deux valeurs de chaque variable choisie, donc n'&eacute;carte aucune affectation. La proc&eacute;dure est donc correcte et compl&egrave;te : elle trouve un mod&egrave;le s'il en existe, et prouve l'absence sinon.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Mesure : le nombre de variables non affect&eacute;es, entier positif qui d&eacute;cro&icirc;t strictement &agrave; chaque descente. La propagation ne fait que le diminuer plus vite.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Exponentiel au pire cas, ce qui est in&eacute;vitable puisque le probl&egrave;me est NP-complet. La m&eacute;moire, elle, est lin&eacute;aire en le nombre de variables : c'est l'avantage d&eacute;cisif sur la m&eacute;thode d'&eacute;limination de 1960, qui saturait la m&eacute;moire des machines de l'&eacute;poque.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Propager une seule fois au lieu de propager jusqu'&agrave; saturation : la moiti&eacute; du b&eacute;n&eacute;fice dispara&icirc;t. Consid&eacute;rer comme unitaire une clause d&eacute;j&agrave; satisfaite, ce qui force des valeurs sans raison. Oublier de d&eacute;faire les affectations propag&eacute;es au retour, ce qui pollue la branche s&oelig;ur. Et choisir la variable de branchement au hasard : sur les grandes instances, l'heuristique de branchement fait souvent plus de diff&eacute;rence que tout le reste.</p>
+<nav class="lesson-nav"><div class="container">
+<a href="page.html">&larr; Retour au chapitre 7</a>
+<a href="../../index.html">Sommaire du manuel</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+</body></html>

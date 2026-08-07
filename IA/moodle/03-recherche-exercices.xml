@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Parcours en largeur</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;PARCOURS EN LARGEUR&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Un graphe non pondere est donne sous forme de dictionnaire d'adjacence. On cherche un chemin comportant le plus petit nombre d'aretes.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire une fonction &lt;strong&gt;&lt;code&gt;bfs(graphe, depart, but)&lt;/code&gt;&lt;/strong&gt; qui renvoie la liste des sommets d'un plus court chemin (en nombre d'aretes) de &lt;code&gt;depart&lt;/code&gt; a &lt;code&gt;but&lt;/code&gt;, ou &lt;code&gt;None&lt;/code&gt; s'il n'en existe aucun. Les voisins sont explores dans l'ordre ou ils apparaissent dans la liste d'adjacence.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;bfs({'A': ['B', 'C'], 'B': ['D'], 'C': ['D'], 'D': []}, 'A', 'D') &amp;rarr; ['A', 'B', 'D']&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>from collections import deque
+
+def bfs(graphe, depart, but):
+    # 1. cas trivial : depart == but
+    # 2. file d'attente + dictionnaire des parents
+    # 3. tant que la file n'est pas vide : defiler, explorer les voisins
+    # 4. remonter les parents pour reconstruire le chemin
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>from collections import deque
+
+def bfs(graphe, depart, but):
+    if depart == but:
+        return [depart]
+    file = deque([depart])
+    parent = {depart: None}
+    while file:
+        s = file.popleft()
+        for v in graphe.get(s, []):
+            if v in parent:
+                continue
+            parent[v] = s
+            if v == but:
+                chemin = [v]
+                while chemin[-1] is not None:
+                    chemin.append(parent[chemin[-1]])
+                return chemin[-2::-1]
+            file.append(v)
+    return None
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'A': ['B', 'C'], 'B': ['D'], 'C': ['D'], 'D': []}
+print(bfs(G, 'A', 'D'))
+</text></testcode><stdin><text /></stdin><expected><text>['A', 'B', 'D']
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'A': ['B'], 'B': ['A']}
+print(bfs(G, 'A', 'A'))
+</text></testcode><stdin><text /></stdin><expected><text>['A']
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {1: [2, 3], 2: [4], 3: [4, 5], 4: [6], 5: [6], 6: []}
+print(bfs(G, 1, 6))
+</text></testcode><stdin><text /></stdin><expected><text>[1, 2, 4, 6]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'A': ['B'], 'B': ['A'], 'C': []}
+print(bfs(G, 'A', 'C'))
+</text></testcode><stdin><text /></stdin><expected><text>None
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {i: [i + 1] for i in range(50)}
+G[50] = []
+print(len(bfs(G, 0, 50)))
+</text></testcode><stdin><text /></stdin><expected><text>51
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Recherche a cout uniforme</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;COUT UNIFORME&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Les aretes portent maintenant un cout strictement positif. Le chemin ayant le moins d'aretes n'est plus forcement le moins couteux.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire une fonction &lt;strong&gt;&lt;code&gt;cout_uniforme(graphe, depart, but)&lt;/code&gt;&lt;/strong&gt; qui renvoie le couple &lt;code&gt;(cout, chemin)&lt;/code&gt; d'un chemin de cout minimal, ou &lt;code&gt;(float('inf'), None)&lt;/code&gt; s'il n'existe pas. Le graphe est un dictionnaire associant a chaque sommet la liste des couples &lt;code&gt;(voisin, cout)&lt;/code&gt;. Utiliser le module &lt;code&gt;heapq&lt;/code&gt;.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;graphe = {'S': [('A', 1), ('B', 5)], 'A': [('B', 1)], 'B': []}
+cout_uniforme(graphe, 'S', 'B') &amp;rarr; (2, ['S', 'A', 'B'])&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import heapq
+
+def cout_uniforme(graphe, depart, but):
+    # dictionnaire des meilleurs couts connus, dictionnaire des parents
+    # tas min ordonne sur le cout cumule, ensemble des sommets deja developpes
+    # ne s'arreter QUE lorsque le but est extrait du tas, pas quand il est decouvert
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import heapq
+
+def cout_uniforme(graphe, depart, but):
+    g = {depart: 0}
+    parent = {depart: None}
+    tas = [(0, depart)]
+    ferme = set()
+    while tas:
+        cout, s = heapq.heappop(tas)
+        if s in ferme:
+            continue
+        ferme.add(s)
+        if s == but:
+            chemin = []
+            while s is not None:
+                chemin.append(s)
+                s = parent[s]
+            return (cout, chemin[::-1])
+        for v, c in graphe.get(s, []):
+            if v not in g or cout + c &lt; g[v]:
+                g[v] = cout + c
+                parent[v] = s
+                heapq.heappush(tas, (cout + c, v))
+    return (float('inf'), None)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'S': [('A', 1), ('B', 5)], 'A': [('B', 1)], 'B': []}
+print(cout_uniforme(G, 'S', 'B'))
+</text></testcode><stdin><text /></stdin><expected><text>(2, ['S', 'A', 'B'])
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'S': [('A', 2), ('B', 3)], 'A': [('C', 3), ('D', 2)], 'B': [('D', 4), ('E', 3)],
+     'C': [('F', 2)], 'D': [('F', 3), ('G', 6)], 'E': [('G', 5)], 'F': [('G', 2)], 'G': []}
+print(cout_uniforme(G, 'S', 'G'))
+</text></testcode><stdin><text /></stdin><expected><text>(9, ['S', 'A', 'D', 'F', 'G'])
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'A': [], 'B': []}
+print(cout_uniforme(G, 'A', 'B'))
+</text></testcode><stdin><text /></stdin><expected><text>(inf, None)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'A': [('B', 10), ('C', 1)], 'B': [], 'C': [('B', 1)]}
+print(cout_uniforme(G, 'A', 'B'))
+</text></testcode><stdin><text /></stdin><expected><text>(2, ['A', 'C', 'B'])
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'X': [('X', 1)]}
+print(cout_uniforme(G, 'X', 'X'))
+</text></testcode><stdin><text /></stdin><expected><text>(0, ['X'])
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — A* sur une grille</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;ALGORITHME A*&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Une grille rectangulaire contient des murs. On se deplace horizontalement ou verticalement, chaque pas coutant 1. L'heuristique de Manhattan est admissible et coherente pour ce probleme.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;a_star(grille, depart, arrivee)&lt;/code&gt;&lt;/strong&gt; qui renvoie le couple &lt;code&gt;(cout, nb_developpes)&lt;/code&gt;. La grille est une liste de chaines : &lt;code&gt;'.'&lt;/code&gt; designe une case libre, &lt;code&gt;'#'&lt;/code&gt; un mur. Les positions sont des couples &lt;code&gt;(ligne, colonne)&lt;/code&gt;. &lt;code&gt;nb_developpes&lt;/code&gt; compte les cases extraites du tas et effectivement developpees (sans les doublons perimes). Si l'arrivee est inatteignable, renvoyer &lt;code&gt;(-1, nb_developpes)&lt;/code&gt;. A cout total egal, extraire en priorite la case de plus grand cout deja paye.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;grille = ['....', '.##.', '....']
+a_star(grille, (0, 0), (2, 3)) &amp;rarr; (5, 6)&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import heapq
+
+def a_star(grille, depart, arrivee):
+    # h(p) = distance de Manhattan de p a l'arrivee
+    # tas ordonne sur (g + h, -g, position) : le -g departage a f egal
+    # compter un developpement a chaque extraction non perimee
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import heapq
+
+def a_star(grille, depart, arrivee):
+    nl, nc = len(grille), len(grille[0])
+
+    def libre(p):
+        i, j = p
+        return 0 &lt;= i &lt; nl and 0 &lt;= j &lt; nc and grille[i][j] != '#'
+
+    def h(p):
+        return abs(p[0] - arrivee[0]) + abs(p[1] - arrivee[1])
+
+    if not libre(depart) or not libre(arrivee):
+        return (-1, 0)
+    g = {depart: 0}
+    tas = [(h(depart), 0, depart)]
+    ferme = set()
+    developpes = 0
+    while tas:
+        f, mg, p = heapq.heappop(tas)
+        if p in ferme:
+            continue
+        ferme.add(p)
+        developpes += 1
+        if p == arrivee:
+            return (-mg, developpes)
+        i, j = p
+        for v in ((i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)):
+            if not libre(v):
+                continue
+            ng = g[p] + 1
+            if v not in g or ng &lt; g[v]:
+                g[v] = ng
+                heapq.heappush(tas, (ng + h(v), -ng, v))
+    return (-1, developpes)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>g = ['....', '.##.', '....']
+print(a_star(g, (0, 0), (2, 3)))
+</text></testcode><stdin><text /></stdin><expected><text>(5, 6)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>g = ['...', '...', '...']
+print(a_star(g, (0, 0), (0, 2)))
+</text></testcode><stdin><text /></stdin><expected><text>(2, 3)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>g = ['.#.', '.#.', '.#.']
+print(a_star(g, (0, 0), (0, 2)))
+</text></testcode><stdin><text /></stdin><expected><text>(-1, 3)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>g = ['.....', '####.', '.....']
+print(a_star(g, (0, 0), (2, 0)))
+</text></testcode><stdin><text /></stdin><expected><text>(10, 11)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>g = ['.']
+print(a_star(g, (0, 0), (0, 0)))
+</text></testcode><stdin><text /></stdin><expected><text>(0, 1)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q4 — Admissibilite et coherence d'une heuristique</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;TESTER UNE HEURISTIQUE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Une heuristique est admissible si elle ne surestime jamais le cout restant, et coherente si elle verifie l'inegalite triangulaire le long de chaque arc. La coherence implique l'admissibilite ; la reciproque est fausse.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;diagnostic(graphe, h, but)&lt;/code&gt;&lt;/strong&gt; qui renvoie le couple de booleens &lt;code&gt;(admissible, coherente)&lt;/code&gt;. Le graphe est un dictionnaire de listes de couples &lt;code&gt;(voisin, cout)&lt;/code&gt; ; &lt;code&gt;h&lt;/code&gt; est un dictionnaire des valeurs de l'heuristique. Une heuristique est admissible si pour tout sommet &lt;code&gt;s&lt;/code&gt; on a &lt;code&gt;h[s] &amp;lt;= d(s, but)&lt;/code&gt;, ou &lt;code&gt;d&lt;/code&gt; est le cout optimal reel (les sommets d'ou le but est inatteignable sont ignores). Elle est coherente si &lt;code&gt;h[u] &amp;lt;= c + h[v]&lt;/code&gt; pour tout arc, et si &lt;code&gt;h[but] == 0&lt;/code&gt;.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;graphe = {'A': [('B', 1)], 'B': [('C', 1)], 'C': []}
+diagnostic(graphe, {'A': 2, 'B': 1, 'C': 0}, 'C') &amp;rarr; (True, True)&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import heapq
+
+def diagnostic(graphe, h, but):
+    # 1. construire le graphe inverse
+    # 2. Dijkstra depuis le but sur ce graphe inverse : couts reels d[s]
+    # 3. admissible : h[s] &lt;= d[s] pour tout sommet d'ou le but est atteignable
+    # 4. coherente : h[but] == 0 et h[u] &lt;= c + h[v] pour tout arc (u, v, c)
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import heapq
+
+def diagnostic(graphe, h, but):
+    # distances reelles vers le but : Dijkstra sur le graphe inverse
+    inverse = {s: [] for s in graphe}
+    for u in graphe:
+        for v, c in graphe[u]:
+            inverse.setdefault(v, []).append((u, c))
+            inverse.setdefault(u, inverse.get(u, []))
+    d = {but: 0}
+    tas = [(0, but)]
+    while tas:
+        cout, s = heapq.heappop(tas)
+        if cout &gt; d.get(s, float('inf')):
+            continue
+        for u, c in inverse.get(s, []):
+            if cout + c &lt; d.get(u, float('inf')):
+                d[u] = cout + c
+                heapq.heappush(tas, (cout + c, u))
+    admissible = all(h[s] &lt;= d[s] for s in graphe if s in d and s in h)
+    coherente = h.get(but, 0) == 0
+    for u in graphe:
+        for v, c in graphe[u]:
+            if u in h and v in h and h[u] &gt; c + h[v]:
+                coherente = False
+    return (admissible, coherente)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'A': [('B', 1)], 'B': [('C', 1)], 'C': []}
+print(diagnostic(G, {'A': 2, 'B': 1, 'C': 0}, 'C'))
+</text></testcode><stdin><text /></stdin><expected><text>(True, True)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'A': [('B', 1)], 'B': [('C', 1)], 'C': []}
+print(diagnostic(G, {'A': 5, 'B': 1, 'C': 0}, 'C'))
+</text></testcode><stdin><text /></stdin><expected><text>(False, False)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'A': [('B', 1), ('C', 4)], 'B': [('C', 1)], 'C': []}
+print(diagnostic(G, {'A': 2, 'B': 0, 'C': 0}, 'C'))
+</text></testcode><stdin><text /></stdin><expected><text>(True, False)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'A': [('B', 3)], 'B': []}
+print(diagnostic(G, {'A': 3, 'B': 0}, 'B'))
+</text></testcode><stdin><text /></stdin><expected><text>(True, True)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'A': [('B', 3)], 'B': []}
+print(diagnostic(G, {'A': 0, 'B': 1}, 'B'))
+</text></testcode><stdin><text /></stdin><expected><text>(False, False)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q5 — A* a approfondissement iteratif</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;IDA*&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;A* garde toute la frange en memoire. IDA* n'en conserve qu'une branche : il relance une recherche en profondeur avec une borne croissante sur f = g + h.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;ida_star(graphe, h, depart, but)&lt;/code&gt;&lt;/strong&gt; qui renvoie le cout optimal, ou &lt;code&gt;-1&lt;/code&gt; si le but est inatteignable. Le graphe est un dictionnaire de listes de couples &lt;code&gt;(voisin, cout)&lt;/code&gt;, &lt;code&gt;h&lt;/code&gt; un dictionnaire d'heuristique admissible. A chaque iteration, on explore en profondeur en abandonnant toute branche des que &lt;code&gt;f &amp;gt; borne&lt;/code&gt;, puis on remplace la borne par la plus petite valeur de &lt;code&gt;f&lt;/code&gt; ainsi rejetee. Eviter les sommets deja presents sur la branche courante.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;graphe = {'S': [('A', 2), ('B', 3)], 'A': [('G', 5)], 'B': [('G', 3)], 'G': []}
+ida_star(graphe, {'S': 0, 'A': 0, 'B': 0, 'G': 0}, 'S', 'G') &amp;rarr; 6&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def ida_star(graphe, h, depart, but):
+    # borne initiale = h[depart]
+    # explorer(g, borne) : renvoie 'TROUVE', ou la plus petite valeur de f rejetee
+    # tant qu'on n'a pas trouve : borne &lt;- plus petite valeur rejetee
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def ida_star(graphe, h, depart, but):
+    borne = h.get(depart, 0)
+    chemin = [depart]
+
+    def explorer(g, borne):
+        s = chemin[-1]
+        f = g + h.get(s, 0)
+        if f &gt; borne:
+            return f
+        if s == but:
+            return 'TROUVE'
+        mini = float('inf')
+        for v, c in graphe.get(s, []):
+            if v in chemin:
+                continue
+            chemin.append(v)
+            r = explorer(g + c, borne)
+            chemin.pop()
+            if r == 'TROUVE':
+                return 'TROUVE'
+            if r &lt; mini:
+                mini = r
+        return mini
+
+    while True:
+        r = explorer(0, borne)
+        if r == 'TROUVE':
+            return borne
+        if r == float('inf'):
+            return -1
+        borne = r
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'S': [('A', 2), ('B', 3)], 'A': [('G', 5)], 'B': [('G', 3)], 'G': []}
+print(ida_star(G, {'S': 0, 'A': 0, 'B': 0, 'G': 0}, 'S', 'G'))
+</text></testcode><stdin><text /></stdin><expected><text>6
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'S': [('A', 2), ('B', 3)], 'A': [('C', 3), ('D', 2)], 'B': [('D', 4), ('E', 3)],
+     'C': [('F', 2)], 'D': [('F', 3), ('G', 6)], 'E': [('G', 5)], 'F': [('G', 2)], 'G': []}
+print(ida_star(G, {'S': 7, 'A': 5, 'B': 6, 'C': 3, 'D': 4, 'E': 4, 'F': 2, 'G': 0}, 'S', 'G'))
+</text></testcode><stdin><text /></stdin><expected><text>9
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'A': [], 'B': []}
+print(ida_star(G, {'A': 0, 'B': 0}, 'A', 'B'))
+</text></testcode><stdin><text /></stdin><expected><text>-1
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'A': [('B', 1)], 'B': [('A', 1)]}
+print(ida_star(G, {'A': 1, 'B': 0}, 'A', 'B'))
+</text></testcode><stdin><text /></stdin><expected><text>1
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>G = {'A': [('A', 1)]}
+print(ida_star(G, {'A': 0}, 'A', 'A'))
+</text></testcode><stdin><text /></stdin><expected><text>0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

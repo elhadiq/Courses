@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 9 &mdash; Annexe algorithmique</title>
+<meta name="description" content="Plus proches voisins, descente de gradient, construction d un arbre et validation croisee, pas a pas.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Chapitre 9 &middot; Annexe</div>
+<h1>Les algorithmes d'apprentissage, pas &agrave; pas</h1>
+<div class="lesson-sub">Quatre proc&eacute;dures d&eacute;crites en fran&ccedil;ais, avec des exemples chiffr&eacute;s v&eacute;rifiables &agrave; la calculatrice.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box tip"><div class="box-title">Comment lire cette annexe</div>
+Aucune ligne de programme. <a href="page.html">Retour au chapitre</a>.</div>
+
+<div class="annex-toc">
+<a href="#d1">1. Les \(k\) plus proches voisins</a>
+<a href="#d2">2. Descente de gradient</a>
+<a href="#d3">3. Construction d'un arbre de d&eacute;cision</a>
+<a href="#d4">4. Validation crois&eacute;e</a>
+</div>
+
+<figure class="viz"><div class="viz-title">Les six exemples</div><svg viewBox="0 0 760 354" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Les six exemples, et ce que chaque valeur de \(k\) englobe</text><path d="M 120 176 L 640 176" style="fill:none;stroke:var(--viz-axis);stroke-width:1.5;"/><path d="M 380 60 L 380 292" style="fill:none;stroke:var(--viz-axis);stroke-width:1.5;"/><circle cx="380" cy="176" r="43" style="fill:none;stroke:var(--primary);stroke-width:1.4;stroke-dasharray:4 4;"/><text x="380" y="126" text-anchor="middle" style="fill:var(--primary);font-size:11px;font-weight:700;font-family:inherit;">k = 1</text><circle cx="380" cy="176" r="68.8" style="fill:none;stroke:var(--primary);stroke-width:1.4;stroke-dasharray:4 4;"/><text x="380" y="100.2" text-anchor="middle" style="fill:var(--primary);font-size:11px;font-weight:700;font-family:inherit;">k = 3</text><circle cx="380" cy="176" r="116.1" style="fill:none;stroke:var(--primary);stroke-width:1.4;stroke-dasharray:4 4;"/><text x="380" y="52.9" text-anchor="middle" style="fill:var(--primary);font-size:11px;font-weight:700;font-family:inherit;">k = 5</text><circle cx="405.8" cy="160" r="8" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:2;"/><text x="405.8" y="164" text-anchor="middle" style="fill:var(--color-bg);font-size:10px;font-weight:700;font-family:inherit;">A</text><circle cx="328.4" cy="176" r="8" style="fill:var(--viz-blue);stroke:var(--color-bg);stroke-width:2;"/><text x="328.4" y="180" text-anchor="middle" style="fill:var(--color-bg);font-size:10px;font-weight:700;font-family:inherit;">B</text><circle cx="380" cy="208" r="8" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:2;"/><text x="380" y="212" text-anchor="middle" style="fill:var(--color-bg);font-size:10px;font-weight:700;font-family:inherit;">A</text><circle cx="457.4" cy="224" r="8" style="fill:var(--viz-blue);stroke:var(--color-bg);stroke-width:2;"/><text x="457.4" y="228" text-anchor="middle" style="fill:var(--color-bg);font-size:10px;font-weight:700;font-family:inherit;">B</text><circle cx="242.4" cy="128" r="8" style="fill:var(--viz-blue);stroke:var(--color-bg);stroke-width:2;"/><text x="242.4" y="132" text-anchor="middle" style="fill:var(--color-bg);font-size:10px;font-weight:700;font-family:inherit;">B</text><circle cx="560.6" cy="64" r="8" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:2;"/><text x="560.6" y="68" text-anchor="middle" style="fill:var(--color-bg);font-size:10px;font-weight:700;font-family:inherit;">A</text><circle cx="380" cy="176" r="7" style="fill:var(--color-bg);stroke:var(--viz-bad);stroke-width:3;"/><text x="380" y="202" text-anchor="middle" style="fill:var(--viz-bad);font-size:12px;font-weight:700;font-family:inherit;">point &agrave; classer</text><text x="380" y="322" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Avec \(k = 1\) et \(k = 3\) , la majorit&eacute; est A ; avec \(k = 5\) , elle bascule sur B. Un seul jeu de donn&eacute;es, trois r&eacute;ponses :</text><text x="380" y="340" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">\(k\) est bien un hyperparam&egrave;tre, &agrave; choisir sur des donn&eacute;es s&eacute;par&eacute;es.</text></svg><figcaption class="viz-caption"><strong>Figure A.1.</strong> Le jeu de donn&eacute;es du premier d&eacute;roul&eacute;. Les cercles pointill&eacute;s montrent ce que chaque valeur de \(k\) englobe, et pourquoi la r&eacute;ponse bascule entre 3 et 5 voisins.</figcaption></figure>
+
+<h2 id="d1">1. Les \(k\) plus proches voisins</h2>
+<div class="algo-tag">m&eacute;thode par m&eacute;morisation &middot; aucun apprentissage</div>
+<p><strong>But.</strong> Pr&eacute;dire l'&eacute;tiquette d'un nouvel individu en regardant ce qui est arriv&eacute; aux individus qui lui ressemblent le plus.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div>
+<p><strong>Entr&eacute;e</strong> : un tableau d'exemples d&eacute;crits par des nombres et &eacute;tiquet&eacute;s, un nouvel individu, un entier \(k\), une fa&ccedil;on de mesurer la distance.<br>
+<strong>Sortie</strong> : l'&eacute;tiquette pr&eacute;dite.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div>
+<ol>
+<li><strong>Mettre toutes les colonnes &agrave; la m&ecirc;me &eacute;chelle</strong> : retrancher la moyenne et diviser par l'&eacute;cart-type de chaque variable. Sans cela, une variable exprim&eacute;e en milliers &eacute;craserait toutes les autres dans la distance. Ces moyennes et &eacute;carts-types se calculent sur les seuls exemples d'apprentissage.</li>
+<li><strong>Calculer la distance du nouvel individu &agrave; chacun des exemples.</strong> Aucune structure n'a &eacute;t&eacute; construite &agrave; l'avance : tout le travail est ici.</li>
+<li><strong>Retenir les \(k\) exemples les plus proches.</strong></li>
+<li><strong>Faire voter leurs &eacute;tiquettes</strong> et rendre la majoritaire. On prend \(k\) impair en classification binaire pour &eacute;viter les &eacute;galit&eacute;s. En r&eacute;gression, on rend la moyenne des valeurs.</li>
+<li><strong>Variante utile</strong> : pond&eacute;rer chaque vote par l'inverse de la distance, ce qui &eacute;vite qu'un voisin lointain p&egrave;se autant qu'un voisin coll&eacute; au point.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Six exemples d&eacute;j&agrave; normalis&eacute;s, deux variables, deux classes. On veut classer le point \((0{,}0\ ;\ 0{,}0)\) :</p>
+<table>
+<thead><tr><th>Exemple</th><th>Coordonn&eacute;es</th><th>Classe</th><th>Distance au point</th><th>Rang</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>(0,3 ; 0,4)</td><td>A</td><td>0,50</td><td>1</td></tr>
+<tr><td>2</td><td>(&minus;0,6 ; 0,0)</td><td>B</td><td>0,60</td><td>2</td></tr>
+<tr><td>3</td><td>(0,0 ; &minus;0,8)</td><td>A</td><td>0,80</td><td>3</td></tr>
+<tr><td>4</td><td>(0,9 ; &minus;1,2)</td><td>B</td><td>1,50</td><td>4</td></tr>
+<tr><td>5</td><td>(&minus;1,6 ; 1,2)</td><td>B</td><td>2,00</td><td>5</td></tr>
+<tr><td>6</td><td>(2,1 ; 2,8)</td><td>A</td><td>3,50</td><td>6</td></tr>
+</tbody></table>
+<p>Avec \(k=1\), le vote donne <strong>A</strong>. Avec \(k=3\), les voisins sont A, B, A : encore <strong>A</strong>. Avec \(k=5\), ce sont A, B, A, B, B : la r&eacute;ponse bascule sur <strong>B</strong>. Un seul jeu de donn&eacute;es, trois r&eacute;ponses possibles selon \(k\) : c'est bien un hyperparam&egrave;tre &agrave; choisir, et &agrave; choisir sur des donn&eacute;es s&eacute;par&eacute;es.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Il n'y a pas de correction au sens des chapitres pr&eacute;c&eacute;dents, mais une garantie statistique : quand le nombre d'exemples tend vers l'infini, le taux d'erreur de la r&egrave;gle &agrave; un voisin ne d&eacute;passe jamais le double du minimum absolu atteignable en connaissant la loi qui engendre les donn&eacute;es. La moiti&eacute; de l'information utile est port&eacute;e par le seul voisin le plus proche.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> La proc&eacute;dure ne comporte aucune boucle non born&eacute;e : un balayage des exemples, un tri, un vote.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Rien &agrave; l'apprentissage, ce qui est exceptionnel ; mais chaque pr&eacute;diction co&ucirc;te un balayage complet du jeu d'apprentissage, soit le nombre d'exemples multipli&eacute; par le nombre de variables. En production, cela devient le goulot d'&eacute;tranglement, et il faut recourir &agrave; des structures d'indexation spatiale.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Oublier la normalisation, ce qui revient &agrave; ne regarder qu'une seule variable. Calculer moyenne et &eacute;cart-type sur l'ensemble des donn&eacute;es, y compris celles r&eacute;serv&eacute;es &agrave; l'&eacute;valuation : le score obtenu est alors faussement bon. Et surtout, la grande dimension : d&egrave;s une vingtaine de variables, tous les points sont &agrave; peu pr&egrave;s &agrave; la m&ecirc;me distance les uns des autres, et la notion de voisinage perd son sens.</p>
+
+<h2 id="d2">2. Descente de gradient</h2>
+<div class="algo-tag">m&eacute;thode it&eacute;rative &middot; optimisation num&eacute;rique</div>
+<p><strong>But.</strong> Trouver les param&egrave;tres qui minimisent une mesure d'erreur, lorsqu'aucune formule ne les donne directement.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div>
+<p><strong>Entr&eacute;e</strong> : une fonction d'erreur d&eacute;pendant de param&egrave;tres, la fa&ccedil;on de calculer sa pente en un point, un point de d&eacute;part, un pas.<br>
+<strong>Sortie</strong> : des param&egrave;tres pour lesquels l'erreur est proche de son minimum.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div>
+<ol>
+<li><strong>Partir de param&egrave;tres quelconques</strong>, souvent tous nuls ou tir&eacute;s au hasard tr&egrave;s pr&egrave;s de z&eacute;ro.</li>
+<li><strong>Calculer la pente de l'erreur</strong> en ce point, param&egrave;tre par param&egrave;tre. Elle indique la direction dans laquelle l'erreur cro&icirc;t le plus vite.</li>
+<li><strong>Se d&eacute;placer dans la direction oppos&eacute;e</strong>, d'une longueur proportionnelle &agrave; la pente et au pas choisi. On descend donc la surface d'erreur.</li>
+<li><strong>R&eacute;p&eacute;ter</strong> jusqu'&agrave; ce que l'erreur ne diminue plus de fa&ccedil;on appr&eacute;ciable, ou qu'un nombre maximal d'it&eacute;rations soit atteint.</li>
+<li><strong>Variante pour les grands jeux de donn&eacute;es</strong> : au lieu de calculer la pente sur tous les exemples, la calculer sur un petit lot tir&eacute; au hasard. Chaque pas est bien plus rapide et bruit&eacute; ; le bruit aide m&ecirc;me &agrave; s'&eacute;chapper des minima locaux peu profonds.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Erreur \(J(\theta) = (\theta - 3)^{2}\), donc de pente \(2(\theta-3)\), avec un pas de 0,3 depuis \(\theta = 0\) :</p>
+<table>
+<thead><tr><th>It&eacute;ration</th><th>\(\theta\)</th><th>Pente</th><th>D&eacute;placement</th><th>Erreur</th></tr></thead>
+<tbody>
+<tr><td>0</td><td>0,000</td><td>&minus;6,000</td><td>+1,800</td><td>9,000</td></tr>
+<tr><td>1</td><td>1,800</td><td>&minus;2,400</td><td>+0,720</td><td>1,440</td></tr>
+<tr><td>2</td><td>2,520</td><td>&minus;0,960</td><td>+0,288</td><td>0,230</td></tr>
+<tr><td>3</td><td>2,808</td><td>&minus;0,384</td><td>+0,115</td><td>0,037</td></tr>
+<tr><td>4</td><td>2,923</td><td>&minus;0,154</td><td>+0,046</td><td>0,006</td></tr>
+</tbody></table>
+<p>L'&eacute;cart au minimum est multipli&eacute; par 0,4 &agrave; chaque tour : la convergence est g&eacute;om&eacute;trique. Refaites le calcul avec un pas de 1,1 : l'&eacute;cart est alors multipli&eacute; par &minus;1,2 et la suite <em>diverge</em> en oscillant. Ici la courbure vaut 2, et la condition de convergence est un pas strictement inf&eacute;rieur &agrave; 1.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Si l'erreur est convexe et de pente lipschitzienne de constante \(L\), et si le pas ne d&eacute;passe pas \(1/L\), chaque it&eacute;ration diminue l'erreur et la suite converge vers le minimum global ; l'&eacute;cart d&eacute;cro&icirc;t comme l'inverse du nombre d'it&eacute;rations. Si l'erreur est de plus fortement convexe, la d&eacute;croissance devient g&eacute;om&eacute;trique, comme dans l'exemple ci-dessus. Sans convexit&eacute;, on ne garantit qu'un point o&ugrave; la pente s'annule.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Par un crit&egrave;re impos&eacute; : nombre maximal d'it&eacute;rations, ou diminution de l'erreur inf&eacute;rieure &agrave; un seuil. Il n'y a pas de variant entier qui garantirait l'arr&ecirc;t.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Chaque it&eacute;ration co&ucirc;te un balayage des donn&eacute;es, soit le nombre d'exemples multipli&eacute; par le nombre de variables. Le nombre d'it&eacute;rations d&eacute;pend du rapport entre la plus grande et la plus petite courbure de la surface d'erreur : plus ce rapport est grand, plus la descente zigzague. C'est la raison pratique pour laquelle on normalise les variables, m&ecirc;me quand la m&eacute;thode ne l'exige pas.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Un pas trop grand fait diverger, un pas trop petit fait ramper. Des variables d'&eacute;chelles tr&egrave;s diff&eacute;rentes cr&eacute;ent une vall&eacute;e &eacute;troite o&ugrave; la descente rebondit d'un bord &agrave; l'autre. Enfin, sur une erreur non convexe, le point atteint d&eacute;pend du point de d&eacute;part.</p>
+
+<h2 id="d3">3. Construction d'un arbre de d&eacute;cision</h2>
+<div class="algo-tag">m&eacute;thode gloutonne &middot; d&eacute;coupage r&eacute;cursif</div>
+<p><strong>But.</strong> Construire une suite de questions simples, portant chacune sur une seule variable, qui s&eacute;pare les exemples en groupes aussi homog&egrave;nes que possible.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div>
+<p><strong>Entr&eacute;e</strong> : un tableau d'exemples &eacute;tiquet&eacute;s, une profondeur maximale ou un effectif minimal par feuille.<br>
+<strong>Sortie</strong> : un arbre dont chaque n&oelig;ud interne pose une question et chaque feuille pr&eacute;dit une &eacute;tiquette.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div>
+<ol>
+<li><strong>Mesurer l'h&eacute;t&eacute;rog&eacute;n&eacute;it&eacute; du groupe courant.</strong> Deux mesures usuelles : l'entropie, qui vaut z&eacute;ro si toutes les &eacute;tiquettes sont identiques et un pour deux classes en proportions &eacute;gales ; ou l'indice de Gini, qui est la probabilit&eacute; de se tromper en tirant une &eacute;tiquette au hasard dans le groupe.</li>
+<li><strong>Si le groupe est pur, ou trop petit, ou si la profondeur maximale est atteinte, en faire une feuille</strong> qui pr&eacute;dit l'&eacute;tiquette majoritaire.</li>
+<li><strong>Sinon, essayer toutes les questions possibles</strong> : pour chaque variable et chaque valeur seuil, calculer l'h&eacute;t&eacute;rog&eacute;n&eacute;it&eacute; moyenne des deux groupes obtenus, pond&eacute;r&eacute;e par leurs effectifs.</li>
+<li><strong>Retenir la question qui r&eacute;duit le plus cette h&eacute;t&eacute;rog&eacute;n&eacute;it&eacute;.</strong> Le choix est glouton : on ne regarde qu'un pas en avant, jamais la combinaison de deux questions.</li>
+<li><strong>Recommencer &agrave; l'&eacute;tape 1</strong> sur chacun des deux groupes.</li>
+<li><strong>Une fois l'arbre construit, l'&eacute;laguer</strong> : supprimer les sous-arbres dont la disparition n'aggrave pas l'erreur mesur&eacute;e sur des donn&eacute;es mises de c&ocirc;t&eacute;. Un test peu informatif peut en pr&eacute;c&eacute;der un tr&egrave;s informatif, et l'arr&ecirc;t pr&eacute;coce seul ne le verrait jamais.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Quatorze journ&eacute;es, dont neuf o&ugrave; l'on a jou&eacute; et cinq o&ugrave; l'on n'a pas jou&eacute;. L'h&eacute;t&eacute;rog&eacute;n&eacute;it&eacute; initiale, mesur&eacute;e par l'entropie, vaut 0,940. On compare trois questions :</p>
+<table>
+<thead><tr><th>Question</th><th>Groupes obtenus (jou&eacute; / pas jou&eacute;)</th><th>Entropies</th><th>Moyenne pond&eacute;r&eacute;e</th><th>Gain</th></tr></thead>
+<tbody>
+<tr><td>temps ?</td><td>ensoleill&eacute; 2/3, couvert 4/0, pluie 3/2</td><td>0,971 &middot; 0,000 &middot; 0,971</td><td>0,694</td><td><strong>0,247</strong></td></tr>
+<tr><td>humidit&eacute; ?</td><td>haute 3/4, normale 6/1</td><td>0,985 &middot; 0,592</td><td>0,788</td><td>0,152</td></tr>
+<tr><td>vent ?</td><td>faible 6/2, fort 3/3</td><td>0,811 &middot; 1,000</td><td>0,892</td><td>0,048</td></tr>
+</tbody></table>
+<p>La question retenue est &laquo; quel temps fait-il ? &raquo;. Sa branche &laquo; couvert &raquo; est d&eacute;j&agrave; pure &mdash; entropie nulle, quatre journ&eacute;es sur quatre o&ugrave; l'on a jou&eacute; &mdash; et devient imm&eacute;diatement une feuille. Les deux autres branches sont trait&eacute;es r&eacute;cursivement avec les questions restantes. Notez la faiblesse de la question sur le vent : elle coupe l'&eacute;chantillon en deux parts d&eacute;s&eacute;quilibr&eacute;es et presque aussi m&eacute;lang&eacute;es que le d&eacute;part.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Il n'y a aucune garantie d'optimalit&eacute; : construire l'arbre le plus petit qui classe correctement les exemples est un probl&egrave;me NP-difficile, et la construction gloutonne n'en donne qu'une approximation. Ce que l'on garantit est plus modeste : chaque coupe diminue l'h&eacute;t&eacute;rog&eacute;n&eacute;it&eacute; moyenne, et l'arbre complet classe correctement tous les exemples d'apprentissage &mdash; ce qui, pr&eacute;cis&eacute;ment, est le probl&egrave;me.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Mesure : le nombre d'exemples du groupe courant, entier positif qui d&eacute;cro&icirc;t strictement &agrave; chaque descente puisqu'on ne retient que les coupes produisant deux groupes non vides. La profondeur maximale fournit une seconde garantie.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> &Agrave; chaque n&oelig;ud, on examine toutes les variables et tous les seuils : si les variables sont tri&eacute;es au pr&eacute;alable, cela revient &agrave; un balayage par variable. Le co&ucirc;t total est de l'ordre du nombre de variables multipli&eacute; par le nombre d'exemples et par le logarithme de ce nombre. La pr&eacute;diction, elle, est quasi instantan&eacute;e : on descend une seule branche.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Le gain d'information favorise m&eacute;caniquement les variables &agrave; nombreuses valeurs : un num&eacute;ro d'identification d&eacute;coupe parfaitement l'&eacute;chantillon et n'apprend rien &mdash; d'o&ugrave; le rapport de gain, qui divise par l'entropie de la r&eacute;partition elle-m&ecirc;me. Un arbre laiss&eacute; libre atteint z&eacute;ro erreur d'apprentissage et m&eacute;morise le bruit. Enfin, les coupes &eacute;tant parall&egrave;les aux axes, une fronti&egrave;re oblique demande un escalier de nombreuses coupes.</p>
+
+<h2 id="d4">4. Validation crois&eacute;e</h2>
+<div class="algo-tag">proc&eacute;dure d'&eacute;valuation &middot; estimation sans complaisance</div>
+<p><strong>But.</strong> Estimer la performance d'un mod&egrave;le sur des donn&eacute;es qu'il n'a jamais vues, sans gaspiller la moiti&eacute; du jeu de donn&eacute;es et sans d&eacute;pendre d'un tirage particulier.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div>
+<p><strong>Entr&eacute;e</strong> : un jeu de donn&eacute;es &eacute;tiquet&eacute;, une proc&eacute;dure d'apprentissage compl&egrave;te &mdash; pr&eacute;traitements compris &mdash; et un entier \(K\).<br>
+<strong>Sortie</strong> : une estimation de la performance, et une mesure de sa stabilit&eacute;.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div>
+<ol>
+<li><strong>M&eacute;langer les donn&eacute;es puis les d&eacute;couper en \(K\) blocs de m&ecirc;me taille.</strong> Si les classes sont d&eacute;s&eacute;quilibr&eacute;es, respecter leurs proportions dans chaque bloc.</li>
+<li><strong>Pour chaque bloc &agrave; son tour</strong> : apprendre sur les \(K-1\) autres, &eacute;valuer sur celui-l&agrave;.</li>
+<li><strong>Ajuster tous les pr&eacute;traitements &agrave; l'int&eacute;rieur de la boucle</strong>, sur la seule portion d'apprentissage du tour. C'est l'&eacute;tape que l'on saute le plus souvent, et c'est celle qui invalide tout.</li>
+<li><strong>Moyenner les \(K\) scores</strong> et calculer leur &eacute;cart-type : la moyenne estime la performance, l'&eacute;cart-type dit &agrave; quel point elle d&eacute;pend du d&eacute;coupage.</li>
+<li><strong>Pour choisir un hyperparam&egrave;tre</strong>, r&eacute;p&eacute;ter toute la proc&eacute;dure pour chaque valeur candidate et retenir la meilleure. Le score de la valeur retenue est alors optimiste : pour l'estimer honn&ecirc;tement, il faut un jeu de test rest&eacute; totalement &agrave; l'&eacute;cart, ou une validation crois&eacute;e imbriqu&eacute;e.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Choix du nombre de voisins par validation crois&eacute;e &agrave; cinq blocs, taux de bonnes r&eacute;ponses :</p>
+<table>
+<thead><tr><th>\(k\)</th><th>Bloc 1</th><th>Bloc 2</th><th>Bloc 3</th><th>Bloc 4</th><th>Bloc 5</th><th>Moyenne</th><th>&Eacute;cart-type</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>0,82</td><td>0,78</td><td>0,86</td><td>0,74</td><td>0,80</td><td>0,800</td><td>0,040</td></tr>
+<tr><td>5</td><td>0,88</td><td>0,86</td><td>0,90</td><td>0,84</td><td>0,87</td><td><strong>0,870</strong></td><td>0,020</td></tr>
+<tr><td>11</td><td>0,86</td><td>0,85</td><td>0,87</td><td>0,83</td><td>0,84</td><td>0,850</td><td>0,014</td></tr>
+<tr><td>21</td><td>0,79</td><td>0,80</td><td>0,78</td><td>0,77</td><td>0,81</td><td>0,790</td><td>0,014</td></tr>
+</tbody></table>
+<p>La valeur retenue est \(k=5\). Notez la seconde colonne d'information : l'&eacute;cart-type d&eacute;cro&icirc;t quand \(k\) augmente, ce qui traduit exactement le compromis du cours &mdash; un mod&egrave;le plus rigide varie moins d'un &eacute;chantillon &agrave; l'autre, m&ecirc;me lorsqu'il devient moins bon en moyenne. Un &eacute;cart de 0,020 entre \(k=5\) et \(k=11\) est du m&ecirc;me ordre que les &eacute;carts-types : conclure &agrave; une sup&eacute;riorit&eacute; nette serait abusif.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Chaque bloc est &eacute;valu&eacute; par un mod&egrave;le qui ne l'a pas vu : l'estimation est donc non biais&eacute;e pour un apprentissage sur \(K-1\) blocs. Elle est l&eacute;g&egrave;rement pessimiste pour le mod&egrave;le final, qui sera appris sur la totalit&eacute; des donn&eacute;es &mdash; c'est un biais du bon c&ocirc;t&eacute;.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Le nombre de tours est fix&eacute; &agrave; \(K\) ; chaque tour se termine si l'apprentissage se termine.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> \(K\) apprentissages complets au lieu d'un seul. Avec \(K = n\), c'est-&agrave;-dire un exemple mis de c&ocirc;t&eacute; &agrave; chaque tour, l'estimation est presque sans biais mais co&ucirc;te \(n\) apprentissages et pr&eacute;sente une forte variance, car les \(n\) mod&egrave;les sont presque identiques. Les valeurs 5 et 10 sont le compromis usuel.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Normaliser, s&eacute;lectionner des variables ou imputer les valeurs manquantes <em>avant</em> le d&eacute;coupage : de l'information des blocs d'&eacute;valuation entre alors dans le mod&egrave;le et les scores deviennent flatteurs. D&eacute;couper au hasard des donn&eacute;es temporelles, ce qui laisse le mod&egrave;le apprendre le futur pour pr&eacute;dire le pass&eacute; ; il faut alors des d&eacute;coupages chronologiques. Placer dans des blocs diff&eacute;rents des mesures issues d'un m&ecirc;me individu. Et enfin, r&eacute;p&eacute;ter la proc&eacute;dure jusqu'&agrave; obtenir le r&eacute;sultat souhait&eacute; : au bout de vingt essais, on finit toujours par trouver un d&eacute;coupage flatteur.</p>
+
+<nav class="lesson-nav"><div class="container">
+<a href="page.html">&larr; Retour au chapitre 9</a>
+<a href="../../index.html">Sommaire du manuel</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+</body></html>

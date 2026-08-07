@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Auditer par sous-groupe</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;AUDIT&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Un score global eleve masque regulierement un echec complet sur une sous-population. L'audit produit un tableau, jamais un score unique.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;auditer(dossiers)&lt;/code&gt;&lt;/strong&gt; ou chaque dossier est le triplet &lt;code&gt;(groupe, reel, predit)&lt;/code&gt; avec &lt;code&gt;reel&lt;/code&gt; et &lt;code&gt;predit&lt;/code&gt; booleens. Renvoyer un dictionnaire groupe vers un dictionnaire de cles &lt;code&gt;'effectif'&lt;/code&gt;, &lt;code&gt;'selection'&lt;/code&gt;, &lt;code&gt;'tvp'&lt;/code&gt; (taux de vrais positifs), &lt;code&gt;'tfp'&lt;/code&gt; (taux de faux positifs) et &lt;code&gt;'precision'&lt;/code&gt;, chaque taux arrondi a 4 decimales. Un taux dont le denominateur est nul vaut &lt;code&gt;0.0&lt;/code&gt;.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;auditer([('A',True,True), ('A',False,False)])['A']['tvp'] &amp;rarr; 1.0&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def auditer(dossiers):
+    # compter vp, fp, fn, vn PAR GROUPE
+    # puis calculer les quatre taux, en protegeant les denominateurs nuls
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def auditer(dossiers):
+    groupes = {}
+    for g, reel, predit in dossiers:
+        if g not in groupes:
+            groupes[g] = {'vp': 0, 'fp': 0, 'fn': 0, 'vn': 0}
+        if reel and predit:
+            groupes[g]['vp'] += 1
+        elif not reel and predit:
+            groupes[g]['fp'] += 1
+        elif reel and not predit:
+            groupes[g]['fn'] += 1
+        else:
+            groupes[g]['vn'] += 1
+    resultat = {}
+    for g, c in groupes.items():
+        n = c['vp'] + c['fp'] + c['fn'] + c['vn']
+        positifs = c['vp'] + c['fn']
+        negatifs = c['fp'] + c['vn']
+        selectionnes = c['vp'] + c['fp']
+        resultat[g] = {
+            'effectif': n,
+            'selection': round(selectionnes / n, 4) if n else 0.0,
+            'tvp': round(c['vp'] / positifs, 4) if positifs else 0.0,
+            'tfp': round(c['fp'] / negatifs, 4) if negatifs else 0.0,
+            'precision': round(c['vp'] / selectionnes, 4) if selectionnes else 0.0}
+    return resultat
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>d = [('A',True,True), ('A',False,False)]
+print(auditer(d)['A']['tvp'], auditer(d)['A']['precision'])
+</text></testcode><stdin><text /></stdin><expected><text>1.0 1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>D = ([('A',True,True)] * 240 + [('A',True,False)] * 60
+   + [('A',False,True)] * 140 + [('A',False,False)] * 560
+   + [('B',True,True)] * 80 + [('B',True,False)] * 20
+   + [('B',False,True)] * 180 + [('B',False,False)] * 720)
+r = auditer(D)
+print(r['A']['tvp'], r['B']['tvp'])
+print(r['A']['precision'], r['B']['precision'])
+</text></testcode><stdin><text /></stdin><expected><text>0.8 0.8
+0.6316 0.3077
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(auditer([('A',False,False)]))
+</text></testcode><stdin><text /></stdin><expected><text>{'A': {'effectif': 1, 'selection': 0.0, 'tvp': 0.0, 'tfp': 0.0, 'precision': 0.0}}
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(sorted(auditer([('A',True,True), ('B',False,True)])))
+</text></testcode><stdin><text /></stdin><expected><text>['A', 'B']
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(auditer([]))
+</text></testcode><stdin><text /></stdin><expected><text>{}
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Trois criteres d'equite incompatibles</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;THEOREME D'IMPOSSIBILITE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Des que les taux de base different et que le classifieur n'est pas parfait, la calibration et l'egalite des taux d'erreur ne peuvent pas coexister.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;criteres(audit, seuil)&lt;/code&gt;&lt;/strong&gt; qui prend le resultat de &lt;code&gt;auditer&lt;/code&gt; pour exactement deux groupes et renvoie le dictionnaire de cles &lt;code&gt;'parite'&lt;/code&gt;, &lt;code&gt;'chances'&lt;/code&gt; et &lt;code&gt;'calibration'&lt;/code&gt;, chacune valant &lt;code&gt;True&lt;/code&gt; si l'ecart absolu entre les deux groupes sur le taux correspondant (selection, tvp, precision) est strictement inferieur a &lt;code&gt;seuil&lt;/code&gt;. Ecrire &lt;strong&gt;&lt;code&gt;nb_satisfaits(audit, seuil)&lt;/code&gt;&lt;/strong&gt; qui renvoie le nombre de criteres satisfaits.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;Avec des taux de vrais positifs egaux et des taux de base differents, on obtient
+{'parite': False, 'chances': True, 'calibration': False}&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def criteres(audit, seuil):
+    # comparer les deux groupes sur les trois taux
+    ...
+
+def nb_satisfaits(audit, seuil):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def criteres(audit, seuil):
+    noms = sorted(audit)
+    a, b = audit[noms[0]], audit[noms[1]]
+    return {'parite': abs(a['selection'] - b['selection']) &lt; seuil,
+            'chances': abs(a['tvp'] - b['tvp']) &lt; seuil,
+            'calibration': abs(a['precision'] - b['precision']) &lt; seuil}
+
+def nb_satisfaits(audit, seuil):
+    c = criteres(audit, seuil)
+    return sum(1 for v in c.values() if v)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>A = {'A': {'selection': 0.38, 'tvp': 0.80, 'precision': 0.632},
+     'B': {'selection': 0.26, 'tvp': 0.80, 'precision': 0.308}}
+print(criteres(A, 0.01))
+</text></testcode><stdin><text /></stdin><expected><text>{'parite': False, 'chances': True, 'calibration': False}
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>A = {'A': {'selection': 0.38, 'tvp': 0.80, 'precision': 0.632},
+     'B': {'selection': 0.26, 'tvp': 0.80, 'precision': 0.308}}
+print(nb_satisfaits(A, 0.01), nb_satisfaits(A, 0.5))
+</text></testcode><stdin><text /></stdin><expected><text>1 3
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>A = {'A': {'selection': 0.4, 'tvp': 0.9, 'precision': 0.6},
+     'B': {'selection': 0.4, 'tvp': 0.9, 'precision': 0.6}}
+print(nb_satisfaits(A, 0.01))
+</text></testcode><stdin><text /></stdin><expected><text>3
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>A = {'Z': {'selection': 0.1, 'tvp': 0.1, 'precision': 0.1},
+     'A': {'selection': 0.2, 'tvp': 0.1, 'precision': 0.3}}
+print(criteres(A, 0.05))
+</text></testcode><stdin><text /></stdin><expected><text>{'parite': False, 'chances': True, 'calibration': False}
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>A = {'A': {'selection': 0.5, 'tvp': 0.5, 'precision': 0.5},
+     'B': {'selection': 0.51, 'tvp': 0.5, 'precision': 0.5}}
+print(nb_satisfaits(A, 0.01))
+</text></testcode><stdin><text /></stdin><expected><text>2
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — Explication contre-factuelle</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;CONTRE-FACTUEL&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;La question utile n'est pas « pourquoi ce refus ? » mais « qu'aurait-il fallu changer ? ». On cherche la modification de cout minimal parmi les variables actionnables.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;contrefactuel(dossier, decision, actionnables, pas, bornes)&lt;/code&gt;&lt;/strong&gt;. &lt;code&gt;decision(d)&lt;/code&gt; renvoie un booleen ; &lt;code&gt;actionnables&lt;/code&gt; est la liste des cles modifiables ; &lt;code&gt;pas[k]&lt;/code&gt; le pas de variation ; &lt;code&gt;bornes[k]&lt;/code&gt; le couple &lt;code&gt;(min, max)&lt;/code&gt;. Explorer, pour chaque variable actionnable prise seule, les valeurs par pas croissants dans les deux sens, et renvoyer le couple &lt;code&gt;(cle, nouvelle_valeur)&lt;/code&gt; demandant le plus petit nombre de pas ; a egalite, la cle la plus petite dans l'ordre alphabetique, puis la valeur la plus petite. Renvoyer &lt;code&gt;None&lt;/code&gt; si aucune modification isolee ne suffit.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;Un refus qui bascule en augmentant le revenu de 300 : ('revenu', 2400)&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def contrefactuel(dossier, decision, actionnables, pas, bornes):
+    # pour chaque variable actionnable, s eloigner par pas croissants
+    # garder la modification demandant le MOINS de pas
+    # ne jamais modifier une variable non actionnable
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def contrefactuel(dossier, decision, actionnables, pas, bornes):
+    meilleur = None
+    for cle in sorted(actionnables):
+        bas, haut = bornes[cle]
+        p = pas[cle]
+        depart = dossier[cle]
+        n_max = int(max((haut - depart) / p, (depart - bas) / p)) + 1
+        for n in range(1, n_max + 1):
+            candidats = []
+            for valeur in (depart - n * p, depart + n * p):
+                if bas &lt;= valeur &lt;= haut:
+                    candidats.append(valeur)
+            for valeur in sorted(candidats):
+                essai = dict(dossier)
+                essai[cle] = valeur
+                if decision(essai):
+                    if meilleur is None or n &lt; meilleur[0]:
+                        meilleur = (n, cle, valeur)
+                    break
+            if meilleur is not None and meilleur[0] &lt;= n:
+                break
+    return (meilleur[1], meilleur[2]) if meilleur else None
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>d = {'revenu': 2100, 'age': 34, 'dettes': 480}
+dec = lambda x: x['revenu'] - x['dettes'] &gt;= 1920
+print(contrefactuel(d, dec, ['revenu', 'dettes'],
+                    {'revenu': 100, 'dettes': 100},
+                    {'revenu': (0, 9000), 'dettes': (0, 3000)}))
+</text></testcode><stdin><text /></stdin><expected><text>('dettes', 180)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>d = {'revenu': 2100, 'dettes': 480}
+dec = lambda x: x['revenu'] &gt;= 2400
+print(contrefactuel(d, dec, ['revenu'], {'revenu': 100}, {'revenu': (0, 9000)}))
+</text></testcode><stdin><text /></stdin><expected><text>('revenu', 2400)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>d = {'revenu': 2100, 'age': 19}
+dec = lambda x: x['age'] &gt;= 25
+print(contrefactuel(d, dec, ['revenu'], {'revenu': 100}, {'revenu': (0, 3000)}))
+</text></testcode><stdin><text /></stdin><expected><text>None
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>d = {'a': 0, 'b': 0}
+dec = lambda x: x['a'] &gt;= 1 or x['b'] &gt;= 1
+print(contrefactuel(d, dec, ['b', 'a'], {'a': 1, 'b': 1}, {'a': (0, 5), 'b': (0, 5)}))
+</text></testcode><stdin><text /></stdin><expected><text>('a', 1)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>d = {'x': 5}
+dec = lambda x: x['x'] == 3 or x['x'] == 7
+print(contrefactuel(d, dec, ['x'], {'x': 2}, {'x': (0, 10)}))
+</text></testcode><stdin><text /></stdin><expected><text>('x', 3)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

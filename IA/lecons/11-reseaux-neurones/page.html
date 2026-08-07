@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 11 &mdash; R&eacute;seaux de neurones</title>
+<meta name="description" content="Neurone formel, perceptron, retropropagation, approximation universelle, convolutions.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Partie IV &middot; Chapitre 11</div>
+<h1>Chapitre 11 &mdash; Du perceptron &agrave; l'apprentissage profond</h1>
+<div class="lesson-sub">Neurone formel, perceptron et ses limites, r&eacute;seau multicouche, r&eacute;tropropagation, th&eacute;or&egrave;me d'approximation universelle, convolutions.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">Annexe compagnon</div><p>Le neurone formel, la r&egrave;gle du perceptron, la r&eacute;tropropagation et la descente par mini-lots sont d&eacute;taill&eacute;s <strong><a href="algorithms.html">pas &agrave; pas dans l'annexe</a></strong>, avec un exemple chiffr&eacute; d&eacute;roul&eacute; &agrave; la main.</p></div>
+
+<h2>11.1 Le neurone formel</h2>
+
+<p>McCulloch et Pitts proposent en 1943 &mdash; avant tout ordinateur &mdash; un mod&egrave;le math&eacute;matique du neurone : une unit&eacute; qui somme ses entr&eacute;es pond&eacute;r&eacute;es et s'active si le total d&eacute;passe un seuil. Ils d&eacute;montrent qu'un r&eacute;seau de telles unit&eacute;s peut calculer n'importe quelle fonction logique <a class="cite" href="#ref-mcculloch1943">[1]</a>.</p>
+
+<div class="box def"><div class="box-title">D&eacute;finition &mdash; Neurone formel</div>
+<p>Un neurone de param&egrave;tres \(w \in \mathbb{R}^{d}\) et \(b \in \mathbb{R}\) calcule</p>
+<div class="eq">\[a = \varphi\!\left(\sum_{i=1}^{d} w_i x_i + b\right) = \varphi(w^{\mathsf{T}}x + b)\]</div>
+<p>o&ugrave; \(\varphi\) est la <strong>fonction d'activation</strong>. Le vecteur \(w\) donne l'importance de chaque entr&eacute;e, le biais \(b\) d&eacute;place le seuil de d&eacute;clenchement.</p></div>
+
+<figure class="viz"><div class="viz-title">Quatre fonctions d'activation</div>
+<svg viewBox="0 0 760 320" role="img" style="width:100%;height:auto;display:block;"><path d="M 34 130 L 174 130" style="fill:none;stroke:var(--viz-axis);stroke-width:1.2;"/><path d="M 104 68 L 104 170" style="fill:none;stroke:var(--viz-axis);stroke-width:1.2;"/><path d="M 34 130 L 35 130 L 36 130 L 37 130 L 38 130 L 39 130 L 40 130 L 41 130 L 42 130 L 43 130 L 44 130 L 45 130 L 46 130 L 47 130 L 48 130 L 49 130 L 50 130 L 51 130 L 52 130 L 53 130 L 54 130 L 55 130 L 56 130 L 57 130 L 58 130 L 59 130 L 60 130 L 61 130 L 62 130 L 63 130 L 64 130 L 65 130 L 66 130 L 67 130 L 68 130 L 69 130 L 70 130 L 71 130 L 72 130 L 73 130 L 74 130 L 75 130 L 76 130 L 77 130 L 78 130 L 79 130 L 80 130 L 81 130 L 82 130 L 83 130 L 84 130 L 85 130 L 86 130 L 87 130 L 88 130 L 89 130 L 90 130 L 91 130 L 92 130 L 93 130 L 94 130 L 95 130 L 96 130 L 97 130 L 98 130 L 99 130 L 100 130 L 101 130 L 102 130 L 103 130 L 104 130 L 105 88 L 106 88 L 107 88 L 108 88 L 109 88 L 110 88 L 111 88 L 112 88 L 113 88 L 114 88 L 115 88 L 116 88 L 117 88 L 118 88 L 119 88 L 120 88 L 121 88 L 122 88 L 123 88 L 124 88 L 125 88 L 126 88 L 127 88 L 128 88 L 129 88 L 130 88 L 131 88 L 132 88 L 133 88 L 134 88 L 135 88 L 136 88 L 137 88 L 138 88 L 139 88 L 140 88 L 141 88 L 142 88 L 143 88 L 144 88 L 145 88 L 146 88 L 147 88 L 148 88 L 149 88 L 150 88 L 151 88 L 152 88 L 153 88 L 154 88 L 155 88 L 156 88 L 157 88 L 158 88 L 159 88 L 160 88 L 161 88 L 162 88 L 163 88 L 164 88 L 165 88 L 166 88 L 167 88 L 168 88 L 169 88 L 170 88 L 171 88 L 172 88 L 173 88 L 174 88" style="fill:none;stroke:var(--viz-bad);stroke-width:2.8;"/><text x="104" y="34" text-anchor="middle" style="fill:var(--viz-bad);font-size:12.5px;font-weight:700;font-family:inherit;">marche</text><text x="104" y="200" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">d&eacute;riv&eacute;e nulle</text><text x="104" y="215" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">partout : aucun</text><text x="104" y="230" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">gradient</text><path d="M 220 130 L 360 130" style="fill:none;stroke:var(--viz-axis);stroke-width:1.2;"/><path d="M 290 68 L 290 170" style="fill:none;stroke:var(--viz-axis);stroke-width:1.2;"/><path d="M 220 129.896 L 221 129.887 L 222 129.877 L 223 129.866 L 224 129.854 L 225 129.841 L 226 129.827 L 227 129.811 L 228 129.794 L 229 129.776 L 230 129.756 L 231 129.734 L 232 129.711 L 233 129.685 L 234 129.657 L 235 129.627 L 236 129.594 L 237 129.558 L 238 129.519 L 239 129.476 L 240 129.43 L 241 129.379 L 242 129.325 L 243 129.265 L 244 129.201 L 245 129.131 L 246 129.055 L 247 128.972 L 248 128.883 L 249 128.786 L 250 128.681 L 251 128.567 L 252 128.443 L 253 128.309 L 254 128.165 L 255 128.008 L 256 127.839 L 257 127.656 L 258 127.459 L 259 127.247 L 260 127.018 L 261 126.772 L 262 126.507 L 263 126.222 L 264 125.917 L 265 125.59 L 266 125.24 L 267 124.866 L 268 124.467 L 269 124.042 L 270 123.59 L 271 123.111 L 272 122.603 L 273 122.066 L 274 121.5 L 275 120.904 L 276 120.278 L 277 119.623 L 278 118.939 L 279 118.226 L 280 117.487 L 281 116.721 L 282 115.931 L 283 115.118 L 284 114.284 L 285 113.432 L 286 112.565 L 287 111.685 L 288 110.796 L 289 109.899 L 290 109 L 291 108.101 L 292 107.204 L 293 106.315 L 294 105.435 L 295 104.568 L 296 103.716 L 297 102.882 L 298 102.069 L 299 101.279 L 300 100.513 L 301 99.7736 L 302 99.0612 L 303 98.3771 L 304 97.722 L 305 97.0963 L 306 96.5003 L 307 95.934 L 308 95.3971 L 309 94.8891 L 310 94.4096 L 311 93.9577 L 312 93.5328 L 313 93.1339 L 314 92.76 L 315 92.41 L 316 92.083 L 317 91.7778 L 318 91.4933 L 319 91.2284 L 320 90.982 L 321 90.7531 L 322 90.5406 L 323 90.3436 L 324 90.161 L 325 89.9919 L 326 89.8354 L 327 89.6907 L 328 89.557 L 329 89.4335 L 330 89.3194 L 331 89.2142 L 332 89.1171 L 333 89.0276 L 334 88.9451 L 335 88.869 L 336 88.799 L 337 88.7345 L 338 88.6751 L 339 88.6205 L 340 88.5702 L 341 88.524 L 342 88.4814 L 343 88.4423 L 344 88.4063 L 345 88.3732 L 346 88.3428 L 347 88.3149 L 348 88.2892 L 349 88.2656 L 350 88.2439 L 351 88.224 L 352 88.2057 L 353 88.1888 L 354 88.1734 L 355 88.1592 L 356 88.1462 L 357 88.1342 L 358 88.1232 L 359 88.1131 L 360 88.1039" style="fill:none;stroke:var(--accent);stroke-width:2.8;"/><text x="290" y="34" text-anchor="middle" style="fill:var(--accent);font-size:12.5px;font-weight:700;font-family:inherit;">sigmo&iuml;de</text><text x="290" y="200" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">d&eacute;riv&eacute;e au plus 1/4 :</text><text x="290" y="215" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">le gradient s'&eacute;vanouit</text><text x="290" y="230" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">en profondeur</text><path d="M 406 130 L 546 130" style="fill:none;stroke:var(--viz-axis);stroke-width:1.2;"/><path d="M 476 68 L 476 170" style="fill:none;stroke:var(--viz-axis);stroke-width:1.2;"/><path d="M 406 171.972 L 407 171.968 L 408 171.965 L 409 171.96 L 410 171.956 L 411 171.95 L 412 171.944 L 413 171.937 L 414 171.93 L 415 171.921 L 416 171.912 L 417 171.901 L 418 171.889 L 419 171.876 L 420 171.861 L 421 171.844 L 422 171.825 L 423 171.804 L 424 171.78 L 425 171.754 L 426 171.724 L 427 171.691 L 428 171.653 L 429 171.611 L 430 171.565 L 431 171.512 L 432 171.454 L 433 171.388 L 434 171.314 L 435 171.232 L 436 171.14 L 437 171.037 L 438 170.922 L 439 170.793 L 440 170.65 L 441 170.489 L 442 170.31 L 443 170.11 L 444 169.887 L 445 169.638 L 446 169.361 L 447 169.053 L 448 168.71 L 449 168.329 L 450 167.906 L 451 167.438 L 452 166.919 L 453 166.345 L 454 165.712 L 455 165.013 L 456 164.246 L 457 163.403 L 458 162.48 L 459 161.472 L 460 160.374 L 461 159.181 L 462 157.89 L 463 156.496 L 464 154.999 L 465 153.397 L 466 151.689 L 467 149.878 L 468 147.966 L 469 145.958 L 470 143.861 L 471 141.684 L 472 139.436 L 473 137.13 L 474 134.779 L 475 132.397 L 476 130 L 477 127.603 L 478 125.221 L 479 122.87 L 480 120.564 L 481 118.316 L 482 116.139 L 483 114.042 L 484 112.034 L 485 110.122 L 486 108.311 L 487 106.603 L 488 105.001 L 489 103.504 L 490 102.11 L 491 100.819 L 492 99.6263 L 493 98.5281 L 494 97.5199 L 495 96.597 L 496 95.7543 L 497 94.9865 L 498 94.2885 L 499 93.6551 L 500 93.0813 L 501 92.5623 L 502 92.0936 L 503 91.6708 L 504 91.2899 L 505 90.9471 L 506 90.6388 L 507 90.3618 L 508 90.1132 L 509 89.8901 L 510 89.6901 L 511 89.5108 L 512 89.3503 L 513 89.2066 L 514 89.0779 L 515 88.9629 L 516 88.8599 L 517 88.7679 L 518 88.6857 L 519 88.6121 L 520 88.5465 L 521 88.4878 L 522 88.4354 L 523 88.3886 L 524 88.3468 L 525 88.3095 L 526 88.2762 L 527 88.2464 L 528 88.2199 L 529 88.1962 L 530 88.175 L 531 88.1562 L 532 88.1393 L 533 88.1243 L 534 88.1109 L 535 88.0989 L 536 88.0883 L 537 88.0787 L 538 88.0702 L 539 88.0627 L 540 88.0559 L 541 88.0499 L 542 88.0445 L 543 88.0397 L 544 88.0354 L 545 88.0316 L 546 88.0282" style="fill:none;stroke:var(--viz-blue);stroke-width:2.8;"/><text x="476" y="34" text-anchor="middle" style="fill:var(--viz-blue);font-size:12.5px;font-weight:700;font-family:inherit;">tangente hyperbolique</text><text x="476" y="200" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">centr&eacute;e en z&eacute;ro,</text><text x="476" y="215" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">mais m&ecirc;me d&eacute;faut</text><text x="476" y="230" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">de saturation</text><path d="M 592 130 L 732 130" style="fill:none;stroke:var(--viz-axis);stroke-width:1.2;"/><path d="M 662 68 L 662 170" style="fill:none;stroke:var(--viz-axis);stroke-width:1.2;"/><path d="M 592 130 L 593 130 L 594 130 L 595 130 L 596 130 L 597 130 L 598 130 L 599 130 L 600 130 L 601 130 L 602 130 L 603 130 L 604 130 L 605 130 L 606 130 L 607 130 L 608 130 L 609 130 L 610 130 L 611 130 L 612 130 L 613 130 L 614 130 L 615 130 L 616 130 L 617 130 L 618 130 L 619 130 L 620 130 L 621 130 L 622 130 L 623 130 L 624 130 L 625 130 L 626 130 L 627 130 L 628 130 L 629 130 L 630 130 L 631 130 L 632 130 L 633 130 L 634 130 L 635 130 L 636 130 L 637 130 L 638 130 L 639 130 L 640 130 L 641 130 L 642 130 L 643 130 L 644 130 L 645 130 L 646 130 L 647 130 L 648 130 L 649 130 L 650 130 L 651 130 L 652 130 L 653 130 L 654 130 L 655 130 L 656 130 L 657 130 L 658 130 L 659 130 L 660 130 L 661 130 L 662 130 L 663 128.8 L 664 127.6 L 665 126.4 L 666 125.2 L 667 124 L 668 122.8 L 669 121.6 L 670 120.4 L 671 119.2 L 672 118 L 673 116.8 L 674 115.6 L 675 114.4 L 676 113.2 L 677 112 L 678 110.8 L 679 109.6 L 680 108.4 L 681 107.2 L 682 106 L 683 104.8 L 684 103.6 L 685 102.4 L 686 101.2 L 687 100 L 688 98.8 L 689 97.6 L 690 96.4 L 691 95.2 L 692 94 L 693 92.8 L 694 91.6 L 695 90.4 L 696 89.2 L 697 88 L 698 86.8 L 699 85.6 L 700 84.4 L 701 83.2 L 702 82 L 703 80.8 L 704 79.6 L 705 78.4 L 706 77.2 L 707 76 L 708 74.8 L 709 73.6 L 710 72.4 L 711 71.2 L 712 70 L 713 68.8 L 714 67.6 L 715 66.4 L 716 65.2 L 717 64 L 718 62.8 L 719 62.8 L 720 62.8 L 721 62.8 L 722 62.8 L 723 62.8 L 724 62.8 L 725 62.8 L 726 62.8 L 727 62.8 L 728 62.8 L 729 62.8 L 730 62.8 L 731 62.8 L 732 62.8" style="fill:none;stroke:var(--primary);stroke-width:2.8;"/><text x="662" y="34" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;font-family:inherit;">rectification</text><text x="662" y="200" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">d&eacute;riv&eacute;e 1 &agrave; droite :</text><text x="662" y="215" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">c'est ce qui a d&eacute;bloqu&eacute;</text><text x="662" y="230" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">le profond</text><text x="380" y="278" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Sans fonction non lin&eacute;aire, un empilement de couches reste une seule application lin&eacute;aire.</text><text x="380" y="302" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Le choix de cette fonction a d&eacute;cid&eacute; de dix ans d'histoire du domaine.</text></svg>
+<figcaption class="viz-caption"><strong>Figure 11.1.</strong> Le point d&eacute;cisif est la d&eacute;riv&eacute;e. La marche a une d&eacute;riv&eacute;e nulle partout : aucun gradient ne peut la traverser, ce qui interdit d'entra&icirc;ner un r&eacute;seau profond. La sigmo&iuml;de et la tangente hyperbolique ont une d&eacute;riv&eacute;e qui tend vers z&eacute;ro d&egrave;s que l'entr&eacute;e s'&eacute;loigne de l'origine : sur dix couches, ces facteurs se multiplient et le gradient dispara&icirc;t. La rectification a une d&eacute;riv&eacute;e constante &eacute;gale &agrave; 1 sur toute sa partie croissante : c'est cette propri&eacute;t&eacute; triviale qui a rendu praticables les r&eacute;seaux profonds.</figcaption></figure>
+
+<div class="box warn"><div class="box-title">Pourquoi une non-lin&eacute;arit&eacute; est indispensable</div>
+Si \(\varphi\) est l'identit&eacute;, la composition de deux couches donne \(W_2(W_1x + b_1) + b_2 = (W_2W_1)x + (W_2b_1 + b_2)\), c'est-&agrave;-dire une seule application affine. Empiler mille couches lin&eacute;aires produit exactement la m&ecirc;me classe de fonctions qu'une seule. Toute la puissance des r&eacute;seaux profonds vient de cette fonction non lin&eacute;aire ins&eacute;r&eacute;e entre les couches.</div>
+
+<h2>11.2 Le perceptron et sa limite</h2>
+
+<p>Rosenblatt construit en 1958 la premi&egrave;re machine apprenante, avec une r&egrave;gle de mise &agrave; jour d'une simplicit&eacute; remarquable et un th&eacute;or&egrave;me de convergence <a class="cite" href="#ref-rosenblatt1958">[2]</a>.</p>
+
+<div class="algo"><div class="algo-cap">Algorithme 11.1 &mdash; R&egrave;gle d'apprentissage du perceptron</div><div class="algo-io"><b>Entr&eacute;e :</b> \(\big((x_i, y_i)\big)_{i=1}^{n}\) avec \(y_i \in \{0,1\}\), un nombre d'&eacute;poques \(E\)<br><b>Sortie :</b> \((w, b)\) classant tous les exemples, si les classes sont s&eacute;parables</div><ol class="algo-corps"><li>\(w \leftarrow 0\) ; \(b \leftarrow 0\)</li><li><b class="kw">pour</b> \(e = 1\) <b class="kw">jusqu'&agrave;</b> \(E\) <b class="kw">faire</b></li><li class="n1">\(\varepsilon \leftarrow 0\)</li><li class="n1"><b class="kw">pour</b> \(i = 1\) <b class="kw">jusqu'&agrave;</b> \(n\) <b class="kw">faire</b></li><li class="n2">\(\hat{y} \leftarrow \mathbf{1}\big[\,w^{\mathsf{T}}x_i + b \gt 0\,\big]\)</li><li class="n2"><b class="kw">si</b> \(\hat{y} \neq y_i\) <b class="kw">alors</b></li><li class="n3">\(w \leftarrow w + (y_i - \hat{y})\,x_i\) ; \(b \leftarrow b + (y_i - \hat{y})\)</li><li class="n3">\(\varepsilon \leftarrow \varepsilon + 1\)</li><li class="n1"><b class="kw">si</b> \(\varepsilon = 0\) <b class="kw">alors</b> <b class="kw">retourner</b> \((w, b)\)          <span class="cm">// plus aucune erreur</span></li><li><b class="kw">retourner</b> \((w, b)\)</li></ol><p class="algo-note"><strong>Th&eacute;or&egrave;me de Novikoff.</strong> Si les classes sont s&eacute;parables avec une marge \(\gamma \gt 0\) et \(\lVert x_i\rVert \le R\), le nombre de corrections est born&eacute; par \(R^{2}/\gamma^{2}\) &mdash; ind&eacute;pendamment de \(n\), de la dimension et de l'ordre. Contrapos&eacute;e : si l'algorithme ne converge pas, les donn&eacute;es ne sont pas s&eacute;parables.</p></div>
+
+<div class="box thm"><div class="box-title">Th&eacute;or&egrave;me de convergence du perceptron</div>
+<p>Si les exemples sont lin&eacute;airement s&eacute;parables avec une marge \(\gamma \gt 0\), et si tous sont de norme au plus \(R\), alors la r&egrave;gle du perceptron commet au plus \(R^{2}/\gamma^{2}\) corrections avant de ne plus se tromper &mdash; quel que soit l'ordre de pr&eacute;sentation des exemples <a class="cite" href="#ref-novikoff1962">[3]</a>.</p>
+<p>La borne ne d&eacute;pend ni du nombre d'exemples ni de la dimension : c'est un r&eacute;sultat fort. Sa contrapos&eacute;e l'est tout autant : si l'algorithme ne converge pas, c'est que les donn&eacute;es ne sont pas lin&eacute;airement s&eacute;parables.</p></div>
+
+<div class="box thm"><div class="box-title">Th&eacute;or&egrave;me &mdash; Le perceptron ne calcule pas le OU exclusif</div>
+<p>Il n'existe aucun couple \((w, b)\) tel que le perceptron classe correctement les quatre points \((0,0) \mapsto 0\), \((0,1) \mapsto 1\), \((1,0) \mapsto 1\), \((1,1) \mapsto 0\).</p>
+<p><em>Preuve.</em> Les deux premi&egrave;res contraintes donnent \(b \le 0\) et \(w_2 + b \gt 0\), donc \(w_2 \gt -b \ge 0\). La troisi&egrave;me donne de m&ecirc;me \(w_1 \gt -b \ge 0\). En sommant, \(w_1 + w_2 \gt -2b\), donc \(w_1 + w_2 + b \gt -b \ge 0\). Le quatri&egrave;me point serait donc class&eacute; 1, alors qu'il vaut 0. Contradiction. \(\square\)</p>
+<p>Minsky et Papert ont publi&eacute; ce r&eacute;sultat et ses g&eacute;n&eacute;ralisations en 1969 <a class="cite" href="#ref-minsky1969">[4]</a>. Il est exact ; sa port&eacute;e a &eacute;t&eacute; surinterpr&eacute;t&eacute;e, car il ne dit rien des r&eacute;seaux &agrave; plusieurs couches.</p></div>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Le premier curseur choisit la fonction bool&eacute;enne &agrave; apprendre, le second avance dans les &eacute;poques. Les carr&eacute;s valent 0, les disques valent 1 ; la droite est la fronti&egrave;re apprise.</p>
+<div id="jxg1" class="viz-board" style="height:520px;"></div>
+<p class="viz-caption"><strong>Figure 11.2.</strong> Le perceptron converge en 6 &eacute;poques sur le ET, en 4 sur le OU. Sur le OU exclusif, il continue &agrave; se tromper sur les quatre exemples apr&egrave;s 40 &eacute;poques, et la droite oscille sans fin : ce n'est pas une question de patience ni de r&eacute;glage, aucune droite ne s&eacute;pare ces quatre points.</p></div>
+
+<h2>11.3 Le r&eacute;seau multicouche et la r&eacute;tropropagation</h2>
+
+<p>La solution &eacute;tait connue d&egrave;s 1969 : empiler des couches. Ce qui manquait &eacute;tait le moyen d'ajuster les poids des couches internes, pour lesquelles aucune &laquo; bonne r&eacute;ponse &raquo; n'est disponible. La r&eacute;ponse est la r&egrave;gle de d&eacute;rivation des fonctions compos&eacute;es, appliqu&eacute;e de la sortie vers l'entr&eacute;e <a class="cite" href="#ref-rumelhart1986">[5]</a>.</p>
+
+<figure class="viz"><div class="viz-title">Les deux passes</div>
+<svg viewBox="0 0 760 330" role="img" style="width:100%;height:auto;display:block;"><text x="90" y="42" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">entr&eacute;e</text><text x="260" y="42" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">couche 1</text><text x="430" y="42" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">couche 2</text><text x="600" y="42" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">sortie</text><path d="M 103 104 L 247 81" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 104 L 247 127" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 104 L 247 173" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 104 L 247 219" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 150 L 247 81" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 150 L 247 127" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 150 L 247 173" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 150 L 247 219" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 196 L 247 81" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 196 L 247 127" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 196 L 247 173" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 196 L 247 219" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 81 L 417 81" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 81 L 417 127" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 81 L 417 173" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 81 L 417 219" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 127 L 417 81" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 127 L 417 127" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 127 L 417 173" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 127 L 417 219" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 173 L 417 81" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 173 L 417 127" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 173 L 417 173" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 173 L 417 219" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 219 L 417 81" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 219 L 417 127" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 219 L 417 173" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 219 L 417 219" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 443 81 L 587 150" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 443 127 L 587 150" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 443 173 L 587 150" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 443 219 L 587 150" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="90" cy="104" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="90" cy="150" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="90" cy="196" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="260" cy="81" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="260" cy="127" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="260" cy="173" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="260" cy="219" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="430" cy="81" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="430" cy="127" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="430" cy="173" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="430" cy="219" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="600" cy="150" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><path d="M 60 76 L 630 76" style="fill:none;stroke:var(--primary);stroke-width:3;"/><path d="M 622 70 L 636 76 L 622 82 Z" style="fill:var(--primary);"/><text x="345" y="68" text-anchor="middle" style="fill:var(--primary);font-size:13px;font-weight:700;font-family:inherit;">passe avant : on calcule la sortie et la perte</text><path d="M 630 246 L 60 246" style="fill:none;stroke:var(--viz-bad);stroke-width:3;"/><path d="M 68 240 L 54 246 L 68 252 Z" style="fill:var(--viz-bad);"/><text x="345" y="266" text-anchor="middle" style="fill:var(--viz-bad);font-size:13px;font-weight:700;font-family:inherit;">passe arri&egrave;re : on redistribue la responsabilit&eacute; de l'erreur</text><text x="668" y="146" style="fill:var(--color-text);font-size:13px;font-family:inherit;">perte</text><text x="380" y="306" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;"><tspan x="380" dy="0">La r&eacute;tropropagation n'est rien d'autre que la r&egrave;gle de d&eacute;rivation des fonctions compos&eacute;es, appliqu&eacute;e de droite &agrave; gauche pour ne rien</tspan><tspan x="380" dy="16">recalculer.</tspan></text></svg>
+<figcaption class="viz-caption"><strong>Figure 11.3.</strong> La passe avant calcule la sortie et la perte, en m&eacute;morisant les valeurs interm&eacute;diaires. La passe arri&egrave;re redistribue la d&eacute;riv&eacute;e de la perte &agrave; chaque poids, couche par couche. La m&eacute;thode ne d&eacute;couvre rien de nouveau : elle calcule un gradient. Son m&eacute;rite est de le faire en un temps proportionnel au nombre de poids, l&agrave; o&ugrave; une diff&eacute;rence finie param&egrave;tre par param&egrave;tre co&ucirc;terait ce nombre au carr&eacute;.</figcaption></figure>
+
+<div class="algo"><div class="algo-cap">Algorithme 11.2 &mdash; R&eacute;tropropagation sur un r&eacute;seau &agrave; une couche cach&eacute;e</div><div class="algo-io"><b>Entr&eacute;e :</b> \(X \in \mathbb{R}^{n\times d}\), \(y \in \{0,1\}^{n}\), les param&egrave;tres \(W_1, b_1, W_2, b_2\), un pas \(\eta\)<br><b>Sortie :</b> les param&egrave;tres mis &agrave; jour</div><ol class="algo-corps"><li>\(Z_1 \leftarrow XW_1 + b_1\) ; \(A_1 \leftarrow \phi(Z_1)\)          <span class="cm">// passe avant : on MEMORISE Z1 et A1</span></li><li>\(Z_2 \leftarrow A_1W_2 + b_2\) ; \(A_2 \leftarrow \sigma(Z_2)\)</li><li>\(\displaystyle J \leftarrow -\tfrac{1}{n}\sum_{i}\big[y_i \ln A_2^{(i)} + (1-y_i)\ln(1 - A_2^{(i)})\big]\)</li><li>&nbsp;</li><li>\(D_2 \leftarrow \tfrac{1}{n}(A_2 - y)\)          <span class="cm">// passe arriere : derivee de J par rapport a Z2</span></li><li>\(\nabla_{W_2} J \leftarrow A_1^{\mathsf{T}}D_2\) ; \(\nabla_{b_2} J \leftarrow \mathbf{1}^{\mathsf{T}}D_2\)</li><li>\(D_1 \leftarrow \big(D_2 W_2^{\mathsf{T}}\big) \odot \phi'(Z_1)\)          <span class="cm">// regle de derivation en chaine</span></li><li>\(\nabla_{W_1} J \leftarrow X^{\mathsf{T}}D_1\) ; \(\nabla_{b_1} J \leftarrow \mathbf{1}^{\mathsf{T}}D_1\)</li><li>&nbsp;</li><li>\(W_j \leftarrow W_j - \eta\,\nabla_{W_j} J\) ; \(b_j \leftarrow b_j - \eta\,\nabla_{b_j} J\) <b class="kw">pour</b> \(j \in \{1,2\}\)</li></ol><p class="algo-note">La m&eacute;morisation de \(Z_1\) et \(A_1\) rend le calcul lin&eacute;aire en le nombre de poids, l&agrave; o&ugrave; une diff&eacute;rence finie param&egrave;tre par param&egrave;tre co&ucirc;terait ce nombre au carr&eacute;. C'est aussi elle qui explique la consommation m&eacute;moire des grands mod&egrave;les.</p></div>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Un r&eacute;seau &agrave; une couche cach&eacute;e apprend le OU exclusif. Les curseurs r&egrave;glent le nombre de neurones cach&eacute;s et le pas de descente ; l'initialisation est la m&ecirc;me dans tous les cas.</p>
+<div id="jxg2" class="viz-board" style="height:440px;"></div>
+<p class="viz-caption"><strong>Figure 11.4.</strong> Avec <strong>un seul</strong> neurone cach&eacute;, le r&eacute;seau reste bloqu&eacute; &agrave; 3 exemples sur 4 : une couche cach&eacute;e &agrave; une unit&eacute; ne fait que composer deux fonctions monotones d'une m&ecirc;me combinaison lin&eacute;aire, ce qui ne peut pas s&eacute;parer le OU exclusif. D&egrave;s <strong>deux</strong> neurones, la perte s'effondre et les quatre exemples sont corrects. C'est la traduction exp&eacute;rimentale du th&eacute;or&egrave;me suivant.</p></div>
+
+<div class="box thm"><div class="box-title">Th&eacute;or&egrave;me d'approximation universelle</div>
+<p>Soit \(\varphi\) une fonction continue non polynomiale. Pour toute fonction continue \(f\) sur un compact \(K \subset \mathbb{R}^{d}\) et tout \(\varepsilon \gt 0\), il existe un entier \(N\) et des param&egrave;tres tels que le r&eacute;seau &agrave; une seule couche cach&eacute;e de \(N\) unit&eacute;s approche \(f\) &agrave; \(\varepsilon\) pr&egrave;s uniform&eacute;ment sur \(K\) <a class="cite" href="#ref-cybenko1989">[6]</a><a class="cite" href="#ref-hornik1991">[7]</a>.</p>
+<p><strong>Ce que le th&eacute;or&egrave;me ne dit pas</strong>, et c'est l'essentiel. Il ne dit pas combien d'unit&eacute;s : \(N\) peut cro&icirc;tre exponentiellement avec la dimension. Il ne dit pas comment trouver les param&egrave;tres : l'existence n'est pas une m&eacute;thode. Il ne dit rien de la g&eacute;n&eacute;ralisation : approcher une fonction sur les points connus n'est pas la conna&icirc;tre. Invoquer ce th&eacute;or&egrave;me pour justifier l'emploi d'un r&eacute;seau est un contresens fr&eacute;quent.</p></div>
+
+<h2>11.4 Pourquoi profond plut&ocirc;t que large</h2>
+
+<p>Si une couche suffit en th&eacute;orie, pourquoi empiler ? Parce que la profondeur permet une &eacute;conomie de param&egrave;tres <em>exponentielle</em> sur certaines familles de fonctions : il existe des fonctions qu'un r&eacute;seau de profondeur \(k\) repr&eacute;sente avec un nombre polynomial d'unit&eacute;s, et qui exigent un nombre exponentiel d'unit&eacute;s en profondeur \(k-1\) <a class="cite" href="#ref-telgarsky2016">[8]</a>.</p>
+
+<p>L'intuition est celle de la composition : les premi&egrave;res couches d&eacute;tectent des motifs &eacute;l&eacute;mentaires, les suivantes les combinent en motifs plus riches. Sur une image, contours, puis textures, puis parties d'objets, puis objets. Cette hi&eacute;rarchie n'est pas impos&eacute;e : elle &eacute;merge de l'apprentissage.</p>
+
+<div class="box warn"><div class="box-title">Trois obstacles de la profondeur, et leurs rem&egrave;des</div>
+<p><strong>Le gradient qui s'&eacute;vanouit.</strong> Chaque couche multiplie le gradient par la d&eacute;riv&eacute;e de son activation. Avec une sigmo&iuml;de, cette d&eacute;riv&eacute;e vaut au plus 0,25 : sur dix couches, le facteur tombe &agrave; \(10^{-6}\). Rem&egrave;des : la rectification, une initialisation adapt&eacute;e &agrave; la taille des couches, et les connexions r&eacute;siduelles qui laissent le gradient court-circuiter des couches <a class="cite" href="#ref-he2016">[9]</a>.</p>
+<p><strong>Le sur-apprentissage.</strong> Un r&eacute;seau moderne compte souvent plus de param&egrave;tres que le jeu d'entra&icirc;nement ne compte d'exemples. Rem&egrave;des : arr&ecirc;t pr&eacute;coce, p&eacute;nalisation des poids, extinction al&eacute;atoire d'unit&eacute;s pendant l'entra&icirc;nement, augmentation artificielle des donn&eacute;es.</p>
+<p><strong>Le co&ucirc;t.</strong> C'est ce qui a r&eacute;ellement chang&eacute; entre 1986 et 2012 : ni la r&eacute;tropropagation ni les architectures, mais trois ordres de grandeur de calcul disponible et des jeux de donn&eacute;es de plusieurs millions d'exemples annot&eacute;s.</p></div>
+
+<h2>11.5 Les convolutions</h2>
+
+<p>Un r&eacute;seau enti&egrave;rement connect&eacute; sur une image de \(224 \times 224\) pixels en couleurs demande d&eacute;j&agrave; plus de 150 000 poids pour un seul neurone de la premi&egrave;re couche. Il ignore de plus deux propri&eacute;t&eacute;s &eacute;videntes des images : les pixels voisins sont li&eacute;s, et un motif garde son sens o&ugrave; qu'il se trouve.</p>
+
+<div class="box def"><div class="box-title">Trois id&eacute;es, un gain &eacute;norme</div>
+<ul>
+<li><strong>Connexions locales</strong> : chaque unit&eacute; ne regarde qu'une petite fen&ecirc;tre.</li>
+<li><strong>Partage des poids</strong> : la m&ecirc;me fen&ecirc;tre est appliqu&eacute;e partout dans l'image. Un filtre de \(3 \times 3\) sur trois canaux ne co&ucirc;te que 27 poids, quelle que soit la taille de l'image.</li>
+<li><strong>Sous-&eacute;chantillonnage</strong> : on r&eacute;duit progressivement la r&eacute;solution, ce qui &eacute;largit le champ de vision des couches profondes.</li>
+</ul>
+<p>Cette architecture, propos&eacute;e par LeCun pour la lecture de codes postaux <a class="cite" href="#ref-lecun1998">[10]</a>, est rest&eacute;e minoritaire quatorze ans avant de remporter en 2012 le concours de reconnaissance d'images de r&eacute;f&eacute;rence avec une avance consid&eacute;rable, et de faire basculer tout le domaine <a class="cite" href="#ref-krizhevsky2017">[11]</a>.</p></div>
+
+<div class="box warn"><div class="box-title">Ce que les r&eacute;seaux profonds ne savent pas faire</div>
+<p>Une modification d'image imperceptible &agrave; l'&oelig;il peut faire basculer une classification avec une confiance &eacute;lev&eacute;e <a class="cite" href="#ref-szegedy2014">[12]</a> : la fronti&egrave;re de d&eacute;cision apprise n'a pas la forme que l'on croit. Un r&eacute;seau peut par ailleurs apprendre par c&oelig;ur des &eacute;tiquettes tir&eacute;es au hasard sur un jeu de donn&eacute;es entier, ce qui montre que sa capacit&eacute; d&eacute;passe largement la t&acirc;che et que la th&eacute;orie classique de la g&eacute;n&eacute;ralisation ne suffit pas &agrave; expliquer ses succ&egrave;s <a class="cite" href="#ref-zhang2017">[13]</a>. Enfin, la trace du calcul n'est pas une explication : c'est l'objet du chapitre 14.</p></div>
+
+<h2>Synth&egrave;se</h2>
+<ul>
+<li>Un neurone est une combinaison lin&eacute;aire suivie d'une non-lin&eacute;arit&eacute; ; sans cette derni&egrave;re, la profondeur n'apporte rien.</li>
+<li>Le perceptron converge en un nombre born&eacute; de corrections si et seulement si les donn&eacute;es sont lin&eacute;airement s&eacute;parables <a class="cite" href="#ref-novikoff1962">[3]</a>, ce que le OU exclusif n'est pas <a class="cite" href="#ref-minsky1969">[4]</a>.</li>
+<li>La r&eacute;tropropagation calcule le gradient de tous les poids en un temps proportionnel &agrave; leur nombre <a class="cite" href="#ref-rumelhart1986">[5]</a>.</li>
+<li>Une couche cach&eacute;e suffit &agrave; approcher toute fonction continue, sans aucune garantie sur le nombre d'unit&eacute;s ni sur la fa&ccedil;on de les trouver <a class="cite" href="#ref-cybenko1989">[6]</a>.</li>
+<li>La profondeur est une &eacute;conomie de param&egrave;tres, pas un gain d'expressivit&eacute; <a class="cite" href="#ref-telgarsky2016">[8]</a>.</li>
+<li>Les convolutions exploitent la localit&eacute; et l'invariance par translation ; leur succ&egrave;s de 2012 doit autant aux donn&eacute;es et au calcul qu'aux id&eacute;es <a class="cite" href="#ref-krizhevsky2017">[11]</a>.</li>
+</ul>
+
+<h2>R&eacute;f&eacute;rences</h2>
+<ol class="reflist">
+<li id="ref-mcculloch1943">McCulloch, W. S. &amp; Pitts, W. (1943). A logical calculus of the ideas immanent in nervous activity. <em>Bulletin of Mathematical Biophysics</em>, 5, 115&ndash;133. DOI&nbsp;: 10.1007/BF02478259. <a href="https://doi.org/10.1007/BF02478259">https://doi.org/10.1007/BF02478259</a></li>
+<li id="ref-rosenblatt1958">Rosenblatt, F. (1958). The perceptron: a probabilistic model for information storage and organization in the brain. <em>Psychological Review</em>, 65(6), 386&ndash;408. DOI&nbsp;: 10.1037/h0042519. <a href="https://doi.org/10.1037/h0042519">https://doi.org/10.1037/h0042519</a></li>
+<li id="ref-novikoff1962">Novikoff, A. B. J. (1962). On convergence proofs for perceptrons. <em>Proceedings of the Symposium on the Mathematical Theory of Automata</em>, 12, 615&ndash;622. <a href="https://apps.dtic.mil/sti/citations/AD0298258">https://apps.dtic.mil/sti/citations/AD0298258</a></li>
+<li id="ref-minsky1969">Minsky, M. &amp; Papert, S. (1969). <em>Perceptrons</em>. MIT Press. DOI&nbsp;: 10.7551/mitpress/11301.001.0001. <a href="https://doi.org/10.7551/mitpress/11301.001.0001">https://doi.org/10.7551/mitpress/11301.001.0001</a></li>
+<li id="ref-rumelhart1986">Rumelhart, D. E., Hinton, G. E. &amp; Williams, R. J. (1986). Learning representations by back-propagating errors. <em>Nature</em>, 323, 533&ndash;536. DOI&nbsp;: 10.1038/323533a0. <a href="https://doi.org/10.1038/323533a0">https://doi.org/10.1038/323533a0</a></li>
+<li id="ref-cybenko1989">Cybenko, G. (1989). Approximation by superpositions of a sigmoidal function. <em>Mathematics of Control, Signals and Systems</em>, 2, 303&ndash;314. DOI&nbsp;: 10.1007/BF02551274. <a href="https://doi.org/10.1007/BF02551274">https://doi.org/10.1007/BF02551274</a></li>
+<li id="ref-hornik1991">Hornik, K. (1991). Approximation capabilities of multilayer feedforward networks. <em>Neural Networks</em>, 4(2), 251&ndash;257. DOI&nbsp;: 10.1016/0893-6080(91)90009-T. <a href="https://doi.org/10.1016/0893-6080(91)90009-T">https://doi.org/10.1016/0893-6080(91)90009-T</a></li>
+<li id="ref-telgarsky2016">Telgarsky, M. (2016). Benefits of depth in neural networks. <em>Proceedings of COLT 2016</em>, PMLR 49, 1517&ndash;1539. <a href="https://proceedings.mlr.press/v49/telgarsky16.html">https://proceedings.mlr.press/v49/telgarsky16.html</a></li>
+<li id="ref-he2016">He, K., Zhang, X., Ren, S. &amp; Sun, J. (2016). Deep residual learning for image recognition. <em>Proceedings of CVPR 2016</em>, 770&ndash;778. DOI&nbsp;: 10.1109/CVPR.2016.90. <a href="https://doi.org/10.1109/CVPR.2016.90">https://doi.org/10.1109/CVPR.2016.90</a></li>
+<li id="ref-lecun1998">LeCun, Y., Bottou, L., Bengio, Y. &amp; Haffner, P. (1998). Gradient-based learning applied to document recognition. <em>Proceedings of the IEEE</em>, 86(11), 2278&ndash;2324. DOI&nbsp;: 10.1109/5.726791. <a href="https://doi.org/10.1109/5.726791">https://doi.org/10.1109/5.726791</a></li>
+<li id="ref-krizhevsky2017">Krizhevsky, A., Sutskever, I. &amp; Hinton, G. E. (2017). ImageNet classification with deep convolutional neural networks. <em>Communications of the ACM</em>, 60(6), 84&ndash;90. DOI&nbsp;: 10.1145/3065386. <a href="https://doi.org/10.1145/3065386">https://doi.org/10.1145/3065386</a></li>
+<li id="ref-szegedy2014">Szegedy, C., Zaremba, W., Sutskever, I. <em>et al.</em> (2014). Intriguing properties of neural networks. <em>Proceedings of ICLR 2014</em>. arXiv&nbsp;: 1312.6199. <a href="https://arxiv.org/abs/1312.6199">https://arxiv.org/abs/1312.6199</a></li>
+<li id="ref-zhang2017">Zhang, C., Bengio, S., Hardt, M., Recht, B. &amp; Vinyals, O. (2017). Understanding deep learning requires rethinking generalization. <em>Proceedings of ICLR 2017</em>. arXiv&nbsp;: 1611.03530. <a href="https://arxiv.org/abs/1611.03530">https://arxiv.org/abs/1611.03530</a></li>
+</ol>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../10-non-supervise/page.html">\(\leftarrow\) Chapitre 10 &mdash; Apprentissage non supervis&eacute;</a>
+<a href="algorithms.html">Annexe algorithmique</a>
+<a href="../../index.html">Sommaire du manuel</a>
+<a href="../12-renforcement/page.html">Chapitre 12 &mdash; Apprentissage par renforcement \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">La figure interactive n\'a pas pu etre chargee. Verifiez votre connexion reseau.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ====== Figure : le perceptron et la limite du OU exclusif ================ */
+var JEUX = [
+  {nom:'ET logique',        pts:[[0,0,0],[0,1,0],[1,0,0],[1,1,1]]},
+  {nom:'OU logique',        pts:[[0,0,0],[0,1,1],[1,0,1],[1,1,1]]},
+  {nom:'OU exclusif',       pts:[[0,0,0],[0,1,1],[1,0,1],[1,1,0]]}
+];
+function perceptron(pts, n_epoques){
+  var w = [0, 0], b = 0, hist = [];
+  for (var e = 0; e < n_epoques; e++){
+    var erreurs = 0;
+    for (var i = 0; i < pts.length; i++){
+      var x1 = pts[i][0], x2 = pts[i][1], y = pts[i][2];
+      var s = (w[0]*x1 + w[1]*x2 + b) > 0 ? 1 : 0;
+      if (s !== y){
+        w[0] += (y - s) * x1; w[1] += (y - s) * x2; b += (y - s);
+        erreurs++;
+      }
+    }
+    hist.push({w: w.slice(), b: b, erreurs: erreurs});
+    if (erreurs === 0) { break; }
+  }
+  return hist;
+}
+var CACHE11 = {};
+function perc(j){
+  if (!(j in CACHE11)) { CACHE11[j] = perceptron(JEUX[j].pts, 40); }
+  return CACHE11[j];
+}
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-0.75, 2.05, 1.85, -1.15], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: true
+});
+var sJeu = b1.create('slider', [[-0.65, -0.62], [0.35, -0.62], [0, 0, 2]], {
+  name: 'fonction', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sEp = b1.create('slider', [[0.70, -0.62], [1.75, -0.62], [1, 40, 40]], {
+  name: 'epoque', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function jeu(){ return Math.round(sJeu.Value()); }
+function ep(){ var h = perc(jeu()); return Math.min(Math.round(sEp.Value()), h.length) - 1; }
+function etat11(){ var h = perc(jeu()); return h[Math.max(0, ep())]; }
+b1.create('segment', [[-0.4, 0], [1.5, 0]], {strokeColor: PAL.ref, strokeWidth: 1.2,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b1.create('segment', [[0, -0.4], [0, 1.5]], {strokeColor: PAL.ref, strokeWidth: 1.2,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+/* la droite de separation w0 x + w1 y + b = 0 */
+b1.create('curve', [
+  function(t){ return t; },
+  function(t){
+    var e = etat11();
+    if (Math.abs(e.w[1]) < 1e-9) { return -10; }
+    return -(e.w[0] * t + e.b) / e.w[1];
+  }, -0.4, 1.5], {
+  strokeColor: function(){ return cssv('--primary', '#026573'); }, strokeWidth: 3,
+  highlight: false, fixed: true});
+for (var k = 0; k < 4; k++){
+  (function(idx){
+    b1.create('point', [
+      function(){ return JEUX[jeu()].pts[idx][0]; },
+      function(){ return JEUX[jeu()].pts[idx][1]; }
+    ], {name: '', size: 7, fixed: true, highlight: false, strokeWidth: 2,
+        face: function(){ return JEUX[jeu()].pts[idx][2] === 1 ? 'o' : '[]'; },
+        strokeColor: function(){
+          return JEUX[jeu()].pts[idx][2] === 1 ? cssv('--accent','#f59e0b') : cssv('--viz-blue','#2563eb'); },
+        fillColor: function(){
+          return JEUX[jeu()].pts[idx][2] === 1 ? cssv('--accent','#f59e0b') : cssv('--viz-blue','#2563eb'); },
+        fillOpacity: 1});
+  })(k);
+}
+b1.create('text', [-0.72, 1.98, function(){
+  var h = perc(jeu()), e = etat11();
+  return JEUX[jeu()].nom + '   |   epoque ' + (ep() + 1) + ' sur ' + h.length
+       + '   |   erreurs a cette epoque : ' + e.erreurs;
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-0.72, 1.82, function(){
+  var e = etat11();
+  return 'Droite : ' + e.w[0].toFixed(0) + ' x1 + ' + e.w[1].toFixed(0) + ' x2 + '
+       + e.b.toFixed(0) + ' = 0';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-0.72, -0.95, function(){
+  var h = perc(jeu());
+  if (h[h.length-1].erreurs === 0){
+    return 'Convergence en ' + h.length + ' epoques : les deux classes sont lineairement separables.';
+  }
+  return 'Aucune convergence apres ' + h.length
+       + ' epoques : AUCUNE droite ne separe ces quatre points. Le perceptron oscille indefiniment.';
+}], {fontSize: 13.5, fixed: true, highlight: false,
+     strokeColor: function(){
+       var h = perc(jeu());
+       return h[h.length-1].erreurs === 0 ? cssv('--viz-ok','#16a34a') : cssv('--viz-bad','#dc2626'); }});
+
+/* ====== Figure : un reseau a une couche cachee apprend le OU exclusif ==== */
+function sigm(x){ return 1 / (1 + Math.exp(-x)); }
+function entrainerMLP(nCaches, eta, nIter, graine){
+  var s = graine;
+  function rnd(){ s = (s*1103515245+12345)%2147483648; return s/2147483648; }
+  var X = [[0,0],[0,1],[1,0],[1,1]], Y = [0,1,1,0];
+  var W1 = [], b1v = [], W2 = [], b2v = 0, i, j;
+  for (j = 0; j < nCaches; j++){
+    W1.push([(rnd()-0.5)*4, (rnd()-0.5)*4]); b1v.push((rnd()-0.5)*2);
+    W2.push((rnd()-0.5)*4);
+  }
+  b2v = (rnd()-0.5)*2;
+  var hist = [];
+  for (var it = 0; it <= nIter; it++){
+    var perte = 0;
+    var gW1 = [], gb1 = [], gW2 = [], gb2 = 0;
+    for (j = 0; j < nCaches; j++){ gW1.push([0,0]); gb1.push(0); gW2.push(0); }
+    for (i = 0; i < 4; i++){
+      var h = [], a = [];
+      for (j = 0; j < nCaches; j++){
+        var z = W1[j][0]*X[i][0] + W1[j][1]*X[i][1] + b1v[j];
+        a.push(z); h.push(sigm(z));
+      }
+      var z2 = b2v;
+      for (j = 0; j < nCaches; j++){ z2 += W2[j] * h[j]; }
+      var o = sigm(z2);
+      perte += -(Y[i]*Math.log(Math.max(1e-12,o)) + (1-Y[i])*Math.log(Math.max(1e-12,1-o)));
+      var d2 = o - Y[i];                       /* derivee de l entropie croisee */
+      gb2 += d2;
+      for (j = 0; j < nCaches; j++){
+        gW2[j] += d2 * h[j];
+        var d1 = d2 * W2[j] * h[j] * (1 - h[j]);
+        gW1[j][0] += d1 * X[i][0];
+        gW1[j][1] += d1 * X[i][1];
+        gb1[j] += d1;
+      }
+    }
+    hist.push({perte: perte / 4,
+               W1: W1.map(function(w){ return w.slice(); }), b1: b1v.slice(),
+               W2: W2.slice(), b2: b2v});
+    if (it === nIter) { break; }
+    for (j = 0; j < nCaches; j++){
+      W1[j][0] -= eta * gW1[j][0] / 4; W1[j][1] -= eta * gW1[j][1] / 4;
+      b1v[j] -= eta * gb1[j] / 4; W2[j] -= eta * gW2[j] / 4;
+    }
+    b2v -= eta * gb2 / 4;
+  }
+  return hist;
+}
+var CACHEM11 = {};
+function mlp(nCaches, eta){
+  var k = nCaches + '|' + eta.toFixed(2);
+  if (!(k in CACHEM11)) { CACHEM11[k] = entrainerMLP(nCaches, eta, 3000, 20250806); }
+  return CACHEM11[k];
+}
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-0.95, 1.55, 1.95, -1.05], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sH = b2.create('slider', [[-0.85, -0.55], [0.15, -0.55], [1, 3, 6]], {
+  name: 'neurones caches', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sEta = b2.create('slider', [[0.50, -0.55], [1.85, -0.55], [0.5, 5.0, 12.0]], {
+  name: 'pas', snapWidth: 0.5, precision: 1,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function nH(){ return Math.round(sH.Value()); }
+function eta11(){ return Math.round(sEta.Value() * 2) / 2; }
+b2.create('segment', [[0, 0], [1.7, 0]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b2.create('segment', [[0, 0], [0, 1.2]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+var cPerte = b2.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--primary', '#026573'); }, strokeWidth: 3,
+  highlight: false, fixed: true});
+cPerte.updateDataArray = function(){
+  var h = mlp(nH(), eta11()), X = [], Y = [];
+  var m = h[0].perte || 1;
+  for (var i = 0; i < h.length; i += 20){ X.push(1.7 * i / h.length); Y.push(h[i].perte / m); }
+  this.dataX = X; this.dataY = Y;
+};
+b2.create('text', [-0.9, 1.50, function(){
+  var h = mlp(nH(), eta11());
+  return nH() + ' neurones caches, pas ' + eta11().toFixed(1)
+       + '   |   perte initiale ' + h[0].perte.toFixed(3)
+       + '   |   perte finale ' + h[h.length-1].perte.toFixed(4);
+}], {fontSize: 14, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-0.9, 1.36, function(){
+  var h = mlp(nH(), eta11()), f = h[h.length-1];
+  /* verifie si les 4 exemples sont bien classes */
+  var X = [[0,0],[0,1],[1,0],[1,1]], Y = [0,1,1,0], ok = 0;
+  for (var i = 0; i < 4; i++){
+    var z2 = f.b2;
+    for (var j = 0; j < f.W2.length; j++){
+      z2 += f.W2[j] * sigm(f.W1[j][0]*X[i][0] + f.W1[j][1]*X[i][1] + f.b1[j]);
+    }
+    if ((sigm(z2) > 0.5 ? 1 : 0) === Y[i]) { ok++; }
+  }
+  return ok + ' des 4 exemples correctement classes apres 3000 iterations.';
+}], {fontSize: 13, fixed: true, highlight: false,
+     strokeColor: function(){ return cssv('--primary-dark', '#014a55'); }});
+b2.create('text', [0.85, -0.85, 'iterations de descente de gradient'], {fontSize: 12.5,
+  anchorX: 'middle', strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-0.9, -1.0,
+  'Meme initialisation pour toutes les configurations : les differences ne viennent que des reglages.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

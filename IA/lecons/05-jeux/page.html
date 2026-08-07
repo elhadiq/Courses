@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 5 &mdash; Jeux &agrave; deux joueurs</title>
+<meta name="description" content="Arbre de jeu, min-max, elagage alpha-beta, evaluation, effet d horizon, echantillonnage.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Partie II &middot; Chapitre 5</div>
+<h1>Chapitre 5 &mdash; Jeux &agrave; deux joueurs et adversaire optimal</h1>
+<div class="lesson-sub">Arbre de jeu, valeur d'une position, algorithme min-max, &eacute;lagage alpha-b&ecirc;ta, fonction d'&eacute;valuation, effet d'horizon et recherche par &eacute;chantillonnage.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">Annexe compagnon</div><p>Min-max, l'&eacute;lagage alpha-b&ecirc;ta, la recherche &agrave; profondeur it&eacute;rative et l'exploration arborescente par &eacute;chantillonnage sont d&eacute;taill&eacute;s <strong><a href="algorithms.html">pas &agrave; pas dans l'annexe</a></strong>, exemples chiffr&eacute;s &agrave; l'appui et sans une ligne de programme.</p></div>
+
+<h2>2.1 Le cadre : jeux &agrave; somme nulle et information parfaite</h2>
+
+<p>Le chapitre pr&eacute;c&eacute;dent supposait un monde qui ne r&eacute;siste pas : les actions ont l'effet qu'on attend d'elles. Un jeu introduit un second d&eacute;cideur dont les int&eacute;r&ecirc;ts sont exactement oppos&eacute;s aux n&ocirc;tres. Le plan lin&eacute;aire du chapitre 3 ne suffit plus : il faut une <em>strat&eacute;gie</em>, c'est-&agrave;-dire une r&eacute;ponse pr&eacute;vue &agrave; chaque coup adverse.</p>
+
+<div class="box def"><div class="box-title">D&eacute;finition &mdash; Jeu &agrave; somme nulle, deux joueurs, information parfaite</div>
+<p>Un tel jeu est la donn&eacute;e d'un ensemble de positions, d'une position initiale, d'une fonction qui &agrave; toute position associe le joueur au trait, d'une fonction qui &eacute;num&egrave;re les coups l&eacute;gaux, d'un test de position terminale et d'une <strong>fonction d'utilit&eacute;</strong> \(u\) qui affecte &agrave; toute position terminale un r&eacute;el, du point de vue du premier joueur appel&eacute; MAX. Le second joueur, MIN, re&ccedil;oit \(-u\) : la somme des gains est nulle. <em>Information parfaite</em> signifie que chaque joueur conna&icirc;t l'int&eacute;gralit&eacute; de la position &mdash; ni cartes cach&eacute;es, ni d&eacute;s.</p></div>
+
+<p>Les positions et les coups engendrent un <strong>arbre de jeu</strong>. &Eacute;checs, dames, morpion, puissance 4, go et Nim entrent dans ce cadre ; le poker et le bridge n'y entrent pas. Zermelo a &eacute;tabli d&egrave;s 1913 que dans un tel jeu fini, l'un des deux joueurs poss&egrave;de une strat&eacute;gie qui lui garantit au moins la nulle <a class="cite" href="#ref-zermelo1913">[1]</a> ; von Neumann en a donn&eacute; la formulation g&eacute;n&eacute;rale sous le nom de th&eacute;or&egrave;me du minimax <a class="cite" href="#ref-vonneumann1928">[2]</a>.</p>
+
+<div class="box def"><div class="box-title">D&eacute;finition &mdash; Valeur d'une position</div>
+<p>La valeur \(V(s)\) d'une position \(s\), du point de vue de MAX, est d&eacute;finie r&eacute;cursivement par</p>
+<div class="eq">\[V(s) = \begin{cases} u(s) & \text{si } s \text{ est terminale}\\ \max_{a} V(T(s,a)) & \text{si MAX est au trait}\\ \min_{a} V(T(s,a)) & \text{si MIN est au trait}\end{cases}\]</div>
+<p>C'est le r&eacute;sultat auquel aboutit la partie si les deux joueurs jouent parfaitement.</p></div>
+
+<figure class="viz"><div class="viz-title">Anatomie d'un arbre de jeu</div>
+<svg viewBox="0 0 760 320" role="img" style="width:100%;height:auto;display:block;"><path d="M 380 66 L 190 124" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 380 66 L 380 124" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 380 66 L 570 124" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 190 156 L 110 219" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 190 156 L 250 219" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 380 156 L 330 219" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 380 156 L 430 219" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 570 156 L 510 219" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 570 156 L 610 219" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 570 156 L 700 219" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 380 33 L 397 63 L 363 63 Z" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="380" y="59" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">3</text><path d="M 190 157 L 207 127 L 173 127 Z" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="190" y="142" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">3</text><path d="M 380 157 L 397 127 L 363 127 Z" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="380" y="142" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">2</text><path d="M 570 157 L 587 127 L 553 127 Z" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="570" y="142" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">2</text><rect x="93" y="220" width="34" height="30" rx="4" style="fill:var(--viz-ref);stroke:var(--color-bg);stroke-width:2;"/><text x="110" y="240" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">3</text><rect x="233" y="220" width="34" height="30" rx="4" style="fill:var(--viz-ref);stroke:var(--color-bg);stroke-width:2;"/><text x="250" y="240" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">12</text><rect x="313" y="220" width="34" height="30" rx="4" style="fill:var(--viz-ref);stroke:var(--color-bg);stroke-width:2;"/><text x="330" y="240" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">8</text><rect x="413" y="220" width="34" height="30" rx="4" style="fill:var(--viz-ref);stroke:var(--color-bg);stroke-width:2;"/><text x="430" y="240" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">2</text><rect x="493" y="220" width="34" height="30" rx="4" style="fill:var(--viz-ref);stroke:var(--color-bg);stroke-width:2;"/><text x="510" y="240" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">4</text><rect x="593" y="220" width="34" height="30" rx="4" style="fill:var(--viz-ref);stroke:var(--color-bg);stroke-width:2;"/><text x="610" y="240" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">6</text><rect x="683" y="220" width="34" height="30" rx="4" style="fill:var(--viz-ref);stroke:var(--color-bg);stroke-width:2;"/><text x="700" y="240" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">14</text><text x="30" y="55" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">niveau MAX</text><text x="30" y="145" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">niveau MIN</text><text x="30" y="240" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">feuilles</text><text x="380" y="290" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">chaque n&oelig;ud MIN prend le minimum de ses fils, chaque n&oelig;ud MAX le maximum</text><text x="380" y="310" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">la valeur du jeu est 3 : c'est le meilleur r&eacute;sultat que MAX peut garantir</text></svg>
+<figcaption class="viz-caption"><strong>Figure 5.1.</strong> Les triangles pointe en haut sont les n&oelig;uds MAX, pointe en bas les n&oelig;uds MIN, les rectangles les positions terminales. Les valeurs remontent des feuilles vers la racine. Ici MAX ne peut pas garantir mieux que 3, bien qu'une feuille &agrave; 14 existe : MIN ne le laissera jamais l'atteindre.</figcaption></figure>
+
+<h2>2.2 Min-max</h2>
+
+<p>La d&eacute;finition ci-dessus est directement un algorithme : un parcours en profondeur qui remonte les valeurs. C'est <strong>min-max</strong>, dont le principe appara&icirc;t d&egrave;s l'article fondateur de Shannon sur la programmation des &eacute;checs <a class="cite" href="#ref-shannon1950">[3]</a>.</p>
+
+<div class="algo"><div class="algo-cap">Algorithme 5.1 &mdash; Min-max</div><div class="algo-io"><b>Entr&eacute;e :</b> une position \(s\), un bool&eacute;en indiquant si MAX est au trait<br><b>Sortie :</b> la valeur \(V(s)\) du jeu, du point de vue de MAX</div><ol class="algo-corps"><li><b class="kw">fonction</b> <span class="fn">MinMax</span>\((s,\ \mathrm{max})\)</li><li class="n1"><b class="kw">si</b> <i class="va">s</i> est terminale <b class="kw">alors</b> <b class="kw">retourner</b> \(u(s)\)</li><li class="n1"><b class="kw">si</b> \(\mathrm{max}\) <b class="kw">alors</b></li><li class="n2"><b class="kw">retourner</b> \(\displaystyle\max_{a \in A(s)} \mathrm{MinMax}\big(T(s,a),\ \mathrm{faux}\big)\)</li><li class="n1"><b class="kw">sinon</b></li><li class="n2"><b class="kw">retourner</b> \(\displaystyle\min_{a \in A(s)} \mathrm{MinMax}\big(T(s,a),\ \mathrm{vrai}\big)\)</li><li>&nbsp;</li><li><b class="kw">fonction</b> <span class="fn">MeilleurCoup</span>\((s)\)</li><li class="n1"><b class="kw">retourner</b> \(\operatorname*{argmax}_{a \in A(s)} \mathrm{MinMax}\big(T(s,a),\ \mathrm{faux}\big)\)</li></ol><p class="algo-note">L'utilit&eacute; \(u\) est toujours exprim&eacute;e du point de vue de MAX, jamais du joueur au trait. <strong>Mesure de terminaison :</strong> la hauteur restante de l'arbre. <strong>Co&ucirc;t :</strong> \(\Theta(b^{d})\) feuilles &eacute;valu&eacute;es.</p></div>
+
+<div class="box method"><div class="box-title">Analyse &mdash; correction, terminaison, complexit&eacute;</div>
+<p><strong>Correction.</strong> Par r&eacute;currence bien fond&eacute;e sur la hauteur de l'arbre. Si la position est terminale, la valeur rendue est l'utilit&eacute;, exacte par d&eacute;finition. Sinon, chaque appel r&eacute;cursif porte sur une position de hauteur strictement plus petite et rend, par hypoth&egrave;se de r&eacute;currence, la valeur exacte du sous-arbre ; le maximum ou le minimum de ces valeurs est bien \(V(s)\).</p>
+<p><strong>Terminaison.</strong> Mesure : la hauteur restante de l'arbre, entier positif qui d&eacute;cro&icirc;t strictement &agrave; chaque appel. Elle atteint z&eacute;ro sur les positions terminales. Attention : cela suppose l'arbre <em>fini</em> &mdash; aux &eacute;checs, la r&egrave;gle de r&eacute;p&eacute;tition est ce qui rend l'arbre fini.</p>
+<p><strong>Complexit&eacute;.</strong> Avec un facteur de branchement \(b\) et une profondeur \(d\), min-max &eacute;value \(b^{d}\) feuilles, en temps \(\Theta(b^{d})\) et en espace \(\Theta(bd)\) (la pile d'appels). Pour les &eacute;checs, \(b \approx 35\) et une partie compl&egrave;te fait \(d \approx 80\) : \(35^{80} \approx 10^{123}\) feuilles. Le nombre d'atomes de l'univers observable est de l'ordre de \(10^{80}\). L'exploration compl&egrave;te est physiquement impossible, pas seulement lente.</p></div>
+
+<h2>2.3 L'&eacute;lagage alpha-b&ecirc;ta</h2>
+
+<p>L'observation d&eacute;cisive est qu'<em>il n'est pas n&eacute;cessaire de conna&icirc;tre la valeur d'un sous-arbre pour savoir qu'il est inutile</em>. Si MAX dispose d&eacute;j&agrave; d'un coup garantissant 3, et qu'un autre coup m&egrave;ne &agrave; une position o&ugrave; MIN peut d&eacute;j&agrave; obtenir 2, il est inutile d'examiner les autres r&eacute;ponses de MIN : elles ne peuvent que faire baisser cette valeur, jamais remonter au-dessus de 3.</p>
+
+<p>On maintient donc deux bornes le long de la branche courante : \(\alpha\), le meilleur r&eacute;sultat que MAX s'est d&eacute;j&agrave; assur&eacute;, et \(\beta\), le meilleur que MIN s'est d&eacute;j&agrave; assur&eacute;. D&egrave;s que \(\alpha \ge \beta\), le sous-arbre restant est coup&eacute;. L'analyse compl&egrave;te de cette proc&eacute;dure, ainsi que sa preuve d'optimalit&eacute;, sont dues &agrave; Knuth et Moore <a class="cite" href="#ref-knuth1975">[4]</a>.</p>
+
+<div class="algo"><div class="algo-cap">Algorithme 5.2 &mdash; &Eacute;lagage alpha-b&ecirc;ta</div><div class="algo-io"><b>Entr&eacute;e :</b> une position \(s\), deux bornes \(\alpha \le \beta\), le joueur au trait<br><b>Sortie :</b> la valeur \(V(s)\), identique &agrave; celle de min-max</div><ol class="algo-corps"><li><b class="kw">fonction</b> <span class="fn">AlphaBeta</span>\((s,\ \alpha,\ \beta,\ \mathrm{max})\)</li><li class="n1"><b class="kw">si</b> <i class="va">s</i> est terminale <b class="kw">alors</b> <b class="kw">retourner</b> \(u(s)\)</li><li class="n1"><b class="kw">si</b> \(\mathrm{max}\) <b class="kw">alors</b></li><li class="n2">\(v \leftarrow -\infty\)</li><li class="n2"><b class="kw">pour tout</b> \(a \in A(s)\) <b class="kw">faire</b></li><li class="n3">\(v \leftarrow \max\big(v,\ \mathrm{AlphaBeta}(T(s,a), \alpha, \beta, \mathrm{faux})\big)\)</li><li class="n3">\(\alpha \leftarrow \max(\alpha, v)\)</li><li class="n3"><b class="kw">si</b> \(\alpha \ge \beta\) <b class="kw">alors</b> <b class="kw">sortir</b>          <span class="cm">// coupure beta</span></li><li class="n1"><b class="kw">sinon</b></li><li class="n2">\(v \leftarrow +\infty\)</li><li class="n2"><b class="kw">pour tout</b> \(a \in A(s)\) <b class="kw">faire</b></li><li class="n3">\(v \leftarrow \min\big(v,\ \mathrm{AlphaBeta}(T(s,a), \alpha, \beta, \mathrm{vrai})\big)\)</li><li class="n3">\(\beta \leftarrow \min(\beta, v)\)</li><li class="n3"><b class="kw">si</b> \(\alpha \ge \beta\) <b class="kw">alors</b> <b class="kw">sortir</b>          <span class="cm">// coupure alpha</span></li><li class="n1"><b class="kw">retourner</b> <i class="va">v</i></li></ol><p class="algo-note">Appel initial : \(\mathrm{AlphaBeta}(s, -\infty, +\infty, \mathrm{vrai})\). <strong>Th&eacute;or&egrave;me.</strong> La valeur rendue &agrave; la racine est exactement celle de min-max ; sous un ordre parfait, le nombre de feuilles lues tombe &agrave; \(b^{\lceil d/2\rceil} + b^{\lfloor d/2\rfloor} - 1\).</p></div>
+
+<div class="box thm"><div class="box-title">Th&eacute;or&egrave;me &mdash; Correction et co&ucirc;t de l'&eacute;lagage</div>
+<p><strong>(a)</strong> Pour toute position \(s\), \(\texttt{alpha\_beta}(s, -\infty, +\infty, \cdot) = \texttt{minmax}(s, \cdot)\) : l'&eacute;lagage ne change <em>jamais</em> la valeur rendue &agrave; la racine.</p>
+<p><strong>(b)</strong> Si les coups sont examin&eacute;s dans l'ordre parfait &mdash; le meilleur d'abord &agrave; chaque n&oelig;ud &mdash; le nombre de feuilles &eacute;valu&eacute;es tombe &agrave; \(b^{\lceil d/2\rceil} + b^{\lfloor d/2\rfloor} - 1\), soit environ \(\Theta(b^{d/2})\) : <strong>&agrave; temps &eacute;gal, on explore deux fois plus profond&eacute;ment</strong>. Aucun algorithme ne peut faire mieux avec la m&ecirc;me information <a class="cite" href="#ref-knuth1975">[4]</a>.</p>
+<p><strong>(c)</strong> Dans un ordre al&eacute;atoire, le co&ucirc;t est de l'ordre de \(\Theta(b^{3d/4})\).</p></div>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Le premier curseur active ou d&eacute;sactive l'&eacute;lagage, le deuxi&egrave;me r&eacute;ordonne les coups fr&egrave;res, le troisi&egrave;me d&eacute;roule l'exploration en profondeur. Les sous-arbres coup&eacute;s apparaissent en pointill&eacute; rouge.</p>
+<div id="jxg1" class="viz-board" style="height:520px;"></div>
+<p class="viz-caption"><strong>Figure 5.2.</strong> Un arbre de profondeur 4 &agrave; branchement 2, seize feuilles. La valeur du jeu vaut 6 dans les six configurations, ce qui illustre le point (a). Le travail, lui, varie fortement : min-max &eacute;value toujours les seize feuilles ; alpha-b&ecirc;ta en &eacute;value quatorze dans l'ordre donn&eacute;, quinze dans le pire ordre, et <strong>sept seulement</strong> dans l'ordre parfait &mdash; exactement la borne \(2^{2} + 2^{2} - 1 = 7\) du point (b).</p></div>
+
+<div class="box tip"><div class="box-title">Comment obtenir un bon ordre sans conna&icirc;tre la r&eacute;ponse</div>
+Trois techniques standard, toutes bon march&eacute; : jouer d'abord le coup qui a provoqu&eacute; une coupure &agrave; la m&ecirc;me profondeur dans une branche voisine (<em>killer move</em>) ; trier les coups par une &eacute;valuation statique rapide, en pla&ccedil;ant les prises en t&ecirc;te ; et surtout la <strong>recherche &agrave; profondeur croissante</strong>, o&ugrave; l'on relance la recherche &agrave; la profondeur \(1, 2, 3, \dots\) en utilisant le meilleur coup de l'it&eacute;ration pr&eacute;c&eacute;dente comme premier coup de la suivante. Ce dernier proc&eacute;d&eacute; sert aussi &agrave; g&eacute;rer le temps : on s'arr&ecirc;te quand la pendule l'exige, avec un coup toujours disponible.</div>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Le curseur fixe le facteur de branchement. L'&eacute;chelle verticale est logarithmique : chaque graduation vaut un facteur 100.</p>
+<div id="jxg2" class="viz-board" style="height:440px;"></div>
+<p class="viz-caption"><strong>Figure 5.3.</strong> Nombre de feuilles &eacute;valu&eacute;es en fonction de la profondeur. Les trois droites (en &eacute;chelle logarithmique) correspondent &agrave; min-max, &agrave; l'&eacute;lagage sur un ordre quelconque et &agrave; l'&eacute;lagage sur un ordre parfait. La pente est divis&eacute;e par deux dans le meilleur cas : c'est un gain sur l'exposant, pas sur une constante.</p></div>
+
+<h2>2.4 Profondeur limit&eacute;e et fonction d'&eacute;valuation</h2>
+
+<p>M&ecirc;me divis&eacute; par deux, l'exposant reste un exposant : aucun programme d'&eacute;checs ne remonte les valeurs depuis les positions terminales. On coupe la r&eacute;cursion &agrave; une profondeur fix&eacute;e et on remplace l'utilit&eacute; par une <strong>fonction d'&eacute;valuation</strong> \(e(s)\), estimation heuristique de la valeur de la position. La qualit&eacute; du programme est alors le produit de deux facteurs : la profondeur atteinte et la finesse de \(e\).</p>
+
+<p>Une fonction d'&eacute;valuation est typiquement une combinaison lin&eacute;aire de caract&eacute;ristiques, \(e(s) = \sum_{i} w_{i}\varphi_{i}(s)\) : mat&eacute;riel, mobilit&eacute;, structure de pions, s&eacute;curit&eacute; du roi. Samuel avait d&eacute;j&agrave; montr&eacute; en 1959, sur les dames, que les poids \(w_{i}\) pouvaient &ecirc;tre <em>appris</em> par la machine en confrontant l'&eacute;valuation d'une position &agrave; celle obtenue apr&egrave;s quelques coups de plus <a class="cite" href="#ref-samuel1959">[5]</a> &mdash; le premier programme d'apprentissage automatique, et l'anc&ecirc;tre direct des m&eacute;thodes du chapitre 9.</p>
+
+<figure class="viz"><div class="viz-title">L'effet d'horizon</div>
+<svg viewBox="0 0 760 340" role="img" style="width:100%;height:auto;display:block;"><path d="M 40 190 L 720 190" style="fill:none;stroke:var(--viz-bad);stroke-width:2.5;stroke-dasharray:8 6;"/><text x="46" y="182" style="fill:var(--viz-bad);font-size:12.5px;font-weight:700;font-family:inherit;">horizon d'exploration : la recherche s'arr&ecirc;te ici</text><path d="M 380 62 L 140 148" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><circle cx="140" cy="148" r="17" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="140" y="152" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">+2,0</text><path d="M 140 168 L 140 232" style="fill:none;stroke:var(--viz-ref);stroke-width:2;stroke-dasharray:4 5;"/><circle cx="140" cy="250" r="17" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><text x="140" y="254" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">-9</text><path d="M 380 62 L 300 148" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><circle cx="300" cy="148" r="17" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="300" y="152" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">+1,8</text><path d="M 300 168 L 300 232" style="fill:none;stroke:var(--viz-ref);stroke-width:2;stroke-dasharray:4 5;"/><circle cx="300" cy="250" r="17" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><text x="300" y="254" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">-9</text><path d="M 380 62 L 460 148" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><circle cx="460" cy="148" r="17" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="460" y="152" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">+2,1</text><path d="M 460 168 L 460 232" style="fill:none;stroke:var(--viz-ref);stroke-width:2;stroke-dasharray:4 5;"/><circle cx="460" cy="250" r="17" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><text x="460" y="254" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">-9</text><path d="M 380 62 L 620 148" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><circle cx="620" cy="148" r="17" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="620" y="152" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">+1,9</text><path d="M 620 168 L 620 232" style="fill:none;stroke:var(--viz-ref);stroke-width:2;stroke-dasharray:4 5;"/><circle cx="620" cy="250" r="17" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><text x="620" y="254" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">-9</text><circle cx="380" cy="45" r="19" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="380" y="50" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">?</text><text x="380" y="20" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">position courante</text><text x="740" y="296" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">d&eacute;faite in&eacute;luctable, un coup au-del&agrave; de l'horizon</text><text x="740" y="320" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">l'&eacute;valuation superficielle annonce un avantage : la machine joue le pire coup</text></svg>
+<figcaption class="viz-caption"><strong>Figure 5.4.</strong> Toutes les suites accessibles &agrave; la profondeur choisie semblent favorables, alors que la d&eacute;faite est in&eacute;luctable un coup plus loin. La recherche &laquo; repousse &raquo; la mauvaise nouvelle au-del&agrave; de son horizon et joue un coup catastrophique en toute confiance. Rem&egrave;de standard : la <strong>recherche de quiescence</strong>, qui prolonge l'exploration tant que la position est agit&eacute;e (prises, &eacute;checs) et ne coupe que sur des positions calmes.</figcaption></figure>
+
+<div class="box warn"><div class="box-title">Deux pathologies de l'&eacute;valuation tronqu&eacute;e</div>
+<p><strong>Effet d'horizon.</strong> D&eacute;crit ci-dessus : la profondeur fixe cr&eacute;e un angle mort syst&eacute;matique.</p>
+<p><strong>Pathologie de la profondeur.</strong> Contre-intuitivement, sur certaines familles de jeux al&eacute;atoires, augmenter la profondeur <em>d&eacute;grade</em> la qualit&eacute; du choix : les erreurs de l'&eacute;valuation s'accumulent au lieu de se compenser <a class="cite" href="#ref-nau1983">[6]</a>. Cela ne se produit pas sur les jeux r&eacute;els, dont les positions voisines ont des valeurs corr&eacute;l&eacute;es, mais c'est un avertissement : &laquo; chercher plus profond &raquo; n'est pas un th&eacute;or&egrave;me.</p></div>
+
+<p>Deep Blue, qui battit Kasparov en 1997, tenait cette ligne jusqu'au bout : circuits d&eacute;di&eacute;s &eacute;valuant environ 200 millions de positions par seconde, alpha-b&ecirc;ta &agrave; profondeur it&eacute;rative, extensions de quiescence, et une fonction d'&eacute;valuation de plusieurs milliers de termes r&eacute;gl&eacute;e &agrave; la main avec l'aide de grands ma&icirc;tres <a class="cite" href="#ref-campbell2002">[7]</a>.</p>
+
+<h2>2.5 Quand l'&eacute;valuation manque : la recherche par &eacute;chantillonnage</h2>
+
+<p>Au go, le facteur de branchement d&eacute;passe 250 et personne n'a su &eacute;crire de fonction d'&eacute;valuation statique fiable : alpha-b&ecirc;ta y est rest&eacute; faible pendant trente ans. La solution est venue d'un changement de nature de l'&eacute;valuation &mdash; au lieu de calculer une valeur, on l'<em>estime par simulation</em>.</p>
+
+<p>L'exploration arborescente de Monte-Carlo r&eacute;p&egrave;te quatre &eacute;tapes : descendre dans l'arbre d&eacute;j&agrave; construit en suivant un crit&egrave;re de s&eacute;lection, ajouter un n&oelig;ud, simuler une partie al&eacute;atoire jusqu'&agrave; son terme, puis remonter le r&eacute;sultat le long du chemin parcouru. Le crit&egrave;re de s&eacute;lection UCT choisit &agrave; chaque n&oelig;ud le fils maximisant</p>
+
+<div class="eq">\[\frac{w_{i}}{n_{i}} + c\sqrt{\frac{\ln N}{n_{i}}}\]</div>
+
+<p>o&ugrave; \(w_i\) est le nombre de victoires observ&eacute;es sous ce fils, \(n_i\) son nombre de visites et \(N\) celui du p&egrave;re. Le premier terme exploite ce qui marche, le second explore ce qui est mal connu ; la constante \(c\) arbitre entre les deux. Kocsis et Szepesv&aacute;ri ont montr&eacute; que cette r&egrave;gle fait converger l'estimation vers la valeur min-max <a class="cite" href="#ref-kocsis2006">[8]</a>. Combin&eacute;e &agrave; des r&eacute;seaux de neurones fournissant la politique de s&eacute;lection et l'&eacute;valuation, elle a donn&eacute; AlphaGo <a class="cite" href="#ref-silver2016">[9]</a>.</p>
+
+<h2>2.6 Mise en &oelig;uvre : un joueur complet</h2>
+
+<p>Voici un joueur g&eacute;n&eacute;rique, param&eacute;tr&eacute; par les r&egrave;gles du jeu, avec profondeur it&eacute;rative, table de transposition et tri des coups. Les positions sont suppos&eacute;es hachables.</p>
+
+<div class="algo"><div class="algo-cap">Algorithme 5.3 &mdash; Joueur &agrave; profondeur croissante et table de transpositions</div><div class="algo-io"><b>Entr&eacute;e :</b> une position \(s\), une profondeur maximale \(d_{\max}\), une &eacute;valuation \(e\)<br><b>Sortie :</b> le meilleur coup connu au moment de l'arr&ecirc;t</div><ol class="algo-corps"><li>\(\mathcal{T} \leftarrow \varnothing\)          <span class="cm">// table de transpositions</span></li><li><b class="kw">pour</b> \(d = 1\) <b class="kw">jusqu'&agrave;</b> \(d_{\max}\) <b class="kw">faire</b></li><li class="n1">\(a^{*} \leftarrow \operatorname*{argmax}_{a \in A(s)} \mathrm{AB}\big(T(s,a),\ d-1,\ -\infty,\ +\infty,\ \mathrm{faux}\big)\)</li><li class="n1"><span class="cm">// le coup retenu sera examine EN PREMIER a l iteration suivante</span></li><li><b class="kw">retourner</b> \(a^{*}\)</li><li>&nbsp;</li><li><b class="kw">fonction</b> <span class="fn">AB</span>\((s,\ d,\ \alpha,\ \beta,\ \mathrm{max})\)</li><li class="n1">\(\kappa \leftarrow (s,\ d,\ \mathrm{max})\)          <span class="cm">// les trois composantes sont necessaires</span></li><li class="n1"><b class="kw">si</b> \(\kappa \in \mathcal{T}\) <b class="kw">alors</b> <b class="kw">retourner</b> \(\mathcal{T}[\kappa]\)</li><li class="n1"><b class="kw">si</b> <i class="va">s</i> est terminale <b class="kw">alors</b> <b class="kw">retourner</b> \(u(s)\)</li><li class="n1"><b class="kw">si</b> \(d = 0\) <b class="kw">alors</b> <b class="kw">retourner</b> \(e(s)\)</li><li class="n1">trier \(A(s)\) par \(e\) d&eacute;croissante si \(\mathrm{max}\), croissante sinon</li><li class="n1">\(v \leftarrow\) r&eacute;sultat de l'&eacute;lagage alpha-b&ecirc;ta sur cette liste</li><li class="n1">\(\mathcal{T}[\kappa] \leftarrow v\) ; <b class="kw">retourner</b> <i class="va">v</i></li></ol><p class="algo-note">Indexer \(\mathcal{T}\) sur la seule position, sans \(d\) ni le joueur au trait, produit un joueur incoh&eacute;rent : une valeur obtenue &agrave; profondeur 2 serait r&eacute;utilis&eacute;e comme si elle valait &agrave; profondeur 6.</p></div>
+
+<div class="box warn"><div class="box-title">Trois erreurs fr&eacute;quentes</div>
+<p><strong>Signe.</strong> L'utilit&eacute; est toujours exprim&eacute;e du point de vue de MAX, jamais du joueur au trait. Inverser ce point de vue au milieu de la r&eacute;cursion est l'erreur la plus co&ucirc;teuse et la plus difficile &agrave; d&eacute;bosseler.</p>
+<p><strong>Table de transposition.</strong> La cl&eacute; doit inclure la profondeur restante : une valeur obtenue &agrave; profondeur 2 n'est pas r&eacute;utilisable &agrave; profondeur 6. Elle doit aussi inclure le joueur au trait.</p>
+<p><strong>Comparaison flottante.</strong> Avec une &eacute;valuation r&eacute;elle, tester \(\alpha \ge \beta\) et non l'&eacute;galit&eacute; stricte ; sinon des coupures l&eacute;gitimes sont manqu&eacute;es.</p></div>
+
+<h2>Synth&egrave;se</h2>
+<ul>
+<li>Un jeu &agrave; somme nulle et information parfaite a une <strong>valeur</strong>, d&eacute;finie par r&eacute;currence sur l'arbre de jeu <a class="cite" href="#ref-zermelo1913">[1]</a>.</li>
+<li>Min-max la calcule exactement en \(\Theta(b^{d})\) : correct mais inapplicable au-del&agrave; de quelques coups.</li>
+<li>L'&eacute;lagage alpha-b&ecirc;ta rend la m&ecirc;me valeur et descend &agrave; \(\Theta(b^{d/2})\) sous un ordre parfait : on double la profondeur atteignable <a class="cite" href="#ref-knuth1975">[4]</a>.</li>
+<li>En pratique on tronque la r&eacute;cursion et on &eacute;value : la qualit&eacute; vient conjointement de la profondeur et de la fonction d'&eacute;valuation, avec l'effet d'horizon pour rappel &agrave; l'ordre.</li>
+<li>Quand aucune &eacute;valuation statique n'est disponible, on estime la valeur par simulation guid&eacute;e <a class="cite" href="#ref-kocsis2006">[8]</a>.</li>
+</ul>
+
+<h2>R&eacute;f&eacute;rences</h2>
+<ol class="reflist">
+<li id="ref-zermelo1913">Zermelo, E. (1913). &Uuml;ber eine Anwendung der Mengenlehre auf die Theorie des Schachspiels. <em>Proceedings of the Fifth International Congress of Mathematicians</em>, vol. II, 501&ndash;504. Cambridge University Press. <a href="https://www.mathunion.org/fileadmin/ICM/Proceedings/ICM1912.2/ICM1912.2.ocr.pdf">https://www.mathunion.org/fileadmin/ICM/Proceedings/ICM1912.2/ICM1912.2.ocr.pdf</a></li>
+<li id="ref-vonneumann1928">von Neumann, J. (1928). Zur Theorie der Gesellschaftsspiele. <em>Mathematische Annalen</em>, 100(1), 295&ndash;320. DOI&nbsp;: 10.1007/BF01448847. <a href="https://doi.org/10.1007/BF01448847">https://doi.org/10.1007/BF01448847</a></li>
+<li id="ref-shannon1950">Shannon, C. E. (1950). Programming a computer for playing chess. <em>Philosophical Magazine</em>, 41(314), 256&ndash;275. DOI&nbsp;: 10.1080/14786445008521796. <a href="https://doi.org/10.1080/14786445008521796">https://doi.org/10.1080/14786445008521796</a></li>
+<li id="ref-knuth1975">Knuth, D. E. &amp; Moore, R. W. (1975). An analysis of alpha-beta pruning. <em>Artificial Intelligence</em>, 6(4), 293&ndash;326. DOI&nbsp;: 10.1016/0004-3702(75)90019-3. <a href="https://doi.org/10.1016/0004-3702(75)90019-3">https://doi.org/10.1016/0004-3702(75)90019-3</a></li>
+<li id="ref-samuel1959">Samuel, A. L. (1959). Some studies in machine learning using the game of checkers. <em>IBM Journal of Research and Development</em>, 3(3), 210&ndash;229. DOI&nbsp;: 10.1147/rd.33.0210. <a href="https://doi.org/10.1147/rd.33.0210">https://doi.org/10.1147/rd.33.0210</a></li>
+<li id="ref-nau1983">Nau, D. S. (1983). Pathology on game trees revisited, and an alternative to minimaxing. <em>Artificial Intelligence</em>, 21(1&ndash;2), 221&ndash;244. DOI&nbsp;: 10.1016/S0004-3702(83)80009-1. <a href="https://doi.org/10.1016/S0004-3702(83)80009-1">https://doi.org/10.1016/S0004-3702(83)80009-1</a></li>
+<li id="ref-campbell2002">Campbell, M., Hoane, A. J. &amp; Hsu, F.-h. (2002). Deep Blue. <em>Artificial Intelligence</em>, 134(1&ndash;2), 57&ndash;83. DOI&nbsp;: 10.1016/S0004-3702(01)00129-1. <a href="https://doi.org/10.1016/S0004-3702(01)00129-1">https://doi.org/10.1016/S0004-3702(01)00129-1</a></li>
+<li id="ref-kocsis2006">Kocsis, L. &amp; Szepesv&aacute;ri, C. (2006). Bandit based Monte-Carlo planning. <em>ECML 2006</em>, LNCS 4212, 282&ndash;293. DOI&nbsp;: 10.1007/11871842_29. <a href="https://doi.org/10.1007/11871842_29">https://doi.org/10.1007/11871842_29</a></li>
+<li id="ref-silver2016">Silver, D., Huang, A., Maddison, C. J. <em>et al.</em> (2016). Mastering the game of Go with deep neural networks and tree search. <em>Nature</em>, 529, 484&ndash;489. DOI&nbsp;: 10.1038/nature16961. <a href="https://doi.org/10.1038/nature16961">https://doi.org/10.1038/nature16961</a></li>
+</ol>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../04-metaheuristiques/page.html">\(\leftarrow\) Chapitre 4 &mdash; M&eacute;taheuristiques</a>
+<a href="algorithms.html">Annexe algorithmique</a>
+<a href="../../index.html">Sommaire du manuel</a>
+<a href="../06-contraintes/page.html">Chapitre 6 &mdash; Contraintes \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">La figure interactive n\'a pas pu etre chargee. Verifiez votre connexion reseau.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ================= Arbre de jeu : 16 feuilles, profondeur 4, racine MAX ==== */
+var FEUILLES = [5, 6, 7, 4, 5, 3, 6, 6, 9, 7, 5, 9, 8, 6, 4, 3];
+var ORDRES = ['ordre donne', 'meilleur coup en premier', 'pire coup en premier'];
+
+function feuillesOrdonnees(mode){
+  if (mode === 0) { return FEUILLES.slice(); }
+  var f = FEUILLES.slice();
+  /* On reordonne a l'interieur de chaque paire de freres, puis de chaque bloc de
+     4, puis de chaque bloc de 8, en tenant compte du joueur du niveau. */
+  function tri(deb, len, maximisant, croissant){
+    if (len === 1) { return; }
+    var moitie = len / 2;
+    tri(deb, moitie, !maximisant, croissant);
+    tri(deb + moitie, moitie, !maximisant, croissant);
+    var g = valeurBloc(f, deb, moitie, !maximisant);
+    var d = valeurBloc(f, deb + moitie, moitie, !maximisant);
+    var echange = maximisant ? (croissant ? g < d : g > d) : (croissant ? g > d : g < d);
+    if (echange){
+      var tmp = f.slice(deb, deb + moitie);
+      for (var i = 0; i < moitie; i++){ f[deb + i] = f[deb + moitie + i]; }
+      for (var i = 0; i < moitie; i++){ f[deb + moitie + i] = tmp[i]; }
+    }
+  }
+  tri(0, 16, true, mode === 1);
+  return f;
+}
+function valeurBloc(f, deb, len, maximisant){
+  if (len === 1) { return f[deb]; }
+  var g = valeurBloc(f, deb, len/2, !maximisant);
+  var d = valeurBloc(f, deb + len/2, len/2, !maximisant);
+  return maximisant ? Math.max(g, d) : Math.min(g, d);
+}
+
+/* Trace de l'exploration. elagage = false : min-max complet. */
+function trace(f, elagage){
+  var evts = [], evalFeuilles = 0;
+  function noeud(niveau, indice, alpha, beta){
+    /* niveau 4 = feuille ; indice = position dans le niveau */
+    if (niveau === 4){
+      evalFeuilles++;
+      evts.push({niveau: 4, indice: indice, val: f[indice], alpha: alpha, beta: beta, coupe: false});
+      return f[indice];
+    }
+    var maximisant = (niveau % 2 === 0);
+    var v = maximisant ? -Infinity : Infinity;
+    var coupe = false;
+    for (var k = 0; k < 2; k++){
+      var fils = indice * 2 + k;
+      var r = noeud(niveau + 1, fils, alpha, beta);
+      if (maximisant){
+        if (r > v) { v = r; }
+        if (elagage && v > alpha) { alpha = v; }
+      } else {
+        if (r < v) { v = r; }
+        if (elagage && v < beta) { beta = v; }
+      }
+      if (elagage && alpha >= beta && k === 0){
+        coupe = true;
+        marquerElague(niveau + 1, indice * 2 + 1, evts);
+        break;
+      }
+    }
+    evts.push({niveau: niveau, indice: indice, val: v, alpha: alpha, beta: beta, coupe: coupe});
+    return v;
+  }
+  function marquerElague(niveau, indice, evts){
+    evts.push({niveau: niveau, indice: indice, val: null, alpha: null, beta: null, elague: true});
+  }
+  var racine = noeud(0, 0, -Infinity, Infinity);
+  return {evts: evts, valeur: racine, feuilles: evalFeuilles};
+}
+
+var CACHE2 = {};
+function traceCache(mode, elagage){
+  var k = mode + '|' + elagage;
+  if (!(k in CACHE2)) { CACHE2[k] = trace(feuillesOrdonnees(mode), elagage); }
+  return CACHE2[k];
+}
+
+/* ----------------------------------------- Figure 2.1 : arbre alpha-beta */
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-1.2, 5.4, 17.2, -2.6], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+function px(niveau, indice){
+  var n = Math.pow(2, niveau);
+  return (indice + 0.5) * (16 / n) - 0.5;
+}
+function py(niveau){ return 4.2 - niveau * 1.15; }
+
+var sElag = b1.create('slider', [[0, -1.4], [5.6, -1.4], [0, 1, 1]], {
+  name: 'elagage', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sOrdre = b1.create('slider', [[6.6, -1.4], [11.0, -1.4], [0, 0, 2]], {
+  name: 'ordre', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+var sPas = b1.create('slider', [[12.0, -1.4], [16.4, -1.4], [0, 40, 40]], {
+  name: 'etape', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--viz-blue', '#2563eb'); }}
+});
+function modeOrdre(){ return Math.round(sOrdre.Value()); }
+function avecElagage(){ return Math.round(sElag.Value()) === 1; }
+function traceCourante(){ return traceCache(modeOrdre(), avecElagage()); }
+function pas(){ return Math.min(Math.round(sPas.Value()), traceCourante().evts.length); }
+function etatNoeud(niveau, indice){
+  var t = traceCourante(), n = pas();
+  for (var i = 0; i < n; i++){
+    var e = t.evts[i];
+    if (e.niveau === niveau && e.indice === indice) { return e; }
+    if (e.elague && e.niveau <= niveau){
+      var d = niveau - e.niveau, dec = indice >> d;
+      if (dec === e.indice && e.elague) { return {elague: true}; }
+    }
+  }
+  return null;
+}
+
+/* aretes */
+for (var niv = 0; niv < 4; niv++){
+  for (var idx = 0; idx < Math.pow(2, niv); idx++){
+    for (var k = 0; k < 2; k++){
+      (function(n, i, kk){
+        b1.create('segment', [[px(n, i), py(n) - 0.28], [px(n+1, i*2+kk), py(n+1) + 0.28]], {
+          strokeColor: function(){
+            var e = etatNoeud(n+1, i*2+kk);
+            if (e && e.elague) { return cssv('--viz-bad', '#dc2626'); }
+            return e ? cssv('--primary', '#026573') : PAL.ref();
+          },
+          strokeWidth: function(){ var e = etatNoeud(n+1, i*2+kk); return e ? 2.6 : 1.4; },
+          dash: function(){ var e = etatNoeud(n+1, i*2+kk); return (e && e.elague) ? 2 : 0; },
+          straightFirst: false, straightLast: false, highlight: false, fixed: true
+        });
+      })(niv, idx, k);
+    }
+  }
+}
+/* noeuds */
+for (var niv = 0; niv <= 4; niv++){
+  for (var idx = 0; idx < Math.pow(2, niv); idx++){
+    (function(n, i){
+      b1.create('point', [px(n, i), py(n)], {
+        name: '', size: (n === 4 ? 11 : 13), face: (n % 2 === 0 ? '^' : 'v'),
+        fixed: true, highlight: false, strokeWidth: 2,
+        strokeColor: function(){
+          var e = etatNoeud(n, i);
+          if (e && e.elague) { return cssv('--viz-bad', '#dc2626'); }
+          return e ? cssv('--primary', '#026573') : PAL.axis();
+        },
+        fillColor: function(){
+          var e = etatNoeud(n, i);
+          if (e && e.elague) { return cssv('--viz-bad', '#dc2626'); }
+          return e ? cssv('--primary', '#026573') : PAL.bg();
+        }, fillOpacity: 1
+      });
+      b1.create('text', [px(n, i), py(n) - (n === 4 ? 0.42 : 0.44), function(){
+        var e = etatNoeud(n, i);
+        if (!e) { return n === 4 ? '?' : ''; }
+        if (e.elague) { return 'coupe'; }
+        return String(e.val);
+      }], {fontSize: 13, anchorX: 'middle', fixed: true, highlight: false,
+           strokeColor: function(){
+             var e = etatNoeud(n, i);
+             return (e && e.elague) ? cssv('--viz-bad', '#dc2626') : PAL.text();
+           }});
+    })(niv, idx);
+  }
+}
+b1.create('text', [-1.1, 5.1, function(){
+  var t = traceCourante(), n = pas();
+  var vus = 0;
+  for (var i = 0; i < n; i++){ if (t.evts[i].niveau === 4 && !t.evts[i].elague) { vus++; } }
+  return (avecElagage() ? 'Elagage alpha-beta' : 'Min-max complet')
+       + '   |   ' + ORDRES[modeOrdre()]
+       + '   |   feuilles evaluees a cette etape : ' + vus + ' sur 16';
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-1.1, 4.7, function(){
+  var t = traceCourante(), n = pas();
+  if (n === 0) { return 'Deplacez le curseur d’etape pour derouler l’exploration.'; }
+  var e = t.evts[n-1];
+  if (e.elague) { return 'Sous-arbre coupe : sa valeur ne peut plus influencer la racine.'; }
+  var a = (e.alpha === -Infinity) ? '-inf' : String(e.alpha);
+  var b = (e.beta === Infinity) ? '+inf' : String(e.beta);
+  return 'Dernier noeud remonte : niveau ' + e.niveau + ', valeur ' + e.val
+       + '   |   fenetre alpha = ' + a + ', beta = ' + b;
+}], {fontSize: 14, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-1.1, -2.2, function(){
+  var t = traceCourante();
+  if (pas() < t.evts.length) { return 'Exploration en cours...'; }
+  return 'Valeur du jeu : ' + t.valeur + '   |   feuilles evaluees au total : '
+       + t.feuilles + ' sur 16';
+}], {fontSize: 15, strokeColor: function(){ return cssv('--primary','#026573'); },
+     fixed: true, highlight: false});
+
+/* ------------------- Figure 2.2 : cout de min-max et d'alpha-beta */
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-1.4, 8.6, 13.4, -1.9], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sB = b2.create('slider', [[0.4, -1.1], [5.4, -1.1], [2, 4, 12]], {
+  name: 'facteur de branchement b', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+b2.create('segment', [[0,0],[12.4,0]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b2.create('segment', [[0,0],[0,8.2]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+function log10(x){ return Math.log(x) / Math.LN10; }
+var cMinmax = b2.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); },
+  strokeWidth: 3, highlight: false, fixed: true});
+cMinmax.updateDataArray = function(){
+  var b = Math.round(sB.Value()), X = [], Y = [];
+  for (var d = 1; d <= 12; d++){ X.push(d); Y.push(d * log10(b)); }
+  this.dataX = X; this.dataY = Y;
+};
+var cAB = b2.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--primary', '#026573'); },
+  strokeWidth: 3, highlight: false, fixed: true});
+cAB.updateDataArray = function(){
+  var b = Math.round(sB.Value()), X = [], Y = [];
+  for (var d = 1; d <= 12; d++){ X.push(d); Y.push(d / 2 * log10(b)); }
+  this.dataX = X; this.dataY = Y;
+};
+var cMoy = b2.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--accent', '#f59e0b'); },
+  strokeWidth: 2.4, dash: 2, highlight: false, fixed: true});
+cMoy.updateDataArray = function(){
+  var b = Math.round(sB.Value()), X = [], Y = [];
+  for (var d = 1; d <= 12; d++){ X.push(d); Y.push(d * 0.75 * log10(b)); }
+  this.dataX = X; this.dataY = Y;
+};
+for (var d = 2; d <= 12; d += 2){
+  (function(v){ b2.create('text', [v, -0.45, String(v)], {fontSize: 12, anchorX: 'middle',
+    strokeColor: PAL.muted, fixed: true, highlight: false}); })(d);
+}
+for (var e = 2; e <= 8; e += 2){
+  (function(v){ b2.create('text', [-0.15, v, '1e' + v], {fontSize: 12, anchorX: 'right',
+    strokeColor: PAL.muted, fixed: true, highlight: false}); })(e);
+}
+b2.create('text', [6.2, -1.7, 'profondeur d’exploration'], {fontSize: 13, anchorX: 'middle',
+  strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [12.2, 8.3, 'min-max : b^d'], {fontSize: 13, anchorX: 'right',
+  strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }, fixed: true, highlight: false});
+b2.create('text', [12.2, 7.7, 'alpha-beta, ordre quelconque : environ b^(3d/4)'], {fontSize: 13,
+  anchorX: 'right', strokeColor: function(){ return cssv('--accent', '#f59e0b'); },
+  fixed: true, highlight: false});
+b2.create('text', [12.2, 7.1, 'alpha-beta, ordre parfait : b^(d/2)'], {fontSize: 13, anchorX: 'right',
+  strokeColor: function(){ return cssv('--primary', '#026573'); }, fixed: true, highlight: false});
+b2.create('text', [-1.3, 8.3, function(){
+  var b = Math.round(sB.Value());
+  var d = 8;
+  return 'b = ' + b + ' et profondeur 8 : min-max evalue ' + Math.pow(b, d).toExponential(1)
+       + ' feuilles, alpha-beta parfaitement ordonne seulement '
+       + Math.pow(b, d/2).toExponential(1) + '.';
+}], {fontSize: 14, strokeColor: PAL.text, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

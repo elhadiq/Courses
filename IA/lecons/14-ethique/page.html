@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 14 &mdash; &Eacute;thique et soci&eacute;t&eacute;</title>
+<meta name="description" content="Biais, equite, impossibilite, explicabilite, cout, documentation, regulation.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Partie V &middot; Chapitre 14</div>
+<h1>Chapitre 14 &mdash; Biais, explicabilit&eacute; et responsabilit&eacute;</h1>
+<div class="lesson-sub">D'o&ugrave; viennent les biais, quelles d&eacute;finitions d'&eacute;quit&eacute; sont math&eacute;matiquement incompatibles, comment expliquer une d&eacute;cision, quel co&ucirc;t environnemental, quelle r&eacute;gulation.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">Annexe compagnon</div><p>L'audit d'un syst&egrave;me, la mesure d'un &eacute;cart d'&eacute;quit&eacute;, la production d'une explication contre-factuelle et la fiche descriptive d'un mod&egrave;le sont d&eacute;taill&eacute;s <strong><a href="algorithms.html">pas &agrave; pas dans l'annexe</a></strong>.</p></div>
+
+<h2>14.1 Pourquoi ce chapitre est technique</h2>
+
+<p>Ce chapitre ne rel&egrave;ve pas de la morale g&eacute;n&eacute;rale. Les questions qu'il traite ont des r&eacute;ponses math&eacute;matiques pr&eacute;cises, dont certaines sont des <em>th&eacute;or&egrave;mes d'impossibilit&eacute;</em> : elles ferment d&eacute;finitivement des options que le discours courant continue de proposer. On ne peut pas &laquo; simplement rendre l'algorithme &eacute;quitable &raquo;, parce que le mot &eacute;quitable recouvre des exigences incompatibles entre elles.</p>
+
+<h2>14.2 D'o&ugrave; viennent les biais</h2>
+
+<p>Un biais n'est presque jamais une erreur de programmation. Il entre dans le syst&egrave;me &agrave; six endroits distincts, dont un seul rel&egrave;ve du choix de l'algorithme.</p>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Le curseur parcourt la cha&icirc;ne, du monde r&eacute;el jusqu'&agrave; l'usage. &Agrave; chaque &eacute;tape, la source de biais correspondante est d&eacute;crite.</p>
+<div id="jxg2" class="viz-board" style="height:460px;"></div>
+<p class="viz-caption"><strong>Figure 14.1.</strong> Deux &eacute;tapes m&eacute;ritent une attention particuli&egrave;re. L'<strong>&eacute;tiquetage</strong> : on ne mesure presque jamais la variable qui int&eacute;resse. On voudrait pr&eacute;dire la criminalit&eacute; et l'on mesure les arrestations ; on voudrait pr&eacute;dire la comp&eacute;tence et l'on mesure les &eacute;valuations pass&eacute;es. Le mod&egrave;le apprend fid&egrave;lement le substitut, biais compris. La <strong>boucle de r&eacute;troaction</strong> : la d&eacute;cision modifie le monde que l'on mesurera demain. Envoyer plus de patrouilles dans un quartier y fait constater plus d'infractions, ce qui justifie d'y envoyer encore plus de patrouilles. Le syst&egrave;me se confirme lui-m&ecirc;me.</p></div>
+
+<div class="box warn"><div class="box-title">Supprimer l'attribut sensible ne supprime pas le biais</div>
+C'est la premi&egrave;re id&eacute;e de tout le monde, et elle ne fonctionne pas. Dans des donn&eacute;es riches, l'attribut sensible est reconstituable &agrave; partir des autres : code postal, pr&eacute;nom, historique d'achat, vocabulaire employ&eacute;. Le mod&egrave;le retrouve la variable qu'on lui a cach&eacute;e, et l'on perd en outre la possibilit&eacute; de <em>mesurer</em> l'&eacute;cart, donc de le corriger. Mesurer l'attribut sensible est en g&eacute;n&eacute;ral n&eacute;cessaire pour d&eacute;tecter la discrimination, ce qui cr&eacute;e une tension r&eacute;elle avec la protection des donn&eacute;es.</div>
+
+<p>L'&eacute;tude la plus cit&eacute;e sur le sujet a mesur&eacute; les taux d'erreur de trois syst&egrave;mes commerciaux de classification du genre &agrave; partir de photographies : moins de 1 % d'erreur sur les hommes &agrave; peau claire, jusqu'&agrave; 34,7 % sur les femmes &agrave; peau fonc&eacute;e <a class="cite" href="#ref-buolamwini2018">[1]</a>. Aucun de ces syst&egrave;mes n'&eacute;tait &laquo; mal programm&eacute; &raquo; : leurs jeux d'entra&icirc;nement &eacute;taient d&eacute;s&eacute;quilibr&eacute;s, et leur score global &eacute;lev&eacute; masquait l'&eacute;chec sur une sous-population.</p>
+
+<h2>14.3 Trois d&eacute;finitions d'&eacute;quit&eacute;, et un th&eacute;or&egrave;me d'impossibilit&eacute;</h2>
+
+<div class="box def"><div class="box-title">Trois crit&egrave;res, tous raisonnables</div>
+<ul>
+<li><strong>Parit&eacute; d&eacute;mographique</strong> : la proportion de personnes s&eacute;lectionn&eacute;es est la m&ecirc;me dans chaque groupe.</li>
+<li><strong>&Eacute;galit&eacute; des chances</strong> : parmi les personnes qui m&eacute;ritent d'&ecirc;tre s&eacute;lectionn&eacute;es, la proportion effectivement s&eacute;lectionn&eacute;e est la m&ecirc;me dans chaque groupe <a class="cite" href="#ref-hardt2016">[2]</a>.</li>
+<li><strong>Calibration</strong> : un score donn&eacute; signifie la m&ecirc;me chose quel que soit le groupe &mdash; parmi ceux qui obtiennent 0,8, la m&ecirc;me proportion est r&eacute;ellement positive.</li>
+</ul></div>
+
+<div class="box thm"><div class="box-title">Th&eacute;or&egrave;me d'impossibilit&eacute;</div>
+<p>D&egrave;s que les taux de base diff&egrave;rent entre les groupes et que le classifieur n'est pas parfait, il est <strong>math&eacute;matiquement impossible</strong> de satisfaire simultan&eacute;ment la calibration et l'&eacute;galit&eacute; des taux d'erreur <a class="cite" href="#ref-kleinberg2017">[3]</a><a class="cite" href="#ref-chouldechova2017">[4]</a>.</p>
+<p>Ce n'est pas une limite technique &agrave; d&eacute;passer : c'est une contrainte alg&eacute;brique. Il faut donc <em>choisir</em>, expliciter le choix, et le justifier au regard de l'usage. Un syst&egrave;me d'aide au diagnostic et un syst&egrave;me d'attribution de pr&ecirc;t n'appellent pas le m&ecirc;me arbitrage.</p></div>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Deux groupes, un m&ecirc;me mod&egrave;le, un seuil de d&eacute;cision r&eacute;glable par groupe. Les taux de base diff&egrave;rent : 30 % dans A, 10 % dans B.</p>
+<div id="jxg1" class="viz-board" style="height:480px;"></div>
+<p class="viz-caption"><strong>Figure 14.2.</strong> Cherchez un r&eacute;glage qui satisfasse les trois crit&egrave;res. Un balayage complet des deux seuils par pas de 0,05 &mdash; 2 601 combinaisons &mdash; en trouve <strong>zero</strong>. Il en existe qui satisfont la parit&eacute; et l'&eacute;galit&eacute; des chances ensemble ; jamais les trois. Avec des seuils identiques, l'&eacute;galit&eacute; des chances est parfaite et la pr&eacute;cision passe de 62,8 % dans A &agrave; 30,5 % dans B : le m&ecirc;me score n'y signifie pas la m&ecirc;me chose.</p></div>
+
+<h2>14.4 Expliquer une d&eacute;cision</h2>
+
+<p>Le r&egrave;glement europ&eacute;en sur la protection des donn&eacute;es reconna&icirc;t &agrave; toute personne le droit de ne pas &ecirc;tre soumise &agrave; une d&eacute;cision enti&egrave;rement automatis&eacute;e produisant des effets juridiques, et le droit d'obtenir une intervention humaine et de contester la d&eacute;cision <a class="cite" href="#ref-rgpd2016">[5]</a>. Reste &agrave; savoir ce qu'expliquer veut dire.</p>
+
+<figure class="viz"><div class="viz-title">Quatre choses appel&eacute;es &laquo; explication &raquo;</div>
+<svg viewBox="0 0 760 330" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="28" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Quatre choses tr&egrave;s diff&eacute;rentes appel&eacute;es &laquo; explication &raquo;</text><rect x="22" y="52" width="716" height="58" rx="8" style="fill:var(--viz-ok);fill-opacity:0.08;stroke:var(--viz-ok);stroke-width:2;"/><text x="44" y="76" style="fill:var(--viz-ok);font-size:13px;font-weight:700;font-family:inherit;">Mod&egrave;le intrins&egrave;quement lisible</text><text x="44" y="96" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">arbre peu profond, r&egrave;gles, r&eacute;gression lin&eacute;aire</text><text x="716" y="86" text-anchor="end" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">l'explication EST le mod&egrave;le : elle est exacte par construction</text><rect x="22" y="120" width="716" height="58" rx="8" style="fill:var(--accent);fill-opacity:0.08;stroke:var(--accent);stroke-width:2;"/><text x="44" y="144" style="fill:var(--accent);font-size:13px;font-weight:700;font-family:inherit;">Explication locale a posteriori</text><text x="44" y="164" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">on approche le mod&egrave;le pr&egrave;s d'un point par un mod&egrave;le simple</text><text x="716" y="154" text-anchor="end" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">l'explication est une <tspan style="font-weight:700;">approximation</tspan>, pas la cause</text><rect x="22" y="188" width="716" height="58" rx="8" style="fill:var(--viz-blue);fill-opacity:0.08;stroke:var(--viz-blue);stroke-width:2;"/><text x="44" y="212" style="fill:var(--viz-blue);font-size:13px;font-weight:700;font-family:inherit;">Carte de saillance</text><text x="44" y="232" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">on regarde &agrave; quoi la sortie est sensible</text><text x="716" y="222" text-anchor="end" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">montre o&ugrave; le mod&egrave;le regarde, pas pourquoi il conclut</text><rect x="22" y="256" width="716" height="58" rx="8" style="fill:var(--primary);fill-opacity:0.08;stroke:var(--primary);stroke-width:2;"/><text x="44" y="280" style="fill:var(--primary);font-size:13px;font-weight:700;font-family:inherit;">Contre-factuel</text><text x="44" y="300" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">quel changement minimal inverserait la d&eacute;cision ?</text><text x="716" y="290" text-anchor="end" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">actionnable pour la personne concern&eacute;e, mais non unique</text><text x="380" y="324" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Seule la premi&egrave;re ligne donne une explication fid&egrave;le. Les trois autres expliquent un <tspan style="font-style:italic;">substitut</tspan> du mod&egrave;le.</text></svg>
+<figcaption class="viz-caption"><strong>Figure 14.3.</strong> Seule la premi&egrave;re ligne donne une explication fid&egrave;le, parce que le mod&egrave;le <em>est</em> l'explication. Les m&eacute;thodes locales comme LIME <a class="cite" href="#ref-ribeiro2016">[6]</a> ou les valeurs de Shapley <a class="cite" href="#ref-lundberg2017">[7]</a> ajustent un mod&egrave;le simple au voisinage d'un point : elles expliquent ce substitut, pas le mod&egrave;le. Deux explications de m&eacute;thodes diff&eacute;rentes pour la m&ecirc;me d&eacute;cision peuvent se contredire, sans qu'aucune soit fausse.</figcaption></figure>
+
+<div class="box tip"><div class="box-title">L'explication contre-factuelle</div>
+&laquo; Votre pr&ecirc;t a &eacute;t&eacute; refus&eacute; ; il aurait &eacute;t&eacute; accord&eacute; avec un revenu sup&eacute;rieur de 300 euros &raquo; est plus utile &agrave; la personne concern&eacute;e que la liste des poids du mod&egrave;le. Cette forme est actionnable et ne demande pas d'ouvrir la bo&icirc;te <a class="cite" href="#ref-wachter2018">[8]</a>. Deux pr&eacute;cautions : il faut privil&eacute;gier les variables sur lesquelles la personne peut agir &mdash; sugg&eacute;rer de changer d'&acirc;ge n'a aucun sens &mdash; et il en existe une infinit&eacute;, dont le choix est lui-m&ecirc;me un acte de conception.</div>
+
+<div class="box warn"><div class="box-title">Une pr&eacute;caution souvent oubli&eacute;e</div>
+Une explication plausible augmente la confiance ind&eacute;pendamment de sa justesse. Fournir une explication &agrave; c&ocirc;t&eacute; d'une pr&eacute;diction fausse rend l'utilisateur <em>plus</em> susceptible de la suivre. Une explication n'est donc pas seulement un service rendu : c'est un dispositif de persuasion, qu'il faut &eacute;valuer comme tel.</div>
+
+<h2>14.5 Le co&ucirc;t environnemental</h2>
+
+<figure class="viz"><div class="viz-title">O&ugrave; part l'&eacute;nergie</div>
+<svg viewBox="0 0 760 300" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="30" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">O&ugrave; part l'&eacute;nergie d'un syst&egrave;me apprenant, en ordre de grandeur</text><rect x="60" y="72" width="51.2" height="56" style="fill:var(--viz-blue);fill-opacity:0.85;"/><text x="85.6" y="106" text-anchor="middle" style="fill:var(--color-bg);font-size:14px;font-weight:700;font-family:inherit;">8 %</text><text x="85.6" y="152" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;"><tspan x="85.6" dy="0">Collecte et stockage des</tspan><tspan x="85.6" dy="16">donn&eacute;es</tspan></text><rect x="111.2" y="72" width="217.6" height="56" style="fill:var(--viz-bad);fill-opacity:0.85;"/><text x="220" y="106" text-anchor="middle" style="fill:var(--color-bg);font-size:14px;font-weight:700;font-family:inherit;">34 %</text><text x="220" y="174" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Entra&icirc;nement du mod&egrave;le</text><rect x="328.8" y="72" width="140.8" height="56" style="fill:var(--accent);fill-opacity:0.85;"/><text x="399.2" y="106" text-anchor="middle" style="fill:var(--color-bg);font-size:14px;font-weight:700;font-family:inherit;">22 %</text><text x="399.2" y="152" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Recherche d'architecture et essais</text><rect x="469.6" y="72" width="230.4" height="56" style="fill:var(--primary);fill-opacity:0.85;"/><text x="584.8" y="106" text-anchor="middle" style="fill:var(--color-bg);font-size:14px;font-weight:700;font-family:inherit;">36 %</text><text x="584.8" y="174" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Mise en service, requ&ecirc;te apr&egrave;s requ&ecirc;te</text><text x="380" y="216" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">La r&eacute;partition d&eacute;pend enti&egrave;rement du syst&egrave;me : ces proportions sont illustratives, pas mesur&eacute;es.</text><text x="380" y="242" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Le point robuste est ailleurs : pour un mod&egrave;le tr&egrave;s utilis&eacute;, le service finit par co&ucirc;ter davantage que l'entra&icirc;nement,</text><text x="380" y="264" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">et la recherche d'architecture peut co&ucirc;ter davantage que l'entra&icirc;nement final lui-m&ecirc;me.</text><text x="380" y="290" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Publier la consommation mesur&eacute;e reste rare, ce qui rend toute comparaison difficile.</text></svg>
+<figcaption class="viz-caption"><strong>Figure 14.4.</strong> Deux constats robustes, ind&eacute;pendants des chiffres pr&eacute;cis. D'abord, pour un mod&egrave;le tr&egrave;s utilis&eacute;, le service finit par co&ucirc;ter davantage que l'entra&icirc;nement, puisqu'il se r&eacute;p&egrave;te &agrave; chaque requ&ecirc;te. Ensuite, la recherche d'architecture &mdash; les centaines d'essais qui pr&eacute;c&egrave;dent le mod&egrave;le publi&eacute; &mdash; peut co&ucirc;ter bien davantage que l'entra&icirc;nement final <a class="cite" href="#ref-strubell2019">[9]</a>. Les proportions repr&eacute;sent&eacute;es sont illustratives : la publication des consommations mesur&eacute;es reste rare, ce qui rend toute comparaison difficile.</figcaption></figure>
+
+<h2>14.6 Documenter, r&eacute;guler</h2>
+
+<div class="box def"><div class="box-title">Deux pratiques de documentation</div>
+<ul>
+<li><strong>Fiche de mod&egrave;le</strong> : usage pr&eacute;vu, usages explicitement d&eacute;conseill&eacute;s, performances <em>ventil&eacute;es par sous-population</em>, donn&eacute;es d'&eacute;valuation, limites connues <a class="cite" href="#ref-mitchell2019">[10]</a>.</li>
+<li><strong>Fiche de jeu de donn&eacute;es</strong> : pourquoi il a &eacute;t&eacute; constitu&eacute;, par qui, comment, qui a &eacute;tiquet&eacute; et selon quelles consignes, quelles populations y figurent et lesquelles en sont absentes <a class="cite" href="#ref-gebru2021">[11]</a>.</li>
+</ul>
+<p>Ces deux documents co&ucirc;tent quelques jours et &eacute;vitent la plupart des mauvais usages. La ligne la plus utile est souvent la plus courte : &laquo; ce mod&egrave;le n'a pas &eacute;t&eacute; &eacute;valu&eacute; sur telle population &raquo;.</p></div>
+
+<p>Le r&egrave;glement europ&eacute;en sur l'intelligence artificielle, adopt&eacute; en 2024, organise les obligations par <em>niveau de risque</em> : certaines pratiques sont interdites, les syst&egrave;mes &agrave; haut risque sont soumis &agrave; des obligations de documentation, de qualit&eacute; des donn&eacute;es, de tra&ccedil;abilit&eacute; et de supervision humaine, et les autres &agrave; de simples obligations de transparence <a class="cite" href="#ref-aiact2024">[12]</a>. Le principe directeur est que l'exigence porte sur l'<em>usage</em>, non sur la technique employ&eacute;e.</p>
+
+<div class="box warn"><div class="box-title">Trois &eacute;cueils de la supervision humaine</div>
+<p><strong>Le biais d'automatisation.</strong> Un op&eacute;rateur qui doit valider les d&eacute;cisions d'un syst&egrave;me fiable &agrave; 95 % finit par tout valider : c'est rationnel individuellement et catastrophique collectivement.</p>
+<p><strong>La responsabilit&eacute; de fa&ccedil;ade.</strong> Placer un humain dans la boucle sans lui donner le temps, l'information ni le pouvoir de contredire produit un responsable d&eacute;sign&eacute;, pas une supervision.</p>
+<p><strong>Le rideau de fum&eacute;e de la complexit&eacute;.</strong> &laquo; C'est trop complexe pour &ecirc;tre expliqu&eacute; &raquo; n'est pas un argument recevable : c'est un choix de conception, et il en existe d'autres.</p></div>
+
+<h2>14.7 Ce que ce chapitre demande &agrave; l'ing&eacute;nieur</h2>
+
+<div class="box tip"><div class="box-title">Six questions &agrave; se poser avant de livrer</div>
+<ol>
+<li>Sur quelle population le syst&egrave;me a-t-il &eacute;t&eacute; &eacute;valu&eacute; ? Et sur laquelle sera-t-il employ&eacute; ?</li>
+<li>Les performances ont-elles &eacute;t&eacute; mesur&eacute;es <em>par sous-groupe</em>, et pas seulement en moyenne ?</li>
+<li>Quel crit&egrave;re d'&eacute;quit&eacute; a &eacute;t&eacute; privil&eacute;gi&eacute;, et pourquoi celui-l&agrave; ?</li>
+<li>Que devient une personne mal class&eacute;e ? Existe-t-il un recours, et est-il r&eacute;el ?</li>
+<li>La d&eacute;cision modifie-t-elle les donn&eacute;es futures ? Si oui, comment la d&eacute;rive sera-t-elle d&eacute;tect&eacute;e ?</li>
+<li>Qu'est-ce qui n'a pas &eacute;t&eacute; test&eacute;, et qui doit figurer noir sur blanc dans la documentation ?</li>
+</ol></div>
+
+<h2>Synth&egrave;se</h2>
+<ul>
+<li>Les biais entrent &agrave; six endroits ; un seul rel&egrave;ve du choix de l'algorithme.</li>
+<li>Supprimer l'attribut sensible ne supprime pas la discrimination et emp&ecirc;che de la mesurer.</li>
+<li>Parit&eacute;, &eacute;galit&eacute; des chances et calibration sont math&eacute;matiquement incompatibles d&egrave;s que les taux de base diff&egrave;rent <a class="cite" href="#ref-kleinberg2017">[3]</a>.</li>
+<li>Les explications a posteriori portent sur un substitut du mod&egrave;le et augmentent la confiance ind&eacute;pendamment de leur justesse <a class="cite" href="#ref-ribeiro2016">[6]</a>.</li>
+<li>Le service r&eacute;p&eacute;t&eacute; et la recherche d'architecture p&egrave;sent souvent plus que l'entra&icirc;nement final <a class="cite" href="#ref-strubell2019">[9]</a>.</li>
+<li>Documenter le mod&egrave;le et le jeu de donn&eacute;es co&ucirc;te peu et &eacute;vite l'essentiel des mauvais usages <a class="cite" href="#ref-mitchell2019">[10]</a>.</li>
+</ul>
+
+<h2>Annexe : la proc&eacute;dure d'audit</h2>
+<div class="algo"><div class="algo-cap">Algorithme 14.1 &mdash; Audit d'un syst&egrave;me de d&eacute;cision</div><div class="algo-io"><b>Entr&eacute;e :</b> un classifieur \(f\), un jeu &eacute;tiquet&eacute; repr&eacute;sentatif, des attributs sensibles<br><b>Sortie :</b> un tableau de taux par groupe et par crit&egrave;re &mdash; jamais un score unique</div><ol class="algo-corps"><li><b class="kw">pour tout</b> attribut sensible \(s\) <b class="kw">et tout</b> groupe \(G\) qu'il d&eacute;finit <b class="kw">faire</b></li><li class="n1">\(\displaystyle \mathrm{sel}(G) \leftarrow P\big(f = 1 \mid G\big)\)          <span class="cm">// parite demographique</span></li><li class="n1">\(\displaystyle \mathrm{tvp}(G) \leftarrow P\big(f = 1 \mid Y = 1,\ G\big)\)          <span class="cm">// egalite des chances</span></li><li class="n1">\(\displaystyle \mathrm{tfp}(G) \leftarrow P\big(f = 1 \mid Y = 0,\ G\big)\)</li><li class="n1">\(\displaystyle \mathrm{pr\acute{e}c}(G) \leftarrow P\big(Y = 1 \mid f = 1,\ G\big)\)          <span class="cm">// calibration</span></li><li><b class="kw">pour tout</b> crit&egrave;re \(\kappa \in \{\mathrm{sel}, \mathrm{tvp}, \mathrm{tfp}, \mathrm{pr\acute{e}c}\}\) <b class="kw">faire</b></li><li class="n1"><b class="kw">si</b> \(\max_{G,G'} |\kappa(G) - \kappa(G')| \gt \text{seuil admis}\) <b class="kw">alors</b> signaler \((\kappa, G, G')\)</li><li><b class="kw">retourner</b> le tableau complet, et le crit&egrave;re privil&eacute;gi&eacute; avec sa justification</li></ol><p class="algo-note"><strong>Th&eacute;or&egrave;me d'impossibilit&eacute;.</strong> Si \(P(Y=1 \mid G) \neq P(Y=1 \mid G')\) et que \(f\) n'est pas parfait, alors \(\mathrm{pr\acute{e}c}\) et le couple \((\mathrm{tvp}, \mathrm{tfp})\) ne peuvent pas &ecirc;tre &eacute;galis&eacute;s ensemble. R&eacute;duire l'&eacute;quit&eacute; &agrave; un score unique revient &agrave; choisir en secret l'un des crit&egrave;res incompatibles.</p></div>
+
+<h2>R&eacute;f&eacute;rences</h2>
+<ol class="reflist">
+<li id="ref-buolamwini2018">Buolamwini, J. &amp; Gebru, T. (2018). Gender shades: intersectional accuracy disparities in commercial gender classification. <em>Proceedings of Machine Learning Research</em>, 81, 77&ndash;91. <a href="https://proceedings.mlr.press/v81/buolamwini18a.html">https://proceedings.mlr.press/v81/buolamwini18a.html</a></li>
+<li id="ref-hardt2016">Hardt, M., Price, E. &amp; Srebro, N. (2016). Equality of opportunity in supervised learning. <em>Advances in Neural Information Processing Systems 29</em>. arXiv&nbsp;: 1610.02413. <a href="https://arxiv.org/abs/1610.02413">https://arxiv.org/abs/1610.02413</a></li>
+<li id="ref-kleinberg2017">Kleinberg, J., Mullainathan, S. &amp; Raghavan, M. (2017). Inherent trade-offs in the fair determination of risk scores. <em>Proceedings of ITCS 2017</em>. DOI&nbsp;: 10.4230/LIPIcs.ITCS.2017.43. <a href="https://doi.org/10.4230/LIPIcs.ITCS.2017.43">https://doi.org/10.4230/LIPIcs.ITCS.2017.43</a></li>
+<li id="ref-chouldechova2017">Chouldechova, A. (2017). Fair prediction with disparate impact. <em>Big Data</em>, 5(2), 153&ndash;163. DOI&nbsp;: 10.1089/big.2016.0047. <a href="https://doi.org/10.1089/big.2016.0047">https://doi.org/10.1089/big.2016.0047</a></li>
+<li id="ref-rgpd2016">Parlement europ&eacute;en et Conseil (2016). R&egrave;glement (UE) 2016/679 relatif &agrave; la protection des personnes physiques &agrave; l'&eacute;gard du traitement des donn&eacute;es &agrave; caract&egrave;re personnel, article 22. <a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj">https://eur-lex.europa.eu/eli/reg/2016/679/oj</a></li>
+<li id="ref-ribeiro2016">Ribeiro, M. T., Singh, S. &amp; Guestrin, C. (2016). &laquo; Why should I trust you? &raquo; Explaining the predictions of any classifier. <em>Proceedings of KDD 2016</em>, 1135&ndash;1144. DOI&nbsp;: 10.1145/2939672.2939778. <a href="https://doi.org/10.1145/2939672.2939778">https://doi.org/10.1145/2939672.2939778</a></li>
+<li id="ref-lundberg2017">Lundberg, S. M. &amp; Lee, S.-I. (2017). A unified approach to interpreting model predictions. <em>Advances in Neural Information Processing Systems 30</em>. arXiv&nbsp;: 1705.07874. <a href="https://arxiv.org/abs/1705.07874">https://arxiv.org/abs/1705.07874</a></li>
+<li id="ref-wachter2018">Wachter, S., Mittelstadt, B. &amp; Russell, C. (2018). Counterfactual explanations without opening the black box. <em>Harvard Journal of Law &amp; Technology</em>, 31(2), 841&ndash;887. DOI&nbsp;: 10.2139/ssrn.3063289. <a href="https://doi.org/10.2139/ssrn.3063289">https://doi.org/10.2139/ssrn.3063289</a></li>
+<li id="ref-strubell2019">Strubell, E., Ganesh, A. &amp; McCallum, A. (2019). Energy and policy considerations for deep learning in NLP. <em>Proceedings of ACL 2019</em>, 3645&ndash;3650. DOI&nbsp;: 10.18653/v1/P19-1355. <a href="https://doi.org/10.18653/v1/P19-1355">https://doi.org/10.18653/v1/P19-1355</a></li>
+<li id="ref-mitchell2019">Mitchell, M., Wu, S., Zaldivar, A. <em>et al.</em> (2019). Model cards for model reporting. <em>Proceedings of FAT* 2019</em>, 220&ndash;229. DOI&nbsp;: 10.1145/3287560.3287596. <a href="https://doi.org/10.1145/3287560.3287596">https://doi.org/10.1145/3287560.3287596</a></li>
+<li id="ref-gebru2021">Gebru, T., Morgenstern, J., Vecchione, B. <em>et al.</em> (2021). Datasheets for datasets. <em>Communications of the ACM</em>, 64(12), 86&ndash;92. DOI&nbsp;: 10.1145/3458723. <a href="https://doi.org/10.1145/3458723">https://doi.org/10.1145/3458723</a></li>
+<li id="ref-aiact2024">Parlement europ&eacute;en et Conseil (2024). R&egrave;glement (UE) 2024/1689 &eacute;tablissant des r&egrave;gles harmonis&eacute;es concernant l'intelligence artificielle. <a href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj">https://eur-lex.europa.eu/eli/reg/2024/1689/oj</a></li>
+</ol>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../13-generative/page.html">\(\leftarrow\) Chapitre 13 &mdash; IA g&eacute;n&eacute;rative</a>
+<a href="algorithms.html">Annexe algorithmique</a>
+<a href="../../index.html">Sommaire du manuel</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">La figure interactive n\'a pas pu etre chargee. Verifiez votre connexion reseau.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ==== Figure : trois definitions d'equite, incompatibles entre elles ====== */
+/* Population de deux groupes, avec des taux de base differents.
+   On fixe un seuil de decision par groupe et l'on mesure trois criteres. */
+var GROUPES = [
+  {nom: 'groupe A', n: 1000, base: 0.30, couleur: '--viz-blue'},
+  {nom: 'groupe B', n: 1000, base: 0.10, couleur: '--accent'}
+];
+/* Le score est suppose gaussien : moyenne 1 pour les positifs, 0 pour les negatifs,
+   ecart-type 0.6 dans les deux cas. C'est le meme modele pour les deux groupes. */
+function phi(x){
+  /* fonction de repartition normale centree reduite, approximation d'Abramowitz-Stegun */
+  var t = 1 / (1 + 0.2316419 * Math.abs(x));
+  var d = 0.3989422804014327 * Math.exp(-x * x / 2);
+  var p = d * t * (0.319381530 + t * (-0.356563782 + t * (1.781477937
+        + t * (-1.821255978 + t * 1.330274429))));
+  return x >= 0 ? 1 - p : p;
+}
+function mesures(g, seuil){
+  var s = 0.6;
+  var tvp = 1 - phi((seuil - 1) / s);      /* taux de vrais positifs */
+  var tfp = 1 - phi((seuil - 0) / s);      /* taux de faux positifs */
+  var b = g.base;
+  var vp = b * tvp, fn = b * (1 - tvp), fp = (1 - b) * tfp, vn = (1 - b) * (1 - tfp);
+  var selection = vp + fp;
+  var precision = selection > 0 ? vp / selection : 0;
+  return {tvp: tvp, tfp: tfp, vp: vp, fn: fn, fp: fp, vn: vn,
+          selection: selection, precision: precision};
+}
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-0.35, 1.36, 2.55, -0.72], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sA = b1.create('slider', [[0.00, -0.30], [1.00, -0.30], [-0.5, 0.50, 2.0]], {
+  name: 'seuil groupe A', snapWidth: 0.05, precision: 2,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--viz-blue', '#2563eb'); }}
+});
+var sB = b1.create('slider', [[1.40, -0.30], [2.40, -0.30], [-0.5, 0.50, 2.0]], {
+  name: 'seuil groupe B', snapWidth: 0.05, precision: 2,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function seuilA(){ return Math.round(sA.Value() * 20) / 20; }
+function seuilB(){ return Math.round(sB.Value() * 20) / 20; }
+function ecart(a, b){ return Math.abs(a - b); }
+var CRITERES = [
+  {nom: 'Parite demographique', desc: 'meme taux de selection dans les deux groupes',
+   calc: function(){ return ecart(mesures(GROUPES[0], seuilA()).selection,
+                                  mesures(GROUPES[1], seuilB()).selection); }},
+  {nom: 'Egalite des chances', desc: 'meme taux de vrais positifs dans les deux groupes',
+   calc: function(){ return ecart(mesures(GROUPES[0], seuilA()).tvp,
+                                  mesures(GROUPES[1], seuilB()).tvp); }},
+  {nom: 'Calibration', desc: 'meme precision : un score signifie la meme chose partout',
+   calc: function(){ return ecart(mesures(GROUPES[0], seuilA()).precision,
+                                  mesures(GROUPES[1], seuilB()).precision); }}
+];
+for (var i = 0; i < 3; i++){
+  (function(k){
+    var y = 0.92 - k * 0.30;
+    b1.create('text', [-0.30, y + 0.10, CRITERES[k].nom], {fontSize: 14, fixed: true,
+      highlight: false, strokeColor: PAL.text});
+    b1.create('text', [-0.30, y - 0.02, CRITERES[k].desc], {fontSize: 11.5, fixed: true,
+      highlight: false, strokeColor: PAL.muted});
+    /* barre d'ecart */
+    b1.create('curve', [
+      function(){ return [1.20, 1.20 + Math.min(1.2, CRITERES[k].calc() * 4),
+                          1.20 + Math.min(1.2, CRITERES[k].calc() * 4), 1.20, 1.20]; },
+      function(){ return [y - 0.03, y - 0.03, y + 0.11, y + 0.11, y - 0.03]; }], {
+      strokeWidth: 0, highlight: false, fixed: true,
+      fillColor: function(){
+        return CRITERES[k].calc() < 0.01 ? cssv('--viz-ok', '#16a34a') : cssv('--viz-bad', '#dc2626'); },
+      fillOpacity: 0.8});
+    b1.create('text', [2.50, y + 0.05, function(){
+      var e = CRITERES[k].calc();
+      return (e < 0.01 ? 'satisfait' : 'ecart de ' + (100 * e).toFixed(1) + ' points');
+    }], {fontSize: 12.5, anchorX: 'right', fixed: true, highlight: false,
+         strokeColor: function(){
+           return CRITERES[k].calc() < 0.01 ? cssv('--viz-ok','#16a34a') : cssv('--viz-bad','#dc2626'); }});
+  })(i);
+}
+b1.create('text', [-0.30, 1.30, function(){
+  var a = mesures(GROUPES[0], seuilA()), b = mesures(GROUPES[1], seuilB());
+  return 'Taux de base : 30 % dans A, 10 % dans B  -  meme modele, seuls les seuils different.';
+}], {fontSize: 13, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-0.30, 1.18, function(){
+  var a = mesures(GROUPES[0], seuilA()), b = mesures(GROUPES[1], seuilB());
+  return 'A : ' + (100*a.selection).toFixed(1) + ' % selectionnes, ' + (100*a.tvp).toFixed(1)
+       + ' % de vrais positifs detectes, precision ' + (100*a.precision).toFixed(1) + ' %.';
+}], {fontSize: 12.5, strokeColor: function(){ return cssv('--viz-blue','#2563eb'); },
+     fixed: true, highlight: false});
+b1.create('text', [-0.30, 1.08, function(){
+  var b = mesures(GROUPES[1], seuilB());
+  return 'B : ' + (100*b.selection).toFixed(1) + ' % selectionnes, ' + (100*b.tvp).toFixed(1)
+       + ' % de vrais positifs detectes, precision ' + (100*b.precision).toFixed(1) + ' %.';
+}], {fontSize: 12.5, strokeColor: function(){ return cssv('--accent','#f59e0b'); },
+     fixed: true, highlight: false});
+b1.create('text', [-0.30, -0.58, function(){
+  var n = 0;
+  for (var k = 0; k < 3; k++){ if (CRITERES[k].calc() < 0.01) { n++; } }
+  if (n === 3) { return 'Impossible : aucun couple de seuils ne satisfait les trois a la fois.'; }
+  if (n === 2) { return 'Deux criteres sur trois satisfaits — c’est le maximum atteignable ici.'; }
+  return n + ' critere sur 3 satisfait. Deux sont atteignables ensemble, jamais les trois.';
+}], {fontSize: 13, fixed: true, highlight: false,
+     strokeColor: function(){ return cssv('--primary','#026573'); }});
+b1.create('text', [-0.30, -0.68,
+  'Le theoreme d’impossibilite dit que les trois ne peuvent coexister des que les taux de base different.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+/* ==== Figure : d'ou vient un biais, etape par etape ====================== */
+var ETAPES = [
+  {nom: 'Le monde',              biais: 'inegalites reelles preexistantes'},
+  {nom: 'La collecte',           biais: 'certains groupes sous-representes'},
+  {nom: 'L’etiquetage',          biais: 'la cible mesuree remplace la cible voulue'},
+  {nom: 'Le modele',             biais: 'optimise la moyenne, donc la majorite'},
+  {nom: 'Le seuil',              biais: 'un seul seuil pour des populations differentes'},
+  {nom: 'L’usage',               biais: 'la decision modifie le monde et se confirme'}
+];
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-0.4, 3.4, 6.4, -2.4], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sEt14 = b2.create('slider', [[0.0, -1.4], [4.0, -1.4], [0, 0, 5]], {
+  name: 'etape', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }}
+});
+function et14(){ return Math.round(sEt14.Value()); }
+for (var e = 0; e < ETAPES.length; e++){
+  (function(k){
+    var x = 0.15 + k * 1.02;
+    b2.create('curve', [[x, x + 0.86, x + 0.86, x, x], [1.2, 1.2, 2.2, 2.2, 1.2]], {
+      strokeWidth: function(){ return k === et14() ? 3 : 1.4; },
+      strokeColor: function(){ return k === et14() ? cssv('--viz-bad','#dc2626') : PAL.axis(); },
+      fillColor: function(){ return cssv('--viz-bad', '#dc2626'); },
+      fillOpacity: function(){ return k <= et14() ? 0.10 + 0.06 * k : 0.03; },
+      highlight: false, fixed: true});
+    b2.create('text', [x + 0.43, 1.70, ETAPES[k].nom], {fontSize: 12.5, anchorX: 'middle',
+      anchorY: 'middle', strokeColor: PAL.text, fixed: true, highlight: false});
+    if (k < ETAPES.length - 1){
+      b2.create('arrow', [[x + 0.88, 1.7], [x + 1.13, 1.7]], {strokeColor: PAL.axis,
+        strokeWidth: 1.6, highlight: false, fixed: true});
+    }
+  })(e);
+}
+b2.create('arrow', [[5.6, 1.2], [5.6, 0.5]], {strokeColor: function(){ return cssv('--viz-bad','#dc2626'); },
+  strokeWidth: 2, highlight: false, fixed: true});
+b2.create('curve', [[5.6, 0.3, 0.3, 0.58], [0.5, 0.5, 1.2, 1.2]], {
+  strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }, strokeWidth: 2, dash: 2,
+  highlight: false, fixed: true});
+b2.create('text', [3.0, 0.30, 'boucle de retroaction : la decision change le monde qu’on mesurera demain'],
+  {fontSize: 12.5, anchorX: 'middle', fixed: true, highlight: false,
+   strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }});
+b2.create('text', [-0.35, 3.2, function(){
+  return 'Etape ' + (et14() + 1) + ' sur 6 : ' + ETAPES[et14()].nom;
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-0.35, 2.8, function(){
+  return 'Source de biais a cette etape : ' + ETAPES[et14()].biais + '.';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-0.35, -1.9,
+  'Aucune de ces six sources ne se corrige en changeant d’algorithme : elles sont anterieures ou posterieures au modele.'],
+  {fontSize: 12.5, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-0.35, -2.25,
+  'La seule etape ou l’ingenieur intervient directement est la quatrieme, et c’est la moins determinante.'],
+  {fontSize: 12.5, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

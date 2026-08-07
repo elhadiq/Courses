@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 6 &mdash; Annexe algorithmique</title>
+<meta name="description" content="Retour sur trace, verification en avant, coherence d arc et minimum de conflits, pas a pas.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Chapitre 6 &middot; Annexe</div>
+<h1>Les algorithmes de contraintes, pas &agrave; pas</h1>
+<div class="lesson-sub">Quatre proc&eacute;dures d&eacute;crites en fran&ccedil;ais, avec un exemple d&eacute;roul&eacute; &agrave; la main pour chacune.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box tip"><div class="box-title">Comment lire cette annexe</div>
+Aucune ligne de programme. <a href="page.html">Retour au chapitre</a>.</div>
+
+<div class="annex-toc">
+<a href="#c1">1. Retour sur trace</a>
+<a href="#c2">2. V&eacute;rification en avant et choix de variable</a>
+<a href="#c3">3. Coh&eacute;rence d'arc</a>
+<a href="#c4">4. R&eacute;paration par minimum de conflits</a>
+</div>
+
+<p><strong>Le probl&egrave;me de r&eacute;f&eacute;rence.</strong> Colorier quatre r&eacute;gions \(P, Q, R, S\) avec trois couleurs &mdash; rouge, vert, bleu &mdash; de sorte que deux r&eacute;gions voisines n'aient pas la m&ecirc;me. Les voisinages sont : \(P\)&ndash;\(Q\), \(P\)&ndash;\(R\), \(Q\)&ndash;\(R\), \(Q\)&ndash;\(S\), \(R\)&ndash;\(S\). Les trois r&eacute;gions \(P, Q, R\) forment donc un triangle, et \(S\) touche \(Q\) et \(R\).</p>
+
+<figure class="viz"><div class="viz-title">Le probl&egrave;me de r&eacute;f&eacute;rence</div><svg viewBox="0 0 760 308" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Le probl&egrave;me de r&eacute;f&eacute;rence de cette annexe, r&eacute;solu</text><path d="M 250 90 L 400 90" style="fill:none;stroke:var(--viz-axis);stroke-width:2.2;"/><path d="M 250 90 L 325 200" style="fill:none;stroke:var(--viz-axis);stroke-width:2.2;"/><path d="M 400 90 L 325 200" style="fill:none;stroke:var(--viz-axis);stroke-width:2.2;"/><path d="M 400 90 L 475 200" style="fill:none;stroke:var(--viz-axis);stroke-width:2.2;"/><path d="M 325 200 L 475 200" style="fill:none;stroke:var(--viz-axis);stroke-width:2.2;"/><circle cx="250" cy="90" r="26" style="fill:var(--viz-blue);stroke:var(--color-bg);stroke-width:3;"/><text x="250" y="96" text-anchor="middle" style="fill:var(--color-bg);font-size:16px;font-weight:700;font-family:inherit;">P</text><text x="250" y="134" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">bleu</text><circle cx="400" cy="90" r="26" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:3;"/><text x="400" y="96" text-anchor="middle" style="fill:var(--color-bg);font-size:16px;font-weight:700;font-family:inherit;">Q</text><text x="400" y="134" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">rouge</text><circle cx="325" cy="200" r="26" style="fill:var(--viz-ok);stroke:var(--color-bg);stroke-width:3;"/><text x="325" y="206" text-anchor="middle" style="fill:var(--color-bg);font-size:16px;font-weight:700;font-family:inherit;">R</text><text x="325" y="244" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">vert</text><circle cx="475" cy="200" r="26" style="fill:var(--viz-blue);stroke:var(--color-bg);stroke-width:3;"/><text x="475" y="206" text-anchor="middle" style="fill:var(--color-bg);font-size:16px;font-weight:700;font-family:inherit;">S</text><text x="475" y="244" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">bleu</text><text x="560" y="96" style="fill:var(--color-text);font-size:13px;font-family:inherit;">P, Q et R forment un triangle :</text><text x="560" y="116" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">trois couleurs sont n&eacute;cessaires.</text><text x="560" y="150" style="fill:var(--color-text);font-size:13px;font-family:inherit;">S ne touche que Q et R :</text><text x="560" y="170" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">il peut reprendre celle de P.</text><text x="380" y="276" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Quatre r&eacute;gions, cinq voisinages, trois couleurs. Les quatre proc&eacute;dures de l'annexe aboutissent toutes &agrave; une coloration</text><text x="380" y="294" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">valide, mais par des chemins tr&egrave;s diff&eacute;rents et avec des nombres d'essais qui vont de 4 &agrave; 7.</text></svg><figcaption class="viz-caption"><strong>Figure A.1.</strong> Les quatre proc&eacute;dures de cette annexe portent sur ce graphe. Les trois premi&egrave;res y aboutissent toutes, avec des nombres d'essais qui vont de 4 &agrave; 7 ; la quatri&egrave;me n'offre aucune garantie.</figcaption></figure>
+
+<h2 id="c1">1. Retour sur trace</h2>
+<div class="algo-tag">m&eacute;thode syst&eacute;matique &middot; construction progressive</div>
+<p><strong>But.</strong> Construire une affectation compl&egrave;te en fixant les variables une &agrave; une, et abandonner une piste d&egrave;s qu'elle viole une contrainte plut&ocirc;t qu'apr&egrave;s l'avoir men&eacute;e &agrave; son terme.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div>
+<p><strong>Entr&eacute;e</strong> : une liste de variables, la liste des valeurs autoris&eacute;es pour chacune, et la liste des contraintes.<br>
+<strong>Sortie</strong> : une affectation compl&egrave;te satisfaisant toutes les contraintes, ou la certitude qu'il n'en existe aucune.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div>
+<ol>
+<li><strong>Si toutes les variables sont affect&eacute;es, c'est fini</strong> : l'affectation courante est une solution, car on n'a jamais laiss&eacute; passer une violation.</li>
+<li><strong>Sinon, choisir une variable non affect&eacute;e.</strong> N'importe laquelle convient pour la correction ; le choix n'influence que le temps de calcul.</li>
+<li><strong>Essayer ses valeurs une par une.</strong> Avant d'en retenir une, v&eacute;rifier qu'elle ne contredit aucune contrainte avec les variables <em>d&eacute;j&agrave;</em> affect&eacute;es. Les contraintes portant sur des variables encore libres ne peuvent pas encore &ecirc;tre &eacute;valu&eacute;es.</li>
+<li><strong>Si la valeur passe le test, l'affecter et recommencer &agrave; l'&eacute;tape 1</strong> sur le probl&egrave;me r&eacute;duit.</li>
+<li><strong>Si l'appel r&eacute;cursif &eacute;choue, d&eacute;faire l'affectation</strong> et passer &agrave; la valeur suivante. C'est le retour sur trace proprement dit.</li>
+<li><strong>Si aucune valeur ne convient, &eacute;chouer</strong> : le probl&egrave;me n'a pas de solution qui prolonge l'affectation courante.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;</strong> sur l'ordre \(P, Q, R, S\), couleurs essay&eacute;es dans l'ordre rouge, vert, bleu :</p>
+<table>
+<thead><tr><th>Tour</th><th>Variable</th><th>Valeur essay&eacute;e</th><th>Verdict</th><th>Affectation apr&egrave;s le tour</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>P</td><td>rouge</td><td>accept&eacute;e</td><td>P=rouge</td></tr>
+<tr><td>2</td><td>Q</td><td>rouge</td><td>rejet&eacute;e (voisine de P)</td><td>P=rouge</td></tr>
+<tr><td>3</td><td>Q</td><td>vert</td><td>accept&eacute;e</td><td>P=rouge, Q=vert</td></tr>
+<tr><td>4</td><td>R</td><td>rouge</td><td>rejet&eacute;e (voisine de P)</td><td>&mdash;</td></tr>
+<tr><td>5</td><td>R</td><td>vert</td><td>rejet&eacute;e (voisine de Q)</td><td>&mdash;</td></tr>
+<tr><td>6</td><td>R</td><td>bleu</td><td>accept&eacute;e</td><td>P=rouge, Q=vert, R=bleu</td></tr>
+<tr><td>7</td><td>S</td><td>rouge</td><td>accept&eacute;e (S ne touche que Q et R)</td><td>solution compl&egrave;te</td></tr>
+</tbody></table>
+<p>Sept essais, aucun retour sur trace ici : l'instance est facile. Il suffit de changer l'ordre pour en provoquer. Essayez \(S, P, Q, R\) : \(S\) recevra rouge, puis \(P\) rouge, puis \(Q\) vert &mdash; et \(R\) n'aura plus aucune couleur, ce qui obligera &agrave; revenir en arri&egrave;re jusqu'&agrave; \(P\).</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Invariant : l'affectation partielle courante satisfait toutes les contraintes dont les deux extr&eacute;mit&eacute;s sont affect&eacute;es. Il est vrai au d&eacute;part (rien n'est affect&eacute;) et pr&eacute;serv&eacute; par le test de l'&eacute;tape 3. La proc&eacute;dure est aussi exhaustive : on n'&eacute;carte une valeur que si elle viole d&eacute;j&agrave; une contrainte, donc aucune solution n'est perdue.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Mesure : le nombre de variables non affect&eacute;es, entier positif strictement d&eacute;croissant &agrave; chaque descente. Chaque niveau ne parcourt qu'un nombre fini de valeurs.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Au pire, autant d'affectations qu'il y a de fa&ccedil;ons de choisir une valeur par variable : le nombre de valeurs &eacute;lev&eacute; &agrave; la puissance du nombre de variables. La m&eacute;moire, en revanche, se limite &agrave; l'affectation courante &mdash; une liste de la taille du probl&egrave;me.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Oublier de d&eacute;faire l'affectation au retour, ce qui pollue les branches suivantes. Tester les contraintes contre des variables non encore affect&eacute;es, ce qui rejette &agrave; tort. Et surtout : croire qu'un ordre vaut l'autre &mdash; il change le temps de calcul d'un facteur pouvant atteindre plusieurs milliers.</p>
+
+<h2 id="c2">2. V&eacute;rification en avant et choix de variable</h2>
+<div class="algo-tag">am&eacute;lioration du retour sur trace &middot; d&eacute;tection pr&eacute;coce</div>
+<p><strong>But.</strong> Rep&eacute;rer une impasse au moment o&ugrave; elle se cr&eacute;e, et non au moment o&ugrave; l'on bute dessus.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div>
+<p><strong>Entr&eacute;e</strong> : celle du retour sur trace, avec les domaines maintenus &agrave; jour au fil de la recherche.<br>
+<strong>Sortie</strong> : identique &agrave; celle du retour sur trace &mdash; les m&ecirc;mes solutions, trouv&eacute;es plus vite.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div>
+<ol>
+<li><strong>Apr&egrave;s avoir affect&eacute; une valeur &agrave; une variable, retirer cette valeur du domaine de toutes ses voisines non affect&eacute;es.</strong> On enregistre ainsi imm&eacute;diatement la cons&eacute;quence de la d&eacute;cision, au lieu de la red&eacute;couvrir plus tard.</li>
+<li><strong>Si un domaine devient vide, abandonner tout de suite cette valeur</strong> et passer &agrave; la suivante : on sait d&eacute;j&agrave; que la variable concern&eacute;e ne pourra plus &ecirc;tre affect&eacute;e.</li>
+<li><strong>Pour choisir la prochaine variable, prendre celle dont le domaine restant est le plus petit.</strong> C'est le maillon faible : s'il doit c&eacute;der, autant qu'il c&egrave;de tout de suite, en haut de l'arbre, plut&ocirc;t qu'apr&egrave;s l'exploration d'un sous-arbre entier.</li>
+<li><strong>En cas d'&eacute;galit&eacute;, pr&eacute;f&eacute;rer la variable qui a le plus de voisines non affect&eacute;es</strong> : elle contraindra le plus le reste du probl&egrave;me.</li>
+<li><strong>Pour choisir la valeur, pr&eacute;f&eacute;rer celle qui retire le moins d'options aux voisines.</strong> Logique inverse de celle du choix de variable, et c'est normal : une seule valeur doit r&eacute;ussir, alors que toutes les variables devront &ecirc;tre affect&eacute;es.</li>
+<li><strong>Au retour sur trace, remettre dans les domaines toutes les valeurs qu'on en avait retir&eacute;es.</strong></li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;</strong> avec les deux am&eacute;liorations, sur le m&ecirc;me probl&egrave;me. Les domaines sont not&eacute;s par les initiales des couleurs encore possibles :</p>
+<table>
+<thead><tr><th>Tour</th><th>Variable choisie et pourquoi</th><th>Valeur</th><th>Domaines apr&egrave;s propagation</th></tr></thead>
+<tbody>
+<tr><td>0</td><td>&mdash;</td><td>&mdash;</td><td>P : rvb, Q : rvb, R : rvb, S : rvb</td></tr>
+<tr><td>1</td><td>Q (domaines &eacute;gaux, mais Q a 3 voisines)</td><td>rouge</td><td>P : vb, R : vb, S : vb</td></tr>
+<tr><td>2</td><td>P (domaine de taille 2, 1 voisine libre)&hellip; on pr&eacute;f&egrave;re R, qui en a 2</td><td>vert</td><td>P : b, S : b</td></tr>
+<tr><td>3</td><td>P (domaine de taille 1)</td><td>bleu</td><td>S : b</td></tr>
+<tr><td>4</td><td>S (seule restante)</td><td>bleu</td><td>solution compl&egrave;te</td></tr>
+</tbody></table>
+<p>Quatre affectations, aucun essai rejet&eacute;, aucun retour sur trace : chaque valeur choisie &eacute;tait la seule possible ou le restait apr&egrave;s propagation. Comparez aux sept essais du paragraphe pr&eacute;c&eacute;dent.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> On ne retire d'un domaine qu'une valeur d&eacute;j&agrave; incompatible avec une affectation en vigueur : aucune solution prolongeant l'affectation courante n'est donc perdue. Les remises en place au retour garantissent que les branches s&oelig;urs retrouvent des domaines exacts.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> M&ecirc;me mesure que le retour sur trace. La propagation ne fait qu'&eacute;laguer, jamais cro&icirc;tre.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Chaque affectation demande un balayage des voisines : un surco&ucirc;t proportionnel au degr&eacute; de la variable, largement compens&eacute; par les branches &eacute;vit&eacute;es. Le pire cas th&eacute;orique reste exponentiel.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Oublier la restauration des domaines au retour : la recherche croit &agrave; tort que certaines valeurs sont interdites et d&eacute;clare l'absence de solution. Recalculer les domaines &agrave; partir de z&eacute;ro &agrave; chaque n&oelig;ud, ce qui co&ucirc;te plus cher que la propagation elle-m&ecirc;me. Enfin, la v&eacute;rification en avant ne voit qu'un pas : deux voisines qui ne peuvent plus &ecirc;tre distinctes ne sont pas d&eacute;tect&eacute;es &mdash; il faut pour cela la proc&eacute;dure suivante.</p>
+
+<h2 id="c3">3. Coh&eacute;rence d'arc</h2>
+<div class="algo-tag">m&eacute;thode d&eacute;ductive &middot; r&eacute;duction sans &eacute;num&eacute;ration</div>
+<p><strong>But.</strong> Retirer des domaines toutes les valeurs qui ne peuvent appara&icirc;tre dans aucune solution, en raisonnant contrainte par contrainte, sans essayer aucune affectation.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div>
+<p><strong>Entr&eacute;e</strong> : les variables, leurs domaines, les contraintes binaires.<br>
+<strong>Sortie</strong> : les m&ecirc;mes domaines, r&eacute;duits ; ou la certitude qu'il n'existe aucune solution si l'un d'eux se vide.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div>
+<ol>
+<li><strong>Placer dans une file toutes les contraintes, dans les deux sens.</strong> Une contrainte entre deux r&eacute;gions doit &ecirc;tre examin&eacute;e de la premi&egrave;re vers la seconde <em>et</em> de la seconde vers la premi&egrave;re : la r&eacute;duction n'est pas sym&eacute;trique.</li>
+<li><strong>Retirer un couple de la file et le r&eacute;viser</strong> : pour chaque valeur de la premi&egrave;re variable, chercher au moins une valeur de la seconde qui soit compatible. S'il n'y en a aucune, la valeur est impossible : la supprimer.</li>
+<li><strong>Si le domaine devient vide, s'arr&ecirc;ter</strong> : le probl&egrave;me n'a pas de solution, et on l'a prouv&eacute; sans le moindre essai.</li>
+<li><strong>Si au moins une valeur a &eacute;t&eacute; supprim&eacute;e, remettre en file tous les couples qui pointent vers la variable modifi&eacute;e.</strong> Ils avaient &eacute;t&eacute; d&eacute;clar&eacute;s coh&eacute;rents avec un domaine plus riche ; ils ne le sont peut-&ecirc;tre plus.</li>
+<li><strong>Recommencer &agrave; l'&eacute;tape 2</strong> jusqu'&agrave; ce que la file soit vide.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Trois variables \(X, Y, Z\) de domaine \(\{1,2,3\}\), avec \(X \lt Y\) et \(Y \lt Z\) :</p>
+<table>
+<thead><tr><th>&Eacute;tape</th><th>Couple r&eacute;vis&eacute;</th><th>Valeurs supprim&eacute;es</th><th>Domaines</th><th>Remises en file</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>X vers Y</td><td>3 dans X (aucun Y plus grand)</td><td>X : 1 2, Y : 1 2 3, Z : 1 2 3</td><td>&mdash;</td></tr>
+<tr><td>2</td><td>Y vers X</td><td>1 dans Y (aucun X plus petit)</td><td>X : 1 2, Y : 2 3, Z : 1 2 3</td><td>X vers Y</td></tr>
+<tr><td>3</td><td>Y vers Z</td><td>3 dans Y (aucun Z plus grand)</td><td>X : 1 2, Y : 2, Z : 1 2 3</td><td>X vers Y</td></tr>
+<tr><td>4</td><td>Z vers Y</td><td>1 et 2 dans Z</td><td>X : 1 2, Y : 2, Z : 3</td><td>&mdash;</td></tr>
+<tr><td>5</td><td>X vers Y (remis en file)</td><td>2 dans X</td><td>X : 1, Y : 2, Z : 3</td><td>&mdash;</td></tr>
+</tbody></table>
+<p>L'unique solution est apparue sans qu'aucune affectation ait &eacute;t&eacute; essay&eacute;e. Notez l'&eacute;tape 5 : sans la remise en file de l'&eacute;tape 2, la valeur 2 serait rest&eacute;e &agrave; tort dans le domaine de \(X\). C'est tout l'int&eacute;r&ecirc;t de la file.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Une valeur n'est supprim&eacute;e que lorsqu'elle n'a aucun support : elle ne peut donc figurer dans aucune solution. Les domaines finaux contiennent par cons&eacute;quent toutes les solutions du probl&egrave;me initial. Attention &agrave; la r&eacute;ciproque : un r&eacute;seau coh&eacute;rent d'arc peut n'avoir <em>aucune</em> solution. Trois r&eacute;gions formant un triangle avec seulement deux couleurs sont coh&eacute;rentes d'arc et pourtant impossibles &agrave; colorier.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Variant : la somme des tailles des domaines, entier positif. Une r&eacute;vision qui supprime au moins une valeur la fait d&eacute;cro&icirc;tre strictement ; une r&eacute;vision qui ne supprime rien ne remet rien en file. Le nombre total d'insertions est donc born&eacute;.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Chaque contrainte peut &ecirc;tre remise en file autant de fois qu'une valeur peut dispara&icirc;tre, et chaque r&eacute;vision compare toutes les paires de valeurs : le co&ucirc;t est proportionnel au nombre de contraintes multipli&eacute; par le cube de la taille des domaines. C'est polynomial, donc bon march&eacute; devant la recherche.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Ne traiter chaque contrainte que dans un seul sens. Oublier de remettre en file les couples affect&eacute;s par une suppression, ce qui laisse des valeurs mortes. Conclure qu'un r&eacute;seau coh&eacute;rent d'arc a une solution. Enfin, appliquer la m&eacute;thode telle quelle &agrave; des contraintes de port&eacute;e sup&eacute;rieure &agrave; deux : il faut alors une notion de coh&eacute;rence adapt&eacute;e.</p>
+
+<h2 id="c4">4. R&eacute;paration par minimum de conflits</h2>
+<div class="algo-tag">m&eacute;thode approch&eacute;e &middot; am&eacute;lioration it&eacute;rative</div>
+<p><strong>But.</strong> Trouver rapidement une solution &agrave; une instance peu contrainte, en partant d'une affectation compl&egrave;te fausse et en la corrigeant.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div>
+<p><strong>Entr&eacute;e</strong> : le probl&egrave;me, une affectation compl&egrave;te de d&eacute;part, un nombre maximal d'&eacute;tapes.<br>
+<strong>Sortie</strong> : une affectation sans conflit, ou un &eacute;chec qui ne prouve rien.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div>
+<ol>
+<li><strong>Partir d'une affectation compl&egrave;te</strong>, tir&eacute;e au hasard ou construite gloutonnement. Contrairement au retour sur trace, toutes les variables ont une valeur d&egrave;s le d&eacute;part &mdash; simplement, certaines contraintes sont viol&eacute;es.</li>
+<li><strong>Recenser les variables en conflit.</strong> S'il n'y en a aucune, c'est termin&eacute; : l'affectation est une solution.</li>
+<li><strong>En choisir une au hasard.</strong> Le hasard n'est pas cosm&eacute;tique : un choix d&eacute;terministe fait tourner en boucle sur les m&ecirc;mes variables.</li>
+<li><strong>Lui donner la valeur qui minimise le nombre de conflits</strong>, en d&eacute;partageant au hasard entre les valeurs &eacute;galement bonnes. Ce d&eacute;partage permet de traverser les plateaux, ces r&eacute;gions o&ugrave; aucun mouvement n'am&eacute;liore mais o&ugrave; certains ne d&eacute;gradent pas.</li>
+<li><strong>Recommencer &agrave; l'&eacute;tape 2</strong> jusqu'&agrave; une solution ou l'&eacute;puisement du budget d'&eacute;tapes.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Quatre reines, une par colonne ; les lignes de d&eacute;part sont 1, 1, 1, 2. La colonne &agrave; d&eacute;placer est tir&eacute;e au hasard parmi celles en conflit, et la ligne au hasard parmi les meilleures :</p>
+<table>
+<thead><tr><th>&Eacute;tape</th><th>Lignes</th><th>Paires en conflit</th><th>Colonnes en conflit</th><th>Colonne tir&eacute;e</th><th>Conflits par ligne 1, 2, 3, 4</th><th>Ligne retenue</th></tr></thead>
+<tbody>
+<tr><td>0</td><td>1, 1, 1, 2</td><td>4</td><td>1, 2, 3, 4</td><td>1</td><td>2, 2, 1, <strong>0</strong></td><td>4</td></tr>
+<tr><td>1</td><td>4, 1, 1, 2</td><td>2</td><td>2, 3, 4</td><td>3</td><td>2, 3, <strong>1</strong>, <strong>1</strong></td><td>4 (tir&eacute;e parmi 3 et 4)</td></tr>
+<tr><td>2</td><td>4, 1, 4, 2</td><td>1</td><td>1, 3</td><td>1</td><td>1, 3, <strong>0</strong>, 1</td><td>3</td></tr>
+<tr><td>3</td><td>3, 1, 4, 2</td><td>0</td><td>aucune</td><td>&mdash;</td><td>&mdash;</td><td>solution</td></tr>
+</tbody></table>
+<p>Trois d&eacute;placements ont suffi. Observez l'&eacute;tape 1 : deux lignes sont &eacute;galement bonnes, et c'est le tirage entre elles qui permet de ne pas rester bloqu&eacute;. Avec un choix syst&eacute;matique de la premi&egrave;re colonne en conflit et de la premi&egrave;re ligne optimale, ce m&ecirc;me probl&egrave;me tourne ind&eacute;finiment entre deux configurations &agrave; un conflit. Sur cette famille de probl&egrave;mes, le nombre de r&eacute;parations ne cro&icirc;t presque pas avec la taille du plateau : c'est ce que montre la figure interactive du chapitre.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Une affectation sans conflit satisfait, par d&eacute;finition, toutes les contraintes. La proc&eacute;dure est donc correcte <em>quand elle r&eacute;ussit</em>. Elle n'offre en revanche aucune garantie de r&eacute;ussite &mdash; c'est la diff&eacute;rence de nature avec les trois pr&eacute;c&eacute;dentes.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Uniquement parce que le budget d'&eacute;tapes est fini. Il n'existe aucun variant : le nombre de conflits peut remonter d'une &eacute;tape &agrave; l'autre, et rien n'interdit de repasser par une configuration d&eacute;j&agrave; visit&eacute;e. C'est le seul algorithme de cette annexe dont la terminaison est impos&eacute;e de l'ext&eacute;rieur.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Chaque &eacute;tape demande d'&eacute;valuer le nombre de conflits pour chaque valeur possible de la variable choisie. La m&eacute;moire se limite &agrave; l'affectation courante. Sur les instances peu contraintes, le nombre d'&eacute;tapes observ&eacute; cro&icirc;t tr&egrave;s lentement avec la taille du probl&egrave;me ; pr&egrave;s du seuil de difficult&eacute;, il explose.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> N'accepter que les mouvements strictement am&eacute;liorants : la recherche se bloque au premier plateau. Choisir toujours la premi&egrave;re variable en conflit plut&ocirc;t qu'une au hasard : on oscille entre deux configurations. Et surtout, interpr&eacute;ter un &eacute;chec comme une preuve d'impossibilit&eacute; : ce n'en est jamais une.</p>
+
+<nav class="lesson-nav"><div class="container">
+<a href="page.html">&larr; Retour au chapitre 6</a>
+<a href="../../index.html">Sommaire du manuel</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+</body></html>

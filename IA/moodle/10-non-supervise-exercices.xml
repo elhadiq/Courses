@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — k-moyennes</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;K-MOYENNES&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Deux etapes alternees : affecter chaque point au centre le plus proche, puis replacer chaque centre a la moyenne de son groupe.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;affecter(points, centres)&lt;/code&gt;&lt;/strong&gt; qui renvoie la liste des indices de centre les plus proches (distance euclidienne, plus petit indice a egalite), &lt;strong&gt;&lt;code&gt;recentrer(points, groupes, K)&lt;/code&gt;&lt;/strong&gt; qui renvoie la liste des nouveaux centres (un centre dont le groupe est vide reste inchange : passer les anciens centres en quatrieme argument &lt;code&gt;anciens&lt;/code&gt;), et &lt;strong&gt;&lt;code&gt;inertie(points, groupes, centres)&lt;/code&gt;&lt;/strong&gt;, arrondie a 4 decimales. Les points sont des tuples de flottants.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;affecter([(1.0,), (2.0,), (8.0,)], [(1.0,), (9.0,)]) &amp;rarr; [0, 0, 1]&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def distance2(a, b):
+    ...
+
+def affecter(points, centres):
+    # indice du centre le plus proche, plus petit indice a egalite
+    ...
+
+def recentrer(points, groupes, K, anciens):
+    # moyenne coordonnee par coordonnee ; groupe vide : garder l ancien centre
+    ...
+
+def inertie(points, groupes, centres):
+    # somme des carres des distances au centre de son groupe
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def distance2(a, b):
+    return sum((x - y) ** 2 for x, y in zip(a, b))
+
+def affecter(points, centres):
+    res = []
+    for p in points:
+        best, bd = 0, distance2(p, centres[0])
+        for k in range(1, len(centres)):
+            d = distance2(p, centres[k])
+            if d &lt; bd:
+                bd, best = d, k
+        res.append(best)
+    return res
+
+def recentrer(points, groupes, K, anciens):
+    nouveaux = []
+    for k in range(K):
+        membres = [p for p, g in zip(points, groupes) if g == k]
+        if not membres:
+            nouveaux.append(anciens[k])
+        else:
+            d = len(membres[0])
+            nouveaux.append(tuple(round(sum(m[i] for m in membres) / len(membres), 6)
+                                  for i in range(d)))
+    return nouveaux
+
+def inertie(points, groupes, centres):
+    return round(sum(distance2(p, centres[g]) for p, g in zip(points, groupes)), 4)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>P = [(1.0,), (2.0,), (8.0,)]
+print(affecter(P, [(1.0,), (9.0,)]))
+</text></testcode><stdin><text /></stdin><expected><text>[0, 0, 1]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>P = [(1.0,), (2.0,), (4.0,), (8.0,), (9.0,), (11.0,)]
+c = [(1.0,), (2.0,)]
+for _ in range(4):
+    g = affecter(P, c)
+    c = recentrer(P, g, 2, c)
+print(c, inertie(P, affecter(P, c), c))
+</text></testcode><stdin><text /></stdin><expected><text>[(2.333333,), (9.333333,)] 9.3333
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>P = [(0.0, 0.0), (0.0, 1.0), (5.0, 5.0), (5.0, 6.0)]
+g = affecter(P, [(0.0, 0.0), (5.0, 5.0)])
+print(g, recentrer(P, g, 2, [(0.0, 0.0), (5.0, 5.0)]))
+</text></testcode><stdin><text /></stdin><expected><text>[0, 0, 1, 1] [(0.0, 0.5), (5.0, 5.5)]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>P = [(1.0,), (2.0,)]
+print(recentrer(P, [0, 0], 2, [(1.0,), (99.0,)]))
+</text></testcode><stdin><text /></stdin><expected><text>[(1.5,), (99.0,)]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>P = [(3.0,)]
+print(affecter(P, [(3.0,), (3.0,)]), inertie(P, [0], [(3.0,)]))
+</text></testcode><stdin><text /></stdin><expected><text>[0] 0.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Score de silhouette</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;SILHOUETTE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Contrairement a l'inertie, la silhouette ne croit pas mecaniquement avec le nombre de groupes : elle est comparable d'un K a l'autre.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;silhouette(points, groupes)&lt;/code&gt;&lt;/strong&gt; qui renvoie la liste des scores individuels, arrondis a 4 decimales, puis &lt;strong&gt;&lt;code&gt;silhouette_moyenne(points, groupes)&lt;/code&gt;&lt;/strong&gt;. Le score d'un point est &lt;code&gt;(b - a) / max(a, b)&lt;/code&gt; ou &lt;code&gt;a&lt;/code&gt; est sa distance moyenne aux autres membres de son groupe et &lt;code&gt;b&lt;/code&gt; la plus petite distance moyenne a un autre groupe. Un point seul dans son groupe recoit le score &lt;code&gt;0.0&lt;/code&gt;. La distance est euclidienne.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;silhouette([(1.0,), (2.0,), (8.0,), (9.0,)], [0, 0, 1, 1]) &amp;rarr; [0.8667, 0.8462, 0.8462, 0.8667]&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>from math import sqrt
+
+def distance(a, b):
+    ...
+
+def silhouette(points, groupes):
+    # a : distance moyenne DANS son groupe, sans se compter soi-meme
+    # b : la plus petite distance moyenne a un AUTRE groupe
+    ...
+
+def silhouette_moyenne(points, groupes):
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>from math import sqrt
+
+def distance(a, b):
+    return sqrt(sum((x - y) ** 2 for x, y in zip(a, b)))
+
+def silhouette(points, groupes):
+    etiquettes = sorted(set(groupes))
+    res = []
+    for i, p in enumerate(points):
+        memes = [q for j, q in enumerate(points) if groupes[j] == groupes[i] and j != i]
+        if not memes:
+            res.append(0.0)
+            continue
+        a = sum(distance(p, q) for q in memes) / len(memes)
+        b = None
+        for e in etiquettes:
+            if e == groupes[i]:
+                continue
+            autres = [q for j, q in enumerate(points) if groupes[j] == e]
+            if not autres:
+                continue
+            d = sum(distance(p, q) for q in autres) / len(autres)
+            if b is None or d &lt; b:
+                b = d
+        if b is None:
+            res.append(0.0)
+        else:
+            res.append(round((b - a) / max(a, b), 4))
+    return res
+
+def silhouette_moyenne(points, groupes):
+    s = silhouette(points, groupes)
+    return round(sum(s) / len(s), 4) if s else 0.0
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(silhouette([(1.0,), (2.0,), (8.0,), (9.0,)], [0, 0, 1, 1]))
+</text></testcode><stdin><text /></stdin><expected><text>[0.8667, 0.8462, 0.8462, 0.8667]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>P = [(1.0,), (2.0,), (4.0,), (8.0,), (9.0,), (11.0,)]
+print(silhouette_moyenne(P, [0, 0, 0, 1, 1, 1]))
+</text></testcode><stdin><text /></stdin><expected><text>0.7034
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>P = [(1.0,), (2.0,), (4.0,), (8.0,), (9.0,), (11.0,)]
+print(silhouette(P, [0, 0, 1, 1, 1, 1])[2])
+</text></testcode><stdin><text /></stdin><expected><text>-0.5312
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(silhouette([(0.0,), (1.0,)], [0, 1]))
+</text></testcode><stdin><text /></stdin><expected><text>[0.0, 0.0]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(silhouette_moyenne([(0.0,), (1.0,), (2.0,)], [0, 0, 0]))
+</text></testcode><stdin><text /></stdin><expected><text>0.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — Analyse en composantes principales</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;COMPOSANTES PRINCIPALES&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Centrer, calculer la covariance, diagonaliser, projeter. La part de variance conservee est le rapport des valeurs propres.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Avec NumPy, ecrire &lt;strong&gt;&lt;code&gt;acp(X, q)&lt;/code&gt;&lt;/strong&gt; qui renvoie le triplet &lt;code&gt;(projection, part_variance, axes)&lt;/code&gt;. &lt;code&gt;X&lt;/code&gt; est un tableau de &lt;code&gt;n&lt;/code&gt; lignes et &lt;code&gt;d&lt;/code&gt; colonnes ; on le centre sans le reduire. &lt;code&gt;part_variance&lt;/code&gt; est la somme des &lt;code&gt;q&lt;/code&gt; plus grandes valeurs propres divisee par leur somme totale, arrondie a 4 decimales. &lt;code&gt;axes&lt;/code&gt; est le tableau des &lt;code&gt;q&lt;/code&gt; vecteurs propres en colonnes, chacun normalise de sorte que sa plus grande composante en valeur absolue soit positive.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;acp(np.array([[-2.,-1.],[-1.,0.],[1.,0.],[2.,1.]]), 1)[1] &amp;rarr; 0.9714&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def acp(X, q):
+    # centrer, covariance, eigh (matrice symetrique), tri decroissant
+    # fixer le signe de chaque axe pour rendre le resultat reproductible
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def acp(X, q):
+    Xc = X - X.mean(axis=0)
+    C = np.cov(Xc, rowvar=False, bias=True)
+    C = np.atleast_2d(C)
+    valeurs, vecteurs = np.linalg.eigh(C)
+    ordre = np.argsort(valeurs)[::-1]
+    valeurs = valeurs[ordre]
+    vecteurs = vecteurs[:, ordre]
+    axes = vecteurs[:, :q].copy()
+    for k in range(axes.shape[1]):
+        colonne = axes[:, k]
+        if colonne[np.argmax(np.abs(colonne))] &lt; 0:
+            axes[:, k] = -colonne
+    part = round(float(valeurs[:q].sum() / valeurs.sum()), 4)
+    return (Xc @ axes, part, axes)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[-2.,-1.],[-1.,0.],[1.,0.],[2.,1.]])
+p, part, axes = acp(X, 1)
+print(part, np.round(axes.ravel(), 3))
+</text></testcode><stdin><text /></stdin><expected><text>0.9714 [0.924 0.383]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[-2.,-1.],[-1.,0.],[1.,0.],[2.,1.]])
+p, part, axes = acp(X, 2)
+print(part, np.round(p[:, 0], 3))
+</text></testcode><stdin><text /></stdin><expected><text>1.0 [-2.23  -0.924  0.924  2.23 ]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[1., 0.], [2., 0.], [3., 0.], [4., 0.]])
+print(acp(X, 1)[1])
+</text></testcode><stdin><text /></stdin><expected><text>1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+rng = np.random.default_rng(0)
+X = rng.normal(size=(50, 4))
+p, part, axes = acp(X, 4)
+print(part, np.allclose(axes.T @ axes, np.eye(4), atol=1e-9))
+</text></testcode><stdin><text /></stdin><expected><text>1.0 True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[0., 0.], [0., 2.], [0., 4.]])
+print(acp(X, 1)[1], np.round(np.abs(acp(X, 1)[2].ravel()), 3))
+</text></testcode><stdin><text /></stdin><expected><text>1.0 [0. 1.]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

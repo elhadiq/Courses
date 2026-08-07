@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 2 &mdash; Agents et environnements</title>
+<meta name="description" content="Agent rationnel, mesure de performance, environnements, architectures, utilite esperee.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Partie I &middot; Chapitre 2</div>
+<h1>Chapitre 2 &mdash; Agents rationnels et environnements</h1>
+<div class="lesson-sub">Percepts, actions, mesure de performance, propri&eacute;t&eacute;s d'un environnement et cinq architectures d'agent, du r&eacute;flexe pur &agrave; l'agent apprenant.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">Annexe compagnon</div><p>La sp&eacute;cification d'une t&acirc;che, la mise &agrave; jour de l'&eacute;tat interne, le choix d'action par utilit&eacute; esp&eacute;r&eacute;e et la boucle d'apprentissage sont d&eacute;taill&eacute;s <strong><a href="algorithms.html">pas &agrave; pas dans l'annexe</a></strong>.</p></div>
+
+<h2>2.1 L'agent, d&eacute;fini formellement</h2>
+
+<p>Le chapitre pr&eacute;c&eacute;dent a retenu, parmi quatre d&eacute;finitions possibles de l'intelligence artificielle, celle de l'agent rationnel. Il reste &agrave; lui donner un contenu math&eacute;matique, faute de quoi elle ne serait qu'une formule.</p>
+
+<div class="box def"><div class="box-title">D&eacute;finition &mdash; Agent, fonction d'agent, programme d'agent</div>
+<p>Soit \(P\) l'ensemble des perceptions possibles et \(A\) l'ensemble des actions possibles. Une <strong>s&eacute;quence de perceptions</strong> est un &eacute;l&eacute;ment de \(P^{*}\), l'ensemble des suites finies d'&eacute;l&eacute;ments de \(P\).</p>
+<ul>
+<li>La <strong>fonction d'agent</strong> est une application \(f : P^{*} \to A\). C'est une description <em>externe</em> et compl&egrave;te du comportement : elle dit ce que l'agent fait, jamais comment.</li>
+<li>Le <strong>programme d'agent</strong> est une impl&eacute;mentation concr&egrave;te de \(f\), qui s'ex&eacute;cute sur une architecture physique et ne dispose que d'une m&eacute;moire finie.</li>
+</ul>
+<p>La distinction est essentielle : la fonction d'agent est un objet math&eacute;matique, en g&eacute;n&eacute;ral infini &mdash; \(P^{*}\) est infini d&egrave;s que \(P\) contient au moins deux &eacute;l&eacute;ments. Le programme, lui, est fini. Toute la difficult&eacute; de l'ing&eacute;nierie tient dans cet &eacute;cart.</p></div>
+
+<div class="box example"><div class="box-title">Un agent minuscule, enti&egrave;rement tabulable</div>
+<p>Deux cases \(G\) et \(D\), chacune propre ou sale ; l'agent per&ccedil;oit sa position et l'&eacute;tat de sa case, et peut aspirer, aller &agrave; gauche ou aller &agrave; droite. Il y a donc quatre perceptions possibles. La fonction d'agent restreinte aux s&eacute;quences de longueur 1 tient en quatre lignes :</p>
+<table><thead><tr><th>Perception</th><th>Action</th></tr></thead>
+<tbody><tr><td>(G, sale)</td><td>aspirer</td></tr><tr><td>(G, propre)</td><td>aller &agrave; droite</td></tr>
+<tr><td>(D, sale)</td><td>aspirer</td></tr><tr><td>(D, propre)</td><td>aller &agrave; gauche</td></tr></tbody></table>
+<p>Pour les s&eacute;quences de longueur \(n\), la table compte \(4^{n}\) lignes. Un agent qui percevrait une image de \(1000 \times 1000\) pixels en niveaux de gris aurait \(256^{10^{6}}\) perceptions possibles : la table est d&eacute;finissable, jamais constructible. C'est pourquoi on programme des <em>r&egrave;gles</em> plut&ocirc;t que des tables.</p></div>
+
+<h2>2.2 La rationalit&eacute; n'est pas l'omniscience</h2>
+
+<div class="box def"><div class="box-title">D&eacute;finition &mdash; Agent rationnel</div>
+<p>Pour chaque s&eacute;quence de perceptions possible, un agent rationnel choisit l'action dont on attend qu'elle maximise la <strong>mesure de performance</strong>, compte tenu de ce que la s&eacute;quence de perceptions r&eacute;v&egrave;le et de la connaissance pr&eacute;alable dont l'agent dispose.</p></div>
+
+<p>Quatre &eacute;l&eacute;ments apparaissent dans cette d&eacute;finition, et chacun est une source d'erreur s'il est mal pos&eacute;.</p>
+
+<div class="box warn"><div class="box-title">La mesure de performance est le pi&egrave;ge principal</div>
+<p>Elle doit &ecirc;tre d&eacute;finie sur les <em>&eacute;tats de l'environnement</em>, pas sur les &eacute;tats internes de l'agent. Un aspirateur not&eacute; sur la quantit&eacute; de poussi&egrave;re aspir&eacute;e a int&eacute;r&ecirc;t &agrave; rejeter la poussi&egrave;re pour la r&eacute;aspirer ; il faut le noter sur la propret&eacute; du sol.</p>
+<p>C'est le probl&egrave;me g&eacute;n&eacute;ral de la sp&eacute;cification : un agent optimise <em>exactement</em> ce qu'on lui demande, y compris quand ce n'est pas ce qu'on voulait. Le chapitre 12 y reviendra sous le nom de conception de r&eacute;compense, et le chapitre 14 sous celui d'alignement.</p></div>
+
+<div class="box tip"><div class="box-title">Rationnel n'est pas parfait</div>
+La rationalit&eacute; maximise la performance <em>attendue</em> ; la perfection maximiserait la performance <em>r&eacute;elle</em>, ce qui exige de conna&icirc;tre l'avenir. Traverser une rue apr&egrave;s avoir regard&eacute; des deux c&ocirc;t&eacute;s reste rationnel m&ecirc;me si une porte d'avion tombe du ciel. En revanche, la rationalit&eacute; impose de <em>collecter de l'information</em> quand cela en vaut la peine, et d'<em>apprendre</em> de ce que l'on per&ccedil;oit : un agent qui ignore ce qu'il observe n'est pas rationnel, il est born&eacute;.</div>
+
+<h3>Sp&eacute;cifier une t&acirc;che avant de la programmer</h3>
+
+<p>Avant tout code, on d&eacute;crit quatre choses : la mesure de performance, l'environnement, les actionneurs et les capteurs. L'exercice para&icirc;t formel ; il r&eacute;v&egrave;le en pratique la moiti&eacute; des difficult&eacute;s d'un projet.</p>
+
+<table>
+<thead><tr><th>T&acirc;che</th><th>Mesure de performance</th><th>Environnement</th><th>Actionneurs</th><th>Capteurs</th></tr></thead>
+<tbody>
+<tr><td>Taxi autonome</td><td>s&eacute;curit&eacute;, temps, l&eacute;galit&eacute;, confort, carburant</td><td>routes, autres v&eacute;hicules, pi&eacute;tons, m&eacute;t&eacute;o</td><td>direction, acc&eacute;l&eacute;rateur, frein, clignotants</td><td>cam&eacute;ras, t&eacute;l&eacute;m&egrave;tres, positionnement, odom&egrave;tre</td></tr>
+<tr><td>Diagnostic m&eacute;dical</td><td>sant&eacute; du patient, co&ucirc;t, absence de test inutile</td><td>patient, personnel, dossier</td><td>questions, examens prescrits, traitements</td><td>r&eacute;ponses, r&eacute;sultats d'analyse</td></tr>
+<tr><td>Tuteur d'anglais</td><td>note de l'&eacute;l&egrave;ve &agrave; un test ind&eacute;pendant</td><td>&eacute;l&egrave;ve, programme officiel</td><td>exercices, corrections, explications</td><td>r&eacute;ponses saisies, temps de r&eacute;ponse</td></tr>
+</tbody></table>
+
+<p>Notez la troisi&egrave;me ligne : mesurer la performance du tuteur sur un test qu'il aurait lui-m&ecirc;me con&ccedil;u n'aurait aucun sens. La bonne mesure est toujours ext&eacute;rieure &agrave; l'agent.</p>
+
+<h2>2.3 Les six dimensions d'un environnement</h2>
+
+<p>La difficult&eacute; d'une t&acirc;che ne d&eacute;pend pas seulement de son objectif, mais de la nature du monde dans lequel elle se d&eacute;roule. Six propri&eacute;t&eacute;s ind&eacute;pendantes suffisent &agrave; le caract&eacute;riser, et elles d&eacute;terminent l'architecture d'agent qu'il faudra.</p>
+
+<figure class="viz"><div class="viz-title">Trois environnements sur six axes</div>
+<svg viewBox="0 0 760 330" role="img" style="width:100%;height:auto;display:block;"><path d="M 250 60 L 610 60" style="fill:none;stroke:var(--viz-axis);stroke-width:1.6;"/><text x="238" y="64" text-anchor="end" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">enti&egrave;rement observable</text><text x="622" y="64" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">partiellement observable</text><path d="M 250 98 L 610 98" style="fill:none;stroke:var(--viz-axis);stroke-width:1.6;"/><text x="238" y="102" text-anchor="end" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">d&eacute;terministe</text><text x="622" y="102" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">stochastique</text><path d="M 250 136 L 610 136" style="fill:none;stroke:var(--viz-axis);stroke-width:1.6;"/><text x="238" y="140" text-anchor="end" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">&eacute;pisodique</text><text x="622" y="140" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">s&eacute;quentiel</text><path d="M 250 174 L 610 174" style="fill:none;stroke:var(--viz-axis);stroke-width:1.6;"/><text x="238" y="178" text-anchor="end" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">statique</text><text x="622" y="178" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">dynamique</text><path d="M 250 212 L 610 212" style="fill:none;stroke:var(--viz-axis);stroke-width:1.6;"/><text x="238" y="216" text-anchor="end" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">discret</text><text x="622" y="216" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">continu</text><path d="M 250 250 L 610 250" style="fill:none;stroke:var(--viz-axis);stroke-width:1.6;"/><text x="238" y="254" text-anchor="end" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">mono-agent</text><text x="622" y="254" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">multi-agent</text><circle cx="257.2" cy="60" r="6" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="257.2" cy="98" r="6" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="592" cy="136" r="6" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="257.2" cy="174" r="6" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="257.2" cy="212" r="6" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="257.2" cy="250" r="6" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><path d="M 257.2 60 L 257.2 98 L 592 136 L 257.2 174 L 257.2 212 L 257.2 250" style="fill:none;stroke:var(--primary);stroke-width:2;stroke-dasharray:5 4;opacity:0.75;"/><circle cx="150" cy="300" r="6" style="fill:var(--primary);"/><text x="162" y="304" style="fill:var(--color-text);font-size:13px;font-family:inherit;">mots crois&eacute;s</text><circle cx="592" cy="60" r="6" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><circle cx="592" cy="98" r="6" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><circle cx="592" cy="136" r="6" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><circle cx="592" cy="174" r="6" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><circle cx="592" cy="212" r="6" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><circle cx="592" cy="250" r="6" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><path d="M 592 60 L 592 98 L 592 136 L 592 174 L 592 212 L 592 250" style="fill:none;stroke:var(--viz-bad);stroke-width:2;stroke-dasharray:5 4;opacity:0.75;"/><circle cx="360" cy="300" r="6" style="fill:var(--viz-bad);"/><text x="372" y="304" style="fill:var(--color-text);font-size:13px;font-family:inherit;">taxi autonome</text><circle cx="257.2" cy="60" r="6" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:2;"/><circle cx="257.2" cy="98" r="6" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:2;"/><circle cx="592" cy="136" r="6" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:2;"/><circle cx="466" cy="174" r="6" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:2;"/><circle cx="257.2" cy="212" r="6" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:2;"/><circle cx="592" cy="250" r="6" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:2;"/><path d="M 257.2 60 L 257.2 98 L 592 136 L 466 174 L 257.2 212 L 592 250" style="fill:none;stroke:var(--accent);stroke-width:2;stroke-dasharray:5 4;opacity:0.75;"/><circle cx="570" cy="300" r="6" style="fill:var(--accent);"/><text x="582" y="304" style="fill:var(--color-text);font-size:13px;font-family:inherit;">&eacute;checs avec pendule</text><text x="380" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Six dimensions ind&eacute;pendantes : plus on va vers la droite, plus l'agent doit &ecirc;tre sophistiqu&eacute;</text></svg>
+<figcaption class="viz-caption"><strong>Figure 2.1.</strong> Les mots crois&eacute;s sont &agrave; l'extr&ecirc;me gauche de presque tous les axes : c'est pourquoi ils se r&eacute;solvent par la recherche du chapitre 3. Le taxi est &agrave; l'extr&ecirc;me droite partout, et c'est pourquoi aucun chapitre isol&eacute; ne suffit &agrave; le traiter. Les &eacute;checs avec pendule sont un cas mixte instructif : parfaitement observables et d&eacute;terministes, mais &agrave; deux agents et semi-dynamiques, puisque l'horloge tourne pendant la r&eacute;flexion.</figcaption></figure>
+
+<div class="box def"><div class="box-title">Les six propri&eacute;t&eacute;s</div>
+<ul>
+<li><strong>Enti&egrave;rement ou partiellement observable.</strong> Les capteurs donnent-ils acc&egrave;s &agrave; tout ce qui est pertinent pour la d&eacute;cision ? Sinon, l'agent doit maintenir un &eacute;tat interne.</li>
+<li><strong>D&eacute;terministe ou stochastique.</strong> L'&eacute;tat suivant est-il enti&egrave;rement d&eacute;termin&eacute; par l'&eacute;tat courant et l'action ? Sinon, il faut raisonner en probabilit&eacute;s (chapitre 8).</li>
+<li><strong>&Eacute;pisodique ou s&eacute;quentiel.</strong> L'exp&eacute;rience se d&eacute;coupe-t-elle en &eacute;pisodes ind&eacute;pendants, ou une d&eacute;cision engage-t-elle les suivantes ? La classification d'images est &eacute;pisodique ; conduire est s&eacute;quentiel.</li>
+<li><strong>Statique ou dynamique.</strong> Le monde change-t-il pendant que l'agent d&eacute;lib&egrave;re ? S'il ne change pas mais que le score se d&eacute;grade avec le temps, on dit l'environnement <em>semi-dynamique</em>.</li>
+<li><strong>Discret ou continu.</strong> Les &eacute;tats, le temps et les actions prennent-ils un nombre fini de valeurs ?</li>
+<li><strong>Mono-agent ou multi-agent.</strong> Et si multi-agent, coop&eacute;ratif ou comp&eacute;titif ? Le cas comp&eacute;titif est celui du chapitre 5.</li>
+</ul></div>
+
+<div class="box warn"><div class="box-title">L'observabilit&eacute; d&eacute;pend de l'agent, pas seulement du monde</div>
+Un m&ecirc;me environnement est enti&egrave;rement observable pour un agent bien &eacute;quip&eacute; et partiellement observable pour un autre. Ajouter un capteur peut donc transformer la nature du probl&egrave;me &mdash; c'est souvent moins co&ucirc;teux que de programmer un agent capable de s'en passer. La question &laquo; faut-il un algorithme plus malin ou un capteur de plus ? &raquo; est une vraie question d'ing&eacute;nierie.</div>
+
+<h2>2.4 Cinq architectures d'agent</h2>
+
+<figure class="viz"><div class="viz-title">De la r&egrave;gle r&eacute;flexe &agrave; l'agent apprenant</div>
+<svg viewBox="0 0 760 456" role="img" style="width:100%;height:auto;display:block;"><text x="12" y="24" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Cinq architectures, de la plus pauvre &agrave; la plus riche</text><text x="12.0" y="57.0" style="fill:var(--color-text);font-size:13.0px;font-weight:700;font-family:inherit;">R&eacute;flexe simple</text><rect x="142.9" y="36.0" width="82.0" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="183.9" y="56.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">percepts</text><path d="M 226.9 52.0 L 235.5 52.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 233.5 48.0 L 239.5 52.0 L 233.5 56.0 Z" style="fill:var(--viz-axis);"/><rect x="240.5" y="36.0" width="165.9" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="323.5" y="56.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">r&egrave;gles condition-action</text><path d="M 408.4 52.0 L 417.0 52.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 415.0 48.0 L 421.0 52.0 L 415.0 56.0 Z" style="fill:var(--viz-axis);"/><rect x="422.0" y="36.0" width="112.7" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="478.4" y="56.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">action</text><text x="142.9" y="82.0" style="fill:var(--color-muted);font-size:11.0px;font-family:inherit;">aucune m&eacute;moire : la m&ecirc;me perception donne toujours la m&ecirc;me action</text><text x="12.0" y="131.0" style="fill:var(--color-text);font-size:13.0px;font-weight:700;font-family:inherit;">R&eacute;flexe &agrave; &eacute;tat</text><rect x="142.9" y="110.0" width="82.0" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="183.9" y="130.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">percepts</text><path d="M 226.9 126.0 L 235.5 126.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 233.5 122.0 L 239.5 126.0 L 233.5 130.0 Z" style="fill:var(--viz-axis);"/><rect x="240.5" y="110.0" width="165.9" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="323.5" y="130.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">&eacute;tat interne du monde</text><path d="M 408.4 126.0 L 417.0 126.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 415.0 122.0 L 421.0 126.0 L 415.0 130.0 Z" style="fill:var(--viz-axis);"/><rect x="422.0" y="110.0" width="112.7" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="478.4" y="130.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">r&egrave;gles</text><path d="M 536.7 126.0 L 545.3 126.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 543.3 122.0 L 549.3 126.0 L 543.3 130.0 Z" style="fill:var(--viz-axis);"/><rect x="550.3" y="110.0" width="116.2" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="608.4" y="130.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">action</text><text x="142.9" y="156.0" style="fill:var(--color-muted);font-size:11.0px;font-family:inherit;">un mod&egrave;le du monde mis &agrave; jour : le pass&eacute; compte</text><text x="12.0" y="205.0" style="fill:var(--color-text);font-size:13.0px;font-weight:700;font-family:inherit;">Agent &agrave; but</text><rect x="142.9" y="184.0" width="82.0" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="183.9" y="204.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">percepts</text><path d="M 226.9 200.0 L 235.5 200.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 233.5 196.0 L 239.5 200.0 L 233.5 204.0 Z" style="fill:var(--viz-axis);"/><rect x="240.5" y="184.0" width="165.9" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="323.5" y="204.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">&eacute;tat interne</text><path d="M 408.4 200.0 L 417.0 200.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 415.0 196.0 L 421.0 200.0 L 415.0 204.0 Z" style="fill:var(--viz-axis);"/><rect x="422.0" y="184.0" width="112.7" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="478.4" y="204.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">cons&eacute;quences</text><path d="M 536.7 200.0 L 545.3 200.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 543.3 196.0 L 549.3 200.0 L 543.3 204.0 Z" style="fill:var(--viz-axis);"/><rect x="550.3" y="184.0" width="116.2" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="608.4" y="204.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">but</text><path d="M 668.6 200.0 L 677.2 200.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 675.2 196.0 L 681.2 200.0 L 675.2 204.0 Z" style="fill:var(--viz-axis);"/><rect x="682.2" y="184.0" width="65.8" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="715.1" y="204.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">action</text><text x="142.9" y="230.0" style="fill:var(--color-muted);font-size:11.0px;font-family:inherit;">l'action est choisie parce qu'elle m&egrave;ne quelque part</text><text x="12.0" y="279.0" style="fill:var(--color-text);font-size:13.0px;font-weight:700;font-family:inherit;">Agent &agrave; utilit&eacute;</text><rect x="142.9" y="258.0" width="82.0" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="183.9" y="278.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">percepts</text><path d="M 226.9 274.0 L 235.5 274.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 233.5 270.0 L 239.5 274.0 L 233.5 278.0 Z" style="fill:var(--viz-axis);"/><rect x="240.5" y="258.0" width="165.9" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="323.5" y="278.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">&eacute;tat interne</text><path d="M 408.4 274.0 L 417.0 274.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 415.0 270.0 L 421.0 274.0 L 415.0 278.0 Z" style="fill:var(--viz-axis);"/><rect x="422.0" y="258.0" width="112.7" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="478.4" y="278.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">cons&eacute;quences</text><path d="M 536.7 274.0 L 545.3 274.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 543.3 270.0 L 549.3 274.0 L 543.3 278.0 Z" style="fill:var(--viz-axis);"/><rect x="550.3" y="258.0" width="116.2" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="608.4" y="278.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">utilit&eacute; attendue</text><path d="M 668.6 274.0 L 677.2 274.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 675.2 270.0 L 681.2 274.0 L 675.2 278.0 Z" style="fill:var(--viz-axis);"/><rect x="682.2" y="258.0" width="65.8" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="715.1" y="278.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">action</text><text x="142.9" y="304.0" style="fill:var(--color-muted);font-size:11.0px;font-family:inherit;">les buts sont gradu&eacute;s : on compare des degr&eacute;s de satisfaction</text><text x="12.0" y="353.0" style="fill:var(--color-text);font-size:13.0px;font-weight:700;font-family:inherit;">Agent apprenant</text><rect x="142.9" y="332.0" width="82.0" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="183.9" y="352.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">percepts</text><path d="M 226.9 348.0 L 235.5 348.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 233.5 344.0 L 239.5 348.0 L 233.5 352.0 Z" style="fill:var(--viz-axis);"/><rect x="240.5" y="332.0" width="165.9" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="323.5" y="352.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">critique</text><path d="M 408.4 348.0 L 417.0 348.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 415.0 344.0 L 421.0 348.0 L 415.0 352.0 Z" style="fill:var(--viz-axis);"/><rect x="422.0" y="332.0" width="112.7" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="478.4" y="352.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">apprentissage</text><path d="M 536.7 348.0 L 545.3 348.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 543.3 344.0 L 549.3 348.0 L 543.3 352.0 Z" style="fill:var(--viz-axis);"/><rect x="550.3" y="332.0" width="116.2" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="608.4" y="352.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">ex&eacute;cution</text><path d="M 668.6 348.0 L 677.2 348.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 675.2 344.0 L 681.2 348.0 L 675.2 352.0 Z" style="fill:var(--viz-axis);"/><rect x="682.2" y="332.0" width="65.8" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="715.1" y="352.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">action</text><text x="142.9" y="378.0" style="fill:var(--color-muted);font-size:11.0px;font-family:inherit;">la fonction d'agent elle-m&ecirc;me est modifi&eacute;e par l'exp&eacute;rience</text><text x="12" y="444" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">Chaque ligne ajoute une bo&icirc;te &agrave; la pr&eacute;c&eacute;dente : la m&eacute;moire, puis le but, puis la gradation, puis l'apprentissage.</text></svg>
+<figcaption class="viz-caption"><strong>Figure 2.2.</strong> Chaque architecture ajoute une bo&icirc;te &agrave; la pr&eacute;c&eacute;dente. Aucune n'est meilleure dans l'absolu : la bonne architecture est la plus simple qui suffise &agrave; l'environnement. Un thermostat r&eacute;flexe est parfaitement rationnel dans son environnement, et lui ajouter un mod&egrave;le du monde ne l'am&eacute;liorerait pas.</figcaption></figure>
+
+<h3>Agent r&eacute;flexe simple</h3>
+<p>Il applique des r&egrave;gles condition-action &agrave; la perception courante, sans aucune m&eacute;moire.</p>
+<div class="algo"><div class="algo-cap">Algorithme 2.1 &mdash; Agent r&eacute;flexe simple</div><div class="algo-io"><b>Entr&eacute;e :</b> un percept \(p \in P\), une liste de r&egrave;gles condition-action<br><b>Sortie :</b> une action \(a \in A\)</div><ol class="algo-corps"><li><b class="kw">fonction</b> <span class="fn">AgentReflexe</span>\((p)\)</li><li class="n1">\(e \leftarrow \mathrm{Interpreter}(p)\)          <span class="cm">// aucune memoire : e ne depend que de p</span></li><li class="n1">\(r \leftarrow\) premi&egrave;re r&egrave;gle dont la condition est satisfaite par \(e\)</li><li class="n1"><b class="kw">retourner</b> \(\mathrm{action}(r)\)</li></ol><p class="algo-note">Aucune variable ne survit d'un appel &agrave; l'autre : la fonction d'agent se factorise en \(f = \mathrm{action} \circ r \circ \mathrm{Interpreter}\), donc deux perceptions &eacute;gales donnent la m&ecirc;me action, quel que soit l'historique.</p></div>
+<p>Sa limite est structurelle et non technique : si l'environnement est partiellement observable, deux &eacute;tats du monde diff&eacute;rents peuvent produire la m&ecirc;me perception, et l'agent leur r&eacute;pondra identiquement. Il ne peut pas non plus sortir d'une boucle, faute de savoir qu'il y est d&eacute;j&agrave; pass&eacute;.</p>
+
+<h3>Agent r&eacute;flexe &agrave; &eacute;tat interne</h3>
+<p>Il maintient une repr&eacute;sentation de la partie du monde qu'il ne per&ccedil;oit pas directement.</p>
+<div class="algo"><div class="algo-cap">Algorithme 2.2 &mdash; Agent r&eacute;flexe &agrave; &eacute;tat interne</div><div class="algo-io"><b>Entr&eacute;e :</b> un percept \(p_t\), l'&eacute;tat \(e_{t-1}\), la derni&egrave;re action \(a_{t-1}\), un mod&egrave;le de transition \(\tau\) et un mod&egrave;le de capteur<br><b>Sortie :</b> une action \(a_t\) ; l'&eacute;tat \(e_t\) est conserv&eacute; entre les appels</div><ol class="algo-corps"><li><b class="kw">fonction</b> <span class="fn">AgentAEtat</span>\((p_t)\)</li><li class="n1">\(e_t \leftarrow\) <span class="fn">MajEtat</span>\((e_{t-1},\ a_{t-1},\ p_t)\)</li><li class="n1">\(r \leftarrow\) premi&egrave;re r&egrave;gle dont la condition est satisfaite par \(e_t\)</li><li class="n1">\(a_t \leftarrow \mathrm{action}(r)\) ; <b class="kw">retourner</b> \(a_t\)</li><li>&nbsp;</li><li><b class="kw">fonction</b> <span class="fn">MajEtat</span>\((e,\ a,\ p)\)</li><li class="n1">\(\tilde{e} \leftarrow \tau(e,\ a)\)          <span class="cm">// prediction : effet de l action et evolution propre</span></li><li class="n1"><b class="kw">retourner</b> \(\tilde{e} \sqcap p\)          <span class="cm">// correction par ce que le percept revele</span></li></ol><p class="algo-note">Deux mod&egrave;les distincts sont n&eacute;cessaires : comment le monde &eacute;volue seul, et ce que fait l'action de l'agent. Les confondre produit un agent qui s'attribue les changements dus &agrave; autrui.</p></div>
+
+<h3>Agent &agrave; but, agent &agrave; utilit&eacute;</h3>
+<p>L'agent &agrave; but conna&icirc;t en plus un ensemble d'&eacute;tats souhaitables, et choisit ses actions en fonction de leurs cons&eacute;quences : c'est exactement le probl&egrave;me du chapitre 3. L'agent &agrave; utilit&eacute; va plus loin. Un but est binaire &mdash; atteint ou non &mdash; ce qui ne permet ni d'arbitrer entre deux buts incompatibles, ni de comparer deux fa&ccedil;ons d'atteindre le m&ecirc;me but, ni de d&eacute;cider quand le succ&egrave;s est incertain. Une fonction d'utilit&eacute; \(U : S \to \mathbb{R}\) r&eacute;sout les trois cas &agrave; la fois.</p>
+<div class="algo"><div class="algo-cap">Algorithme 2.3 &mdash; Agent &agrave; utilit&eacute; esp&eacute;r&eacute;e</div><div class="algo-io"><b>Entr&eacute;e :</b> un percept \(p_t\), une utilit&eacute; \(U : S \to \mathbb{R}\), un mod&egrave;le \(P(s' \mid s, a)\)<br><b>Sortie :</b> l'action maximisant l'esp&eacute;rance d'utilit&eacute;</div><ol class="algo-corps"><li>\(e_t \leftarrow\) <span class="fn">MajEtat</span>\((e_{t-1},\ a_{t-1},\ p_t)\)</li><li><b class="kw">pour tout</b> \(a \in A(e_t)\) <b class="kw">faire</b></li><li class="n1">\(\displaystyle \mathrm{EU}(a) \leftarrow \sum_{s' \in S} P(s' \mid e_t, a)\ U(s')\)</li><li>\(a_t \leftarrow \operatorname*{argmax}_{a \in A(e_t)} \mathrm{EU}(a)\)</li><li><b class="kw">retourner</b> \(a_t\)</li></ol><p class="algo-note">C'est la d&eacute;finition op&eacute;ratoire de la rationalit&eacute; retenue dans ce manuel. Le th&eacute;or&egrave;me de von Neumann et Morgenstern &eacute;tablit que, sous quatre axiomes de coh&eacute;rence, toute pr&eacute;f&eacute;rence rationnelle s'&eacute;crit ainsi, avec \(U\) unique &agrave; une transformation affine croissante pr&egrave;s.</p></div>
+
+<div class="box thm"><div class="box-title">Th&eacute;or&egrave;me &mdash; Existence d'une fonction d'utilit&eacute;</div>
+<p>Si les pr&eacute;f&eacute;rences d'un agent sur les loteries satisfont les axiomes de compl&eacute;tude, de transitivit&eacute;, de continuit&eacute; et d'ind&eacute;pendance, alors il existe une fonction \(U\) &agrave; valeurs r&eacute;elles, unique &agrave; une transformation affine croissante pr&egrave;s, telle que l'agent pr&eacute;f&egrave;re la loterie \(L_1\) &agrave; la loterie \(L_2\) si et seulement si \(\mathbb{E}_{L_1}[U] \gt \mathbb{E}_{L_2}[U]\) <a class="cite" href="#ref-vonneumann1944">[1]</a>.</p>
+<p>Autrement dit : agir rationnellement, c'est maximiser une esp&eacute;rance d'utilit&eacute; &mdash; non par choix de mod&eacute;lisation, mais par cons&eacute;quence de quatre exigences de coh&eacute;rence. La contrapos&eacute;e est tout aussi utile : un agent dont les pr&eacute;f&eacute;rences violent ces axiomes peut &ecirc;tre amen&eacute; &agrave; accepter une suite de paris dont il ressort perdant &agrave; coup s&ucirc;r.</p></div>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Le premier curseur choisit l'architecture, le second avance dans le temps. Les cases rouges sont sales, la trace pointill&eacute;e est le trajet parcouru.</p>
+<div id="jxg1" class="viz-board" style="height:520px;"></div>
+<p class="viz-caption"><strong>Figure 2.3.</strong> Un monde de 10 par 4 cases, dix saliss&eacute;es au d&eacute;part, quarante &eacute;tapes. L'agent r&eacute;flexe simple ne quitte jamais sa ligne : sans m&eacute;moire, il ne peut pas savoir qu'il a d&eacute;j&agrave; explor&eacute; quelque chose, et il fait rebondir sa trajectoire ind&eacute;finiment entre les deux murs. L'agent &agrave; &eacute;tat interne balaie tout en serpentin, mais paie chaque case travers&eacute;e. L'agent &agrave; but va droit &agrave; la salet&eacute; la plus proche.</p></div>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">L'&eacute;paisseur du trait et l'opacit&eacute; des barres suivent l'architecture choisie au premier curseur de la figure pr&eacute;c&eacute;dente ; le point mobile suit le curseur d'&eacute;tape.</p>
+<div id="jxg2" class="viz-board" style="height:440px;"></div>
+<p class="viz-caption"><strong>Figure 2.4.</strong> Trois lectures superpos&eacute;es. En haut, le score cumul&eacute; : le r&eacute;flexe simple plonge &agrave; \(-44\), car il d&eacute;pense sans nettoyer. En bas, la d&eacute;composition de chaque score en gains et en d&eacute;penses, avec le d&eacute;tail chiffr&eacute;. Le r&eacute;sultat le plus instructif est le dernier : l'agent &agrave; utilit&eacute; ne fait que 20 d&eacute;placements contre 20 pour l'agent &agrave; but, mais renonce &agrave; deux salet&eacute;s lointaines, et termine deux points derri&egrave;re. Il applique pourtant une r&egrave;gle de rentabilit&eacute; correcte &mdash; mais <em>salet&eacute; par salet&eacute;</em> : il ne voit pas qu'une fois sur place, la seconde ne co&ucirc;te presque rien. Une utilit&eacute; myope n'est pas une utilit&eacute; optimale ; il faudrait &eacute;valuer des <em>plans</em>, ce que fait le chapitre 12.</p></div>
+
+<h2>2.5 L'agent apprenant</h2>
+
+<p>Les quatre architectures pr&eacute;c&eacute;dentes supposent que le concepteur sait &eacute;crire les r&egrave;gles, le mod&egrave;le du monde ou la fonction d'utilit&eacute;. Turing le notait d&eacute;j&agrave; en 1950 : programmer &agrave; la main un syst&egrave;me de niveau humain demanderait un travail d&eacute;raisonnable, et il vaut mieux construire une machine qui apprend <a class="cite" href="#ref-turing1950">[2]</a>.</p>
+
+<div class="box def"><div class="box-title">Les quatre composants d'un agent apprenant</div>
+<ul>
+<li>L'<strong>&eacute;l&eacute;ment d'ex&eacute;cution</strong> : ce qui, jusqu'ici, constituait l'agent tout entier.</li>
+<li>La <strong>critique</strong> : elle observe et dit &agrave; l'&eacute;l&eacute;ment d'apprentissage comment l'agent se comporte au regard d'un standard fixe. Ce standard doit &ecirc;tre <em>ext&eacute;rieur</em> &agrave; l'agent, sinon celui-ci l'ajusterait &agrave; ses propres performances.</li>
+<li>L'<strong>&eacute;l&eacute;ment d'apprentissage</strong> : il modifie l'&eacute;l&eacute;ment d'ex&eacute;cution &agrave; partir des retours de la critique.</li>
+<li>Le <strong>g&eacute;n&eacute;rateur de probl&egrave;mes</strong> : il propose des actions exploratoires, dont l'int&eacute;r&ecirc;t n'est pas imm&eacute;diat mais informatif. Sans lui, l'agent reste enferm&eacute; dans ce qu'il sait d&eacute;j&agrave; faire.</li>
+</ul></div>
+
+<p>Ce dernier composant est le moins intuitif et le plus important. Un agent qui ne joue que ses meilleurs coups connus n'apprend jamais qu'un autre coup &eacute;tait meilleur. Ce compromis entre exploiter et explorer traverse tout le manuel : il appara&icirc;t d&eacute;j&agrave; dans la recherche par &eacute;chantillonnage du chapitre 5, et il est le sujet central du chapitre 12.</p>
+
+<h2>2.6 Une derni&egrave;re honn&ecirc;tet&eacute; : la rationalit&eacute; calculatoire</h2>
+
+<p>La d&eacute;finition de la rationalit&eacute; donn&eacute;e plus haut ignore le temps de calcul. Or d&eacute;lib&eacute;rer prend du temps, et dans un environnement dynamique, l'action optimale calcul&eacute;e trop tard peut &ecirc;tre pire qu'une action m&eacute;diocre choisie tout de suite. Simon a nomm&eacute; <em>rationalit&eacute; limit&eacute;e</em> le comportement d'un agent qui se contente d'une solution satisfaisante faute de pouvoir calculer l'optimale <a class="cite" href="#ref-simon1955">[3]</a>.</p>
+
+<div class="box thm"><div class="box-title">Rationalit&eacute; calculatoire</div>
+<p>La notion pertinente pour un agent r&eacute;el n'est pas &laquo; quelle action est optimale ? &raquo; mais &laquo; quel programme, ex&eacute;cutable sur cette machine, produit le meilleur comportement moyen ? &raquo;. Formellement, on ne cherche plus la fonction d'agent optimale mais le <strong>programme</strong> optimal parmi ceux que l'architecture peut ex&eacute;cuter <a class="cite" href="#ref-russell1995">[4]</a>. Ce d&eacute;placement justifie a posteriori tout ce que fait ce manuel : chercher des heuristiques, tronquer des arbres, approcher des solutions.</p></div>
+
+<h2>Synth&egrave;se</h2>
+<ul>
+<li>Un agent est d&eacute;crit de l'ext&eacute;rieur par une fonction \(P^{*} \to A\), et de l'int&eacute;rieur par un programme fini : tout l'&eacute;cart entre les deux est de l'ing&eacute;nierie.</li>
+<li>Rationnel signifie &laquo; maximise la performance <em>attendue</em> &raquo;, ce qui n'est ni l'omniscience ni la perfection, et impose de collecter de l'information et d'apprendre.</li>
+<li>La mesure de performance porte sur l'environnement, jamais sur l'agent ; mal la poser, c'est obtenir exactement ce qu'on a demand&eacute; et non ce qu'on voulait.</li>
+<li>Six propri&eacute;t&eacute;s ind&eacute;pendantes caract&eacute;risent un environnement et dictent l'architecture n&eacute;cessaire.</li>
+<li>Sous quatre axiomes de coh&eacute;rence, agir rationnellement &eacute;quivaut &agrave; maximiser une esp&eacute;rance d'utilit&eacute; <a class="cite" href="#ref-vonneumann1944">[1]</a>.</li>
+<li>Le temps de calcul fait partie du probl&egrave;me : la bonne question est celle du meilleur programme, pas de la meilleure action <a class="cite" href="#ref-russell1995">[4]</a>.</li>
+</ul>
+
+<h2>R&eacute;f&eacute;rences</h2>
+<ol class="reflist">
+<li id="ref-vonneumann1944">von Neumann, J. &amp; Morgenstern, O. (1944). <em>Theory of Games and Economic Behavior</em>. Princeton University Press. DOI&nbsp;: 10.1515/9781400829460. <a href="https://doi.org/10.1515/9781400829460">https://doi.org/10.1515/9781400829460</a></li>
+<li id="ref-turing1950">Turing, A. M. (1950). Computing machinery and intelligence. <em>Mind</em>, LIX(236), 433&ndash;460. DOI&nbsp;: 10.1093/mind/LIX.236.433. <a href="https://doi.org/10.1093/mind/LIX.236.433">https://doi.org/10.1093/mind/LIX.236.433</a></li>
+<li id="ref-simon1955">Simon, H. A. (1955). A behavioral model of rational choice. <em>The Quarterly Journal of Economics</em>, 69(1), 99&ndash;118. DOI&nbsp;: 10.2307/1884852. <a href="https://doi.org/10.2307/1884852">https://doi.org/10.2307/1884852</a></li>
+<li id="ref-russell1995">Russell, S. J. &amp; Subramanian, D. (1995). Provably bounded-optimal agents. <em>Journal of Artificial Intelligence Research</em>, 2, 575&ndash;609. DOI&nbsp;: 10.1613/jair.133. <a href="https://doi.org/10.1613/jair.133">https://doi.org/10.1613/jair.133</a></li>
+<li id="ref-wooldridge2009">Wooldridge, M. (2009). <em>An Introduction to MultiAgent Systems</em> (2<sup>e</sup> &eacute;dition). Wiley. ISBN 978-0-470-51946-2. <a href="https://archive.org/details/introductiontomu0000wool">https://archive.org/details/introductiontomu0000wool</a></li>
+</ol>
+<p>La caract&eacute;risation des environnements suivant plusieurs agents, coop&eacute;ratifs ou comp&eacute;titifs, est d&eacute;velopp&eacute;e en d&eacute;tail par Wooldridge <a class="cite" href="#ref-wooldridge2009">[5]</a> ; ce manuel n'en retient que le cas comp&eacute;titif &agrave; deux joueurs, au chapitre 5.</p>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../01-qu-est-ce-que-l-ia/page.html">\(\leftarrow\) Chapitre 1 &mdash; Qu'est-ce que l'IA ?</a>
+<a href="algorithms.html">Annexe algorithmique</a>
+<a href="../../index.html">Sommaire du manuel</a>
+<a href="../03-recherche/page.html">Chapitre 3 &mdash; Recherche dans un espace d&#39;&eacute;tats \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">La figure interactive n\'a pas pu etre chargee. Verifiez votre connexion reseau.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ============ Monde de l'aspirateur : quatre architectures d'agent ======== */
+var LARG = 10, HAUT = 4;
+var TYPES = ['reflexe simple', 'reflexe a etat', 'agent a but', 'agent a utilite'];
+var DESCR = [
+ 'Ne regarde que la case courante et n’a aucune memoire. Aspire si c’est sale, sinon avance ; arrive au mur, il repart en sens inverse — et ne quitte donc jamais sa ligne.',
+ 'Se souvient des cases visitees et les balaie en serpentin : il ne repasse jamais deux fois au meme endroit.',
+ 'Se donne pour but la case sale connue la plus proche et s’y rend en ligne brisee la plus courte.',
+ 'Comme l’agent a but, mais chaque deplacement coute 2 et chaque aspiration rapporte 10 : il renonce a une salete distante de 5 cases ou plus, dont le trajet couterait plus qu’il ne rapporte.'
+];
+/* Disposition initiale, fixee pour rendre la figure reproductible. */
+var SALE0 = ['0,0','2,0','1,1','2,1','0,2','2,2','1,3','3,3','9,0','9,3'];
+
+function cle(x, y){ return x + ',' + y; }
+
+function simuler(type, nEtapes){
+  var sale = {}, i;
+  for (i = 0; i < SALE0.length; i++){ sale[SALE0[i]] = true; }
+  var x = 0, y = 0, dir = 1, vus = {}, score = 0, deplacements = 0, aspirations = 0;
+  var etats = [{x:x, y:y, sale:copier(sale), score:score, action:'depart'}];
+  for (var t = 0; t < nEtapes; t++){
+    var action;
+    if (sale[cle(x, y)]){
+      delete sale[cle(x, y)];
+      score += 10; aspirations++;
+      action = 'aspire';
+    } else {
+      vus[cle(x, y)] = true;
+      var cible = null;
+      if (type === 0){
+        if (x + dir < 0 || x + dir >= LARG) { dir = -dir; }   /* aucune memoire : il rebondit */
+        else { x += dir; }
+        action = 'avance';
+      } else if (type === 1){
+        /* serpentin : parcours systematique */
+        if (x + dir < 0 || x + dir >= LARG){ dir = -dir; y = y + 1; if (y >= HAUT) { y = 0; } }
+        else { x += dir; }
+        action = 'balaie';
+      } else {
+        cible = plusProche(sale, x, y, type === 3);
+        if (cible === null){ action = 'inactif'; }
+        else {
+          if (cible[0] !== x) { x += (cible[0] > x) ? 1 : -1; }
+          else if (cible[1] !== y) { y += (cible[1] > y) ? 1 : -1; }
+          action = 'se dirige vers ' + cle(cible[0], cible[1]);
+        }
+      }
+      if (action !== 'inactif'){ score -= 2; deplacements++; }
+    }
+    etats.push({x:x, y:y, sale:copier(sale), score:score, action:action});
+  }
+  return {etats:etats, deplacements:deplacements, aspirations:aspirations, score:score};
+}
+function copier(o){ var r = {}; for (var k in o){ r[k] = o[k]; } return r; }
+function plusProche(sale, x, y, rentable){
+  var best = null, bestd = 1e9;
+  for (var k in sale){
+    var p = k.split(','), d = Math.abs(+p[0] - x) + Math.abs(+p[1] - y);
+    if (rentable && 2 * d >= 10) { continue; }   /* le trajet couterait plus qu il ne rapporte */
+    if (d < bestd){ bestd = d; best = [+p[0], +p[1]]; }
+  }
+  return best;
+}
+var CACHE = {};
+function sim(type){
+  if (!(type in CACHE)) { CACHE[type] = simuler(type, 40); }
+  return CACHE[type];
+}
+
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-1.6, 6.8, 11.6, -2.8], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: true
+});
+var sType = b1.create('slider', [[-1.4, -1.6], [4.0, -1.6], [0, 0, 3]], {
+  name: 'agent', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sPas = b1.create('slider', [[5.8, -1.6], [11.4, -1.6], [0, 0, 40]], {
+  name: 'etape', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function typeCourant(){ return Math.round(sType.Value()); }
+function etatCourant(){
+  var s = sim(typeCourant());
+  return s.etats[Math.min(Math.round(sPas.Value()), s.etats.length - 1)];
+}
+var cGrille = b1.create('curve', [[0],[0]], {strokeColor: PAL.ref, strokeWidth: 1,
+  highlight: false, fixed: true});
+(function(){
+  var X = [], Y = [];
+  for (var i = 0; i <= LARG; i++){ X.push(i, i, NaN); Y.push(0, HAUT, NaN); }
+  for (var j = 0; j <= HAUT; j++){ X.push(0, LARG, NaN); Y.push(j, j, NaN); }
+  cGrille.dataX = X; cGrille.dataY = Y;
+})();
+var cSale = b1.create('curve', [[0],[0]], {strokeWidth: 0,
+  fillColor: function(){ return cssv('--viz-bad', '#dc2626'); }, fillOpacity: 0.30,
+  highlight: false, fixed: true});
+cSale.updateDataArray = function(){
+  var e = etatCourant(), X = [], Y = [];
+  for (var k in e.sale){
+    var p = k.split(','), x = +p[0], y = +p[1];
+    X.push(x + 0.08, x + 0.92, x + 0.92, x + 0.08, x + 0.08, NaN);
+    Y.push(y + 0.08, y + 0.08, y + 0.92, y + 0.92, y + 0.08, NaN);
+  }
+  this.dataX = X; this.dataY = Y;
+};
+var cTrace = b1.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--viz-blue', '#2563eb'); }, strokeWidth: 2,
+  dash: 1, highlight: false, fixed: true});
+cTrace.updateDataArray = function(){
+  var s = sim(typeCourant()), n = Math.min(Math.round(sPas.Value()), s.etats.length - 1);
+  var X = [], Y = [];
+  for (var i = 0; i <= n; i++){ X.push(s.etats[i].x + 0.5); Y.push(s.etats[i].y + 0.5); }
+  this.dataX = X; this.dataY = Y;
+};
+b1.create('point', [function(){ return etatCourant().x + 0.5; },
+                    function(){ return etatCourant().y + 0.5; }], {
+  name: '', size: 10, face: 'o', fixed: true, highlight: false, strokeWidth: 2.5,
+  strokeColor: function(){ return cssv('--primary-dark', '#014a55'); },
+  fillColor: function(){ return cssv('--primary', '#026573'); }, fillOpacity: 1});
+b1.create('text', [-1.5, 6.4, function(){
+  var e = etatCourant(), n = 0;
+  for (var k in e.sale){ n++; }
+  return 'Agent : ' + TYPES[typeCourant()] + '   |   etape ' + Math.min(Math.round(sPas.Value()), 40)
+       + '   |   cases sales restantes : ' + n + '   |   score : ' + e.score;
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-1.5, 5.9, function(){ return DESCR[typeCourant()]; }],
+  {fontSize: 12.5, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-1.5, 5.3, function(){ return 'Derniere action : ' + etatCourant().action; }],
+  {fontSize: 13, strokeColor: function(){ return cssv('--primary','#026573'); },
+   fixed: true, highlight: false});
+b1.create('text', [-1.5, -2.4, function(){
+  var s = sim(typeCourant());
+  return 'Apres 40 etapes : ' + s.aspirations + ' aspirations, ' + s.deplacements
+       + ' deplacements, score final ' + s.score + ' sur ' + (SALE0.length * 10) + ' possibles.';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+/* ====== Figure 2.4 : d'ou vient le score de chaque architecture ========== */
+/* Trois lectures superposees : la trajectoire du score, la decomposition
+   gains / depenses, et le classement final. */
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-13, 118, 46, -46], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var COULA = ['--viz-bad', '--viz-blue', '--accent', '--primary'];
+
+/* --- reperes */
+b2.create('segment', [[0, 0], [40, 0]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b2.create('segment', [[0, -46], [0, 108]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b2.create('segment', [[0, 100], [40, 100]], {
+  strokeColor: function(){ return cssv('--viz-ok', '#16a34a'); },
+  strokeWidth: 1.8, dash: 2, straightFirst: false, straightLast: false,
+  highlight: false, fixed: true});
+b2.create('text', [40.6, 100, 'tout nettoye : 100'], {fontSize: 11.5, anchorX: 'left',
+  strokeColor: function(){ return cssv('--viz-ok', '#16a34a'); }, fixed: true, highlight: false});
+for (var v = 10; v <= 40; v += 10){
+  (function(k){ b2.create('text', [k, -6, String(k)], {fontSize: 11, anchorX: 'middle',
+    strokeColor: PAL.muted, fixed: true, highlight: false}); })(v);
+}
+for (var v = -40; v <= 100; v += 20){
+  (function(k){
+    if (k === 0) { return; }
+    b2.create('segment', [[-0.7, k], [0.7, k]], {strokeColor: PAL.axis, strokeWidth: 1,
+      straightFirst: false, straightLast: false, highlight: false, fixed: true});
+    b2.create('text', [-1.6, k, String(k)], {fontSize: 10.5, anchorX: 'right',
+      strokeColor: PAL.muted, fixed: true, highlight: false});
+  })(v);
+}
+b2.create('text', [20, -12, 'nombre d’etapes ecoulees'], {fontSize: 12.5, anchorX: 'middle',
+  strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-11.5, 54, 'score'], {fontSize: 12.5, anchorX: 'middle',
+  strokeColor: PAL.muted, fixed: true, highlight: false});
+
+/* --- trajectoires, celle de l architecture choisie en epaisseur */
+for (var i = 0; i < 4; i++){
+  (function(t){
+    var c = b2.create('curve', [[0],[0]], {
+      strokeColor: function(){ return cssv(COULA[t], '#026573'); },
+      strokeWidth: function(){ return typeCourant() === t ? 4.5 : 1.8; },
+      highlight: false, fixed: true});
+    c.updateDataArray = function(){
+      var s = sim(t), X = [], Y = [];
+      for (var k = 0; k < s.etats.length; k++){ X.push(k); Y.push(s.etats[k].score); }
+      this.dataX = X; this.dataY = Y;
+    };
+    /* point mobile suivant le curseur d etape de la figure precedente */
+    b2.create('point', [
+      function(){ return Math.min(Math.round(sPas.Value()), 40); },
+      function(){ var s = sim(t);
+                  return s.etats[Math.min(Math.round(sPas.Value()), s.etats.length - 1)].score; }
+    ], {name: '', size: function(){ return typeCourant() === t ? 5 : 3; },
+        face: 'o', fixed: true, highlight: false, strokeWidth: 1.5,
+        strokeColor: function(){ return cssv(COULA[t], '#026573'); },
+        fillColor: function(){ return cssv(COULA[t], '#026573'); }, fillOpacity: 1});
+    /* etiquette au bout de la courbe */
+    b2.create('text', [40.6, function(){ return sim(t).score; }, TYPES[t]], {
+      fontSize: 12, anchorX: 'left', anchorY: 'middle', fixed: true, highlight: false,
+      strokeColor: function(){ return cssv(COULA[t], '#026573'); }});
+  })(i);
+}
+
+/* --- decomposition en barres : ce que chaque agent gagne et depense */
+for (var i = 0; i < 4; i++){
+  (function(t){
+    var x0 = 2 + t * 9.5;
+    b2.create('curve', [
+      function(){ var s = sim(t);
+        return [x0, x0 + 6, x0 + 6, x0, x0]; },
+      function(){ var s = sim(t), g = -6 - s.aspirations * 10 * 0.22;
+        return [-6, -6, g, g, -6]; }], {
+      strokeWidth: 0, highlight: false, fixed: true,
+      fillColor: function(){ return cssv('--viz-ok', '#16a34a'); },
+      fillOpacity: function(){ return typeCourant() === t ? 0.85 : 0.35; }});
+    b2.create('curve', [
+      function(){ var s = sim(t);
+        return [x0, x0 + 6, x0 + 6, x0, x0]; },
+      function(){ var s = sim(t), g = -6 - s.aspirations * 10 * 0.22;
+        var d = g - s.deplacements * 2 * 0.22;
+        return [g, g, d, d, g]; }], {
+      strokeWidth: 0, highlight: false, fixed: true,
+      fillColor: function(){ return cssv('--viz-bad', '#dc2626'); },
+      fillOpacity: function(){ return typeCourant() === t ? 0.85 : 0.35; }});
+    b2.create('text', [x0 + 3, function(){
+      var s = sim(t);
+      return -6 - (s.aspirations * 10 + s.deplacements * 2) * 0.22 - 5;
+    }, function(){
+      var s = sim(t);
+      return '+' + (s.aspirations * 10) + '  −' + (s.deplacements * 2) + '  =  ' + s.score;
+    }], {fontSize: 11, anchorX: 'middle', fixed: true, highlight: false,
+         strokeColor: function(){ return typeCourant() === t ? PAL.text() : PAL.muted(); }});
+  })(i);
+}
+b2.create('text', [-12.5, -8, 'gains'], {fontSize: 11, anchorX: 'left',
+  strokeColor: function(){ return cssv('--viz-ok', '#16a34a'); }, fixed: true, highlight: false});
+b2.create('text', [-12.5, -20, 'depenses'], {fontSize: 11, anchorX: 'left',
+  strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }, fixed: true, highlight: false});
+
+b2.create('text', [-12.5, 114, function(){
+  var r = [];
+  for (var t = 0; t < 4; t++){ r.push(TYPES[t] + ' ' + sim(t).score); }
+  return 'Score apres 40 etapes  -  ' + r.join('   |   ');
+}], {fontSize: 13, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-12.5, 106, function(){
+  var a = sim(2), b = sim(3);
+  return 'L’agent a but nettoie tout en ' + a.deplacements + ' deplacements ; l’agent a utilite '
+       + 'renonce a 2 saletes lointaines et n’en fait que ' + b.deplacements
+       + ', pour un score final pourtant inferieur de ' + (a.score - b.score) + '.';
+}], {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-12.5, -42,
+  'Chaque aspiration rapporte 10 points, chaque deplacement en coute 2. Les barres du bas decomposent le score final.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

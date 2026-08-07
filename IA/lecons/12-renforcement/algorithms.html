@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 12 &mdash; Annexe algorithmique</title>
+<meta name="description" content="Evaluation de politique, iteration sur les valeurs, Q-apprentissage.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head><body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Chapitre 12 &middot; Annexe</div>
+<h1>L'apprentissage par renforcement, pas &agrave; pas</h1>
+<div class="lesson-sub">Quatre proc&eacute;dures d&eacute;crites en fran&ccedil;ais, avec un exemple chiffr&eacute; v&eacute;rifiable de t&ecirc;te pour chacune.</div>
+</div></section>
+<main class="lesson-content">
+<div class="box tip"><div class="box-title">Comment lire cette annexe</div>Aucune ligne de programme, aucune formule inutile : chaque proc&eacute;dure est pr&eacute;sent&eacute;e comme on l'ex&eacute;cuterait &agrave; la main. <a href="page.html">Retour au chapitre</a>.</div>
+<div class="annex-toc">
+<a href="#l1">1. &Eacute;valuer une politique</a>
+<a href="#l2">2. It&eacute;ration sur les valeurs</a>
+<a href="#l3">3. Q-apprentissage</a>
+<a href="#l4">4. Exploration et exploitation</a>
+</div>
+<p>Les deux premi&egrave;res proc&eacute;dures supposent que l'on conna&icirc;t le monde ; les deux suivantes n'en supposent rien. Le passage de l'une &agrave; l'autre est le c&oelig;ur du chapitre : on remplace un calcul exact par une moyenne d'exp&eacute;riences, et une certitude par une garantie asymptotique.</p>
+<figure class="viz"><div class="viz-title">Le monde en grille, r&eacute;solu</div><svg viewBox="0 0 760 404" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Valeurs optimales et politique, pour un co&ucirc;t de \(-0{,}04\) par pas</text><rect x="200" y="240" width="92" height="92" style="fill:var(--viz-ok);fill-opacity:0.26;stroke:var(--viz-axis);stroke-width:1.5;"/><text x="246" y="282" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0.651</text><text x="246" y="310" text-anchor="middle" style="fill:var(--primary);font-size:19px;font-weight:700;font-family:inherit;">↑</text><rect x="200" y="148" width="92" height="92" style="fill:var(--viz-ok);fill-opacity:0.27;stroke:var(--viz-axis);stroke-width:1.5;"/><text x="246" y="190" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0.706</text><text x="246" y="218" text-anchor="middle" style="fill:var(--primary);font-size:19px;font-weight:700;font-family:inherit;">↑</text><rect x="200" y="56" width="92" height="92" style="fill:var(--viz-ok);fill-opacity:0.29;stroke:var(--viz-axis);stroke-width:1.5;"/><text x="246" y="98" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0.762</text><text x="246" y="126" text-anchor="middle" style="fill:var(--primary);font-size:19px;font-weight:700;font-family:inherit;">→</text><rect x="292" y="240" width="92" height="92" style="fill:var(--viz-ok);fill-opacity:0.27;stroke:var(--viz-axis);stroke-width:1.5;"/><text x="338" y="282" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0.702</text><text x="338" y="310" text-anchor="middle" style="fill:var(--primary);font-size:19px;font-weight:700;font-family:inherit;">←</text><rect x="292" y="148" width="92" height="92" style="fill:var(--color-muted);fill-opacity:0.55;stroke:var(--viz-axis);stroke-width:1.5;"/><rect x="292" y="56" width="92" height="92" style="fill:var(--viz-ok);fill-opacity:0.31;stroke:var(--viz-axis);stroke-width:1.5;"/><text x="338" y="98" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0.822</text><text x="338" y="126" text-anchor="middle" style="fill:var(--primary);font-size:19px;font-weight:700;font-family:inherit;">→</text><rect x="384" y="240" width="92" height="92" style="fill:var(--viz-ok);fill-opacity:0.29;stroke:var(--viz-axis);stroke-width:1.5;"/><text x="430" y="282" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0.757</text><text x="430" y="310" text-anchor="middle" style="fill:var(--primary);font-size:19px;font-weight:700;font-family:inherit;">←</text><rect x="384" y="148" width="92" height="92" style="fill:var(--viz-ok);fill-opacity:0.30;stroke:var(--viz-axis);stroke-width:1.5;"/><text x="430" y="190" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0.816</text><text x="430" y="218" text-anchor="middle" style="fill:var(--primary);font-size:19px;font-weight:700;font-family:inherit;">↑</text><rect x="384" y="56" width="92" height="92" style="fill:var(--viz-ok);fill-opacity:0.32;stroke:var(--viz-axis);stroke-width:1.5;"/><text x="430" y="98" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0.883</text><text x="430" y="126" text-anchor="middle" style="fill:var(--primary);font-size:19px;font-weight:700;font-family:inherit;">→</text><rect x="476" y="240" width="92" height="92" style="fill:var(--viz-ok);fill-opacity:0.27;stroke:var(--viz-axis);stroke-width:1.5;"/><text x="522" y="282" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">0.708</text><text x="522" y="310" text-anchor="middle" style="fill:var(--primary);font-size:19px;font-weight:700;font-family:inherit;">←</text><rect x="476" y="148" width="92" height="92" style="fill:var(--viz-bad);fill-opacity:0.30;stroke:var(--viz-bad);stroke-width:2.5;"/><text x="522" y="201" text-anchor="middle" style="fill:var(--viz-bad);font-size:20px;font-weight:700;font-family:inherit;">-1</text><rect x="476" y="56" width="92" height="92" style="fill:var(--viz-ok);fill-opacity:0.30;stroke:var(--viz-ok);stroke-width:2.5;"/><text x="522" y="109" text-anchor="middle" style="fill:var(--viz-ok);font-size:20px;font-weight:700;font-family:inherit;">+1</text><text x="180" y="296" text-anchor="end" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">d&eacute;part</text><text x="380" y="372" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Sous la case perdante, la politique pr&eacute;f&egrave;re aller &agrave; gauche : allonger le trajet co&ucirc;te moins cher que risquer une d&eacute;viation</text><text x="380" y="390" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">fatale.</text></svg><figcaption class="viz-caption"><strong>Figure A.1.</strong> Les valeurs optimales et la politique qu'elles d&eacute;terminent. Les deux premi&egrave;res proc&eacute;dures de cette annexe calculent ces nombres ; les deux suivantes les apprennent sans conna&icirc;tre le mod&egrave;le.</figcaption></figure>
+<h2 id="l1">1. &Eacute;valuer une politique donn&eacute;e</h2>
+<div class="algo-tag">m&eacute;thode it&eacute;rative &middot; le mod&egrave;le est connu</div>
+<p><strong>But.</strong> Calculer, pour chaque situation, le gain total que rapporte une fa&ccedil;on d'agir fix&eacute;e &agrave; l'avance.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : la liste des situations, l'action prescrite dans chacune, les probabilit&eacute;s d'arriver dans chaque situation suivante, les r&eacute;compenses, et un facteur d'actualisation strictement inf&eacute;rieur &agrave; un.<br>
+<strong>Sortie</strong> : la valeur de chaque situation sous cette fa&ccedil;on d'agir.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Mettre toutes les valeurs &agrave; z&eacute;ro</strong>, sauf celles des situations finales, qui valent leur r&eacute;compense.</li>
+<li><strong>Pour chaque situation non finale, recalculer sa valeur</strong> : la r&eacute;compense imm&eacute;diate, plus le facteur d'actualisation multipli&eacute; par la moyenne des valeurs des situations suivantes, pond&eacute;r&eacute;e par leurs probabilit&eacute;s.</li>
+<li><strong>Noter la plus grande variation</strong> observ&eacute;e sur l'ensemble des situations.</li>
+<li><strong>Recommencer</strong> tant que cette variation d&eacute;passe un seuil.</li>
+<li><strong>Ne pas se laisser troubler par la circularit&eacute; apparente</strong> : on calcule chaque valeur &agrave; partir de valeurs elles-m&ecirc;mes approximatives. Le facteur d'actualisation garantit que l'erreur se contracte &agrave; chaque tour.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Trois situations en ligne : A, B, et un but F qui rapporte 10. Depuis A on va en B, depuis B on va en F. Chaque pas co&ucirc;te 1, le facteur d'actualisation vaut 0,9, et les d&eacute;placements r&eacute;ussissent toujours.</p>
+<table><thead><tr><th>Tour</th><th>Valeur de A</th><th>Valeur de B</th><th>Variation maximale</th></tr></thead><tbody>
+<tr><td>0</td><td>0</td><td>0</td><td>&mdash;</td></tr>
+<tr><td>1</td><td>&minus;1 + 0,9 &times; 0 = &minus;1,00</td><td>&minus;1 + 0,9 &times; 10 = 8,00</td><td>8,00</td></tr>
+<tr><td>2</td><td>&minus;1 + 0,9 &times; 8 = 6,20</td><td>8,00</td><td>7,20</td></tr>
+<tr><td>3</td><td>6,20</td><td>8,00</td><td>0,00</td></tr>
+</tbody></table>
+<p>Deux tours suffisent, et l'on peut v&eacute;rifier &agrave; la main : depuis A, on paie 1 tout de suite, puis 0,9 fois (1 pay&eacute; en B, plus 0,9 fois 10 en F), soit \(-1 + 0{,}9 \times 8 = 6{,}2\). Notez l'ordre de propagation : l'information part du but et remonte d'une situation par tour. C'est pourquoi il faut au moins autant de tours que la distance au but.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> L'op&eacute;rateur appliqu&eacute; &agrave; chaque tour est une contraction de rapport &eacute;gal au facteur d'actualisation : deux estimations quelconques se rapprochent d'au moins ce facteur &agrave; chaque application. Le th&eacute;or&egrave;me du point fixe donne alors l'existence, l'unicit&eacute; et la convergence, quelle que soit l'initialisation.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> L'&eacute;cart &agrave; la solution est multipli&eacute; par le facteur d'actualisation &agrave; chaque tour : il devient inf&eacute;rieur &agrave; tout seuil en un nombre fini de tours. Avec un facteur de 0,9, dix tours divisent l'erreur par trois ; avec 0,99, il en faut environ cent.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Chaque tour co&ucirc;te le produit du nombre de situations par le nombre de situations suivantes possibles. Le nombre de tours cro&icirc;t quand le facteur d'actualisation se rapproche de un.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Prendre un facteur d'actualisation &eacute;gal &agrave; un sur un probl&egrave;me sans fin : la somme diverge et rien ne converge. Mettre &agrave; jour les valeurs sur place plut&ocirc;t que dans une copie, ce qui change le r&eacute;sultat interm&eacute;diaire &mdash; ce n'est pas toujours faux, mais il faut le savoir. Et s'arr&ecirc;ter trop t&ocirc;t quand le but est loin : l'information n'a pas eu le temps de remonter.</p>
+<h2 id="l2">2. L'it&eacute;ration sur les valeurs</h2>
+<div class="algo-tag">m&eacute;thode exacte &middot; trouve la meilleure fa&ccedil;on d'agir</div>
+<p><strong>But.</strong> Trouver la meilleure fa&ccedil;on d'agir, et pas seulement &eacute;valuer une fa&ccedil;on impos&eacute;e.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : la m&ecirc;me chose que pr&eacute;c&eacute;demment, mais avec <em>toutes</em> les actions possibles dans chaque situation.<br>
+<strong>Sortie</strong> : la valeur optimale de chaque situation, et l'action &agrave; y choisir.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Mettre toutes les valeurs &agrave; z&eacute;ro.</strong></li>
+<li><strong>Pour chaque situation, essayer toutes les actions</strong> et calculer, pour chacune, la moyenne des valeurs des situations o&ugrave; elle m&egrave;ne.</li>
+<li><strong>Retenir la meilleure</strong> et en faire la nouvelle valeur de la situation. C'est le seul changement par rapport &agrave; la proc&eacute;dure pr&eacute;c&eacute;dente : un maximum au lieu d'une action impos&eacute;e.</li>
+<li><strong>Recommencer</strong> jusqu'&agrave; ce que les valeurs cessent de bouger.</li>
+<li><strong>Lire enfin la fa&ccedil;on d'agir</strong> : dans chaque situation, l'action qui r&eacute;alisait le maximum. Il est inutile de la calculer avant la convergence, car elle peut changer d'un tour &agrave; l'autre.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Une situation A o&ugrave; deux actions sont possibles. L'action prudente m&egrave;ne s&ucirc;rement en B, de valeur 5. L'action risqu&eacute;e m&egrave;ne en C, de valeur 12, avec probabilit&eacute; 0,6, et en D, de valeur \(-4\), avec probabilit&eacute; 0,4. R&eacute;compense nulle, facteur d'actualisation 1.</p>
+<table><thead><tr><th>Action</th><th>Calcul</th><th>Valeur esp&eacute;r&eacute;e</th><th>Retenue ?</th></tr></thead><tbody>
+<tr><td>prudente</td><td>1,0 &times; 5</td><td>5,0</td><td>non</td></tr>
+<tr><td>risqu&eacute;e</td><td>0,6 &times; 12 + 0,4 &times; (&minus;4)</td><td><strong>5,6</strong></td><td><strong>oui</strong></td></tr>
+</tbody></table>
+<p>La valeur de A devient 5,6 et la fa&ccedil;on d'agir prescrit l'action risqu&eacute;e. Changez la probabilit&eacute; de succ&egrave;s &agrave; 0,5 : l'action risqu&eacute;e ne rapporte plus que 4, et la prudente l'emporte. Ce basculement est ce que la figure interactive du chapitre montre sur une grille enti&egrave;re, en faisant varier le co&ucirc;t par pas.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Le point fixe atteint est la fonction de valeur optimale, et la fa&ccedil;on d'agir qui la r&eacute;alise est optimale. La d&eacute;monstration est la m&ecirc;me que pr&eacute;c&eacute;demment : l'op&eacute;rateur avec maximum reste une contraction du m&ecirc;me rapport, car le maximum de deux fonctions ne s'&eacute;carte jamais plus que les fonctions elles-m&ecirc;mes.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> M&ecirc;me argument de contraction. En pratique on s'arr&ecirc;te sur un seuil, et l'on sait borner l'erreur sur la fa&ccedil;on d'agir &agrave; partir de l'erreur sur les valeurs.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Chaque tour co&ucirc;te le produit du nombre de situations, du nombre d'actions et du nombre de situations suivantes. C'est polynomial <em>en le nombre de situations</em>, ce qui est trompeur : ce nombre est lui-m&ecirc;me exponentiel en le nombre de variables qui d&eacute;crivent le monde.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Extraire la fa&ccedil;on d'agir avant la convergence. Oublier que les r&eacute;compenses d&eacute;finissent le probl&egrave;me : un co&ucirc;t par pas mal choisi donne une fa&ccedil;on d'agir absurde, mais parfaitement optimale au regard de ce qu'on a demand&eacute;. Et supposer que le mod&egrave;le est connu, alors qu'il ne l'est presque jamais : c'est l'objet de la proc&eacute;dure suivante.</p>
+<h2 id="l3">3. Le Q-apprentissage</h2>
+<div class="algo-tag">m&eacute;thode par essais &middot; le mod&egrave;le est inconnu</div>
+<p><strong>But.</strong> Apprendre &agrave; bien agir sans conna&icirc;tre ni les cons&eacute;quences des actions ni les r&eacute;compenses, uniquement en agissant et en observant ce qui arrive.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : la possibilit&eacute; d'agir dans le monde, un pas d'apprentissage, un taux d'exploration, un facteur d'actualisation.<br>
+<strong>Sortie</strong> : une table donnant, pour chaque situation et chaque action, le gain esp&eacute;r&eacute;.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Mettre toute la table &agrave; z&eacute;ro.</strong></li>
+<li><strong>Dans la situation courante, choisir une action</strong> : la meilleure connue la plupart du temps, une action au hasard de temps en temps. Sans ce hasard, l'agent ne d&eacute;couvrira jamais qu'une autre action &eacute;tait meilleure.</li>
+<li><strong>Ex&eacute;cuter l'action</strong> et observer la r&eacute;compense re&ccedil;ue et la nouvelle situation.</li>
+<li><strong>Calculer la cible</strong> : la r&eacute;compense observ&eacute;e, plus le facteur d'actualisation multipli&eacute; par la <em>meilleure</em> valeur connue dans la nouvelle situation &mdash; quelle que soit l'action que l'on jouera r&eacute;ellement ensuite.</li>
+<li><strong>Corriger l'entr&eacute;e de la table</strong> d'une fraction de l'&eacute;cart entre cette cible et ce qu'on croyait. Une fraction, pas la totalit&eacute; : une seule exp&eacute;rience est bruit&eacute;e.</li>
+<li><strong>Passer &agrave; la nouvelle situation</strong> et recommencer, jusqu'&agrave; la fin de l'&eacute;pisode, puis relancer un nouvel &eacute;pisode.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Une situation A, deux actions. La table vaut 0 partout. Pas d'apprentissage 0,5, facteur d'actualisation 0,9. On observe successivement quatre transitions depuis A par l'action 1.</p>
+<table><thead><tr><th>Essai</th><th>R&eacute;compense observ&eacute;e</th><th>Meilleure valeur en arriv&eacute;e</th><th>Cible</th><th>Ancienne valeur</th><th>Nouvelle valeur</th></tr></thead><tbody>
+<tr><td>1</td><td>0</td><td>0</td><td>0</td><td>0,000</td><td>0,000</td></tr>
+<tr><td>2</td><td>10</td><td>0</td><td>10,0</td><td>0,000</td><td>5,000</td></tr>
+<tr><td>3</td><td>0</td><td>5</td><td>4,5</td><td>5,000</td><td>4,750</td></tr>
+<tr><td>4</td><td>0</td><td>5</td><td>4,5</td><td>4,750</td><td>4,625</td></tr>
+</tbody></table>
+<p>Regardez l'essai 2 : une seule r&eacute;compense de 10 fait passer la valeur de 0 &agrave; 5, pas &agrave; 10. Le pas d'apprentissage amortit le bruit. Les essais suivants raffinent l'estimation. Avec un pas de 1, la table sauterait &agrave; 10 puis redescendrait brutalement : elle suivrait le bruit au lieu de la moyenne.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> Si chaque couple situation-action est visit&eacute; une infinit&eacute; de fois et si les pas d'apprentissage d&eacute;croissent convenablement &mdash; leur somme diverge, la somme de leurs carr&eacute;s converge &mdash; la table converge presque s&ucirc;rement vers les vraies valeurs optimales. Le point remarquable est que cette convergence a lieu <em>quelle que soit la fa&ccedil;on d'agir pendant l'apprentissage</em>, pourvu qu'elle explore assez.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> Aucune terminaison naturelle : on fixe un nombre d'&eacute;pisodes. La garantie th&eacute;orique porte sur une infinit&eacute; de visites, ce qui n'est jamais r&eacute;alis&eacute;.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Une mise &agrave; jour par action ex&eacute;cut&eacute;e, donc un co&ucirc;t d&eacute;risoire par pas. Le co&ucirc;t r&eacute;el est le <em>nombre d'interactions</em> avec le monde : des millions l&agrave; o&ugrave; un humain apprendrait en quelques dizaines d'essais. C'est la limite pratique principale.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Ne pas explorer du tout : l'agent r&eacute;p&egrave;te la premi&egrave;re strat&eacute;gie trouv&eacute;e et sa table reste fausse partout ailleurs. Explorer trop : le gain s'effondre. Un pas d'apprentissage &eacute;gal &agrave; un : la table suit le dernier &eacute;v&eacute;nement au lieu de moyenner. Et confondre le gain obtenu <em>pendant</em> l'apprentissage avec la qualit&eacute; de ce qui est <em>appris</em> : la figure du chapitre montre qu'ils s'opposent.</p>
+<h2 id="l4">4. Arbitrer entre explorer et exploiter</h2>
+<div class="algo-tag">r&egrave;gle de d&eacute;cision &middot; le dilemme central</div>
+<p><strong>But.</strong> D&eacute;cider, &agrave; chaque instant, s'il faut jouer ce que l'on croit &ecirc;tre le meilleur coup ou en essayer un autre pour apprendre.</p>
+<div class="box def"><div class="box-title">Entr&eacute;e / Sortie</div><p><strong>Entr&eacute;e</strong> : pour chaque action, le nombre de fois o&ugrave; elle a &eacute;t&eacute; essay&eacute;e et le gain moyen observ&eacute;.<br>
+<strong>Sortie</strong> : l'action &agrave; jouer maintenant.</p></div>
+<div class="algo-steps"><div class="algo-steps-title">&Eacute;tapes</div><ol>
+<li><strong>Premi&egrave;re strat&eacute;gie : jouer au hasard de temps en temps.</strong> Avec une petite probabilit&eacute;, choisir une action au hasard ; sinon, la meilleure connue. Simple et robuste ; on fait d&eacute;cro&icirc;tre cette probabilit&eacute; au fil du temps.</li>
+<li><strong>Deuxi&egrave;me strat&eacute;gie : &ecirc;tre optimiste au d&eacute;part.</strong> Initialiser toutes les valeurs &agrave; un niveau &eacute;lev&eacute;. Toute action non essay&eacute;e para&icirc;t alors excellente et sera essay&eacute;e ; la d&eacute;ception la fait redescendre. L'exploration se produit <em>sans aucun hasard</em>.</li>
+<li><strong>Troisi&egrave;me strat&eacute;gie : ajouter un bonus d'incertitude.</strong> &Agrave; chaque action, ajouter une quantit&eacute; qui d&eacute;cro&icirc;t avec le nombre de fois o&ugrave; on l'a essay&eacute;e. Une action mal connue devient attirante par sa seule m&eacute;connaissance.</li>
+<li><strong>Dans tous les cas, faire d&eacute;cro&icirc;tre l'exploration</strong> quand le temps d'apprentissage touche &agrave; sa fin : il faut alors exploiter.</li>
+<li><strong>Distinguer les deux mesures</strong> : le gain accumul&eacute; pendant l'apprentissage, et la qualit&eacute; de ce qui a &eacute;t&eacute; appris. Elles ne se maximisent pas ensemble.</li>
+</ol></div>
+<p><strong>D&eacute;roul&eacute;.</strong> Trois actions, apr&egrave;s cent essais au total. Le bonus est la racine carr&eacute;e du rapport entre le logarithme du nombre total d'essais et le nombre d'essais de l'action.</p>
+<table><thead><tr><th>Action</th><th>Essais</th><th>Gain moyen</th><th>Bonus d'incertitude</th><th>Score total</th><th>Choisie ?</th></tr></thead><tbody>
+<tr><td>A</td><td>70</td><td>0,600</td><td>0,256</td><td>0,856</td><td>non</td></tr>
+<tr><td>B</td><td>20</td><td>0,550</td><td>0,480</td><td>1,030</td><td>non</td></tr>
+<tr><td>C</td><td>10</td><td>0,400</td><td>0,679</td><td><strong>1,079</strong></td><td><strong>oui</strong></td></tr>
+</tbody></table>
+<p>On choisit l'action au plus <em>mauvais</em> gain observ&eacute;, parce qu'elle est aussi la plus mal connue : dix essais ne suffisent pas &agrave; conclure. Mais s'il fallait jouer pour de bon, sans plus rien apprendre, on jouerait A. Ces deux crit&egrave;res sont diff&eacute;rents et les confondre est l'erreur la plus fr&eacute;quente. C'est exactement la r&egrave;gle employ&eacute;e dans la recherche par &eacute;chantillonnage du chapitre 5.</p>
+<p><strong>Pourquoi la r&eacute;ponse est correcte.</strong> On d&eacute;montre que la strat&eacute;gie du bonus d'incertitude garantit un regret &mdash; l'&eacute;cart cumul&eacute; &agrave; la meilleure action fixe &mdash; qui cro&icirc;t seulement comme le logarithme du nombre d'essais. Aucune strat&eacute;gie ne peut faire mieux &agrave; un facteur constant pr&egrave;s. La strat&eacute;gie du hasard &agrave; taux fixe, elle, a un regret qui cro&icirc;t lin&eacute;airement : elle continue d'explorer pour rien.</p>
+<p><strong>Pourquoi &ccedil;a s'arr&ecirc;te.</strong> La proc&eacute;dure est une r&egrave;gle de choix, appel&eacute;e &agrave; chaque pas : elle ne se termine pas, elle est termin&eacute;e par ce qui l'appelle.</p>
+<p><strong>Ce que &ccedil;a co&ucirc;te.</strong> Un balayage des actions par d&eacute;cision, donc n&eacute;gligeable. Le co&ucirc;t r&eacute;el est celui des essais infructueux, et c'est pr&eacute;cis&eacute;ment ce que l'on cherche &agrave; limiter.</p>
+<p><strong>O&ugrave; &ccedil;a se casse.</strong> Une exploration constante qui ne d&eacute;cro&icirc;t jamais : l'agent gaspille &agrave; jamais une fraction fixe de ses actions. Une exploration nulle : l'agent se fige sur la premi&egrave;re strat&eacute;gie acceptable. L'optimisme initial sur un monde qui change au cours du temps : l'agent cesse d'explorer alors que le monde a boug&eacute;. Et surtout, explorer dans un monde o&ugrave; certaines actions sont irr&eacute;versibles ou dangereuses : aucune de ces strat&eacute;gies ne le prend en compte, et c'est l'une des difficult&eacute;s centrales du domaine.</p>
+<nav class="lesson-nav"><div class="container">
+<a href="page.html">&larr; Retour au chapitre 12</a>
+<a href="../../index.html">Sommaire du manuel</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+</body></html>

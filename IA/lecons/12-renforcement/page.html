@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 12 &mdash; Apprentissage par renforcement</title>
+<meta name="description" content="Processus markovien, Bellman, iteration sur les valeurs, Q-apprentissage.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Partie IV &middot; Chapitre 12</div>
+<h1>Chapitre 12 &mdash; Apprendre en agissant</h1>
+<div class="lesson-sub">Processus de d&eacute;cision markovien, &eacute;quation de Bellman, it&eacute;ration sur les valeurs, Q-apprentissage, exploration contre exploitation.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">Annexe compagnon</div><p>L'&eacute;valuation d'une politique, l'it&eacute;ration sur les valeurs, le Q-apprentissage et le choix entre exploration et exploitation sont d&eacute;taill&eacute;s <strong><a href="algorithms.html">pas &agrave; pas dans l'annexe</a></strong>.</p></div>
+
+<h2>12.1 Ni supervis&eacute;, ni non supervis&eacute;</h2>
+
+<p>L'apprentissage supervis&eacute; recevait la bonne r&eacute;ponse pour chaque entr&eacute;e. L'apprentissage non supervis&eacute; n'en recevait aucune. Le renforcement occupe une troisi&egrave;me place : l'agent re&ccedil;oit un signal chiffr&eacute; qui dit &agrave; quel point c'est bien, sans jamais dire ce qu'il aurait fallu faire.</p>
+
+<figure class="viz"><div class="viz-title">La boucle, avec r&eacute;compense</div>
+<svg viewBox="0 0 760 300" role="img" style="width:100%;height:auto;display:block;"><rect x="80" y="100" width="210" height="100" rx="10" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:2.5;"/><text x="185" y="140" text-anchor="middle" style="fill:var(--primary);font-size:15px;font-weight:700;font-family:inherit;">AGENT</text><text x="185" y="166" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">choisit \(a_t\)</text><rect x="470" y="100" width="210" height="100" rx="10" style="fill:var(--viz-ref);fill-opacity:0.45;stroke:var(--viz-axis);stroke-width:2.5;"/><text x="575" y="140" text-anchor="middle" style="fill:var(--color-text);font-size:15px;font-weight:700;font-family:inherit;">ENVIRONNEMENT</text><text x="575" y="166" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">transitions et r&eacute;compenses</text><path d="M 290 128 C 360 96, 400 96, 464 128" style="fill:none;stroke:var(--primary);stroke-width:3;"/><path d="M 456 118 L 472 128 L 454 136 Z" style="fill:var(--primary);"/><text x="378" y="90" text-anchor="middle" style="fill:var(--primary);font-size:13px;font-weight:700;font-family:inherit;">action \(a_t\)</text><path d="M 470 172 C 410 204, 370 204, 292 172" style="fill:none;stroke:var(--accent);stroke-width:3;"/><path d="M 306 164 L 288 172 L 306 182 Z" style="fill:var(--accent);"/><text x="378" y="228" text-anchor="middle" style="fill:var(--accent);font-size:13px;font-weight:700;font-family:inherit;">nouvel &eacute;tat \(s_{t+1}\) et r&eacute;compense \(r_{t+1}\)</text><text x="380" y="38" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">La boucle du chapitre 2, avec un signal en plus : la r&eacute;compense</text><text x="380" y="272" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">L'agent ne conna&icirc;t ni les transitions ni la fonction de r&eacute;compense : il ne voit que ce qui lui arrive.</text></svg>
+<figcaption class="viz-caption"><strong>Figure 12.1.</strong> C'est la boucle du chapitre 2, augment&eacute;e d'un signal scalaire. Trois difficult&eacute;s l'accompagnent : le retour est <em>&eacute;valuatif</em> et non instructif ; il est <em>diff&eacute;r&eacute;</em>, la r&eacute;compense d'un bon coup pouvant arriver cent pas plus tard ; et les donn&eacute;es d&eacute;pendent des actions choisies, ce qui rompt l'hypoth&egrave;se d'ind&eacute;pendance des chapitres 9 &agrave; 11.</figcaption></figure>
+
+<div class="box def"><div class="box-title">D&eacute;finition &mdash; Processus de d&eacute;cision markovien</div>
+<p>Un quintuplet \((S, A, T, R, \gamma)\) : un ensemble d'&eacute;tats, un ensemble d'actions, une fonction de transition \(T(s, a, s') = P(s' \mid s, a)\), une fonction de r&eacute;compense \(R\), et un facteur d'actualisation \(\gamma \in [0, 1[\).</p>
+<p>Une <strong>politique</strong> \(\pi : S \to A\) prescrit une action par &eacute;tat. Sa valeur est l'esp&eacute;rance de la somme actualis&eacute;e des r&eacute;compenses</p>
+<div class="eq">\[V^{\pi}(s) = \mathbb{E}\!\left[\sum_{t=0}^{\infty} \gamma^{t} R(s_t) \;\middle|\; s_0 = s, \pi\right]\]</div>
+<p>Le facteur \(\gamma\) n'est pas cosm&eacute;tique : il rend la somme finie sur un horizon infini, puisque \(\sum \gamma^{t} R_{\max} = R_{\max}/(1-\gamma)\). Il traduit aussi une pr&eacute;f&eacute;rence pour le pr&eacute;sent, exactement comme un taux d'actualisation en finance.</p></div>
+
+<h2>12.2 L'&eacute;quation de Bellman</h2>
+
+<div class="box thm"><div class="box-title">Th&eacute;or&egrave;me &mdash; &Eacute;quation d'optimalit&eacute; de Bellman</div>
+<p>La fonction de valeur optimale v&eacute;rifie, pour tout &eacute;tat \(s\),</p>
+<div class="eq">\[V^{*}(s) = R(s) + \gamma \max_{a \in A}\ \sum_{s'} T(s, a, s')\, V^{*}(s')\]</div>
+<p>et la politique optimale est celle qui r&eacute;alise ce maximum <a class="cite" href="#ref-bellman1957">[1]</a>.</p>
+<p>L'op&eacute;rateur \(B\) d&eacute;fini par le membre de droite est une <strong>contraction</strong> de rapport \(\gamma\) pour la norme du maximum : \(\lVert BV - BW \rVert_{\infty} \le \gamma\lVert V - W \rVert_{\infty}\). Le th&eacute;or&egrave;me du point fixe de Banach donne alors trois r&eacute;sultats d'un coup : la solution existe, elle est unique, et l'it&eacute;ration \(V \leftarrow BV\) converge vers elle g&eacute;om&eacute;triquement, quel que soit le point de d&eacute;part.</p></div>
+
+<div class="algo"><div class="algo-cap">Algorithme 12.1 &mdash; It&eacute;ration sur les valeurs</div><div class="algo-io"><b>Entr&eacute;e :</b> un processus \((S, A, T, R, \gamma)\) avec \(\gamma \in\ [0,1[\), un seuil \(\epsilon\)<br><b>Sortie :</b> \(V^{*}\) &agrave; \(\epsilon\) pr&egrave;s, et la politique optimale \(\pi^{*}\)</div><ol class="algo-corps"><li>\(V(s) \leftarrow 0\) <b class="kw">pour tout</b> \(s \in S\)</li><li><b class="kw">r&eacute;p&eacute;ter</b></li><li class="n1">\(\delta \leftarrow 0\)</li><li class="n1"><b class="kw">pour tout</b> \(s \in S\) non terminal <b class="kw">faire</b></li><li class="n2">\(\displaystyle V'(s) \leftarrow R(s) + \gamma \max_{a \in A}\ \sum_{s' \in S} T(s,a,s')\,V(s')\)</li><li class="n2">\(\delta \leftarrow \max\big(\delta,\ |V'(s) - V(s)|\big)\)</li><li class="n1">\(V \leftarrow V'\)</li><li><b class="kw">jusqu'&agrave;</b> \(\delta \lt \epsilon\)</li><li>\(\displaystyle \pi^{*}(s) \leftarrow \operatorname*{argmax}_{a \in A}\ \sum_{s'} T(s,a,s')\,V(s')\)</li><li><b class="kw">retourner</b> \((V,\ \pi^{*})\)</li></ol><p class="algo-note">L'op&eacute;rateur \(B\) d&eacute;fini par la ligne 5 v&eacute;rifie \(\lVert BV - BW\rVert_{\infty} \le \gamma \lVert V - W\rVert_{\infty}\) : c'est une contraction. Le th&eacute;or&egrave;me du point fixe de Banach donne existence, unicit&eacute; et convergence g&eacute;om&eacute;trique, quel que soit \(V\) initial. Extraire \(\pi^{*}\) avant la convergence est une erreur.</p></div>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Un monde de 4 par 3 cases avec un obstacle, une case gagnante et une case perdante. Les d&eacute;placements r&eacute;ussissent huit fois sur dix ; une fois sur dix l'agent d&eacute;vie &agrave; gauche, une fois sur dix &agrave; droite. Le premier curseur fixe la r&eacute;compense re&ccedil;ue &agrave; chaque pas.</p>
+<div id="jxg1" class="viz-board" style="height:520px;"></div>
+<p class="viz-caption"><strong>Figure 12.2.</strong> Avec un co&ucirc;t de \(-0{,}04\) par pas, la valeur de la case de d&eacute;part vaut 0,651 et la politique contourne prudemment la case perdante : depuis la case juste en dessous d'elle, l'agent pr&eacute;f&egrave;re aller &agrave; gauche, quitte &agrave; rallonger, plut&ocirc;t que de risquer une d&eacute;viation fatale. Poussez le co&ucirc;t &agrave; \(-2\) : l'agent se jette dans la case perdante pour abr&eacute;ger ses souffrances &mdash; c'est rationnel au regard de la r&eacute;compense qu'on lui a donn&eacute;e. Ramenez-le &agrave; 0 : plus rien ne presse, et la politique devient indiff&eacute;rente aux d&eacute;tours. <em>La fonction de r&eacute;compense n'est pas un d&eacute;tail de r&eacute;glage : c'est la sp&eacute;cification du probl&egrave;me.</em></p></div>
+
+<h2>12.3 Quand le mod&egrave;le est inconnu</h2>
+
+<p>L'it&eacute;ration sur les valeurs suppose de conna&icirc;tre \(T\) et \(R\). Un agent r&eacute;el ne les conna&icirc;t pas : il ne dispose que de ce qu'il vit. Trois familles de m&eacute;thodes r&eacute;pondent &agrave; cette situation.</p>
+
+<figure class="viz"><div class="viz-title">Trois fa&ccedil;ons d'estimer une valeur</div>
+<svg viewBox="0 0 760 364" role="img" style="width:100%;height:auto;display:block;"><rect x="20" y="56" width="228" height="196" rx="10" style="fill:var(--primary);fill-opacity:0.09;stroke:var(--primary);stroke-width:2.2;"/><text x="134" y="84" text-anchor="middle" style="fill:var(--primary);font-size:13.5px;font-weight:700;font-family:inherit;">Programmation dynamique</text><circle cx="44" cy="112" r="3.2" style="fill:var(--primary);"/><text x="58" y="116" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">le mod&egrave;le est connu</text><circle cx="44" cy="144" r="3.2" style="fill:var(--primary);"/><text x="58" y="148" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">aucune interaction n&eacute;cessaire</text><circle cx="44" cy="176" r="3.2" style="fill:var(--primary);"/><text x="58" y="180" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">balaie tous les &eacute;tats</text><circle cx="44" cy="208" r="3.2" style="fill:var(--primary);"/><text x="58" y="212" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">exact, mais irr&eacute;aliste</text><rect x="266" y="56" width="228" height="196" rx="10" style="fill:var(--accent);fill-opacity:0.09;stroke:var(--accent);stroke-width:2.2;"/><text x="380" y="84" text-anchor="middle" style="fill:var(--accent);font-size:13.5px;font-weight:700;font-family:inherit;">Monte-Carlo</text><circle cx="290" cy="112" r="3.2" style="fill:var(--accent);"/><text x="304" y="116" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">mod&egrave;le inconnu</text><circle cx="290" cy="144" r="3.2" style="fill:var(--accent);"/><text x="304" y="148" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">attend la fin de l'&eacute;pisode</text><circle cx="290" cy="176" r="3.2" style="fill:var(--accent);"/><text x="304" y="180" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">sans biais, tr&egrave;s variable</text><circle cx="290" cy="208" r="3.2" style="fill:var(--accent);"/><text x="304" y="212" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">exige des &eacute;pisodes finis</text><rect x="512" y="56" width="228" height="196" rx="10" style="fill:var(--viz-ok);fill-opacity:0.09;stroke:var(--viz-ok);stroke-width:2.2;"/><text x="626" y="84" text-anchor="middle" style="fill:var(--viz-ok);font-size:13.5px;font-weight:700;font-family:inherit;">Diff&eacute;rences temporelles</text><circle cx="536" cy="112" r="3.2" style="fill:var(--viz-ok);"/><text x="550" y="116" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">mod&egrave;le inconnu</text><circle cx="536" cy="144" r="3.2" style="fill:var(--viz-ok);"/><text x="550" y="148" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprend d&egrave;s le pas suivant</text><circle cx="536" cy="176" r="3.2" style="fill:var(--viz-ok);"/><text x="550" y="180" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">biais&eacute;, peu variable</text><circle cx="536" cy="208" r="3.2" style="fill:var(--viz-ok);"/><text x="550" y="212" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">fonctionne en continu</text><text x="380" y="30" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Trois fa&ccedil;ons d'estimer la valeur d'un &eacute;tat</text><text x="380" y="284" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;"><tspan x="380" dy="0">Le Q-apprentissage appartient &agrave; la troisi&egrave;me famille : il corrige son estimation &agrave; chaque pas, &agrave; partir de sa propre estimation</tspan><tspan x="380" dy="16">suivante.</tspan></text><text x="380" y="340" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;"><tspan x="380" dy="0">Apprendre &agrave; partir d'une estimation plut&ocirc;t que d'un r&eacute;sultat observ&eacute; para&icirc;t circulaire : le th&eacute;or&egrave;me de convergence dit que &ccedil;a ne</tspan><tspan x="380" dy="16">l'est pas.</tspan></text></svg>
+<figcaption class="viz-caption"><strong>Figure 12.3.</strong> La programmation dynamique exige le mod&egrave;le. Monte-Carlo attend la fin de l'&eacute;pisode et moyenne les gains observ&eacute;s : sans biais, mais tr&egrave;s variable, et inapplicable si la t&acirc;che ne se termine jamais. Les diff&eacute;rences temporelles corrigent l'estimation d&egrave;s le pas suivant, &agrave; partir de leur propre estimation de l'&eacute;tat atteint <a class="cite" href="#ref-sutton1988">[2]</a>.</figcaption></figure>
+
+<div class="box def"><div class="box-title">La fonction Q</div>
+<p>Plut&ocirc;t que la valeur d'un &eacute;tat, on estime celle d'un couple &eacute;tat-action : \(Q^{*}(s,a)\) est le gain esp&eacute;r&eacute; si l'on ex&eacute;cute \(a\) en \(s\) puis agit optimalement. On a \(V^{*}(s) = \max_a Q^{*}(s,a)\), et surtout la politique optimale se lit directement dans \(Q\) &mdash; <em>sans avoir besoin du mod&egrave;le</em>. C'est tout l'int&eacute;r&ecirc;t : avec \(V\) seule, choisir une action exigerait de savoir o&ugrave; elle m&egrave;ne.</p></div>
+
+<div class="algo"><div class="algo-cap">Algorithme 12.2 &mdash; Q-apprentissage</div><div class="algo-io"><b>Entr&eacute;e :</b> un acc&egrave;s au monde, un pas \(\alpha\), un taux d'exploration \(\varepsilon\), un facteur \(\gamma\), un nombre d'&eacute;pisodes \(M\)<br><b>Sortie :</b> une politique gloutonne vis-&agrave;-vis de \(Q\)</div><ol class="algo-corps"><li>\(Q(s,a) \leftarrow 0\) <b class="kw">pour tout</b> \((s,a) \in S \times A\)</li><li><b class="kw">pour</b> \(m = 1\) <b class="kw">jusqu'&agrave;</b> \(M\) <b class="kw">faire</b></li><li class="n1">\(s \leftarrow s_0\)</li><li class="n1"><b class="kw">tant que</b> <i class="va">s</i> n'est pas terminal <b class="kw">faire</b></li><li class="n2">\(u \sim \mathcal{U}([0,1[)\)</li><li class="n2">\(a \leftarrow \begin{cases} \text{action tir\acute{e}e au hasard} & \text{si } u \lt \varepsilon\\ \operatorname*{argmax}_{a'} Q(s,a') & \text{sinon}\end{cases}\)</li><li class="n2">ex&eacute;cuter \(a\), observer \(r\) et \(s'\)</li><li class="n2">\(\displaystyle Q(s,a) \leftarrow Q(s,a) + \alpha\Big[\underbrace{r + \gamma \max_{a'} Q(s',a')}_{\text{cible}} - Q(s,a)\Big]\)</li><li class="n2">\(s \leftarrow s'\)</li><li><b class="kw">retourner</b> \(\pi(s) = \operatorname*{argmax}_{a} Q(s,a)\)</li></ol><p class="algo-note">La cible emploie \(\max_{a'} Q(s',a')\), quelle que soit l'action r&eacute;ellement jou&eacute;e ensuite : c'est ce qui rend la m&eacute;thode <em>hors politique</em>. Sous visites infinies et \(\sum_t \alpha_t = \infty\), \(\sum_t \alpha_t^{2} \lt \infty\), on a \(Q \to Q^{*}\) presque s&ucirc;rement.</p></div>
+
+<div class="box thm"><div class="box-title">Th&eacute;or&egrave;me &mdash; Convergence du Q-apprentissage</div>
+<p>Si chaque couple &eacute;tat-action est visit&eacute; une infinit&eacute; de fois et si les pas d'apprentissage v&eacute;rifient \(\sum_t \alpha_t = \infty\) et \(\sum_t \alpha_t^{2} \lt \infty\), alors \(Q\) converge presque s&ucirc;rement vers \(Q^{*}\) <a class="cite" href="#ref-watkins1992">[3]</a>.</p>
+<p>Deux remarques. D'abord, la convergence a lieu <em>quelle que soit la politique suivie pendant l'apprentissage</em>, pourvu qu'elle explore assez : c'est ce qu'on appelle apprendre hors politique. Ensuite, la condition &laquo; une infinit&eacute; de fois &raquo; est th&eacute;orique ; en pratique elle impose seulement d'explorer suffisamment longtemps.</p></div>
+
+<h2>12.4 Exploration contre exploitation</h2>
+
+<p>Un agent qui joue toujours sa meilleure action connue n'apprendra jamais qu'une autre &eacute;tait meilleure. Un agent qui explore toujours n'exploite jamais ce qu'il sait. Ce dilemme travers&eacute; tout le manuel &mdash; il est apparu au chapitre 5 avec la recherche par &eacute;chantillonnage &mdash; trouve ici sa formulation la plus nette.</p>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Q-apprentissage sur le m&ecirc;me monde, sans conna&icirc;tre le mod&egrave;le. La courbe est le gain moyen par &eacute;pisode ; la politique obtenue est compar&eacute;e &agrave; celle de la figure 12.2.</p>
+<div id="jxg2" class="viz-board" style="height:440px;"></div>
+<p class="viz-caption"><strong>Figure 12.4.</strong> Le r&eacute;sultat est instructif et contre-intuitif. Sans exploration, l'agent obtient le <em>meilleur gain moyen</em> (0,657) mais une politique correcte sur 7 cases seulement : il ex&eacute;cute bien la premi&egrave;re strat&eacute;gie trouv&eacute;e, et ignore tout des r&eacute;gions qu'il ne visite jamais. Avec 30 % d'exploration, il d&eacute;couvre la politique optimale sur les 9 cases, mais son gain moyen tombe &agrave; 0,497 &mdash; il paie ses explorations. Au-del&agrave;, tout s'effondre. <em>Le gain pendant l'apprentissage et la qualit&eacute; de ce qui est appris sont deux objectifs distincts</em>, et il faut savoir lequel on mesure.</p></div>
+
+<div class="box tip"><div class="box-title">Trois strat&eacute;gies d'exploration</div>
+<ul>
+<li><strong>Exploration \(\varepsilon\)-gloutonne</strong> : jouer au hasard avec probabilit&eacute; \(\varepsilon\). Simple, robuste, et l'on fait d&eacute;cro&icirc;tre \(\varepsilon\) au fil du temps.</li>
+<li><strong>Optimisme initial</strong> : initialiser \(Q\) &agrave; des valeurs &eacute;lev&eacute;es. Toute action non essay&eacute;e para&icirc;t excellente, donc l'agent explore <em>sans hasard</em>, puis se corrige.</li>
+<li><strong>Bornes de confiance</strong> : ajouter &agrave; chaque action un bonus d&eacute;croissant avec le nombre de fois o&ugrave; elle a &eacute;t&eacute; essay&eacute;e. C'est exactement la r&egrave;gle UCB du chapitre 5.</li>
+</ul></div>
+
+<h2>12.5 Ce qui se passe quand les &eacute;tats sont trop nombreux</h2>
+
+<p>Une table \(Q\) exige une entr&eacute;e par couple &eacute;tat-action. Au backgammon, il y a \(10^{20}\) positions ; au go, \(10^{170}\). On remplace alors la table par une <strong>fonction approch&eacute;e</strong> \(Q(s,a;\theta)\), typiquement un r&eacute;seau du chapitre 11.</p>
+
+<div class="box warn"><div class="box-title">La triade mortelle</div>
+Combiner trois ingr&eacute;dients &mdash; approximation de fonction, apprentissage hors politique, et mise &agrave; jour &agrave; partir de sa propre estimation &mdash; peut faire <em>diverger</em> l'apprentissage, m&ecirc;me sur des probl&egrave;mes simples <a class="cite" href="#ref-sutton2018">[4]</a>. Le Q-apprentissage profond r&eacute;unit pr&eacute;cis&eacute;ment ces trois ingr&eacute;dients. Deux techniques le stabilisent en pratique : rejouer des transitions pass&eacute;es tir&eacute;es au hasard, ce qui casse la corr&eacute;lation temporelle, et figer p&eacute;riodiquement le r&eacute;seau qui sert &agrave; calculer la cible <a class="cite" href="#ref-mnih2015">[5]</a>. Aucune des deux n'est une garantie.</div>
+
+<p>Ces m&eacute;thodes ont produit les r&eacute;sultats les plus spectaculaires du domaine : ma&icirc;trise d'une cinquantaine de jeux vid&eacute;o &agrave; partir des seuls pixels <a class="cite" href="#ref-mnih2015">[5]</a>, puis le go &agrave; partir du jeu contre soi-m&ecirc;me, sans aucune partie humaine <a class="cite" href="#ref-silver2017">[6]</a>. Elles restent extr&ecirc;mement co&ucirc;teuses en interactions : l&agrave; o&ugrave; un humain apprend un jeu en quelques dizaines de parties, ces syst&egrave;mes en demandent des millions.</p>
+
+<div class="box warn"><div class="box-title">Le d&eacute;tournement de la r&eacute;compense</div>
+Un agent optimise <em>exactement</em> la r&eacute;compense &eacute;crite, jamais l'intention. Un bateau de course virtuel a d&eacute;couvert qu'il gagnait plus de points en tournant ind&eacute;finiment dans un lagon pour ramasser des bonus qu'en terminant la course. Ce n'est pas un dysfonctionnement : c'est la r&eacute;ponse correcte &agrave; une mauvaise question. On retrouve exactement l'avertissement du chapitre 2 sur la mesure de performance, avec des cons&eacute;quences plus visibles.</div>
+
+<h2>Synth&egrave;se</h2>
+<ul>
+<li>Le renforcement apprend d'un signal &eacute;valuatif, diff&eacute;r&eacute;, et sur des donn&eacute;es que l'agent produit lui-m&ecirc;me.</li>
+<li>L'&eacute;quation de Bellman caract&eacute;rise la valeur optimale ; l'op&eacute;rateur associ&eacute; est une contraction, d'o&ugrave; existence, unicit&eacute; et convergence <a class="cite" href="#ref-bellman1957">[1]</a>.</li>
+<li>La fonction \(Q\) permet d'agir sans conna&icirc;tre le mod&egrave;le, ce que \(V\) seule ne permet pas.</li>
+<li>Le Q-apprentissage converge vers l'optimum sous exploration suffisante, quelle que soit la politique suivie <a class="cite" href="#ref-watkins1992">[3]</a>.</li>
+<li>Gain pendant l'apprentissage et qualit&eacute; de la politique apprise sont deux objectifs distincts, souvent oppos&eacute;s.</li>
+<li>L'approximation de fonction rend le passage &agrave; l'&eacute;chelle possible et la convergence non garantie <a class="cite" href="#ref-sutton2018">[4]</a>.</li>
+</ul>
+
+<h2>R&eacute;f&eacute;rences</h2>
+<ol class="reflist">
+<li id="ref-bellman1957">Bellman, R. (1957). <em>Dynamic Programming</em>. Princeton University Press. R&eacute;&eacute;dition 2010, DOI&nbsp;: 10.1515/9781400835386. <a href="https://doi.org/10.1515/9781400835386">https://doi.org/10.1515/9781400835386</a></li>
+<li id="ref-sutton1988">Sutton, R. S. (1988). Learning to predict by the methods of temporal differences. <em>Machine Learning</em>, 3, 9&ndash;44. DOI&nbsp;: 10.1007/BF00115009. <a href="https://doi.org/10.1007/BF00115009">https://doi.org/10.1007/BF00115009</a></li>
+<li id="ref-watkins1992">Watkins, C. J. C. H. &amp; Dayan, P. (1992). Q-learning. <em>Machine Learning</em>, 8, 279&ndash;292. DOI&nbsp;: 10.1007/BF00992698. <a href="https://doi.org/10.1007/BF00992698">https://doi.org/10.1007/BF00992698</a></li>
+<li id="ref-sutton2018">Sutton, R. S. &amp; Barto, A. G. (2018). <em>Reinforcement Learning: An Introduction</em> (2<sup>e</sup> &eacute;dition). MIT Press. ISBN 978-0-262-03924-6. <a href="http://incompleteideas.net/book/the-book-2nd.html">http://incompleteideas.net/book/the-book-2nd.html</a></li>
+<li id="ref-mnih2015">Mnih, V., Kavukcuoglu, K., Silver, D. <em>et al.</em> (2015). Human-level control through deep reinforcement learning. <em>Nature</em>, 518, 529&ndash;533. DOI&nbsp;: 10.1038/nature14236. <a href="https://doi.org/10.1038/nature14236">https://doi.org/10.1038/nature14236</a></li>
+<li id="ref-silver2017">Silver, D., Schrittwieser, J., Simonyan, K. <em>et al.</em> (2017). Mastering the game of Go without human knowledge. <em>Nature</em>, 550, 354&ndash;359. DOI&nbsp;: 10.1038/nature24270. <a href="https://doi.org/10.1038/nature24270">https://doi.org/10.1038/nature24270</a></li>
+<li id="ref-tesauro1995">Tesauro, G. (1995). Temporal difference learning and TD-Gammon. <em>Communications of the ACM</em>, 38(3), 58&ndash;68. DOI&nbsp;: 10.1145/203330.203343. <a href="https://doi.org/10.1145/203330.203343">https://doi.org/10.1145/203330.203343</a></li>
+<li id="ref-howard1960">Howard, R. A. (1960). <em>Dynamic Programming and Markov Processes</em>. MIT Press. <a href="https://archive.org/details/dynamicprogrammi0000howa">https://archive.org/details/dynamicprogrammi0000howa</a></li>
+</ol>
+<p>Le premier succ&egrave;s marquant de ces m&eacute;thodes est ant&eacute;rieur de vingt ans aux r&eacute;sultats r&eacute;cents : un programme de backgammon entra&icirc;n&eacute; par diff&eacute;rences temporelles contre lui-m&ecirc;me atteignait d&egrave;s 1995 le niveau des meilleurs joueurs humains <a class="cite" href="#ref-tesauro1995">[7]</a>. L'alternative &agrave; l'it&eacute;ration sur les valeurs, dite it&eacute;ration sur les politiques, converge souvent en bien moins de tours <a class="cite" href="#ref-howard1960">[8]</a>.</p>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../11-reseaux-neurones/page.html">\(\leftarrow\) Chapitre 11 &mdash; R&eacute;seaux de neurones</a>
+<a href="algorithms.html">Annexe algorithmique</a>
+<a href="../../index.html">Sommaire du manuel</a>
+<a href="../13-generative/page.html">Chapitre 13 &mdash; IA g&eacute;n&eacute;rative \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">La figure interactive n\'a pas pu etre chargee. Verifiez votre connexion reseau.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ========== Monde en grille 4 x 3 : iteration sur les valeurs ============= */
+var LARG12 = 4, HAUT12 = 3;
+var MUR = '1,1';
+var TERM = {'3,2': 1.0, '3,1': -1.0};
+function estCase(x, y){
+  return x >= 0 && y >= 0 && x < LARG12 && y < HAUT12 && (x + ',' + y) !== MUR;
+}
+function estTerm(x, y){ return (x + ',' + y) in TERM; }
+var DIRS = [[0,1],[1,0],[0,-1],[-1,0]];      /* haut, droite, bas, gauche */
+var NOMDIR = ['haut', 'droite', 'bas', 'gauche'];
+/* modele stochastique : 0.8 dans la direction voulue, 0.1 a gauche, 0.1 a droite */
+function transitions(x, y, a){
+  var res = [];
+  var probas = [0.8, 0.1, 0.1];
+  var alt = [a, (a + 3) % 4, (a + 1) % 4];
+  for (var k = 0; k < 3; k++){
+    var d = DIRS[alt[k]];
+    var nx = x + d[0], ny = y + d[1];
+    if (!estCase(nx, ny)) { nx = x; ny = y; }   /* on reste sur place contre un mur */
+    res.push({x: nx, y: ny, p: probas[k]});
+  }
+  return res;
+}
+function iterationValeurs(gamma, cout, nIter){
+  var V = {}, x, y;
+  for (x = 0; x < LARG12; x++) for (y = 0; y < HAUT12; y++){
+    if (!estCase(x, y)) { continue; }
+    V[x + ',' + y] = estTerm(x, y) ? TERM[x + ',' + y] : 0;
+  }
+  var etats = [{V: copier(V), politique: politiqueDe(V, gamma, cout), delta: Infinity}];
+  for (var it = 0; it < nIter; it++){
+    var W = copier(V), delta = 0;
+    for (x = 0; x < LARG12; x++) for (y = 0; y < HAUT12; y++){
+      if (!estCase(x, y) || estTerm(x, y)) { continue; }
+      var best = -Infinity;
+      for (var a = 0; a < 4; a++){
+        var q = 0, t = transitions(x, y, a);
+        for (var k = 0; k < t.length; k++){ q += t[k].p * V[t[k].x + ',' + t[k].y]; }
+        if (q > best) { best = q; }
+      }
+      W[x + ',' + y] = cout + gamma * best;
+      delta = Math.max(delta, Math.abs(W[x + ',' + y] - V[x + ',' + y]));
+    }
+    V = W;
+    etats.push({V: copier(V), politique: politiqueDe(V, gamma, cout), delta: delta});
+    if (delta < 1e-9) { break; }
+  }
+  return etats;
+}
+function copier(o){ var r = {}; for (var k in o){ r[k] = o[k]; } return r; }
+function politiqueDe(V, gamma, cout){
+  var pol = {};
+  for (var x = 0; x < LARG12; x++) for (var y = 0; y < HAUT12; y++){
+    if (!estCase(x, y) || estTerm(x, y)) { continue; }
+    var best = -Infinity, ba = 0;
+    for (var a = 0; a < 4; a++){
+      var q = 0, t = transitions(x, y, a);
+      for (var k = 0; k < t.length; k++){ q += t[k].p * V[t[k].x + ',' + t[k].y]; }
+      if (q > best) { best = q; ba = a; }
+    }
+    pol[x + ',' + y] = ba;
+  }
+  return pol;
+}
+var CACHE12 = {};
+function vi(gamma, cout){
+  var k = gamma.toFixed(2) + '|' + cout.toFixed(2);
+  if (!(k in CACHE12)) { CACHE12[k] = iterationValeurs(gamma, cout, 60); }
+  return CACHE12[k];
+}
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-1.2, 5.4, 5.6, -2.6], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: true
+});
+var sCout = b1.create('slider', [[-1.0, -1.2], [1.4, -1.2], [-2.0, -0.04, 0.0]], {
+  name: 'cout par pas', snapWidth: 0.02, precision: 2,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }}
+});
+var sIt12 = b1.create('slider', [[2.4, -1.2], [5.4, -1.2], [0, 60, 60]], {
+  name: 'iteration', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function cout12(){ return Math.round(sCout.Value() * 50) / 50; }
+function etat12(){
+  var e = vi(0.99, cout12());
+  return e[Math.min(Math.round(sIt12.Value()), e.length - 1)];
+}
+b1.create('curve', [[0],[0]], {strokeColor: PAL.ref, strokeWidth: 1, highlight: false,
+  fixed: true}).updateDataArray = function(){
+  var X = [], Y = [];
+  for (var i = 0; i <= LARG12; i++){ X.push(i, i, NaN); Y.push(0, HAUT12, NaN); }
+  for (var j = 0; j <= HAUT12; j++){ X.push(0, LARG12, NaN); Y.push(j, j, NaN); }
+  this.dataX = X; this.dataY = Y;
+};
+b1.create('curve', [[1, 2, 2, 1, 1], [1, 1, 2, 2, 1]], {
+  strokeWidth: 0, fillColor: PAL.muted, fillOpacity: 0.5, highlight: false, fixed: true});
+for (var x = 0; x < LARG12; x++){
+  for (var y = 0; y < HAUT12; y++){
+    (function(cx, cy){
+      if (!estCase(cx, cy)) { return; }
+      var cle = cx + ',' + cy;
+      b1.create('curve', [[cx+0.04, cx+0.96, cx+0.96, cx+0.04, cx+0.04],
+                          [cy+0.04, cy+0.04, cy+0.96, cy+0.96, cy+0.04]], {
+        strokeWidth: 0, highlight: false, fixed: true,
+        fillColor: function(){
+          var v = etat12().V[cle];
+          return v >= 0 ? cssv('--viz-ok', '#16a34a') : cssv('--viz-bad', '#dc2626'); },
+        fillOpacity: function(){
+          var v = etat12().V[cle];
+          return Math.min(0.55, Math.abs(v) * 0.5); }});
+      b1.create('text', [cx + 0.5, cy + 0.62, function(){
+        return etat12().V[cle].toFixed(3);
+      }], {fontSize: 13, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+           strokeColor: PAL.text});
+      b1.create('text', [cx + 0.5, cy + 0.30, function(){
+        if (estTerm(cx, cy)) { return 'terminal'; }
+        var p = etat12().politique[cle];
+        return NOMDIR[p];
+      }], {fontSize: 11.5, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+           strokeColor: function(){ return cssv('--primary-dark', '#014a55'); }});
+    })(x, y);
+  }
+}
+b1.create('text', [-1.1, 5.1, function(){
+  var e = vi(0.99, cout12()), n = Math.min(Math.round(sIt12.Value()), e.length - 1);
+  return 'Cout par pas : ' + cout12().toFixed(2) + '   |   iteration ' + n + ' sur '
+       + (e.length - 1) + '   |   variation maximale : '
+       + (isFinite(e[n].delta) ? e[n].delta.toFixed(5) : 'depart');
+}], {fontSize: 14, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-1.1, 4.7, function(){
+  var e = vi(0.99, cout12()), f = e[e.length-1];
+  return 'Depart en bas a gauche : la politique optimale y dit ' + NOMDIR[f.politique['0,0']] + '.';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-1.1, -2.0, function(){
+  var f = vi(0.99, cout12());
+  var pol = f[f.length-1].politique;
+  if (cout12() > -0.015) {
+    return 'Cout presque nul : l’agent n’est pas presse, il evite le danger meme en tournant longtemps.';
+  }
+  if (cout12() < -1.0) {
+    return 'Cout tres eleve : l’agent prefere se jeter dans la case negative pour abreger.';
+  }
+  return 'Cout modere : l’agent contourne prudemment la case negative.';
+}], {fontSize: 13, strokeColor: function(){ return cssv('--primary','#026573'); },
+     fixed: true, highlight: false});
+
+/* ========== Q-apprentissage : exploration contre exploitation ============= */
+function aleaQ(g){ var s = g; return function(){ s = (s*1103515245+12345)%2147483648; return s/2147483648; }; }
+function qApprentissage(epsilon, alpha, nEpisodes, graine){
+  var rnd = aleaQ(graine), Q = {}, x, y, a;
+  for (x = 0; x < LARG12; x++) for (y = 0; y < HAUT12; y++){
+    if (!estCase(x, y)) { continue; }
+    Q[x + ',' + y] = [0, 0, 0, 0];
+  }
+  var courbe = [], somme = 0;
+  for (var ep = 0; ep < nEpisodes; ep++){
+    x = 0; y = 0;
+    var total = 0;
+    for (var pas = 0; pas < 60; pas++){
+      if (estTerm(x, y)) { break; }
+      var cle = x + ',' + y;
+      if (rnd() < epsilon){ a = Math.floor(rnd() * 4); }
+      else {
+        a = 0;
+        for (var k = 1; k < 4; k++){ if (Q[cle][k] > Q[cle][a]) { a = k; } }
+      }
+      /* tirage de la transition reelle */
+      var t = transitions(x, y, a), u = rnd(), cum = 0, nx = x, ny = y;
+      for (var i = 0; i < t.length; i++){
+        cum += t[i].p;
+        if (u <= cum){ nx = t[i].x; ny = t[i].y; break; }
+      }
+      var r = estTerm(nx, ny) ? TERM[nx + ',' + ny] : -0.04;
+      total += r;
+      var suiv = nx + ',' + ny;
+      var maxQ = 0;
+      if (!estTerm(nx, ny)){
+        maxQ = Math.max(Q[suiv][0], Q[suiv][1], Q[suiv][2], Q[suiv][3]);
+      }
+      Q[cle][a] += alpha * (r + 0.99 * maxQ - Q[cle][a]);
+      x = nx; y = ny;
+    }
+    somme += total;
+    if (ep % 20 === 0) { courbe.push({ep: ep, moy: somme / (ep + 1)}); }
+  }
+  /* politique finale */
+  var pol = {}, bonnes = 0, total2 = 0;
+  var ref = vi(0.99, -0.04);
+  var polOpt = ref[ref.length-1].politique;
+  for (var k2 in Q){
+    var p = k2.split(',');
+    if (estTerm(+p[0], +p[1])) { continue; }
+    var best = 0;
+    for (var k3 = 1; k3 < 4; k3++){ if (Q[k2][k3] > Q[k2][best]) { best = k3; } }
+    pol[k2] = best; total2++;
+    if (best === polOpt[k2]) { bonnes++; }
+  }
+  return {courbe: courbe, pol: pol, bonnes: bonnes, total: total2};
+}
+var CACHEQ = {};
+function qa(eps, alpha){
+  var k = eps.toFixed(2) + '|' + alpha.toFixed(2);
+  if (!(k in CACHEQ)) { CACHEQ[k] = qApprentissage(eps, alpha, 4000, 20250806); }
+  return CACHEQ[k];
+}
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-900, 0.72, 4600, -1.05], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sEps = b2.create('slider', [[100, -0.72], [1900, -0.72], [0.0, 0.15, 0.60]], {
+  name: 'exploration', snapWidth: 0.05, precision: 2,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+var sAl = b2.create('slider', [[2500, -0.72], [4300, -0.72], [0.05, 0.20, 0.80]], {
+  name: 'pas d’apprentissage', snapWidth: 0.05, precision: 2,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+function eps12(){ return Math.round(sEps.Value() * 20) / 20; }
+function alpha12(){ return Math.round(sAl.Value() * 20) / 20; }
+b2.create('segment', [[0, 0], [4000, 0]], {strokeColor: PAL.axis, strokeWidth: 1.4,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b2.create('segment', [[0, -0.55], [0, 0.65]], {strokeColor: PAL.axis, strokeWidth: 1.4,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+var cQ = b2.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--primary', '#026573'); }, strokeWidth: 3,
+  highlight: false, fixed: true});
+cQ.updateDataArray = function(){
+  var r = qa(eps12(), alpha12()), X = [], Y = [];
+  for (var i = 0; i < r.courbe.length; i++){ X.push(r.courbe[i].ep); Y.push(r.courbe[i].moy); }
+  this.dataX = X; this.dataY = Y;
+};
+for (var g = 1000; g <= 4000; g += 1000){
+  (function(k){ b2.create('text', [k, -0.06, String(k)], {fontSize: 11, anchorX: 'middle',
+    strokeColor: PAL.muted, fixed: true, highlight: false}); })(g);
+}
+b2.create('text', [2000, -0.90, 'episodes'], {fontSize: 12.5, anchorX: 'middle',
+  strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-850, 0.68, function(){
+  var r = qa(eps12(), alpha12());
+  return 'Exploration ' + eps12().toFixed(2) + ', pas ' + alpha12().toFixed(2)
+       + '   |   politique correcte sur ' + r.bonnes + ' des ' + r.total + ' cases'
+       + '   |   gain moyen final ' + r.courbe[r.courbe.length-1].moy.toFixed(3);
+}], {fontSize: 13, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-850, 0.58, function(){
+  if (eps12() < 0.03) {
+    return 'Sans exploration, l’agent repete la premiere strategie trouvee et n’apprend plus rien ailleurs.';
+  }
+  if (eps12() > 0.45) {
+    return 'Trop d’exploration : l’agent agit au hasard une fois sur deux, son gain moyen s’effondre.';
+  }
+  return 'Compromis raisonnable entre exploiter ce qui marche et essayer autre chose.';
+}], {fontSize: 12.5, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-850, -1.0,
+  'La politique est comparee a celle obtenue par iteration sur les valeurs, qui connait le modele.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

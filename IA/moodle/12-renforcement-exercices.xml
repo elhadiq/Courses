@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Iteration sur les valeurs</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;EQUATION DE BELLMAN&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;L'operateur de Bellman est une contraction : quel que soit le point de depart, l'iteration converge vers l'unique solution.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Le processus est decrit par &lt;code&gt;etats&lt;/code&gt; (liste), &lt;code&gt;terminaux&lt;/code&gt; (dictionnaire etat vers recompense finale), &lt;code&gt;actions(s)&lt;/code&gt; (liste), &lt;code&gt;transitions(s, a)&lt;/code&gt; (liste de couples &lt;code&gt;(etat_suivant, probabilite)&lt;/code&gt;), &lt;code&gt;recompense&lt;/code&gt; (valeur recue a chaque pas non terminal) et &lt;code&gt;gamma&lt;/code&gt;. Ecrire &lt;strong&gt;&lt;code&gt;iteration_valeurs(...)&lt;/code&gt;&lt;/strong&gt; qui renvoie le couple &lt;code&gt;(V, politique)&lt;/code&gt;, &lt;code&gt;V&lt;/code&gt; arrondi a 4 decimales. On s'arrete quand la variation maximale passe sous &lt;code&gt;seuil&lt;/code&gt;. A valeur egale, la politique retient la premiere action de la liste.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;Sur une ligne A &amp;rarr; B &amp;rarr; but(+10), cout -1, gamma 0,9 : V(A) = 6.2&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def iteration_valeurs(etats, terminaux, actions, transitions, recompense, gamma, seuil):
+    # initialiser : recompense finale sur les terminaux, 0 ailleurs
+    # repeter : V[s] = recompense + gamma * max sur a de la somme ponderee
+    # extraire la politique SEULEMENT apres convergence
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def iteration_valeurs(etats, terminaux, actions, transitions, recompense, gamma, seuil):
+    V = {}
+    for s in etats:
+        V[s] = terminaux[s] if s in terminaux else 0.0
+    while True:
+        delta = 0.0
+        W = dict(V)
+        for s in etats:
+            if s in terminaux:
+                continue
+            meilleure = None
+            for a in actions(s):
+                q = sum(p * V[s2] for s2, p in transitions(s, a))
+                if meilleure is None or q &gt; meilleure:
+                    meilleure = q
+            if meilleure is None:
+                continue
+            W[s] = recompense + gamma * meilleure
+            delta = max(delta, abs(W[s] - V[s]))
+        V = W
+        if delta &lt; seuil:
+            break
+    politique = {}
+    for s in etats:
+        if s in terminaux:
+            continue
+        meilleure, best_a = None, None
+        for a in actions(s):
+            q = sum(p * V[s2] for s2, p in transitions(s, a))
+            if meilleure is None or q &gt; meilleure:
+                meilleure, best_a = q, a
+        politique[s] = best_a
+    return ({s: round(v, 4) for s, v in V.items()}, politique)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>etats = ['A', 'B', 'F']
+term = {'F': 10.0}
+def actions(s): return ['avancer']
+def trans(s, a): return [('B', 1.0)] if s == 'A' else [('F', 1.0)]
+V, pol = iteration_valeurs(etats, term, actions, trans, -1.0, 0.9, 1e-9)
+print(V['A'], V['B'], pol)
+</text></testcode><stdin><text /></stdin><expected><text>6.2 8.0 {'A': 'avancer', 'B': 'avancer'}
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>etats = ['A', 'G', 'P']
+term = {'G': 10.0, 'P': -10.0}
+def actions(s): return ['sur', 'risque']
+def trans(s, a):
+    return [('G', 1.0)] if a == 'sur' else [('G', 0.5), ('P', 0.5)]
+V, pol = iteration_valeurs(etats, term, actions, trans, 0.0, 1.0, 1e-9)
+print(V['A'], pol['A'])
+</text></testcode><stdin><text /></stdin><expected><text>10.0 sur
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>etats = ['A', 'B', 'F']
+term = {'F': 10.0}
+def actions(s): return ['avancer']
+def trans(s, a): return [('B', 1.0)] if s == 'A' else [('F', 1.0)]
+V, _ = iteration_valeurs(etats, term, actions, trans, -1.0, 0.5, 1e-9)
+print(V['A'], V['B'])
+</text></testcode><stdin><text /></stdin><expected><text>1.0 4.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>etats = ['A', 'F']
+term = {'F': 1.0}
+def actions(s): return ['x']
+def trans(s, a): return [('F', 1.0)]
+V, pol = iteration_valeurs(etats, term, actions, trans, 0.0, 0.9, 1e-9)
+print(V, pol)
+</text></testcode><stdin><text /></stdin><expected><text>{'A': 0.9, 'F': 1.0} {'A': 'x'}
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>etats = ['A', 'F']
+term = {'F': 0.0}
+def actions(s): return ['b', 'a']
+def trans(s, a): return [('F', 1.0)]
+V, pol = iteration_valeurs(etats, term, actions, trans, 0.0, 0.9, 1e-9)
+print(pol['A'])
+</text></testcode><stdin><text /></stdin><expected><text>b
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Mise a jour du Q-apprentissage</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;Q-APPRENTISSAGE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;La cible utilise le MAXIMUM de Q sur l'etat atteint, quelle que soit l'action jouee ensuite : c'est ce qui rend la methode hors politique.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;&lt;code&gt;Q&lt;/code&gt; est un dictionnaire associant a chaque etat une liste de valeurs, une par action. Ecrire &lt;strong&gt;&lt;code&gt;maj(Q, s, a, r, s2, terminal, alpha, gamma)&lt;/code&gt;&lt;/strong&gt; qui met a jour &lt;code&gt;Q&lt;/code&gt; en place et renvoie la nouvelle valeur, arrondie a 6 decimales. Si &lt;code&gt;terminal&lt;/code&gt;, la valeur de l'etat atteint vaut 0. Ecrire aussi &lt;strong&gt;&lt;code&gt;politique(Q)&lt;/code&gt;&lt;/strong&gt; qui renvoie le dictionnaire etat vers indice de la meilleure action, plus petit indice a egalite.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;maj({'A': [0.0]}, 'A', 0, 10.0, 'B', True, 0.5, 0.9) &amp;rarr; 5.0&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def maj(Q, s, a, r, s2, terminal, alpha, gamma):
+    # cible = recompense + gamma * meilleure valeur connue en s2
+    # correction d une FRACTION alpha de l ecart
+    ...
+
+def politique(Q):
+    # indice de la valeur maximale, plus petit indice a egalite
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def maj(Q, s, a, r, s2, terminal, alpha, gamma):
+    futur = 0.0 if terminal else max(Q[s2])
+    cible = r + gamma * futur
+    Q[s][a] = round(Q[s][a] + alpha * (cible - Q[s][a]), 6)
+    return Q[s][a]
+
+def politique(Q):
+    res = {}
+    for s in Q:
+        best = 0
+        for k in range(1, len(Q[s])):
+            if Q[s][k] &gt; Q[s][best]:
+                best = k
+        res[s] = best
+    return res
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>Q = {'A': [0.0], 'B': [0.0]}
+print(maj(Q, 'A', 0, 10.0, 'B', True, 0.5, 0.9))
+</text></testcode><stdin><text /></stdin><expected><text>5.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>Q = {'A': [0.0, 0.0], 'B': [5.0, 2.0]}
+for r, term in [(0.0, False), (10.0, True), (0.0, False), (0.0, False)]:
+    print(maj(Q, 'A', 0, r, 'B', term, 0.5, 0.9), end=' ')
+print()
+</text></testcode><stdin><text /></stdin><expected><text>2.25 6.125 5.3125 4.90625 
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>Q = {'A': [1.0, 3.0, 3.0], 'B': [0.0, 0.0, 0.0]}
+print(politique(Q))
+</text></testcode><stdin><text /></stdin><expected><text>{'A': 1, 'B': 0}
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>Q = {'A': [4.0], 'B': [7.0]}
+print(maj(Q, 'A', 0, 1.0, 'B', False, 1.0, 1.0))
+</text></testcode><stdin><text /></stdin><expected><text>8.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>Q = {'A': [4.0], 'B': [7.0]}
+print(maj(Q, 'A', 0, 1.0, 'B', False, 0.0, 1.0))
+</text></testcode><stdin><text /></stdin><expected><text>4.0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — Explorer ou exploiter</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;BORNES DE CONFIANCE&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Le score de selection ajoute au gain observe un bonus qui decroit avec le nombre d'essais : une action mal connue devient attirante par sa seule meconnaissance.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;ucb(stats, c)&lt;/code&gt;&lt;/strong&gt; ou &lt;code&gt;stats&lt;/code&gt; est une liste de couples &lt;code&gt;(victoires, essais)&lt;/code&gt; : renvoyer l'indice de l'action selectionnee. Une action jamais essayee est prioritaire (plus petit indice s'il y en a plusieurs). Sinon le score vaut &lt;code&gt;v / n + c * sqrt(log(N) / n)&lt;/code&gt;, ou &lt;code&gt;N&lt;/code&gt; est la somme des essais. Ecrire &lt;strong&gt;&lt;code&gt;coup_final(stats)&lt;/code&gt;&lt;/strong&gt; qui renvoie l'indice de l'action &lt;em&gt;la plus essayee&lt;/em&gt;.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;ucb([(42,70), (11,20), (4,10)], 1.0) &amp;rarr; 2      coup_final(...) &amp;rarr; 0&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>from math import log, sqrt
+
+def ucb(stats, c):
+    # une action jamais essayee passe en premier
+    # sinon : taux observe + bonus decroissant avec le nombre d essais
+    ...
+
+def coup_final(stats):
+    # le plus ESSAYE, pas le mieux note : les deux criteres different
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>from math import log, sqrt
+
+def ucb(stats, c):
+    for i, (v, n) in enumerate(stats):
+        if n == 0:
+            return i
+    total = sum(n for _, n in stats)
+    meilleur, indice = None, -1
+    for i, (v, n) in enumerate(stats):
+        score = v / n + c * sqrt(log(total) / n)
+        if meilleur is None or score &gt; meilleur:
+            meilleur, indice = score, i
+    return indice
+
+def coup_final(stats):
+    meilleur, indice = -1, -1
+    for i, (v, n) in enumerate(stats):
+        if n &gt; meilleur:
+            meilleur, indice = n, i
+    return indice
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(ucb([(42,70), (11,20), (4,10)], 1.0), coup_final([(42,70), (11,20), (4,10)]))
+</text></testcode><stdin><text /></stdin><expected><text>2 0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(ucb([(42,70), (11,20), (4,10)], 0.0))
+</text></testcode><stdin><text /></stdin><expected><text>0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(ucb([(5,10), (0,0), (3,4)], 1.0))
+</text></testcode><stdin><text /></stdin><expected><text>1
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(ucb([(9,10), (1,10)], 2.0), coup_final([(1,3), (2,3)]))
+</text></testcode><stdin><text /></stdin><expected><text>0 0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(ucb([(0,0), (0,0)], 1.0))
+</text></testcode><stdin><text /></stdin><expected><text>0
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 9 &mdash; Apprendre &agrave; partir d&#39;exemples</title>
+<meta name="description" content="Apprentissage supervise, k plus proches voisins, regression, arbres, validation croisee.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Partie IV &middot; Chapitre 9</div>
+<h1>Chapitre 9 &mdash; Apprendre &agrave; partir d'exemples</h1>
+<div class="lesson-sub">Cadre supervis&eacute;, plus proches voisins, r&eacute;gression lin&eacute;aire et logistique, arbres de d&eacute;cision, sur-apprentissage et &eacute;valuation honn&ecirc;te.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">Annexe compagnon</div><p>Les plus proches voisins, la descente de gradient, la construction d'un arbre de d&eacute;cision et la validation crois&eacute;e sont d&eacute;taill&eacute;s <strong><a href="algorithms.html">pas &agrave; pas dans l'annexe</a></strong>, avec des exemples chiffr&eacute;s v&eacute;rifiables &agrave; la main.</p></div>
+
+<h2>4.1 Le cadre supervis&eacute;</h2>
+
+<p>Les chapitres pr&eacute;c&eacute;dents partaient d'un mod&egrave;le explicite : on connaissait les r&egrave;gles du monde, il fallait raisonner dessus. Ici on renverse le probl&egrave;me : on ne conna&icirc;t pas les r&egrave;gles, mais on dispose d'exemples de leur effet, et l'on veut inf&eacute;rer une fonction qui g&eacute;n&eacute;ralise &agrave; des cas jamais vus.</p>
+
+<div class="box def"><div class="box-title">D&eacute;finition &mdash; Apprentissage supervis&eacute;</div>
+<p>On suppose une distribution de probabilit&eacute; \(P\) inconnue sur \(\mathcal{X}\times\mathcal{Y}\). On observe un &eacute;chantillon \(D = \{(x_1,y_1),\dots,(x_n,y_n)\}\) tir&eacute; ind&eacute;pendamment selon \(P\). Une fonction de perte \(L(y,\hat{y})\) mesure le co&ucirc;t d'une pr&eacute;diction. On cherche \(f\) minimisant le <strong>risque r&eacute;el</strong></p>
+<div class="eq">\[R(f) = \mathbb{E}_{(x,y)\sim P}\big[L(y, f(x))\big]\]</div>
+<p>Comme \(P\) est inconnue, on minimise &agrave; sa place le <strong>risque empirique</strong> \(\hat{R}(f) = \tfrac{1}{n}\sum_{i=1}^{n} L(y_i, f(x_i))\), sur une classe de fonctions \(\mathcal{H}\) fix&eacute;e d'avance.</p></div>
+
+<p>Deux r&eacute;gimes se distinguent selon la nature de \(\mathcal{Y}\) : la <strong>classification</strong> si \(\mathcal{Y}\) est fini, la <strong>r&eacute;gression</strong> si \(\mathcal{Y} = \mathbb{R}\). La perte usuelle est l'indicatrice d'erreur \(L(y,\hat{y}) = \mathbf{1}[y \ne \hat{y}]\) dans le premier cas, l'erreur quadratique \((y-\hat{y})^{2}\) dans le second.</p>
+
+<div class="box warn"><div class="box-title">Le pi&egrave;ge central de tout le chapitre</div>
+Minimiser le risque empirique n'est <em>pas</em> le but. Une fonction qui m&eacute;morise les \(n\) exemples atteint un risque empirique nul et n'apprend rien. L'&eacute;cart entre risque empirique et risque r&eacute;el est le <strong>sur-apprentissage</strong>, et il cro&icirc;t avec la richesse de \(\mathcal{H}\). Toute la discipline consiste &agrave; arbitrer entre une classe assez riche pour repr&eacute;senter le ph&eacute;nom&egrave;ne et assez pauvre pour que le peu de donn&eacute;es disponibles suffise &agrave; y choisir correctement.</div>
+
+<p>Ce compromis a une expression quantitative en r&eacute;gression, la <strong>d&eacute;composition biais&ndash;variance</strong> <a class="cite" href="#ref-geman1992">[1]</a> : pour \(y = g(x) + \varepsilon\) avec \(\mathbb{E}[\varepsilon]=0\) et \(\operatorname{Var}(\varepsilon)=\sigma^{2}\),</p>
+
+<div class="eq">\[\mathbb{E}\big[(y - \hat{f}(x))^{2}\big] = \underbrace{\big(g(x)-\mathbb{E}[\hat{f}(x)]\big)^{2}}_{\text{biais}^{2}} + \underbrace{\operatorname{Var}\big(\hat{f}(x)\big)}_{\text{variance}} + \sigma^{2}\]</div>
+
+<p>Le premier terme mesure ce que la classe de fonctions ne peut pas repr&eacute;senter, le deuxi&egrave;me la sensibilit&eacute; &agrave; l'&eacute;chantillon tir&eacute;, le troisi&egrave;me le bruit irr&eacute;ductible. Enrichir la classe fait baisser le biais et monter la variance. Aucun mod&egrave;le ne descend sous \(\sigma^{2}\). Et aucune m&eacute;thode n'est universellement meilleure : moyenn&eacute; sur toutes les fonctions cibles possibles, tous les algorithmes ont la m&ecirc;me erreur hors &eacute;chantillon <a class="cite" href="#ref-wolpert1996">[2]</a>. La performance vient toujours d'hypoth&egrave;ses qui se trouvent convenir au probl&egrave;me.</p>
+
+<h2>4.2 Les \(k\) plus proches voisins</h2>
+
+<p>La m&eacute;thode la plus simple ne construit aucun mod&egrave;le : elle conserve les exemples et, pour classer un nouveau point, fait voter ses \(k\) voisins les plus proches. Elle remonte &agrave; Fix et Hodges en 1951 ; Cover et Hart en ont &eacute;tabli la propri&eacute;t&eacute; th&eacute;orique remarquable <a class="cite" href="#ref-cover1967">[3]</a>.</p>
+
+<div class="box thm"><div class="box-title">Th&eacute;or&egrave;me &mdash; Borne asymptotique du plus proche voisin</div>
+<p>Quand \(n \to \infty\), le risque de la r&egrave;gle &agrave; un seul voisin v&eacute;rifie \(R^{*} \le R_{1\text{-ppv}} \le 2R^{*}\), o&ugrave; \(R^{*}\) est le risque de Bayes, c'est-&agrave;-dire le minimum absolu atteignable en connaissant \(P\) <a class="cite" href="#ref-cover1967">[3]</a>. Autrement dit : <em>la moiti&eacute; de l'information contenue dans un &eacute;chantillon infini est port&eacute;e par le seul plus proche voisin.</em></p></div>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Le curseur fixe le nombre de voisins consult&eacute;s (toujours impair, pour &eacute;viter les &eacute;galit&eacute;s). Le fond colori&eacute; est la fronti&egrave;re de d&eacute;cision, recalcul&eacute;e sur les seules donn&eacute;es d'apprentissage.</p>
+<div id="jxg1" class="viz-board" style="height:560px;"></div>
+<p class="viz-caption"><strong>Figure 9.1.</strong> Quatre groupes gaussiens dispos&eacute;s en damier : les deux classes ne sont s&eacute;parables par aucune droite. &Agrave; \(k=1\), la fronti&egrave;re est d&eacute;chiquet&eacute;e et l'erreur d'apprentissage est nulle par construction &mdash; chaque point est son propre voisin le plus proche. Elle se lisse quand \(k\) cro&icirc;t. Au-del&agrave; de \(k=15\), les voisinages d&eacute;bordent sur les groupes de l'autre classe et les deux erreurs s'effondrent ensemble : le mod&egrave;le devient trop rigide.</p></div>
+
+<div class="box warn"><div class="box-title">Trois pr&eacute;cautions indispensables</div>
+<p><strong>Normaliser.</strong> La distance euclidienne additionne des carr&eacute;s d'&eacute;carts ; une variable exprim&eacute;e en milliers &eacute;crase toutes les autres. Centrer et r&eacute;duire chaque colonne est obligatoire, et ce calcul doit se faire <em>sur les donn&eacute;es d'apprentissage seulement</em>.</p>
+<p><strong>La dimension.</strong> En dimension \(d\), le volume d'une boule de rayon \(r\) est proportionnel &agrave; \(r^{d}\) : pour capturer une fraction fixe des points, le rayon doit cro&icirc;tre comme \(n^{-1/d}\). D&egrave;s \(d \approx 20\), les &laquo; plus proches voisins &raquo; ne sont plus proches du tout et la m&eacute;thode perd tout sens.</p>
+<p><strong>Le co&ucirc;t.</strong> Aucun temps d'apprentissage, mais \(O(nd)\) par pr&eacute;diction : c'est l'inverse du profil habituel, et cela devient prohibitif en production.</p></div>
+
+<h2>4.3 Mod&egrave;les lin&eacute;aires et descente de gradient</h2>
+
+<p>&Agrave; l'oppos&eacute; du raisonnement par voisinage, on peut postuler une forme fonctionnelle et en ajuster les param&egrave;tres. La plus simple est affine : \(f_{\theta}(x) = \theta^{\mathsf{T}}\tilde{x}\), o&ugrave; \(\tilde{x}\) est \(x\) augment&eacute; d'une coordonn&eacute;e constante.</p>
+
+<div class="box thm"><div class="box-title">Th&eacute;or&egrave;me &mdash; &Eacute;quations normales</div>
+<p>Avec la perte quadratique, \(J(\theta) = \|y - X\theta\|^{2}\) est convexe et diff&eacute;rentiable ; annuler \(\nabla J(\theta) = -2X^{\mathsf{T}}(y - X\theta)\) donne \(X^{\mathsf{T}}X\theta = X^{\mathsf{T}}y\). Si \(X\) est de rang colonne plein, l'unique minimiseur est \(\hat{\theta} = (X^{\mathsf{T}}X)^{-1}X^{\mathsf{T}}y\), et \(X\hat{\theta}\) est la projection orthogonale de \(y\) sur l'espace engendr&eacute; par les colonnes de \(X\). La m&eacute;thode est due &agrave; Legendre <a class="cite" href="#ref-legendre1805">[4]</a>, sa justification probabiliste &agrave; Gauss.</p></div>
+
+<p>Pour la classification binaire, on compose la partie lin&eacute;aire avec la fonction logistique \(\sigma(t) = 1/(1+e^{-t})\) et l'on interpr&egrave;te \(\sigma(\theta^{\mathsf{T}}\tilde{x})\) comme une probabilit&eacute;. La perte adapt&eacute;e est l'entropie crois&eacute;e, dont le gradient prend une forme remarquablement simple :</p>
+
+<div class="eq">\[J(\theta) = -\frac{1}{n}\sum_{i=1}^{n}\Big[y_i\ln \hat{p}_i + (1-y_i)\ln(1-\hat{p}_i)\Big], \qquad \nabla J(\theta) = \frac{1}{n}X^{\mathsf{T}}(\hat{p} - y)\]</div>
+
+<p>Il n'existe pas de solution ferm&eacute;e ; on minimise it&eacute;rativement par \(\theta \leftarrow \theta - \eta\,\nabla J(\theta)\). Pour un objectif convexe et \(L\)-r&eacute;gulier, la descente converge d&egrave;s que \(\eta \le 1/L\), avec une erreur en \(O(1/t)\) ; si l'objectif est de plus \(\mu\)-fortement convexe, la convergence est g&eacute;om&eacute;trique de raison \(1 - \mu/L\). La variante stochastique, qui remplace le gradient complet par celui d'un petit lot, converge sous les conditions de Robbins et Monro \(\sum_t \eta_t = \infty\) et \(\sum_t \eta_t^{2} \lt \infty\) <a class="cite" href="#ref-robbins1951">[5]</a>.</p>
+
+<div class="algo"><div class="algo-cap">Algorithme 9.1 &mdash; R&eacute;gression logistique par descente de gradient</div><div class="algo-io"><b>Entr&eacute;e :</b> \(X \in \mathbb{R}^{n \times d}\) avec sa colonne de biais, \(y \in \{0,1\}^{n}\), un pas \(\eta\), un nombre d'it&eacute;rations \(T\)<br><b>Sortie :</b> \(\hat{\theta} \in \mathbb{R}^{d}\)</div><ol class="algo-corps"><li>\(\theta^{(0)} \leftarrow 0\)</li><li><b class="kw">pour</b> \(t = 0\) <b class="kw">jusqu'&agrave;</b> \(T-1\) <b class="kw">faire</b></li><li class="n1">\(\hat{p} \leftarrow \sigma\big(X\theta^{(t)}\big)\)          <span class="cm">// sigma(z) = 1 / (1 + exp(-z))</span></li><li class="n1">\(\nabla J \leftarrow \tfrac{1}{n} X^{\mathsf{T}}(\hat{p} - y)\)</li><li class="n1">\(\theta^{(t+1)} \leftarrow \theta^{(t)} - \eta\,\nabla J\)</li><li><b class="kw">retourner</b> \(\theta^{(T)}\)</li></ol><p class="algo-note">Le gradient a exactement la forme de celui des moindres carr&eacute;s : seule la fonction appliqu&eacute;e &agrave; \(X\theta\) change. <strong>Convergence.</strong> \(J\) &eacute;tant convexe et \(L\)-r&eacute;guli&egrave;re, la descente converge d&egrave;s que \(\eta \le 1/L\), avec une erreur en \(O(1/t)\).</p></div>
+
+<div class="box tip"><div class="box-title">R&eacute;gularisation</div>
+Plut&ocirc;t que de restreindre la classe &agrave; la main, on p&eacute;nalise la complexit&eacute; dans l'objectif : \(J(\theta) + \lambda\|\theta\|_2^{2}\) (r&eacute;gression ridge, qui stabilise les probl&egrave;mes mal conditionn&eacute;s <a class="cite" href="#ref-hoerl1970">[6]</a>) ou \(J(\theta) + \lambda\|\theta\|_1\) (lasso, dont les lignes de niveau anguleuses am&egrave;nent la solution sur les axes et annulent exactement des coefficients <a class="cite" href="#ref-tibshirani1996">[7]</a>). Dans les deux cas, \(\lambda\) se choisit par validation crois&eacute;e, jamais &agrave; l'&oelig;il.</div>
+
+<h2>4.4 Arbres de d&eacute;cision</h2>
+
+<p>Un arbre de d&eacute;cision d&eacute;coupe r&eacute;cursivement l'espace par des tests sur une seule variable &agrave; la fois, jusqu'&agrave; obtenir des r&eacute;gions homog&egrave;nes. C'est le mod&egrave;le le plus directement lisible : le chemin de la racine &agrave; une feuille <em>est</em> l'explication de la pr&eacute;diction.</p>
+
+<p>La construction est gloutonne : &agrave; chaque n&oelig;ud, on choisit le test qui r&eacute;duit le plus l'impuret&eacute; des sous-ensembles obtenus. Deux mesures dominent :</p>
+
+<div class="eq">\[H(S) = -\sum_{c} p_{c}\log_{2}p_{c} \qquad\text{(entropie, ID3)} \qquad\qquad G(S) = 1 - \sum_{c} p_{c}^{2} \qquad\text{(indice de Gini, CART)}\]</div>
+
+<p>o&ugrave; \(p_c\) est la proportion de la classe \(c\) dans \(S\). Le crit&egrave;re optimis&eacute; est le <strong>gain</strong>, c'est-&agrave;-dire la diff&eacute;rence entre l'impuret&eacute; du n&oelig;ud et la moyenne pond&eacute;r&eacute;e de celles des fils. ID3 est d&ucirc; &agrave; Quinlan <a class="cite" href="#ref-quinlan1986">[8]</a>, CART &agrave; Breiman et ses coauteurs <a class="cite" href="#ref-breiman1984">[9]</a>.</p>
+
+<div class="box warn"><div class="box-title">Le gain d'information favorise les variables &agrave; nombreuses valeurs</div>
+Un identifiant unique par exemple d&eacute;coupe parfaitement l'&eacute;chantillon et obtient le gain maximal &mdash; tout en n'ayant aucun pouvoir pr&eacute;dictif. Rem&egrave;de de Quinlan : diviser le gain par l'entropie de la r&eacute;partition elle-m&ecirc;me, ce qui donne le <em>rapport de gain</em>. CART contourne le probl&egrave;me diff&eacute;remment, en n'autorisant que des coupes binaires.</div>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Le curseur limite la profondeur de l'arbre. Les rectangles sont les feuilles, colori&eacute;es par la classe majoritaire des points d'apprentissage qu'elles contiennent.</p>
+<div id="jxg2" class="viz-board" style="height:560px;"></div>
+<p class="viz-caption"><strong>Figure 9.2.</strong> M&ecirc;mes donn&eacute;es qu'&agrave; la figure pr&eacute;c&eacute;dente, partitionn&eacute;es par un arbre &agrave; coupes parall&egrave;les aux axes. &Agrave; profondeur 0 ou 1, le mod&egrave;le est incapable de s&eacute;parer quatre groupes en damier ; &agrave; profondeur 2, quatre feuilles suffisent &agrave; ramener l'erreur d'apprentissage &agrave; 13 % et l'erreur de test &agrave; 42 %. Au-del&agrave; de la profondeur 5, l'erreur d'apprentissage tombe &agrave; z&eacute;ro tandis que l'erreur de test reste bloqu&eacute;e &agrave; 42 % : l'arbre m&eacute;morise le bruit de l'&eacute;chantillon. Le remplacement des rectangles par un mod&egrave;le lin&eacute;aire serait ici pire encore &mdash; aucune droite ne s&eacute;pare un damier.</p></div>
+
+<p>Les rem&egrave;des au sur-apprentissage d'un arbre sont de deux sortes. L'<strong>arr&ecirc;t pr&eacute;coce</strong> limite la profondeur ou impose un effectif minimal par feuille. L'<strong>&eacute;lagage</strong> laisse pousser l'arbre puis supprime les sous-arbres dont la suppression n'aggrave pas l'erreur estim&eacute;e sur des donn&eacute;es non vues ; c'est en g&eacute;n&eacute;ral la meilleure des deux, car un test peu informatif peut en pr&eacute;c&eacute;der un tr&egrave;s informatif. Enfin, agr&eacute;ger de nombreux arbres construits sur des &eacute;chantillons et des sous-ensembles de variables tir&eacute;s au hasard r&eacute;duit fortement la variance : c'est la for&ecirc;t al&eacute;atoire <a class="cite" href="#ref-breiman2001">[10]</a>.</p>
+
+<h2>4.5 &Eacute;valuer honn&ecirc;tement</h2>
+
+<p>L'erreur mesur&eacute;e sur les donn&eacute;es d'apprentissage est syst&eacute;matiquement optimiste. La seule mesure qui ait un sens porte sur des donn&eacute;es que le mod&egrave;le n'a jamais vues.</p>
+
+<figure class="viz"><div class="viz-title">Matrice de confusion et m&eacute;triques d&eacute;riv&eacute;es</div>
+<svg viewBox="0 0 760 432" role="img" style="width:100%;height:auto;display:block;"><rect x="202" y="74" width="148" height="78" rx="6" style="fill:var(--viz-ok);fill-opacity:0.16;stroke:var(--viz-ok);stroke-width:2;"/><text x="276" y="101" text-anchor="middle" style="fill:var(--viz-ok);font-size:12px;font-weight:700;font-family:inherit;">vrais positifs</text><text x="276" y="132" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">42</text><rect x="358" y="74" width="148" height="78" rx="6" style="fill:var(--viz-bad);fill-opacity:0.16;stroke:var(--viz-bad);stroke-width:2;"/><text x="432" y="101" text-anchor="middle" style="fill:var(--viz-bad);font-size:12px;font-weight:700;font-family:inherit;">faux n&eacute;gatifs</text><text x="432" y="132" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">18</text><rect x="202" y="160" width="148" height="78" rx="6" style="fill:var(--viz-bad);fill-opacity:0.16;stroke:var(--viz-bad);stroke-width:2;"/><text x="276" y="187" text-anchor="middle" style="fill:var(--viz-bad);font-size:12px;font-weight:700;font-family:inherit;">faux positifs</text><text x="276" y="218" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">27</text><rect x="358" y="160" width="148" height="78" rx="6" style="fill:var(--viz-ok);fill-opacity:0.16;stroke:var(--viz-ok);stroke-width:2;"/><text x="432" y="187" text-anchor="middle" style="fill:var(--viz-ok);font-size:12px;font-weight:700;font-family:inherit;">vrais n&eacute;gatifs</text><text x="432" y="218" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">913</text><text x="276" y="58" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">pr&eacute;dit positif</text><text x="432" y="58" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">pr&eacute;dit n&eacute;gatif</text><text x="176" y="119" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">r&eacute;ellement positif</text><text x="176" y="205" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">r&eacute;ellement n&eacute;gatif</text><path d="M 20 260 L 740 260" style="fill:none;stroke:var(--color-rule);stroke-width:1.4;"/><text x="20" y="288" style="fill:var(--color-text);font-size:13px;font-family:inherit;">exactitude = (42 + 913) / 1000 = 95,5 %</text><text x="740" y="288" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">impressionnant &mdash; et pourtant inutile ici</text><text x="20" y="318" style="fill:var(--color-text);font-size:13px;font-family:inherit;">pr&eacute;cision = 42 / (42 + 27) = 60,9 %</text><text x="740" y="318" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">parmi les alertes, la proportion de vraies</text><text x="20" y="348" style="fill:var(--color-text);font-size:13px;font-family:inherit;">rappel = 42 / (42 + 18) = 70,0 %</text><text x="740" y="348" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">parmi les vrais cas, la proportion d&eacute;tect&eacute;e</text><text x="20" y="378" style="fill:var(--color-text);font-size:13px;font-family:inherit;">score F1 = 2 &middot; 0,609 &middot; 0,700 / (0,609 + 0,700) = 65,1 %</text><text x="740" y="378" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">moyenne harmonique des deux</text><text x="20" y="414" style="fill:var(--viz-bad);font-size:12.5px;font-weight:700;font-family:inherit;">classifieur constant &laquo; toujours n&eacute;gatif &raquo; : exactitude 94,0 %, rappel 0 % &mdash; d'o&ugrave; l'inutilit&eacute; de la seule exactitude</text></svg>
+<figcaption class="viz-caption"><strong>Figure 9.3.</strong> Un d&eacute;pistage sur 1 000 patients dont 60 sont r&eacute;ellement malades. L'exactitude de 95,5 % semble excellente, mais un classifieur qui r&eacute;pondrait &laquo; jamais malade &raquo; atteindrait 94,0 % avec un rappel nul. C'est pourquoi on rapporte toujours pr&eacute;cision et rappel, et non l'exactitude seule, d&egrave;s que les classes sont d&eacute;s&eacute;quilibr&eacute;es.</figcaption></figure>
+
+<p>Un seul d&eacute;coupage en deux parts gaspille des donn&eacute;es et rend le score d&eacute;pendant du tirage. La <strong>validation crois&eacute;e</strong> &agrave; \(K\) blocs, formalis&eacute;e par Stone <a class="cite" href="#ref-stone1974">[11]</a>, r&eacute;pond aux deux objections : chaque exemple sert \(K-1\) fois &agrave; l'apprentissage et une fois &agrave; l'&eacute;valuation.</p>
+
+<figure class="viz"><div class="viz-title">Validation crois&eacute;e &agrave; cinq blocs</div>
+<svg viewBox="0 0 760 300" role="img" style="width:100%;height:auto;display:block;"><text x="136" y="82" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">tour 1</text><rect x="150" y="60" width="100" height="34" rx="4" style="fill:var(--accent);fill-opacity:0.3;stroke:var(--accent);stroke-width:2;"/><text x="200" y="82" text-anchor="middle" style="fill:var(--color-text);font-size:11.5px;font-weight:700;font-family:inherit;">validation</text><rect x="256" y="60" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="306" y="82" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><rect x="362" y="60" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="412" y="82" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><rect x="468" y="60" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="518" y="82" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><rect x="574" y="60" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="624" y="82" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><text x="136" y="126" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">tour 2</text><rect x="150" y="104" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="200" y="126" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><rect x="256" y="104" width="100" height="34" rx="4" style="fill:var(--accent);fill-opacity:0.3;stroke:var(--accent);stroke-width:2;"/><text x="306" y="126" text-anchor="middle" style="fill:var(--color-text);font-size:11.5px;font-weight:700;font-family:inherit;">validation</text><rect x="362" y="104" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="412" y="126" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><rect x="468" y="104" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="518" y="126" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><rect x="574" y="104" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="624" y="126" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><text x="136" y="170" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">tour 3</text><rect x="150" y="148" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="200" y="170" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><rect x="256" y="148" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="306" y="170" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><rect x="362" y="148" width="100" height="34" rx="4" style="fill:var(--accent);fill-opacity:0.3;stroke:var(--accent);stroke-width:2;"/><text x="412" y="170" text-anchor="middle" style="fill:var(--color-text);font-size:11.5px;font-weight:700;font-family:inherit;">validation</text><rect x="468" y="148" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="518" y="170" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><rect x="574" y="148" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="624" y="170" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><text x="136" y="214" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">tour 4</text><rect x="150" y="192" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="200" y="214" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><rect x="256" y="192" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="306" y="214" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><rect x="362" y="192" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="412" y="214" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><rect x="468" y="192" width="100" height="34" rx="4" style="fill:var(--accent);fill-opacity:0.3;stroke:var(--accent);stroke-width:2;"/><text x="518" y="214" text-anchor="middle" style="fill:var(--color-text);font-size:11.5px;font-weight:700;font-family:inherit;">validation</text><rect x="574" y="192" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="624" y="214" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><text x="136" y="258" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">tour 5</text><rect x="150" y="236" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="200" y="258" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><rect x="256" y="236" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="306" y="258" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><rect x="362" y="236" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="412" y="258" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><rect x="468" y="236" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="518" y="258" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">apprentissage</text><rect x="574" y="236" width="100" height="34" rx="4" style="fill:var(--accent);fill-opacity:0.3;stroke:var(--accent);stroke-width:2;"/><text x="624" y="258" text-anchor="middle" style="fill:var(--color-text);font-size:11.5px;font-weight:700;font-family:inherit;">validation</text><text x="415" y="40" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">les donn&eacute;es sont d&eacute;coup&eacute;es en 5 blocs de m&ecirc;me taille</text><text x="415" y="290" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">le score retenu est la moyenne des 5 tours ; son &eacute;cart-type mesure la stabilit&eacute; du mod&egrave;le</text></svg>
+<figcaption class="viz-caption"><strong>Figure 9.4.</strong> \(K = 5\) ou \(10\) est le compromis usuel. Un \(K\) petit donne une estimation pessimiste, car chaque mod&egrave;le est appris sur peu de donn&eacute;es ; \(K = n\) (retrait d'un seul exemple) est presque sans biais mais de forte variance et co&ucirc;te \(n\) apprentissages.</figcaption></figure>
+
+<div class="box warn"><div class="box-title">La fuite de donn&eacute;es, erreur num&eacute;ro un en pratique</div>
+Tout traitement qui <em>apprend</em> quelque chose des donn&eacute;es &mdash; normalisation, s&eacute;lection de variables, imputation des manquants, r&eacute;duction de dimension &mdash; doit &ecirc;tre ajust&eacute; &agrave; l'int&eacute;rieur de chaque bloc, sur la seule portion d'apprentissage. Normaliser l'ensemble du jeu de donn&eacute;es avant de le d&eacute;couper fait entrer de l'information du test dans le mod&egrave;le et produit des scores flatteurs qui s'&eacute;vanouissent en production. La m&ecirc;me r&egrave;gle vaut pour le choix des hyperparam&egrave;tres : les s&eacute;lectionner sur le jeu de test revient &agrave; en faire un jeu d'apprentissage.</div>
+
+<h2>4.6 Mise en &oelig;uvre</h2>
+
+<p>Le mod&egrave;le des biblioth&egrave;ques standard suit une convention uniforme : un objet expose <em>fit</em> pour ajuster, <em>predict</em> pour pr&eacute;dire, et se compose dans un encha&icirc;nement qui garantit que la normalisation reste &agrave; l'int&eacute;rieur des blocs de validation <a class="cite" href="#ref-pedregosa2011">[12]</a>.</p>
+
+<div class="algo"><div class="algo-cap">Algorithme 9.2 &mdash; S&eacute;lection de mod&egrave;le par validation crois&eacute;e</div><div class="algo-io"><b>Entr&eacute;e :</b> un jeu \(D\), une famille de mod&egrave;les \(\mathcal{M}\), un entier \(K\)<br><b>Sortie :</b> le mod&egrave;le de meilleur score moyen, et l'&eacute;cart-type de ce score</div><ol class="algo-corps"><li>partitionner \(D\) en \(K\) blocs \(D_1, \dots, D_K\) de m&ecirc;me taille, strates respect&eacute;es</li><li><b class="kw">pour tout</b> \(M \in \mathcal{M}\) <b class="kw">faire</b></li><li class="n1"><b class="kw">pour</b> \(k = 1\) <b class="kw">jusqu'&agrave;</b> \(K\) <b class="kw">faire</b></li><li class="n2">\(A \leftarrow D \setminus D_k\)          <span class="cm">// apprentissage</span></li><li class="n2">ajuster les PR&Eacute;TRAITEMENTS sur \(A\) seulement          <span class="cm">// sinon : fuite de donnees</span></li><li class="n2">ajuster \(M\) sur \(A\) transform&eacute;</li><li class="n2">\(s_k \leftarrow\) score de \(M\) sur \(D_k\) transform&eacute;</li><li class="n1">\(\mu_M \leftarrow \tfrac{1}{K}\sum_k s_k\) ; \(\varsigma_M \leftarrow \operatorname{ecart\text{-}type}(s_1,\dots,s_K)\)</li><li><b class="kw">retourner</b> \(\operatorname*{argmax}_{M} \mu_M\) <b class="kw">et</b> \(\varsigma_M\)</li></ol><p class="algo-note">Ajuster la normalisation <em>avant</em> le d&eacute;coupage fait entrer de l'information du bloc de validation dans le mod&egrave;le. Un &eacute;cart de moyenne inf&eacute;rieur &agrave; \(\varsigma\) ne permet de conclure &agrave; aucune sup&eacute;riorit&eacute;.</p></div>
+
+<p>Le <em>pipeline</em> n'est pas une commodit&eacute; d'&eacute;criture : c'est lui qui emp&ecirc;che la fuite de donn&eacute;es, puisque la normalisation est ajust&eacute;e &agrave; chaque tour sur la seule portion d'apprentissage du bloc. &Eacute;crire &agrave; la place <code>X = StandardScaler().fit_transform(X)</code> avant l'appel produit des scores syst&eacute;matiquement optimistes.</p>
+
+<h2>Synth&egrave;se</h2>
+<ul>
+<li>Apprendre, c'est minimiser un risque r&eacute;el <em>inobservable</em> &agrave; travers son estimation empirique, sur une classe de fonctions choisie d'avance.</li>
+<li>Erreur attendue = biais\(^{2}\) + variance + bruit <a class="cite" href="#ref-geman1992">[1]</a> ; la complexit&eacute; du mod&egrave;le d&eacute;place les deux premiers termes en sens contraire, et aucune m&eacute;thode n'est universellement sup&eacute;rieure <a class="cite" href="#ref-wolpert1996">[2]</a>.</li>
+<li>Les plus proches voisins ne construisent rien mais paient &agrave; la pr&eacute;diction, exigent une normalisation et s'effondrent en grande dimension <a class="cite" href="#ref-cover1967">[3]</a>.</li>
+<li>Les mod&egrave;les lin&eacute;aires ont une solution ferm&eacute;e en r&eacute;gression et s'ajustent par gradient en classification ; la r&eacute;gularisation arbitre entre ajustement et stabilit&eacute; <a class="cite" href="#ref-hoerl1970">[6]</a>.</li>
+<li>Les arbres sont lisibles et non lin&eacute;aires, mais sur-apprennent sans arr&ecirc;t pr&eacute;coce ni &eacute;lagage ; leur agr&eacute;gation r&eacute;duit la variance <a class="cite" href="#ref-breiman2001">[10]</a>.</li>
+<li>Un score n'a de valeur que mesur&eacute; sur des donn&eacute;es jamais vues, par validation crois&eacute;e, et sans aucune fuite de pr&eacute;traitement <a class="cite" href="#ref-stone1974">[11]</a>.</li>
+</ul>
+
+<h2>R&eacute;f&eacute;rences</h2>
+<ol class="reflist">
+<li id="ref-geman1992">Geman, S., Bienenstock, E. &amp; Doursat, R. (1992). Neural networks and the bias/variance dilemma. <em>Neural Computation</em>, 4(1), 1&ndash;58. DOI&nbsp;: 10.1162/neco.1992.4.1.1. <a href="https://doi.org/10.1162/neco.1992.4.1.1">https://doi.org/10.1162/neco.1992.4.1.1</a></li>
+<li id="ref-wolpert1996">Wolpert, D. H. (1996). The lack of a priori distinctions between learning algorithms. <em>Neural Computation</em>, 8(7), 1341&ndash;1390. DOI&nbsp;: 10.1162/neco.1996.8.7.1341. <a href="https://doi.org/10.1162/neco.1996.8.7.1341">https://doi.org/10.1162/neco.1996.8.7.1341</a></li>
+<li id="ref-cover1967">Cover, T. M. &amp; Hart, P. E. (1967). Nearest neighbor pattern classification. <em>IEEE Transactions on Information Theory</em>, 13(1), 21&ndash;27. DOI&nbsp;: 10.1109/TIT.1967.1053964. <a href="https://doi.org/10.1109/TIT.1967.1053964">https://doi.org/10.1109/TIT.1967.1053964</a></li>
+<li id="ref-legendre1805">Legendre, A.-M. (1805). <em>Nouvelles m&eacute;thodes pour la d&eacute;termination des orbites des com&egrave;tes</em>. Firmin Didot, Paris. <a href="https://archive.org/details/nouvellesmthode00legegoog">https://archive.org/details/nouvellesmthode00legegoog</a></li>
+<li id="ref-robbins1951">Robbins, H. &amp; Monro, S. (1951). A stochastic approximation method. <em>Annals of Mathematical Statistics</em>, 22(3), 400&ndash;407. DOI&nbsp;: 10.1214/aoms/1177729586. <a href="https://doi.org/10.1214/aoms/1177729586">https://doi.org/10.1214/aoms/1177729586</a></li>
+<li id="ref-hoerl1970">Hoerl, A. E. &amp; Kennard, R. W. (1970). Ridge regression: biased estimation for nonorthogonal problems. <em>Technometrics</em>, 12(1), 55&ndash;67. DOI&nbsp;: 10.1080/00401706.1970.10488634. <a href="https://doi.org/10.1080/00401706.1970.10488634">https://doi.org/10.1080/00401706.1970.10488634</a></li>
+<li id="ref-tibshirani1996">Tibshirani, R. (1996). Regression shrinkage and selection via the lasso. <em>Journal of the Royal Statistical Society B</em>, 58(1), 267&ndash;288. DOI&nbsp;: 10.1111/j.2517-6161.1996.tb02080.x. <a href="https://doi.org/10.1111/j.2517-6161.1996.tb02080.x">https://doi.org/10.1111/j.2517-6161.1996.tb02080.x</a></li>
+<li id="ref-quinlan1986">Quinlan, J. R. (1986). Induction of decision trees. <em>Machine Learning</em>, 1(1), 81&ndash;106. DOI&nbsp;: 10.1007/BF00116251. <a href="https://doi.org/10.1007/BF00116251">https://doi.org/10.1007/BF00116251</a></li>
+<li id="ref-breiman1984">Breiman, L., Friedman, J. H., Olshen, R. A. &amp; Stone, C. J. (1984). <em>Classification and Regression Trees</em>. Wadsworth. DOI&nbsp;: 10.1201/9781315139470. <a href="https://doi.org/10.1201/9781315139470">https://doi.org/10.1201/9781315139470</a></li>
+<li id="ref-breiman2001">Breiman, L. (2001). Random forests. <em>Machine Learning</em>, 45(1), 5&ndash;32. DOI&nbsp;: 10.1023/A:1010933404324. <a href="https://doi.org/10.1023/A:1010933404324">https://doi.org/10.1023/A:1010933404324</a></li>
+<li id="ref-stone1974">Stone, M. (1974). Cross-validatory choice and assessment of statistical predictions. <em>Journal of the Royal Statistical Society B</em>, 36(2), 111&ndash;147. DOI&nbsp;: 10.1111/j.2517-6161.1974.tb00994.x. <a href="https://doi.org/10.1111/j.2517-6161.1974.tb00994.x">https://doi.org/10.1111/j.2517-6161.1974.tb00994.x</a></li>
+<li id="ref-pedregosa2011">Pedregosa, F. <em>et al.</em> (2011). Scikit-learn: machine learning in Python. <em>Journal of Machine Learning Research</em>, 12, 2825&ndash;2830. <a href="https://www.jmlr.org/papers/v12/pedregosa11a.html">https://www.jmlr.org/papers/v12/pedregosa11a.html</a></li>
+</ol>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../08-probabiliste/page.html">\(\leftarrow\) Chapitre 8 &mdash; Raisonnement probabiliste</a>
+<a href="algorithms.html">Annexe algorithmique</a>
+<a href="../../index.html">Sommaire du manuel</a>
+<a href="../10-non-supervise/page.html">Chapitre 10 &mdash; Apprentissage non supervis&eacute; \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">La figure interactive n\'a pas pu etre chargee. Verifiez votre connexion reseau.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ============== Jeu de donnees 2D deterministe, deux classes ============== */
+function alea(graine){
+  var s = graine;
+  return function(){ s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648; };
+}
+function gauss(rnd){
+  var u = Math.max(1e-9, rnd()), v = rnd();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+var DONNEES = (function(){
+  var rnd = alea(20250806), pts = [];
+  var centres = [[2.6, 6.2, 0], [6.6, 3.0, 0], [6.4, 7.0, 1], [2.8, 2.6, 1]];
+  for (var c = 0; c < centres.length; c++){
+    for (var i = 0; i < 11; i++){
+      pts.push({x: centres[c][0] + 1.0 * gauss(rnd),
+                y: centres[c][1] + 1.0 * gauss(rnd),
+                cl: centres[c][2],
+                test: (i % 3 === 2)});           /* un tiers en jeu de test */
+    }
+  }
+  return pts;
+})();
+function appr(){ return DONNEES.filter(function(p){ return !p.test; }); }
+function tests(){ return DONNEES.filter(function(p){ return p.test; }); }
+
+/* --------------------------------- Figure : k plus proches voisins ------- */
+function voteKnn(x, y, k, base){
+  var d = base.map(function(p){
+    return {d: (p.x-x)*(p.x-x) + (p.y-y)*(p.y-y), cl: p.cl};
+  });
+  d.sort(function(a,b){ return a.d - b.d; });
+  var s = 0;
+  for (var i = 0; i < k && i < d.length; i++){ s += (d[i].cl === 1 ? 1 : -1); }
+  return s >= 0 ? 1 : 0;
+}
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-0.7, 10.2, 9.7, -2.4], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: true
+});
+var sK = b1.create('slider', [[0.2, -1.3], [5.4, -1.3], [1, 5, 21]], {
+  name: 'k', snapWidth: 2, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+function kCourant(){ var k = Math.round(sK.Value()); return k % 2 === 0 ? k + 1 : k; }
+var NX = 34, NY = 34, X0 = 0, X1 = 9, Y0 = 0, Y1 = 9;
+function grilleKnn(classe){
+  var k = kCourant(), base = appr(), X = [], Y = [];
+  var dx = (X1 - X0) / NX, dy = (Y1 - Y0) / NY;
+  for (var i = 0; i < NX; i++){
+    for (var j = 0; j < NY; j++){
+      var cx = X0 + (i + 0.5) * dx, cy = Y0 + (j + 0.5) * dy;
+      if (voteKnn(cx, cy, k, base) !== classe) { continue; }
+      X.push(cx-dx/2, cx+dx/2, cx+dx/2, cx-dx/2, cx-dx/2, NaN);
+      Y.push(cy-dy/2, cy-dy/2, cy+dy/2, cy+dy/2, cy-dy/2, NaN);
+    }
+  }
+  return [X, Y];
+}
+var cZone0 = b1.create('curve', [[0],[0]], {
+  strokeWidth: 0, fillColor: function(){ return cssv('--viz-blue', '#2563eb'); },
+  fillOpacity: 0.16, highlight: false, fixed: true});
+cZone0.updateDataArray = function(){ var d = grilleKnn(0); this.dataX = d[0]; this.dataY = d[1]; };
+var cZone1 = b1.create('curve', [[0],[0]], {
+  strokeWidth: 0, fillColor: function(){ return cssv('--accent', '#f59e0b'); },
+  fillOpacity: 0.20, highlight: false, fixed: true});
+cZone1.updateDataArray = function(){ var d = grilleKnn(1); this.dataX = d[0]; this.dataY = d[1]; };
+
+for (var i = 0; i < DONNEES.length; i++){
+  (function(p){
+    b1.create('point', [p.x, p.y], {
+      name: '', size: p.test ? 4 : 5, face: p.test ? 'x' : 'o',
+      fixed: true, highlight: false, strokeWidth: 2,
+      strokeColor: p.cl === 1 ? '#b45309' : '#1d4ed8',
+      fillColor: p.cl === 1 ? '#f59e0b' : '#2563eb'
+    });
+  })(DONNEES[i]);
+}
+function erreurKnn(ens){
+  var k = kCourant(), base = appr(), e = 0;
+  for (var i = 0; i < ens.length; i++){
+    if (voteKnn(ens[i].x, ens[i].y, k, base) !== ens[i].cl) { e++; }
+  }
+  return e;
+}
+b1.create('text', [-0.6, 9.9, function(){
+  var a = appr(), t = tests();
+  var ea = erreurKnn(a), et = erreurKnn(t);
+  return 'k = ' + kCourant()
+       + '   |   erreur d’apprentissage : ' + ea + ' / ' + a.length
+       + ' (' + (100*ea/a.length).toFixed(0) + ' %)'
+       + '   |   erreur de test : ' + et + ' / ' + t.length
+       + ' (' + (100*et/t.length).toFixed(0) + ' %)';
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-0.6, -2.1, 'disques : donnees d’apprentissage   |   croix : donnees de test'],
+  {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+/* --------------------------------- Figure : arbre de decision ------------ */
+function gini(ens){
+  if (!ens.length) { return 0; }
+  var p = 0;
+  for (var i = 0; i < ens.length; i++){ p += ens[i].cl; }
+  p /= ens.length;
+  return 2 * p * (1 - p);
+}
+function meilleureCoupe(ens){
+  var best = null;
+  for (var axe = 0; axe < 2; axe++){
+    var vals = ens.map(function(p){ return axe === 0 ? p.x : p.y; }).slice().sort(function(a,b){ return a-b; });
+    for (var i = 0; i + 1 < vals.length; i++){
+      var seuil = (vals[i] + vals[i+1]) / 2;
+      if (seuil === vals[i]) { continue; }
+      var g = [], d = [];
+      for (var j = 0; j < ens.length; j++){
+        ((axe === 0 ? ens[j].x : ens[j].y) <= seuil ? g : d).push(ens[j]);
+      }
+      if (!g.length || !d.length) { continue; }
+      var cout = (g.length * gini(g) + d.length * gini(d)) / ens.length;
+      if (best === null || cout < best.cout) { best = {axe: axe, seuil: seuil, cout: cout, g: g, d: d}; }
+    }
+  }
+  return best;
+}
+function construire(ens, prof, boite){
+  var majorite = 0, s = 0;
+  for (var i = 0; i < ens.length; i++){ s += ens[i].cl; }
+  majorite = (s * 2 >= ens.length) ? 1 : 0;
+  var noeud = {boite: boite, cl: majorite, n: ens.length, feuille: true};
+  if (prof === 0 || ens.length < 2 || gini(ens) === 0) { return noeud; }
+  var c = meilleureCoupe(ens);
+  if (c === null) { return noeud; }
+  noeud.feuille = false; noeud.axe = c.axe; noeud.seuil = c.seuil;
+  var bg = boite.slice(), bd = boite.slice();
+  if (c.axe === 0){ bg[2] = c.seuil; bd[0] = c.seuil; } else { bg[3] = c.seuil; bd[1] = c.seuil; }
+  noeud.g = construire(c.g, prof - 1, bg);
+  noeud.d = construire(c.d, prof - 1, bd);
+  return noeud;
+}
+function predire(noeud, p){
+  while (!noeud.feuille){
+    noeud = ((noeud.axe === 0 ? p.x : p.y) <= noeud.seuil) ? noeud.g : noeud.d;
+  }
+  return noeud.cl;
+}
+function feuilles(noeud, acc){
+  acc = acc || [];
+  if (noeud.feuille) { acc.push(noeud); } else { feuilles(noeud.g, acc); feuilles(noeud.d, acc); }
+  return acc;
+}
+var CACHE4 = {};
+function arbre(prof){
+  if (!(prof in CACHE4)) { CACHE4[prof] = construire(appr(), prof, [X0, Y0, X1, Y1]); }
+  return CACHE4[prof];
+}
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-0.7, 10.2, 9.7, -2.4], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: true
+});
+var sProf = b2.create('slider', [[0.2, -1.3], [5.4, -1.3], [0, 2, 8]], {
+  name: 'profondeur maximale', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+function profCourante(){ return Math.round(sProf.Value()); }
+function zonesArbre(classe){
+  var f = feuilles(arbre(profCourante())), X = [], Y = [];
+  for (var i = 0; i < f.length; i++){
+    if (f[i].cl !== classe) { continue; }
+    var b = f[i].boite;
+    X.push(b[0], b[2], b[2], b[0], b[0], NaN);
+    Y.push(b[1], b[1], b[3], b[3], b[1], NaN);
+  }
+  return [X, Y];
+}
+var dZ0 = b2.create('curve', [[0],[0]], {
+  strokeWidth: 0, fillColor: function(){ return cssv('--viz-blue', '#2563eb'); },
+  fillOpacity: 0.16, highlight: false, fixed: true});
+dZ0.updateDataArray = function(){ var d = zonesArbre(0); this.dataX = d[0]; this.dataY = d[1]; };
+var dZ1 = b2.create('curve', [[0],[0]], {
+  strokeWidth: 0, fillColor: function(){ return cssv('--accent', '#f59e0b'); },
+  fillOpacity: 0.20, highlight: false, fixed: true});
+dZ1.updateDataArray = function(){ var d = zonesArbre(1); this.dataX = d[0]; this.dataY = d[1]; };
+var dBord = b2.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--primary', '#026573'); },
+  strokeWidth: 1.6, highlight: false, fixed: true});
+dBord.updateDataArray = function(){
+  var f = feuilles(arbre(profCourante())), X = [], Y = [];
+  for (var i = 0; i < f.length; i++){
+    var b = f[i].boite;
+    X.push(b[0], b[2], b[2], b[0], b[0], NaN);
+    Y.push(b[1], b[1], b[3], b[3], b[1], NaN);
+  }
+  this.dataX = X; this.dataY = Y;
+};
+for (var i = 0; i < DONNEES.length; i++){
+  (function(p){
+    b2.create('point', [p.x, p.y], {
+      name: '', size: p.test ? 4 : 5, face: p.test ? 'x' : 'o',
+      fixed: true, highlight: false, strokeWidth: 2,
+      strokeColor: p.cl === 1 ? '#b45309' : '#1d4ed8',
+      fillColor: p.cl === 1 ? '#f59e0b' : '#2563eb'
+    });
+  })(DONNEES[i]);
+}
+function erreurArbre(ens){
+  var a = arbre(profCourante()), e = 0;
+  for (var i = 0; i < ens.length; i++){ if (predire(a, ens[i]) !== ens[i].cl) { e++; } }
+  return e;
+}
+b2.create('text', [-0.6, 9.9, function(){
+  var a = appr(), t = tests();
+  var ea = erreurArbre(a), et = erreurArbre(t);
+  return 'profondeur ' + profCourante() + '   |   ' + feuilles(arbre(profCourante())).length
+       + ' feuilles   |   erreur d’apprentissage : ' + (100*ea/a.length).toFixed(0)
+       + ' %   |   erreur de test : ' + (100*et/t.length).toFixed(0) + ' %';
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-0.6, -2.1, function(){
+  var a = appr(), t = tests();
+  var ea = erreurArbre(a), et = erreurArbre(t);
+  if (ea === 0 && et > 0) { return 'Erreur d’apprentissage nulle et erreur de test non nulle : sur-apprentissage.'; }
+  if (profCourante() <= 1) { return 'Modele trop pauvre pour separer quatre groupes : sous-apprentissage.'; }
+  return 'Compromis raisonnable entre les deux erreurs.';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

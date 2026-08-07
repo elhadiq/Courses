@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz><question type="coderunner"><name><text>Q1 — Neurone formel et regle du perceptron</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;PERCEPTRON&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Un neurone somme ses entrees ponderees, ajoute un biais et applique une marche. La regle du perceptron corrige les poids sur chaque erreur.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;neurone(x, w, b)&lt;/code&gt;&lt;/strong&gt; qui renvoie &lt;code&gt;1&lt;/code&gt; si &lt;code&gt;w &amp;middot; x + b &amp;gt; 0&lt;/code&gt;, sinon &lt;code&gt;0&lt;/code&gt;. Ecrire &lt;strong&gt;&lt;code&gt;apprendre(exemples, n_epoques)&lt;/code&gt;&lt;/strong&gt; ou &lt;code&gt;exemples&lt;/code&gt; est une liste de couples &lt;code&gt;(x, y)&lt;/code&gt; : partir de poids nuls, parcourir les exemples dans l'ordre a chaque epoque, corriger sur erreur, et renvoyer le triplet &lt;code&gt;(w, b, epoques_utilisees)&lt;/code&gt;. S'arreter des qu'une epoque ne produit aucune erreur.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;apprendre([([0,0],0), ([0,1],0), ([1,0],0), ([1,1],1)], 20) &amp;rarr; ([2, 1], -2, 6)&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def neurone(x, w, b):
+    # somme ponderee STRICTEMENT positive : 1, sinon 0
+    ...
+
+def apprendre(exemples, n_epoques):
+    # poids nuls au depart ; sur erreur, ajouter (y - s) fois l exemple
+    # s arreter des qu une epoque complete se passe sans erreur
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def neurone(x, w, b):
+    return 1 if sum(wi * xi for wi, xi in zip(w, x)) + b &gt; 0 else 0
+
+def apprendre(exemples, n_epoques):
+    d = len(exemples[0][0])
+    w = [0] * d
+    b = 0
+    for epoque in range(1, n_epoques + 1):
+        erreurs = 0
+        for x, y in exemples:
+            s = neurone(x, w, b)
+            if s != y:
+                for i in range(d):
+                    w[i] += (y - s) * x[i]
+                b += (y - s)
+                erreurs += 1
+        if erreurs == 0:
+            return (w, b, epoque)
+    return (w, b, n_epoques)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>ET = [([0,0],0), ([0,1],0), ([1,0],0), ([1,1],1)]
+print(apprendre(ET, 20))
+</text></testcode><stdin><text /></stdin><expected><text>([2, 1], -2, 6)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>OU = [([0,0],0), ([0,1],1), ([1,0],1), ([1,1],1)]
+print(apprendre(OU, 20))
+</text></testcode><stdin><text /></stdin><expected><text>([1, 1], 0, 4)
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>XOR = [([0,0],0), ([0,1],1), ([1,0],1), ([1,1],0)]
+w, b, e = apprendre(XOR, 30)
+print(e, [neurone(x, w, b) for x, _ in XOR])
+</text></testcode><stdin><text /></stdin><expected><text>30 [1, 1, 0, 0]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(neurone([1, 1], [2, 1], -2), neurone([0, 1], [2, 1], -2))
+</text></testcode><stdin><text /></stdin><expected><text>1 0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>D = [([1],1), ([2],1), ([-1],0), ([-2],0)]
+print(apprendre(D, 20))
+</text></testcode><stdin><text /></stdin><expected><text>([1], 1, 2)
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(neurone([], [], 0), neurone([], [], 1))
+</text></testcode><stdin><text /></stdin><expected><text>0 1
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q2 — Retropropagation sur une couche cachee</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;RETROPROPAGATION&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;Passe avant en memorisant les valeurs intermediaires, puis passe arriere qui remonte les derivees couche par couche.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Avec NumPy, ecrire &lt;strong&gt;&lt;code&gt;passe_avant(X, W1, b1, W2, b2)&lt;/code&gt;&lt;/strong&gt; qui renvoie &lt;code&gt;(Z1, A1, Z2, A2)&lt;/code&gt; avec &lt;code&gt;A1 = sigmoide(Z1)&lt;/code&gt; et &lt;code&gt;A2 = sigmoide(Z2)&lt;/code&gt;, puis &lt;strong&gt;&lt;code&gt;gradients(X, y, W1, b1, W2, b2)&lt;/code&gt;&lt;/strong&gt; qui renvoie &lt;code&gt;(gW1, gb1, gW2, gb2)&lt;/code&gt; pour l'entropie croisee moyennee sur les &lt;code&gt;n&lt;/code&gt; exemples. &lt;code&gt;y&lt;/code&gt; est un vecteur colonne de 0 et de 1.&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;Sur le OU exclusif, apres 3000 pas de descente, les 4 exemples sont bien classes.&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>import numpy as np
+
+def sigmoide(z):
+    ...
+
+def passe_avant(X, W1, b1, W2, b2):
+    # memoriser Z1 et A1 : la passe arriere en a besoin
+    ...
+
+def gradients(X, y, W1, b1, W2, b2):
+    # D2 = (A2 - y) / n pour l entropie croisee moyennee
+    # D1 = (D2 . W2 transposee) fois la derivee de la sigmoide en Z1
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>import numpy as np
+
+def sigmoide(z):
+    return 1.0 / (1.0 + np.exp(-z))
+
+def passe_avant(X, W1, b1, W2, b2):
+    Z1 = X @ W1 + b1
+    A1 = sigmoide(Z1)
+    Z2 = A1 @ W2 + b2
+    A2 = sigmoide(Z2)
+    return (Z1, A1, Z2, A2)
+
+def gradients(X, y, W1, b1, W2, b2):
+    n = X.shape[0]
+    Z1, A1, Z2, A2 = passe_avant(X, W1, b1, W2, b2)
+    D2 = (A2 - y) / n
+    gW2 = A1.T @ D2
+    gb2 = D2.sum(axis=0)
+    D1 = (D2 @ W2.T) * A1 * (1 - A1)
+    gW1 = X.T @ D1
+    gb1 = D1.sum(axis=0)
+    return (gW1, gb1, gW2, gb2)
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[0.,0.],[0.,1.],[1.,0.],[1.,1.]])
+W1 = np.array([[0.5, -0.5], [0.5, 0.5]]); b1 = np.zeros(2)
+W2 = np.array([[0.5], [-0.5]]); b2 = np.zeros(1)
+Z1, A1, Z2, A2 = passe_avant(X, W1, b1, W2, b2)
+print(np.round(A2.ravel(), 4))
+</text></testcode><stdin><text /></stdin><expected><text>[0.5    0.5    0.5306 0.5289]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.array([[1.]]); y = np.array([[0.]])
+W1 = np.array([[0.5]]); b1 = np.zeros(1)
+W2 = np.array([[0.5]]); b2 = np.zeros(1)
+gW1, gb1, gW2, gb2 = gradients(X, y, W1, b1, W2, b2)
+print(np.round(gW2.ravel(), 4), np.round(gW1.ravel(), 4))
+</text></testcode><stdin><text /></stdin><expected><text>[0.3593] [0.0678]
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+rng = np.random.default_rng(7)
+X = np.array([[0.,0.],[0.,1.],[1.,0.],[1.,1.]]); y = np.array([[0.],[1.],[1.],[0.]])
+W1 = rng.normal(size=(2,3)); b1 = np.zeros(3)
+W2 = rng.normal(size=(3,1)); b2 = np.zeros(1)
+for _ in range(3000):
+    gW1, gb1, gW2, gb2 = gradients(X, y, W1, b1, W2, b2)
+    W1 -= 5*gW1; b1 -= 5*gb1; W2 -= 5*gW2; b2 -= 5*gb2
+A2 = passe_avant(X, W1, b1, W2, b2)[3]
+print(((A2 &gt; 0.5).astype(int).ravel() == y.ravel().astype(int)).sum())
+</text></testcode><stdin><text /></stdin><expected><text>4
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+rng = np.random.default_rng(1)
+X = rng.normal(size=(5,2)); y = (rng.normal(size=(5,1)) &gt; 0).astype(float)
+W1 = rng.normal(size=(2,3)); b1 = rng.normal(size=3)
+W2 = rng.normal(size=(3,1)); b2 = rng.normal(size=1)
+def perte(W1, b1, W2, b2):
+    A2 = passe_avant(X, W1, b1, W2, b2)[3]
+    A2 = np.clip(A2, 1e-12, 1-1e-12)
+    return float(-(y*np.log(A2) + (1-y)*np.log(1-A2)).mean())
+g = gradients(X, y, W1, b1, W2, b2)[0]
+eps = 1e-6; W1b = W1.copy(); W1b[0,0] += eps
+num = (perte(W1b, b1, W2, b2) - perte(W1, b1, W2, b2)) / eps
+print(abs(num - g[0,0]) &lt; 1e-5)
+</text></testcode><stdin><text /></stdin><expected><text>True
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>import numpy as np
+X = np.zeros((1,1)); y = np.array([[1.]])
+W1 = np.zeros((1,1)); b1 = np.zeros(1); W2 = np.zeros((1,1)); b2 = np.zeros(1)
+print(np.round(passe_avant(X, W1, b1, W2, b2)[3].ravel(), 4))
+</text></testcode><stdin><text /></stdin><expected><text>[0.5]
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question><question type="coderunner"><name><text>Q3 — Fonctions d'activation et gradient qui s'evanouit</text></name><questiontext format="html"><text>&lt;div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #026573;border-radius:8px;padding:20px 24px;margin-bottom:18px;"&gt;&lt;p style="color:#026573;font-family:Georgia,serif;font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px 0;"&gt;ACTIVATIONS&lt;/p&gt;&lt;p style="color:#1e293b;font-family:Georgia,serif;font-size:15px;line-height:1.8;margin:0;"&gt;La derivee de l'activation multiplie le gradient a chaque couche traversee. Une derivee inferieure a 1 le fait disparaitre en profondeur.&lt;/p&gt;&lt;/div&gt;&lt;p style="font-family:Georgia,serif;font-size:15px;color:#1e293b;line-height:1.8;"&gt;Ecrire &lt;strong&gt;&lt;code&gt;derivee_max(nom)&lt;/code&gt;&lt;/strong&gt; qui renvoie la valeur maximale de la derivee : &lt;code&gt;0.0&lt;/code&gt; pour &lt;code&gt;'marche'&lt;/code&gt;, &lt;code&gt;0.25&lt;/code&gt; pour &lt;code&gt;'sigmoide'&lt;/code&gt;, &lt;code&gt;1.0&lt;/code&gt; pour &lt;code&gt;'tanh'&lt;/code&gt; et pour &lt;code&gt;'relu'&lt;/code&gt;. Ecrire &lt;strong&gt;&lt;code&gt;facteur(nom, couches)&lt;/code&gt;&lt;/strong&gt; qui renvoie la borne superieure du facteur multiplicatif subi par le gradient apres &lt;code&gt;couches&lt;/code&gt; couches, en notation scientifique arrondie a 4 chiffres significatifs sous forme de chaine (&lt;code&gt;format(x, '.4g')&lt;/code&gt;).&lt;/p&gt;&lt;div style="background:#e4f1f2;border:1px solid #b7dadd;border-left:5px solid #026573;border-radius:8px;padding:14px 20px;margin:14px 0;"&gt;&lt;pre style="color:#014a55;font-family:'Courier New',monospace;font-size:14px;margin:0;background:none;border:none;"&gt;facteur('sigmoide', 10) &amp;rarr; '9.537e-07'&lt;/pre&gt;&lt;/div&gt;</text></questiontext><generalfeedback format="html"><text /></generalfeedback><defaultgrade>2.0000000</defaultgrade><penalty>0.0000000</penalty><hidden>0</hidden><idnumber /><coderunnertype>python3</coderunnertype><prototypetype>0</prototypetype><allornothing>0</allornothing><penaltyregime>0</penaltyregime><precheck>0</precheck><hidecheck>0</hidecheck><showsource>0</showsource><answerboxlines>18</answerboxlines><answerboxcolumns>100</answerboxcolumns><answerpreload>def derivee_max(nom):
+    # marche : 0 ; sigmoide : 1/4 ; tanh et relu : 1
+    ...
+
+def facteur(nom, couches):
+    # la derivee maximale elevee a la puissance du nombre de couches
+    ...
+</answerpreload><globalextra /><useace /><resultcolumns /><template /><iscombinatortemplate /><allowmultiplestdins /><answer>def derivee_max(nom):
+    table = {'marche': 0.0, 'sigmoide': 0.25, 'tanh': 1.0, 'relu': 1.0}
+    return table[nom]
+
+def facteur(nom, couches):
+    return format(derivee_max(nom) ** couches, '.4g')
+</answer><validateonsave>1</validateonsave><testsplitterre /><language /><acelang /><sandbox /><grader /><cputimelimitsecs /><memlimitmb /><sandboxparams /><templateparams /><hoisttemplateparams>1</hoisttemplateparams><extractcodefromjson>1</extractcodefromjson><templateparamslang>None</templateparamslang><templateparamsevalpertry>0</templateparamsevalpertry><templateparamsevald>{}</templateparamsevald><twigall>0</twigall><uiplugin /><uiparameters /><attachments>0</attachments><attachmentsrequired>0</attachmentsrequired><maxfilesize>10240</maxfilesize><filenamesregex /><filenamesexplain /><displayfeedback>1</displayfeedback><giveupallowed>0</giveupallowed><prototypeextra /><testcases><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(facteur('sigmoide', 10), facteur('relu', 10))
+</text></testcode><stdin><text /></stdin><expected><text>9.537e-07 1
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="1" hiderestiffail="0" mark="1.0000000"><testcode><text>print(derivee_max('marche'), derivee_max('sigmoide'), derivee_max('tanh'))
+</text></testcode><stdin><text /></stdin><expected><text>0.0 0.25 1.0
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>for n in ('sigmoide', 'tanh', 'relu'):
+    print(n, facteur(n, 2), facteur(n, 20))
+</text></testcode><stdin><text /></stdin><expected><text>sigmoide 0.0625 9.095e-13
+tanh 1 1
+relu 1 1
+</text></expected><extra><text /></extra><display><text>SHOW</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(facteur('marche', 1), facteur('marche', 0))
+</text></testcode><stdin><text /></stdin><expected><text>0 1
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase><testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000"><testcode><text>print(facteur('sigmoide', 1), facteur('sigmoide', 0))
+</text></testcode><stdin><text /></stdin><expected><text>0.25 1
+</text></expected><extra><text /></extra><display><text>HIDE</text></display></testcase></testcases></question></quiz>

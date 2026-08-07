@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 8 &mdash; Raisonnement probabiliste</title>
+<meta name="description" content="Bayes, independance conditionnelle, reseaux bayesiens, classifieur naif, Markov.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Intelligence artificielle</a> &middot; Manuel</div><span class="course-code">Programme MP/PSI &middot; 2e periode</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Partie III &middot; Chapitre 8</div>
+<h1>Chapitre 8 &mdash; Raisonner quand l'information est incertaine</h1>
+<div class="lesson-sub">Probabilit&eacute;s, r&egrave;gle de Bayes, ind&eacute;pendance conditionnelle, classifieur na&iuml;f, r&eacute;seaux bay&eacute;siens et cha&icirc;nes de Markov.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">Annexe compagnon</div><p>La r&egrave;gle de Bayes, l'inf&eacute;rence par &eacute;num&eacute;ration, le classifieur na&iuml;f et le filtrage dans une cha&icirc;ne de Markov sont d&eacute;taill&eacute;s <strong><a href="algorithms.html">pas &agrave; pas dans l'annexe</a></strong>.</p></div>
+
+<h2>8.1 Pourquoi la logique ne suffit pas</h2>
+
+<p>Le chapitre pr&eacute;c&eacute;dent traitait le monde comme un ensemble d'&eacute;nonc&eacute;s vrais ou faux. Un agent r&eacute;el n'a presque jamais cette chance. Il faudrait &eacute;crire &laquo; si le patient a mal aux dents, alors il a une carie, ou une infection, ou une fracture, ou&hellip; &raquo; : la liste est ouverte, et aucun m&eacute;decin ne l'a jamais compl&eacute;t&eacute;e.</p>
+
+<div class="box def"><div class="box-title">Trois raisons de renoncer &agrave; la certitude</div>
+<ul>
+<li><strong>La paresse.</strong> &Eacute;num&eacute;rer toutes les exceptions demanderait un travail infini.</li>
+<li><strong>L'ignorance th&eacute;orique.</strong> Aucune science ne dispose d'une th&eacute;orie compl&egrave;te de son domaine.</li>
+<li><strong>L'ignorance pratique.</strong> M&ecirc;me avec une th&eacute;orie compl&egrave;te, on n'a jamais fait tous les examens.</li>
+</ul></div>
+
+<div class="box thm"><div class="box-title">Th&eacute;or&egrave;me &mdash; L'argument du pari hollandais</div>
+<p>Si un agent affiche des degr&eacute;s de croyance qui violent les axiomes de Kolmogorov, alors il existe une combinaison de paris qu'il accepte tous individuellement et dont il ressort perdant quel que soit le r&eacute;sultat <a class="cite" href="#ref-definetti1937">[1]</a>.</p>
+<p>Autrement dit, les probabilit&eacute;s ne sont pas un choix de mod&eacute;lisation parmi d'autres : c'est la seule fa&ccedil;on coh&eacute;rente de quantifier une croyance, exactement comme le th&eacute;or&egrave;me de von Neumann faisait de l'utilit&eacute; esp&eacute;r&eacute;e la seule fa&ccedil;on coh&eacute;rente d'arbitrer entre des risques.</p></div>
+
+<h2>8.2 La r&egrave;gle de Bayes</h2>
+
+<div class="box def"><div class="box-title">D&eacute;finition et r&egrave;gle de Bayes</div>
+<p>La probabilit&eacute; conditionnelle est d&eacute;finie par \(P(a \mid b) = P(a \land b) / P(b)\) pour \(P(b) \gt 0\). En &eacute;crivant \(P(a \land b)\) des deux fa&ccedil;ons possibles, on obtient</p>
+<div class="eq">\[P(h \mid e) = \frac{P(e \mid h)\,P(h)}{P(e)}\]</div>
+<p>o&ugrave; \(h\) est une hypoth&egrave;se et \(e\) une observation. \(P(h)\) est la croyance <em>avant</em> l'observation, \(P(e \mid h)\) la vraisemblance, \(P(h \mid e)\) la croyance <em>apr&egrave;s</em> <a class="cite" href="#ref-bayes1763">[2]</a>.</p>
+<p>L'int&eacute;r&ecirc;t de cette &eacute;criture est pratique : en m&eacute;decine, \(P(\text{sympt&ocirc;me} \mid \text{maladie})\) se mesure sur une cohorte de malades, alors que \(P(\text{maladie} \mid \text{sympt&ocirc;me})\) d&eacute;pend de la population o&ugrave; l'on d&eacute;pistera. La r&egrave;gle permet de passer de la premi&egrave;re, stable, &agrave; la seconde, variable.</p></div>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Le carr&eacute; repr&eacute;sente une population enti&egrave;re. Sa largeur est la proportion de malades, sa hauteur la r&eacute;ponse du test. Les curseurs r&egrave;glent la pr&eacute;valence, la sensibilit&eacute; et la sp&eacute;cificit&eacute;.</p>
+<div id="jxg1" class="viz-board" style="height:520px;"></div>
+<p class="viz-caption"><strong>Figure 8.1.</strong> Un test &agrave; 99 % de sensibilit&eacute; et 95 % de sp&eacute;cificit&eacute; para&icirc;t excellent. Sur une maladie touchant une personne sur mille, un test positif ne signifie pourtant qu'<strong>1,9 %</strong> de chances d'&ecirc;tre malade : la surface rouge des faux positifs &eacute;crase la surface verte des vrais. Poussez la pr&eacute;valence &agrave; 1 % : on passe &agrave; 16,7 %. Portez alors la sp&eacute;cificit&eacute; &agrave; 99 % : exactement 50 %. La sp&eacute;cificit&eacute; est le param&egrave;tre critique en d&eacute;pistage de masse, et c'est contre-intuitif.</p></div>
+
+<div class="box warn"><div class="box-title">L'oubli de la fr&eacute;quence de base</div>
+Confondre \(P(e \mid h)\) et \(P(h \mid e)\) est l'erreur de raisonnement la mieux document&eacute;e de la psychologie exp&eacute;rimentale <a class="cite" href="#ref-tversky1974">[3]</a>. Elle a des cons&eacute;quences r&eacute;elles : dans plusieurs proc&egrave;s c&eacute;l&egrave;bres, la probabilit&eacute; qu'un innocent pr&eacute;sente une trace donn&eacute;e a &eacute;t&eacute; pr&eacute;sent&eacute;e au jury comme la probabilit&eacute; que l'accus&eacute; soit innocent. Le rem&egrave;de est celui de la figure ci-dessus : raisonner sur des effectifs, jamais sur des pourcentages isol&eacute;s.</div>
+
+<h2>8.3 L'ind&eacute;pendance conditionnelle, seule fa&ccedil;on de rendre le calcul possible</h2>
+
+<p>Une loi de probabilit&eacute; sur \(n\) variables bool&eacute;ennes demande \(2^{n}-1\) nombres. Trente variables : plus d'un milliard. Cent variables : davantage que d'atomes dans la galaxie. Aucun expert ne fournira ces nombres, aucune m&eacute;moire ne les stockera, aucun calcul ne les parcourra.</p>
+
+<div class="box def"><div class="box-title">D&eacute;finition &mdash; Ind&eacute;pendance conditionnelle</div>
+<p>\(X\) et \(Y\) sont ind&eacute;pendantes conditionnellement &agrave; \(Z\) si \(P(X, Y \mid Z) = P(X \mid Z)\,P(Y \mid Z)\), ou de fa&ccedil;on &eacute;quivalente \(P(X \mid Y, Z) = P(X \mid Z)\) : une fois \(Z\) connue, \(Y\) n'apporte plus rien sur \(X\).</p>
+<p>C'est une propri&eacute;t&eacute; bien plus fr&eacute;quente et bien plus utile que l'ind&eacute;pendance simple. Deux sympt&ocirc;mes d'une m&ecirc;me maladie sont corr&eacute;l&eacute;s dans la population g&eacute;n&eacute;rale, mais deviennent ind&eacute;pendants une fois que l'on sait si le patient est malade.</p></div>
+
+<figure class="viz"><div class="viz-title">Le co&ucirc;t d'une loi de probabilit&eacute;</div>
+<svg viewBox="0 0 760 340" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Ce que co&ucirc;te une loi de probabilit&eacute; sur \(n\) variables bool&eacute;ennes</text><text x="300" y="76" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">n = 2</text><text x="418" y="76" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">n = 5</text><text x="536" y="76" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">n = 10</text><text x="654" y="76" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">n = 100</text><rect x="20" y="116" width="712" height="62" rx="8" style="fill:var(--viz-bad);fill-opacity:0.08;stroke:var(--viz-bad);stroke-width:2;"/><text x="44" y="142" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Table jointe compl&egrave;te</text><text x="44" y="164" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">2 puissance n moins 1 param&egrave;tres</text><text x="300" y="154" text-anchor="middle" style="fill:var(--viz-bad);font-size:14px;font-weight:700;font-family:inherit;">3</text><text x="418" y="154" text-anchor="middle" style="fill:var(--viz-bad);font-size:14px;font-weight:700;font-family:inherit;">31</text><text x="536" y="154" text-anchor="middle" style="fill:var(--viz-bad);font-size:14px;font-weight:700;font-family:inherit;">1023</text><text x="654" y="154" text-anchor="middle" style="fill:var(--viz-bad);font-size:14px;font-weight:700;font-family:inherit;">environ 10 puissance 30</text><rect x="20" y="198" width="712" height="62" rx="8" style="fill:var(--primary);fill-opacity:0.08;stroke:var(--primary);stroke-width:2;"/><text x="44" y="224" style="fill:var(--color-text);font-size:13px;font-family:inherit;">R&eacute;seau, 2 parents au plus</text><text x="44" y="246" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">au plus 4 n param&egrave;tres</text><text x="300" y="236" text-anchor="middle" style="fill:var(--primary);font-size:14px;font-weight:700;font-family:inherit;">8</text><text x="418" y="236" text-anchor="middle" style="fill:var(--primary);font-size:14px;font-weight:700;font-family:inherit;">20</text><text x="536" y="236" text-anchor="middle" style="fill:var(--primary);font-size:14px;font-weight:700;font-family:inherit;">40</text><text x="654" y="236" text-anchor="middle" style="fill:var(--primary);font-size:14px;font-weight:700;font-family:inherit;">400</text><text x="380" y="300" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">L'ind&eacute;pendance conditionnelle n'est pas une approximation commode : c'est ce qui rend le calcul possible.</text><text x="380" y="324" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Cent variables bool&eacute;ennes : plus de mod&egrave;les possibles que d'atomes dans la galaxie, ou quatre cents nombres.</text></svg>
+<figcaption class="viz-caption"><strong>Figure 8.2.</strong> La table jointe cro&icirc;t exponentiellement, la factorisation lin&eacute;airement. C'est la seule raison pour laquelle le raisonnement probabiliste est praticable, et c'est aussi ce qui explique que la mod&eacute;lisation soit la partie difficile : il faut identifier les bonnes ind&eacute;pendances.</figcaption></figure>
+
+<h2>8.4 Les r&eacute;seaux bay&eacute;siens</h2>
+
+<div class="box def"><div class="box-title">D&eacute;finition &mdash; R&eacute;seau bay&eacute;sien</div>
+<p>Un r&eacute;seau bay&eacute;sien est un graphe orient&eacute; <em>sans circuit</em> dont les sommets sont des variables al&eacute;atoires, muni pour chaque variable d'une table donnant \(P(X_i \mid \text{Parents}(X_i))\). Il repr&eacute;sente la loi jointe</p>
+<div class="eq">\[P(x_1, \dots, x_n) = \prod_{i=1}^{n} P\big(x_i \mid \text{parents}(x_i)\big)\]</div>
+<p>Un arc de \(A\) vers \(B\) se lit &laquo; \(A\) influence directement \(B\) &raquo;. L'absence d'arc porte l'information la plus pr&eacute;cieuse : elle affirme une ind&eacute;pendance conditionnelle <a class="cite" href="#ref-pearl1988">[4]</a>.</p></div>
+
+<div class="viz"><div class="viz-title">Figure interactive</div>
+<p class="viz-intro">Le r&eacute;seau de l'alarme. Les deux curseurs fixent ce que l'on observe : chaque voisin peut avoir appel&eacute;, ne pas avoir appel&eacute;, ou &ecirc;tre inconnu.</p>
+<div id="jxg2" class="viz-board" style="height:520px;"></div>
+<p class="viz-caption"><strong>Figure 8.3.</strong> Sans observation, la probabilit&eacute; d'un cambriolage est le prior : 0,1 %. Si Jean seul appelle, elle monte &agrave; 1,6 % ; si Marie seule appelle, &agrave; 5,6 % &mdash; Marie appelle moins souvent &agrave; tort, donc son appel vaut davantage. Si les deux appellent, elle atteint <strong>28,4 %</strong>, soit bien plus que la somme des deux effets isol&eacute;s. Ces deux appels ne sont pas ind&eacute;pendants : ils passent par la m&ecirc;me cause, l'alarme, dont la probabilit&eacute; grimpe &agrave; 76 %.</p></div>
+
+<div class="box warn"><div class="box-title">L'explication concurrente</div>
+Dans ce m&ecirc;me r&eacute;seau, cambriolage et s&eacute;isme sont ind&eacute;pendants <em>a priori</em>. Observez l'alarme : ils cessent de l'&ecirc;tre. Apprenez alors qu'un s&eacute;isme a eu lieu, et la probabilit&eacute; du cambriolage <em>redescend</em> : le s&eacute;isme explique d&eacute;j&agrave; l'alarme. Ce ph&eacute;nom&egrave;ne, o&ugrave; observer un enfant commun rend deux parents d&eacute;pendants, est la seule des trois configurations de d&eacute;pendance qui r&eacute;siste &agrave; l'intuition. Il porte le nom d'explication concurrente.</div>
+
+<div class="box thm"><div class="box-title">Complexit&eacute; de l'inf&eacute;rence</div>
+<p>L'inf&eacute;rence exacte dans un r&eacute;seau bay&eacute;sien est NP-difficile dans le cas g&eacute;n&eacute;ral <a class="cite" href="#ref-cooper1990">[5]</a>, et l'inf&eacute;rence approch&eacute;e &agrave; erreur born&eacute;e l'est &eacute;galement <a class="cite" href="#ref-dagum1993">[6]</a>. Sur les r&eacute;seaux dont le graphe non orient&eacute; sous-jacent est un arbre, en revanche, la propagation de messages r&eacute;sout le probl&egrave;me en temps lin&eacute;aire.</p></div>
+
+<div class="algo"><div class="algo-cap">Algorithme 8.1 &mdash; Inf&eacute;rence exacte par &eacute;num&eacute;ration</div><div class="algo-io"><b>Entr&eacute;e :</b> un r&eacute;seau bay&eacute;sien sur \(X_1, \dots, X_n\), une variable \(Q\), des observations \(e\)<br><b>Sortie :</b> la loi \(P(Q \mid e)\)</div><ol class="algo-corps"><li><b class="kw">pour tout</b> \(q \in \mathrm{Val}(Q)\) <b class="kw">faire</b></li><li class="n1">\(\displaystyle \alpha_q \leftarrow \sum_{\text{mondes } w \,\models\, e \wedge (Q=q)} \ \prod_{i=1}^{n} P\big(w_i \mid \mathrm{par}(X_i)\big)\)</li><li>\(\displaystyle P(Q = q \mid e) \leftarrow \frac{\alpha_q}{\sum_{q'} \alpha_{q'}}\)          <span class="cm">// normalisation</span></li><li><b class="kw">retourner</b> \(P(Q \mid e)\)</li></ol><p class="algo-note">Les variables doivent &ecirc;tre &eacute;num&eacute;r&eacute;es dans un ordre topologique, o&ugrave; les parents pr&eacute;c&egrave;dent leurs enfants. <strong>Co&ucirc;t.</strong> \(O(d^{\,h})\) o&ugrave; \(h\) est le nombre de variables cach&eacute;es : le probl&egrave;me est NP-difficile en g&eacute;n&eacute;ral, lin&eacute;aire sur les r&eacute;seaux en arbre.</p></div>
+
+<h2>8.5 Le classifieur na&iuml;f de Bayes</h2>
+
+<p>Le cas particulier le plus utilis&eacute; en pratique est aussi le plus grossier : on suppose que toutes les observations sont conditionnellement ind&eacute;pendantes sachant la classe.</p>
+
+<div class="eq">\[\hat{c} = \operatorname*{argmax}_{c}\ P(c)\prod_{i=1}^{n} P(e_i \mid c)\]</div>
+
+<div class="algo"><div class="algo-cap">Algorithme 8.2 &mdash; Classifieur na&iuml;f de Bayes</div><div class="algo-io"><b>Entr&eacute;e :</b> des documents &eacute;tiquet&eacute;s, un vocabulaire \(V\), un lissage \(\lambda \gt 0\)<br><b>Sortie :</b> la classe pr&eacute;dite d'un document nouveau</div><ol class="algo-corps"><li><b class="kw">pour toute</b> classe \(c\) <b class="kw">faire</b></li><li class="n1">\(\displaystyle \hat{P}(c) \leftarrow \frac{|\{\text{documents de classe } c\}|}{N}\)</li><li class="n1"><b class="kw">pour tout</b> \(w \in V\) <b class="kw">faire</b></li><li class="n2">\(\displaystyle \hat{P}(w \mid c) \leftarrow \frac{n_{c,w} + \lambda}{n_c + \lambda\,|V|}\)          <span class="cm">// sans lissage, un mot inconnu annule tout</span></li><li>&nbsp;</li><li><b class="kw">fonction</b> <span class="fn">Classer</span>\((d)\)</li><li class="n1"><b class="kw">retourner</b> \(\displaystyle \operatorname*{argmax}_{c}\ \Big[\ln \hat{P}(c) + \sum_{w \in d} \ln \hat{P}(w \mid c)\Big]\)</li></ol><p class="algo-note">On somme des logarithmes plut&ocirc;t que de multiplier des probabilit&eacute;s : le produit de milliers de nombres inf&eacute;rieurs &agrave; 1 devient num&eacute;riquement nul. L'hypoth&egrave;se d'ind&eacute;pendance est fausse, et le classement reste souvent correct : seul compte l'\(\operatorname{argmax}\), pas la valeur.</p></div>
+
+<figure class="viz"><div class="viz-title">Une hypoth&egrave;se fausse qui fonctionne</div>
+<svg viewBox="0 0 760 330" role="img" style="width:100%;height:auto;display:block;"><text x="200" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Structure suppos&eacute;e</text><ellipse cx="200" cy="76" rx="62" ry="26" style="fill:var(--primary);"/><text x="200" y="81" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">classe</text><path d="M 200 102 L 80 154" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 75 146 L 80 158 L 86 148 Z" style="fill:var(--viz-axis);"/><circle cx="80" cy="176" r="21" style="fill:var(--accent);"/><text x="80" y="181" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">mot 1</text><path d="M 200 102 L 160 154" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 155 146 L 160 158 L 166 148 Z" style="fill:var(--viz-axis);"/><circle cx="160" cy="176" r="21" style="fill:var(--accent);"/><text x="160" y="181" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">mot 2</text><path d="M 200 102 L 240 154" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 235 146 L 240 158 L 246 148 Z" style="fill:var(--viz-axis);"/><circle cx="240" cy="176" r="21" style="fill:var(--accent);"/><text x="240" y="181" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">mot 3</text><path d="M 200 102 L 320 154" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 315 146 L 320 158 L 326 148 Z" style="fill:var(--viz-axis);"/><circle cx="320" cy="176" r="21" style="fill:var(--accent);"/><text x="320" y="181" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">mot 4</text><text x="200" y="228" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">les mots sont suppos&eacute;s ind&eacute;pendants une fois la classe connue</text><text x="570" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">Ce que cette hypoth&egrave;se ignore</text><text x="440" y="76" style="fill:var(--color-text);font-size:13px;font-family:inherit;">&laquo; New &raquo; et &laquo; York &raquo;</text><text x="440" y="96" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">n'apparaissent presque jamais s&eacute;par&eacute;s</text><text x="440" y="128" style="fill:var(--color-text);font-size:13px;font-family:inherit;">&laquo; ne &raquo; et &laquo; pas &raquo;</text><text x="440" y="148" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">inversent le sens ensemble</text><text x="440" y="180" style="fill:var(--color-text);font-size:13px;font-family:inherit;">&laquo; tr&egrave;s &raquo; et &laquo; bien &raquo;</text><text x="440" y="200" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">se renforcent mutuellement</text><text x="570" y="252" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;"><tspan x="570" dy="0">L'hypoth&egrave;se est fausse, et le classifieur fonctionne</tspan><tspan x="570" dy="16">pourtant.</tspan></text><text x="380" y="298" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Raison : pour <tspan style="font-weight:700;">classer</tspan>, seul importe quel produit est le plus grand, pas sa valeur.</text><text x="380" y="320" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">Les probabilit&eacute;s produites sont en revanche tr&egrave;s mal calibr&eacute;es : elles ne doivent jamais &ecirc;tre lues comme des degr&eacute;s de confiance.</text></svg>
+<figcaption class="viz-caption"><strong>Figure 8.4.</strong> L'hypoth&egrave;se d'ind&eacute;pendance est manifestement fausse sur du texte, et le classifieur fonctionne pourtant tr&egrave;s bien. La raison tient en une phrase : pour <em>classer</em>, seul compte de savoir quel produit est le plus grand, pas sa valeur. Les probabilit&eacute;s produites sont en revanche tr&egrave;s mal calibr&eacute;es &mdash; elles saturent &agrave; 0 ou 1 &mdash; et ne doivent jamais &ecirc;tre pr&eacute;sent&eacute;es comme des degr&eacute;s de confiance <a class="cite" href="#ref-domingos1997">[7]</a>.</figcaption></figure>
+
+<h2>8.6 Le temps : cha&icirc;nes de Markov</h2>
+
+<p>Jusqu'ici, le monde &eacute;tait fig&eacute;. Un agent r&eacute;el observe une suite d'&eacute;tats qui &eacute;voluent. Mod&eacute;liser cela sans hypoth&egrave;se conduirait &agrave; conditionner chaque instant par toute l'histoire pass&eacute;e.</p>
+
+<div class="box def"><div class="box-title">D&eacute;finition &mdash; Hypoth&egrave;se de Markov et mod&egrave;le &agrave; &eacute;tat cach&eacute;</div>
+<p>L'<strong>hypoth&egrave;se de Markov d'ordre 1</strong> pose \(P(X_t \mid X_{0:t-1}) = P(X_t \mid X_{t-1})\) : l'&eacute;tat pr&eacute;sent r&eacute;sume tout le pass&eacute;. On ajoute l'hypoth&egrave;se de capteur, \(P(E_t \mid X_{0:t}, E_{0:t-1}) = P(E_t \mid X_t)\) : l'observation ne d&eacute;pend que de l'&eacute;tat courant.</p>
+<p>Le mod&egrave;le est alors enti&egrave;rement d&eacute;crit par trois &eacute;l&eacute;ments : une loi initiale, une matrice de transition et une matrice d'&eacute;mission.</p></div>
+
+<p>Quatre questions se posent, et chacune a son algorithme : le <strong>filtrage</strong> estime l'&eacute;tat courant &agrave; partir de tout ce qui a &eacute;t&eacute; observ&eacute; ; la <strong>pr&eacute;diction</strong> l'&eacute;tend au futur ; le <strong>lissage</strong> corrige une estimation pass&eacute;e &agrave; la lumi&egrave;re de ce qui a suivi ; l'<strong>explication la plus probable</strong> cherche la suite d'&eacute;tats la plus vraisemblable, et se calcule par programmation dynamique gr&acirc;ce &agrave; l'algorithme de Viterbi <a class="cite" href="#ref-viterbi1967">[8]</a>. C'est exactement la mise &agrave; jour d'&eacute;tat interne du chapitre 2, rendue quantitative.</p>
+
+<div class="box tip"><div class="box-title">Le lien avec le chapitre 2</div>
+Le filtrage se calcule en deux temps qui reproduisent mot pour mot la proc&eacute;dure d&eacute;crite au chapitre 2 : <em>pr&eacute;dire</em> en propageant la croyance par la matrice de transition, puis <em>corriger</em> en la pond&eacute;rant par la vraisemblance de l'observation, et enfin normaliser. La version probabiliste ne fait qu'attribuer un poids num&eacute;rique &agrave; l'arbitrage entre pr&eacute;diction et capteur.</div>
+
+<h2>Synth&egrave;se</h2>
+<ul>
+<li>La logique ne suffit pas d&egrave;s que la liste des exceptions est ouverte ; les probabilit&eacute;s sont la seule quantification coh&eacute;rente d'une croyance <a class="cite" href="#ref-definetti1937">[1]</a>.</li>
+<li>La r&egrave;gle de Bayes convertit une vraisemblance mesurable en la croyance que l'on cherche ; oublier la fr&eacute;quence de base est l'erreur la plus fr&eacute;quente <a class="cite" href="#ref-tversky1974">[3]</a>.</li>
+<li>L'ind&eacute;pendance conditionnelle fait passer le nombre de param&egrave;tres de \(2^{n}\) &agrave; une quantit&eacute; lin&eacute;aire : sans elle, rien n'est calculable.</li>
+<li>Un r&eacute;seau bay&eacute;sien encode ces ind&eacute;pendances dans un graphe ; ses arcs <em>absents</em> portent l'essentiel de l'information <a class="cite" href="#ref-pearl1988">[4]</a>.</li>
+<li>L'inf&eacute;rence exacte est NP-difficile en g&eacute;n&eacute;ral, lin&eacute;aire sur les arbres <a class="cite" href="#ref-cooper1990">[5]</a>.</li>
+<li>Le classifieur na&iuml;f repose sur une hypoth&egrave;se fausse et classe pourtant tr&egrave;s bien &mdash; mais ses probabilit&eacute;s ne veulent rien dire <a class="cite" href="#ref-domingos1997">[7]</a>.</li>
+</ul>
+
+<h2>R&eacute;f&eacute;rences</h2>
+<ol class="reflist">
+<li id="ref-definetti1937">de Finetti, B. (1937). La pr&eacute;vision : ses lois logiques, ses sources subjectives. <em>Annales de l'Institut Henri Poincar&eacute;</em>, 7(1), 1&ndash;68. <a href="http://www.numdam.org/item/AIHP_1937__7_1_1_0/">http://www.numdam.org/item/AIHP_1937__7_1_1_0/</a></li>
+<li id="ref-bayes1763">Bayes, T. (1763). An essay towards solving a problem in the doctrine of chances. <em>Philosophical Transactions of the Royal Society of London</em>, 53, 370&ndash;418. DOI&nbsp;: 10.1098/rstl.1763.0053. <a href="https://doi.org/10.1098/rstl.1763.0053">https://doi.org/10.1098/rstl.1763.0053</a></li>
+<li id="ref-tversky1974">Tversky, A. &amp; Kahneman, D. (1974). Judgment under uncertainty: heuristics and biases. <em>Science</em>, 185(4157), 1124&ndash;1131. DOI&nbsp;: 10.1126/science.185.4157.1124. <a href="https://doi.org/10.1126/science.185.4157.1124">https://doi.org/10.1126/science.185.4157.1124</a></li>
+<li id="ref-pearl1988">Pearl, J. (1988). <em>Probabilistic Reasoning in Intelligent Systems: Networks of Plausible Inference</em>. Morgan Kaufmann. DOI&nbsp;: 10.1016/C2009-0-27609-4. <a href="https://doi.org/10.1016/C2009-0-27609-4">https://doi.org/10.1016/C2009-0-27609-4</a></li>
+<li id="ref-cooper1990">Cooper, G. F. (1990). The computational complexity of probabilistic inference using Bayesian belief networks. <em>Artificial Intelligence</em>, 42(2&ndash;3), 393&ndash;405. DOI&nbsp;: 10.1016/0004-3702(90)90060-D. <a href="https://doi.org/10.1016/0004-3702(90)90060-D">https://doi.org/10.1016/0004-3702(90)90060-D</a></li>
+<li id="ref-dagum1993">Dagum, P. &amp; Luby, M. (1993). Approximating probabilistic inference in Bayesian belief networks is NP-hard. <em>Artificial Intelligence</em>, 60(1), 141&ndash;153. DOI&nbsp;: 10.1016/0004-3702(93)90036-B. <a href="https://doi.org/10.1016/0004-3702(93)90036-B">https://doi.org/10.1016/0004-3702(93)90036-B</a></li>
+<li id="ref-domingos1997">Domingos, P. &amp; Pazzani, M. (1997). On the optimality of the simple Bayesian classifier under zero-one loss. <em>Machine Learning</em>, 29, 103&ndash;130. DOI&nbsp;: 10.1023/A:1007413511361. <a href="https://doi.org/10.1023/A:1007413511361">https://doi.org/10.1023/A:1007413511361</a></li>
+<li id="ref-viterbi1967">Viterbi, A. (1967). Error bounds for convolutional codes and an asymptotically optimum decoding algorithm. <em>IEEE Transactions on Information Theory</em>, 13(2), 260&ndash;269. DOI&nbsp;: 10.1109/TIT.1967.1054010. <a href="https://doi.org/10.1109/TIT.1967.1054010">https://doi.org/10.1109/TIT.1967.1054010</a></li>
+<li id="ref-kalman1960">Kalman, R. E. (1960). A new approach to linear filtering and prediction problems. <em>Journal of Basic Engineering</em>, 82(1), 35&ndash;45. DOI&nbsp;: 10.1115/1.3662552. <a href="https://doi.org/10.1115/1.3662552">https://doi.org/10.1115/1.3662552</a></li>
+</ol>
+<p>Lorsque l'&eacute;tat est continu et les lois gaussiennes, le filtrage admet une solution ferm&eacute;e r&eacute;cursive, le filtre de Kalman <a class="cite" href="#ref-kalman1960">[9]</a>, qui &eacute;quipe aujourd'hui la quasi-totalit&eacute; des syst&egrave;mes de navigation.</p>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../07-logique/page.html">\(\leftarrow\) Chapitre 7 &mdash; Logique et d&eacute;monstration</a>
+<a href="algorithms.html">Annexe algorithmique</a>
+<a href="../../index.html">Sommaire du manuel</a>
+<a href="../09-apprentissage/page.html">Chapitre 9 &mdash; Apprentissage supervis&eacute; \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>Intelligence artificielle &mdash; CPGE MP/PSI</strong> &middot; Recherche, jeux, contraintes et apprentissage<span class="footer-meta">&Eacute;dition 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">La figure interactive n\'a pas pu etre chargee. Verifiez votre connexion reseau.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ========== Figure : le paradoxe du depistage, vu comme des surfaces ====== */
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-0.30, 1.42, 1.34, -0.52], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sPrev = b1.create('slider', [[0.00, -0.20], [0.44, -0.20], [0.001, 0.010, 0.300]], {
+  name: 'prevalence', snapWidth: 0.001, precision: 3,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }}
+});
+var sSens = b1.create('slider', [[0.52, -0.20], [0.86, -0.20], [0.50, 0.99, 1.00]], {
+  name: 'sensibilite', snapWidth: 0.01, precision: 2,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sSpec = b1.create('slider', [[0.00, -0.40], [0.44, -0.40], [0.50, 0.95, 1.00]], {
+  name: 'specificite', snapWidth: 0.01, precision: 2,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function prev(){ return Math.round(sPrev.Value() * 1000) / 1000; }
+function sens(){ return Math.round(sSens.Value() * 100) / 100; }
+function spec(){ return Math.round(sSpec.Value() * 100) / 100; }
+function chiffres(){
+  var p = prev(), se = sens(), sp = spec();
+  var vp = p * se, fn = p * (1 - se), fp = (1 - p) * (1 - sp), vn = (1 - p) * sp;
+  var post = (vp + fp) > 0 ? vp / (vp + fp) : 0;
+  return {vp: vp, fn: fn, fp: fp, vn: vn, post: post};
+}
+/* Le carre unite : largeur = malade ou non, hauteur = test positif ou non. */
+function rect(x0, x1, y0, y1){
+  return [[x0, x1, x1, x0, x0], [y0, y0, y1, y1, y0]];
+}
+function zone(nom, couleur, opac, calc){
+  var c = b1.create('curve', [[0],[0]], {strokeWidth: 0.5,
+    strokeColor: function(){ return PAL.bg(); },
+    fillColor: function(){ return cssv(couleur, '#026573'); },
+    fillOpacity: opac, highlight: false, fixed: true});
+  c.updateDataArray = function(){ var d = calc(); this.dataX = d[0]; this.dataY = d[1]; };
+  return c;
+}
+zone('vp', '--viz-ok',   0.85, function(){ var c = chiffres(); return rect(0, prev(), 0, sens()); });
+zone('fn', '--viz-ref',  0.45, function(){ return rect(0, prev(), sens(), 1); });
+zone('fp', '--viz-bad',  0.75, function(){ return rect(prev(), 1, 0, 1 - spec()); });
+zone('vn', '--viz-ref',  0.20, function(){ return rect(prev(), 1, 1 - spec(), 1); });
+b1.create('curve', [[0, 1, 1, 0, 0], [0, 0, 1, 1, 0]], {strokeColor: PAL.axis,
+  strokeWidth: 1.6, highlight: false, fixed: true});
+b1.create('text', [function(){ return prev() / 2; }, function(){ return sens() / 2; }, function(){
+  var c = chiffres();
+  return prev() < 0.06 ? '' : 'vrais positifs\n' + (100 * c.vp).toFixed(1) + ' %';
+}], {fontSize: 12, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+     strokeColor: function(){ return PAL.bg(); }});
+b1.create('text', [function(){ return (prev() + 1) / 2; }, function(){ return (1 - spec()) / 2; },
+  function(){
+    var c = chiffres();
+    return (1 - spec()) < 0.05 ? '' : 'faux positifs ' + (100 * c.fp).toFixed(1) + ' %';
+  }], {fontSize: 12, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+       strokeColor: function(){ return PAL.bg(); }});
+b1.create('text', [-0.28, 1.36, function(){
+  var c = chiffres();
+  return 'Sur 100 000 personnes : ' + Math.round(100000 * (c.vp + c.fn)) + ' malades, '
+       + Math.round(100000 * c.vp) + ' vrais positifs, ' + Math.round(100000 * c.fp)
+       + ' faux positifs.';
+}], {fontSize: 14, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-0.28, 1.24, function(){
+  var c = chiffres();
+  return 'Test positif : probabilite d’etre reellement malade = '
+       + (100 * c.post).toFixed(1) + ' %';
+}], {fontSize: 17, strokeColor: function(){ return cssv('--primary', '#026573'); },
+     fixed: true, highlight: false});
+b1.create('text', [-0.28, 1.12, function(){
+  var c = chiffres();
+  if (c.post < 0.5) {
+    return 'Moins d’une chance sur deux : la majorite des tests positifs sont des faux positifs.';
+  }
+  return 'Plus d’une chance sur deux : le test est informatif dans cette population.';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-0.28, -0.48,
+  'Largeur du carre : proportion de malades. Hauteur : reponse du test. La surface verte comparee a la surface rouge donne la reponse.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+/* ========= Figure : reseau bayesien de l'alarme, inference exacte ========= */
+/* Reseau classique : Cambriolage -> Alarme <- Seisme ; Alarme -> Jean, Marie. */
+var PC = 0.001, PS = 0.002;
+var PA = {'11': 0.95, '10': 0.94, '01': 0.29, '00': 0.001};   /* P(A | C, S) */
+var PJ = {'1': 0.90, '0': 0.05};                               /* P(J | A) */
+var PM = {'1': 0.70, '0': 0.01};                               /* P(M | A) */
+function pTout(c, s, a, j, m){
+  var p = (c ? PC : 1 - PC) * (s ? PS : 1 - PS);
+  var pa = PA[(c ? '1' : '0') + (s ? '1' : '0')];
+  p *= a ? pa : 1 - pa;
+  p *= a ? (j ? PJ['1'] : 1 - PJ['1']) : (j ? PJ['0'] : 1 - PJ['0']);
+  p *= a ? (m ? PM['1'] : 1 - PM['1']) : (m ? PM['0'] : 1 - PM['0']);
+  return p;
+}
+/* obsJ, obsM : -1 inconnu, 0 faux, 1 vrai */
+function posterieur(obsJ, obsM){
+  var num = {c: 0, s: 0, a: 0}, den = 0;
+  for (var c = 0; c < 2; c++) for (var s = 0; s < 2; s++) for (var a = 0; a < 2; a++)
+  for (var j = 0; j < 2; j++) for (var m = 0; m < 2; m++){
+    if (obsJ >= 0 && j !== obsJ) { continue; }
+    if (obsM >= 0 && m !== obsM) { continue; }
+    var p = pTout(c, s, a, j, m);
+    den += p;
+    if (c) { num.c += p; }
+    if (s) { num.s += p; }
+    if (a) { num.a += p; }
+  }
+  return {c: num.c / den, s: num.s / den, a: num.a / den};
+}
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-1.6, 6.6, 9.6, -2.8], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sJ = b2.create('slider', [[-1.2, -1.4], [2.4, -1.4], [-1, -1, 1]], {
+  name: 'Jean appelle', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--viz-blue', '#2563eb'); }}
+});
+var sM = b2.create('slider', [[4.6, -1.4], [8.2, -1.4], [-1, -1, 1]], {
+  name: 'Marie appelle', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function obsJ(){ return Math.round(sJ.Value()); }
+function obsM(){ return Math.round(sM.Value()); }
+function libelle(v){ return v < 0 ? 'inconnu' : (v === 1 ? 'oui' : 'non'); }
+var NOEUDS8 = [
+  {id:'c', nom:'Cambriolage', x:1.6, y:5.0, prior:PC},
+  {id:'s', nom:'Seisme',      x:6.4, y:5.0, prior:PS},
+  {id:'a', nom:'Alarme',      x:4.0, y:3.0, prior:null},
+  {id:'j', nom:'Jean appelle', x:2.0, y:1.0, prior:null},
+  {id:'m', nom:'Marie appelle', x:6.2, y:1.0, prior:null}
+];
+var ARCS8 = [['c','a'], ['s','a'], ['a','j'], ['a','m']];
+function fiche8(id){
+  for (var i = 0; i < NOEUDS8.length; i++){ if (NOEUDS8[i].id === id) { return NOEUDS8[i]; } }
+  return null;
+}
+for (var i = 0; i < ARCS8.length; i++){
+  (function(arc){
+    var u = fiche8(arc[0]), v = fiche8(arc[1]);
+    b2.create('arrow', [[u.x, u.y - 0.34], [v.x, v.y + 0.34]], {
+      strokeColor: PAL.axis, strokeWidth: 2, highlight: false, fixed: true});
+  })(ARCS8[i]);
+}
+for (var i = 0; i < NOEUDS8.length; i++){
+  (function(n){
+    b2.create('curve', [[n.x - 1.0, n.x + 1.0, n.x + 1.0, n.x - 1.0, n.x - 1.0],
+                        [n.y - 0.34, n.y - 0.34, n.y + 0.34, n.y + 0.34, n.y - 0.34]], {
+      strokeColor: function(){
+        if (n.id === 'j' && obsJ() >= 0) { return cssv('--viz-blue', '#2563eb'); }
+        if (n.id === 'm' && obsM() >= 0) { return cssv('--accent', '#f59e0b'); }
+        return PAL.axis(); },
+      strokeWidth: function(){
+        if (n.id === 'j' && obsJ() >= 0) { return 3; }
+        if (n.id === 'm' && obsM() >= 0) { return 3; }
+        return 1.6; },
+      fillColor: function(){ return cssv('--primary', '#026573'); },
+      fillOpacity: function(){
+        if (n.id === 'j') { return obsJ() >= 0 ? 0.22 : 0.06; }
+        if (n.id === 'm') { return obsM() >= 0 ? 0.22 : 0.06; }
+        var p = posterieur(obsJ(), obsM())[n.id];
+        return 0.06 + 0.7 * Math.min(1, p * 3);
+      },
+      highlight: false, fixed: true});
+    b2.create('text', [n.x, n.y + 0.12, n.nom], {fontSize: 13, anchorX: 'middle',
+      anchorY: 'middle', strokeColor: PAL.text, fixed: true, highlight: false});
+    b2.create('text', [n.x, n.y - 0.16, function(){
+      if (n.id === 'j') { return 'observe : ' + libelle(obsJ()); }
+      if (n.id === 'm') { return 'observe : ' + libelle(obsM()); }
+      var p = posterieur(obsJ(), obsM())[n.id];
+      return 'P = ' + (100 * p).toFixed(2) + ' %';
+    }], {fontSize: 12, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+         strokeColor: function(){ return cssv('--primary-dark', '#014a55'); }});
+  })(NOEUDS8[i]);
+}
+b2.create('text', [-1.5, 6.3, function(){
+  var p = posterieur(obsJ(), obsM());
+  return 'Cambriolage : ' + (100 * p.c).toFixed(2) + ' %   |   seisme : '
+       + (100 * p.s).toFixed(2) + ' %   |   alarme : ' + (100 * p.a).toFixed(2) + ' %';
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-1.5, 5.85, function(){
+  var base = posterieur(-1, -1), p = posterieur(obsJ(), obsM());
+  if (obsJ() < 0 && obsM() < 0) { return 'Aucune observation : les probabilites sont les priors.'; }
+  return 'Le cambriolage passe de ' + (100 * base.c).toFixed(2) + ' % a '
+       + (100 * p.c).toFixed(2) + ' %, soit un facteur '
+       + (p.c / base.c).toFixed(0) + '.';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-1.5, -2.2, function(){
+  var seulJ = posterieur(1, -1), seulM = posterieur(-1, 1), deux = posterieur(1, 1);
+  return 'Jean seul : ' + (100 * seulJ.c).toFixed(1) + ' %   |   Marie seule : '
+       + (100 * seulM.c).toFixed(1) + ' %   |   les deux : ' + (100 * deux.c).toFixed(1)
+       + ' %  -  les deux appels ne sont pas independants, ils passent par l’alarme.';
+}], {fontSize: 12.5, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-1.5, -2.65,
+  'Le reseau demande 10 nombres au lieu de 31 pour la loi jointe des 5 variables.'],
+  {fontSize: 12.5, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>
