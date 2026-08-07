@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="category">
+    <category><text>$course$/Mastering Bitcoin/Section 9 - Transaction Fees (Comprehension)</text></category>
+  </question>
+
+  <question type="numerical">
+    <name><text>S9 C1 — Fee rate</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A 200 vB transaction pays 3,000 sat. What is its fee rate in sat/vB?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>3000 / 200 = 15 sat/vB.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>15</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S9 C2 — Fee for a rate</text></name>
+    <questiontext format="html"><text><![CDATA[<p>You want 8 sat/vB on a 150 vB transaction. What fee (in satoshis) must you pay?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>8 * 150 = 1200 sat.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>1200</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S9 C3 — What miners rank by</text></name>
+    <questiontext format="html"><text><![CDATA[<p>When choosing transactions, miners primarily prefer a higher:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Space is what they sell, so rate wins.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Fee rate (sat/vB)]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Absolute fee regardless of size]]></text><feedback format="html"><text>Size matters to them.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Number of outputs]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Transaction age]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S9 C4 — Receiver's tool</text></name>
+    <questiontext format="html"><text><![CDATA[<p>You received a stuck low-fee transaction and want it confirmed. You should use:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Spend its output with a high-fee child.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[CPFP]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[RBF]]></text><feedback format="html"><text>RBF is for the sender.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A larger block]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A new address]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S9 C5 — RBF rule</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A valid replace-by-fee transaction must pay both a higher absolute fee and a higher fee rate than the original.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+</quiz>

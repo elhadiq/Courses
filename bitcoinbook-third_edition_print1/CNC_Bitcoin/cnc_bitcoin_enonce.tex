@@ -1,0 +1,245 @@
+\documentclass[11pt,a4paper]{article}
+
+%============================================================
+%  Problème de type CNC - Informatique - Filière MP (Maroc)
+%  Thème : Structures de données et algorithmes de Bitcoin
+%  ÉNONCÉ
+%============================================================
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{french.ldf}{\usepackage[french]{babel}}{\usepackage[english]{babel}} % french si disponible
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\geometry{margin=2.3cm}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lmodern}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, urlcolor=[RGB]{2,101,115}, linkcolor=black,
+  pdftitle={Preparation CNC Informatique MP - Bitcoin},
+  pdfauthor={Pr Agrege El Hadiq Zouhair}}
+
+\definecolor{codebg}{RGB}{247,249,251}
+\definecolor{kw}{RGB}{175,45,45}
+\definecolor{cmt}{RGB}{110,120,130}
+\definecolor{str}{RGB}{20,110,60}
+
+\lstset{
+  language=Python,
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{kw}\bfseries,
+  commentstyle=\color{cmt}\itshape,
+  stringstyle=\color{str},
+  numbers=left, numberstyle=\tiny\color{cmt}, numbersep=8pt,
+  frame=single, rulecolor=\color{gray!40},
+  showstringspaces=false, breaklines=true, columns=fullflexible,
+  extendedchars=true, inputencoding=utf8,
+  literate={é}{{\'e}}1 {è}{{\`e}}1 {à}{{\`a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ç}{{\c c}}1 {'}{{'}}1
+}
+
+\newcounter{qcnt}
+\newcommand{\Q}{\medskip\par\stepcounter{qcnt}\noindent\textbf{Question~\theqcnt.}~}
+\newcommand{\code}[1]{\lstinline!#1!}
+
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Préparation au CNC --- Informatique MP}
+\rhead{\small Bitcoin}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\titleformat*{\section}{\large\bfseries\scshape}
+
+\begin{document}
+
+\begin{center}
+{\large\bfseries Préparation au Concours National Commun --- Informatique MP}\\[8pt]
+\rule{0.9\linewidth}{0.5pt}\\[6pt]
+{\Large\bfseries Épreuve d'Informatique}\\[4pt]
+{\bfseries Filière MP --- Durée : 4 heures}\\[6pt]
+{\itshape Structures de données et algorithmes de la blockchain \textsc{Bitcoin}}\\[6pt]
+\rule{0.9\linewidth}{0.5pt}\\[8pt]
+{\small Auteur~: \href{https://orcid.org/0000-0002-6108-7176}{\textbf{Pr Agrégé El Hadiq Zouhair}}}\\[3pt]
+{\small \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}} \quad---\quad Tous droits réservés \textcopyright\ cpgeacademy.org}
+\end{center}
+
+\medskip
+\begin{center}
+\fcolorbox{gray}{gray!5}{\begin{minipage}{0.93\linewidth}
+\small
+\textbf{Avis important.} Ce document est une \textbf{initiative personnelle} du professeur, à but strictement pédagogique. Il ne s'agit \textbf{pas} d'un sujet officiel du Concours National Commun~; il s'en inspire uniquement par la forme et l'esprit.
+
+\smallskip
+\textbf{Pour aller plus loin.} Les élèves peuvent traiter une \textbf{nouvelle version} de ce problème dotée d'un \textbf{autocorrecteur des réponses}, et suivre un \textbf{cours complet sur Bitcoin}, sur \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}}.
+\end{minipage}}
+\end{center}
+
+\vspace{4pt}
+\noindent
+\textbf{Consignes.} L'usage de toute calculatrice et de tout document est interdit. Toutes les fonctions demandées seront écrites en \textbf{Python~3}. On pourra librement réutiliser les fonctions écrites dans les questions précédentes. La clarté, la rigueur des justifications et la qualité de la rédaction seront prises en compte. Le sujet comporte cinq parties \emph{largement indépendantes}, de difficulté croissante.
+
+\medskip
+\hrule
+\medskip
+
+\section*{Présentation et notations}
+
+\textsc{Bitcoin} est un système de monnaie électronique décentralisé. Ce problème étudie quelques structures de données et algorithmes qui en constituent le c\oe ur : la représentation des montants, l'encodage des données, les arbres de \textsc{Merkle}, la preuve de travail, et la sélection des fonds à dépenser.
+
+\medskip
+\noindent On adopte les notations suivantes, valables dans tout le sujet.
+\begin{itemize}[nosep,leftmargin=1.4em]
+  \item Les montants sont comptés en \textbf{satoshis}, la plus petite unité~; un bitcoin (noté \textsc{BTC}) vaut exactement $10^{8}$ satoshis.
+  \item Pour un entier $a\ge 0$ et $k\in\mathbb{N}$, $a \gg k$ désigne le décalage binaire à droite, c'est-à-dire $\lfloor a/2^{k}\rfloor$.
+  \item $\log_2$ désigne le logarithme en base $2$~; $\lfloor x\rfloor$ (resp. $\lceil x\rceil$) la partie entière inférieure (resp. supérieure).
+  \item En Python, les entiers sont de taille arbitraire~; on considérera qu'une opération arithmétique élémentaire ($+$, $-$, comparaison, $\gg$) sur des entiers bornés par une constante du problème s'effectue en temps $O(1)$.
+  \item On dispose d'une fonction de hachage $h : \{0,1\}^{*}\to\{0,1\}^{256}$ (le double \textsc{SHA-256}), supposée \emph{résistante aux collisions} : il est calculatoirement impossible d'exhiber deux entrées distinctes $x\neq y$ telles que $h(x)=h(y)$. En Python, \code{h(b)} renvoie un objet \code{bytes} de $32$ octets, et \code{b1 + b2} désigne la concaténation de deux \code{bytes}.
+\end{itemize}
+
+%============================================================
+\section*{Partie I --- Émission monétaire (arithmétique des montants)}
+%============================================================
+
+La création de bitcoins suit une règle déterministe. La \emph{subvention} attribuée au mineur d'un bloc de hauteur $h\in\mathbb{N}$ vaut $50$~\textsc{BTC} pour les premiers blocs, puis elle est divisée par deux (\emph{halving}) tous les $210\,000$ blocs.
+
+\Q Écrire une fonction \code{vers_satoshis(btc)} qui, étant donné un montant \code{btc} (entier ou flottant), renvoie le nombre \emph{entier} de satoshis correspondant, arrondi au plus proche. On rappelle que \code{round} réalise l'arrondi.
+
+\Q Expliquer en une ou deux phrases pourquoi les logiciels du réseau manipulent les montants en satoshis entiers plutôt qu'en bitcoins flottants.
+
+\Q On note $s_0 = 5\,000\,000\,000$ le nombre de satoshis correspondant à $50$~\textsc{BTC}. La subvention d'un bloc de hauteur $h$ vaut, en satoshis,
+\[
+  \sigma(h) \;=\;
+  \begin{cases}
+    s_0 \gg \big\lfloor h/210000\big\rfloor & \text{si } \big\lfloor h/210000\big\rfloor < 64,\\[4pt]
+    0 & \text{sinon.}
+  \end{cases}
+\]
+Écrire une fonction \code{subvention(h)} qui calcule $\sigma(h)$ en utilisant l'opérateur de décalage \code{>>}.
+
+\Q Déterminer la plus petite hauteur $h^\star$ à partir de laquelle la subvention est nulle. Justifier.
+
+\Q Écrire une fonction \code{emission_totale()} qui renvoie le nombre total de satoshis jamais créés, c'est-à-dire
+\[
+  \Sigma \;=\; \sum_{k=0}^{+\infty} 210000 \times \big(s_0 \gg k\big).
+\]
+On expliquera pourquoi cette somme ne comporte en réalité qu'un nombre \emph{fini} de termes non nuls, et on précisera la complexité temporelle de la fonction.
+
+\Q Démontrer l'inégalité $\Sigma \le 21\,000\,000 \times 10^{8}$. \emph{(On pourra majorer $s_0\gg k$ par $s_0/2^k$ et sommer la série géométrique.)} En déduire qu'il n'existera jamais plus de $21$ millions de bitcoins.
+
+%============================================================
+\section*{Partie II --- Encodage \textsc{Base58} et entiers \textsc{CompactSize}}
+%============================================================
+
+Pour écrire de manière compacte et lisible de grands entiers (adresses, clés), \textsc{Bitcoin} utilise un encodage en base $58$. On dispose de la chaîne des $58$ symboles~:
+\begin{center}
+\code{ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"}
+\end{center}
+Le symbole d'indice $r$ ($0\le r\le 57$) est \code{ALPHABET[r]}.
+
+\Q Écrire une fonction \code{base58(n)} qui, pour un entier $n\ge 1$, renvoie la chaîne de caractères représentant $n$ en base $58$ (chiffre de poids fort en tête). On procédera par divisions euclidiennes successives par $58$.
+
+\Q On note $n\ge 1$. Montrer que la boucle de \code{base58(n)} effectue exactement $\lfloor \log_{58} n\rfloor + 1$ tours. En déduire la complexité en nombre de divisions.
+
+\Q Justifier la terminaison de \code{base58} en exhibant un \textbf{variant de boucle} (une quantité entière positive strictement décroissante).
+
+\medskip
+Les compteurs et longueurs (nombre d'entrées, d'octets, etc.) sont encodés au format \textsc{CompactSize}. Un entier $n$ tel que $0\le n < 2^{64}$ est représenté par une suite d'octets $b_0 b_1\ldots$ selon la règle~:
+\begin{center}
+\begin{tabular}{ll}
+$0 \le n \le 252$ & un seul octet égal à $n$~;\\
+$253 \le n \le 2^{16}-1$ & l'octet \code{0xfd} suivi de $n$ sur $2$ octets, \emph{petit-boutiste}~;\\
+$2^{16} \le n \le 2^{32}-1$ & l'octet \code{0xfe} suivi de $n$ sur $4$ octets, \emph{petit-boutiste}~;\\
+$2^{32} \le n \le 2^{64}-1$ & l'octet \code{0xff} suivi de $n$ sur $8$ octets, \emph{petit-boutiste}.\\
+\end{tabular}
+\end{center}
+\emph{Petit-boutiste} signifie que l'octet de poids faible est écrit en premier. En Python, si \code{d} est un objet \code{bytes}, alors \code{d[0]} est un entier, et \code{int.from_bytes(d, "little")} interprète \code{d} comme un entier petit-boutiste~; réciproquement \code{n.to_bytes(k, "little")} produit les \code{k} octets de $n$.
+
+\Q Écrire une fonction \code{lire_varint(d)} qui, étant donné un objet \code{bytes} \code{d} commençant par un entier \textsc{CompactSize}, renvoie la valeur de cet entier.
+
+\Q Écrire une fonction \code{ecrire_varint(n)} qui renvoie l'encodage \textsc{CompactSize} de l'entier $n$ ($0\le n<2^{64}$) sous forme d'un objet \code{bytes}, en choisissant toujours la représentation la plus courte.
+
+\Q Démontrer que pour tout entier $n$ tel que $0\le n<2^{64}$, on a \code{lire_varint(ecrire_varint(n)) == n}. \emph{(On distinguera les quatre cas de la table.)}
+
+%============================================================
+\section*{Partie III --- Arbres de \textsc{Merkle}}
+%============================================================
+
+Un bloc résume ses transactions par un unique condensé, la \textbf{racine de \textsc{Merkle}}, calculée ainsi. On part de la liste des condensés des feuilles $[f_0, f_1, \ldots, f_{n-1}]$ (avec $n\ge 1$, chaque $f_i$ étant un objet \code{bytes}). Tant qu'il reste plus d'un élément~: si le nombre d'éléments est impair, on \emph{duplique} le dernier~; puis on remplace la liste par la liste des condensés $h(f_{2i}\Vert f_{2i+1})$ des paires consécutives. Le dernier élément restant est la racine.
+
+\Q Écrire une fonction \code{racine_merkle(feuilles)} qui prend la liste non vide \code{feuilles} et renvoie la racine (un objet \code{bytes}). Le cas $n=1$ renverra $f_0$.
+
+\Q Soit $n\ge 1$ le nombre de feuilles. Montrer que le nombre total d'appels à $h$ effectués par \code{racine_merkle} est au plus $2n$. \emph{(On pourra majorer, à chaque niveau, le nombre de paires par la moitié de la taille courante augmentée de $1$, puis sommer.)} En déduire que la complexité est $O(n)$ appels à $h$.
+
+\Q On appelle \textbf{preuve d'inclusion} de la feuille d'indice $i$ la liste des condensés « voisins » rencontrés sur le chemin de $f_i$ jusqu'à la racine, chacun accompagné de sa position (à gauche ou à droite du condensé courant). Écrire une fonction \code{preuve(feuilles, i)} qui renvoie cette liste sous forme d'une liste de couples \code{(voisin, gauche)} où \code{voisin} est un objet \code{bytes} et \code{gauche} un booléen valant \code{True} si le voisin se trouve à gauche.
+
+\Q Écrire une fonction \code{verifier(feuille, preuve, racine)} qui, en repliant la feuille le long de la preuve, renvoie \code{True} si et seulement si le condensé reconstruit est égal à \code{racine}. \emph{(Si \code{gauche} vaut \code{True}, le condensé courant $c$ devient $h(\text{voisin}\Vert c)$, sinon $h(c\Vert\text{voisin})$.)}
+
+\Q On suppose $h$ résistante aux collisions. Montrer que si \code{verifier(f, p, r)} renvoie \code{True} pour la racine authentique $r$ d'un arbre, alors, sauf à exhiber une collision de $h$, la feuille \code{f} figurait effectivement parmi les feuilles de cet arbre. \emph{(On raisonnera par récurrence sur la longueur de la preuve.)}
+
+\Q Montrer que pour un bloc de $n$ transactions, la preuve d'inclusion d'une feuille comporte $O(\log n)$ condensés. Commenter l'intérêt de cette propriété pour un client léger (téléphone) qui ne stocke pas toute la chaîne.
+
+%============================================================
+\section*{Partie IV --- Preuve de travail (minage)}
+%============================================================
+
+Miner un bloc consiste à trouver une valeur, le \textbf{nonce}, telle que le condensé de l'en-tête, interprété comme un entier, soit inférieur ou égal à une \textbf{cible} $T$ (un entier tel que $0 < T < 2^{256}$). On modélise l'en-tête par une fonction \code{entete(nonce)} renvoyant un objet \code{bytes}, et on note \code{H(x) = int.from_bytes(h(x), "big")} l'entier associé au condensé.
+
+\Q Écrire une fonction \code{valide(nonce, T)} qui renvoie \code{True} si et seulement si \code{H(entete(nonce)) <= T}.
+
+\Q Écrire une fonction \code{miner(T)} qui renvoie le plus petit \code{nonce} entier $\ge 0$ tel que \code{valide(nonce, T)} soit vrai.
+
+\Q On modélise le hachage comme idéal~: pour chaque \code{nonce}, l'entier \code{H(entete(nonce))} est une variable aléatoire \emph{uniforme} sur $\{0,1,\ldots,2^{256}-1\}$, indépendante d'un nonce à l'autre. On pose $p = \dfrac{T+1}{2^{256}}$.
+\begin{enumerate}[label=(\alph*),nosep,leftmargin=1.6em]
+  \item Justifier que la probabilité qu'un nonce donné soit valide vaut $p$.
+  \item Soit $N$ le nombre de nonces essayés par \code{miner(T)} jusqu'au premier succès inclus. Reconnaître la loi de $N$ et donner son espérance $\mathbb{E}[N]$.
+\end{enumerate}
+
+\Q Montrer que \code{miner(T)} termine \emph{presque sûrement} : la probabilité que les $k$ premiers essais échouent tous tend vers $0$ quand $k\to+\infty$. Que vaut cette probabilité en fonction de $p$ et $k$~?
+
+\medskip
+La cible $T$ est stockée dans l'en-tête sous une forme compacte de $4$ octets appelée \code{nBits}. Si \code{bits} est l'entier correspondant, on pose
+\[
+  \text{exposant} = \texttt{bits} \gg 24, \qquad
+  \text{mantisse} = \texttt{bits}\ \&\ \texttt{0xffffff}, \qquad
+  T = \text{mantisse}\times 256^{\,\text{exposant}-3},
+\]
+où \code{&} désigne le \emph{et} binaire.
+
+\Q Écrire une fonction \code{bits_vers_cible(bits)} qui calcule $T$ d'après cette formule.
+
+\Q Toutes les $2016$ blocs, la cible est réajustée pour viser un intervalle moyen de $10$ minutes par bloc. Si l'ancienne cible est $T$ et que les $2016$ derniers blocs ont mis un temps réel \code{reel} secondes pour un temps visé \code{vise} secondes, la nouvelle cible est
+\[
+  T' = T \times \frac{\mathrm{clamp}(\texttt{reel})}{\texttt{vise}},
+  \qquad
+  \mathrm{clamp}(x) = \min\!\Big(\max\big(x,\tfrac{\texttt{vise}}{4}\big),\, 4\,\texttt{vise}\Big).
+\]
+Écrire une fonction \code{reajuster(T, reel, vise)} renvoyant $\lfloor T'\rfloor$ (on utilisera la division entière \code{//}). Démontrer ensuite l'encadrement $\dfrac{T}{4} \le T' \le 4\,T$.
+
+%============================================================
+\section*{Partie V --- Sélection des fonds à dépenser (programmation dynamique)}
+%============================================================
+
+Pour payer un montant $S$ (en satoshis, $S\ge 1$), un portefeuille doit choisir un sous-ensemble de ses \emph{sorties non dépensées} (UTXO) dont la somme atteint au moins $S$. On dispose d'une liste d'entiers strictement positifs $v = [v_0, \ldots, v_{n-1}]$ (les montants des UTXO). On souhaite choisir $I\subseteq\{0,\ldots,n-1\}$ minimisant $\big(\sum_{i\in I} v_i\big) - S$ sous la contrainte $\sum_{i\in I} v_i \ge S$ (autrement dit minimiser la monnaie rendue). On note $C = \sum_{i} v_i$ la somme totale disponible.
+
+\Q Le problème de décision suivant est-il, à votre avis, « facile » ? \emph{Étant donné $v$ et un entier $S$, existe-t-il $I$ tel que $\sum_{i\in I} v_i = S$ exactement~?} Citer le problème classique auquel il se ramène et sa classe de complexité. \emph{(Aucune démonstration n'est demandée, seulement une identification.)}
+
+\Q On se ramène à énumérer les sommes \emph{atteignables}. Pour $0\le s\le C$, on note $A(s)$ le prédicat « il existe un sous-ensemble de $v$ de somme exactement $s$ ». Donner une relation de récurrence permettant de calculer les $A(s)$ en traitant les $v_i$ un par un, et préciser l'initialisation.
+
+\Q En déduire et écrire une fonction \code{atteignables(v, C)} qui renvoie une liste de booléens \code{acc} de longueur $C+1$ telle que \code{acc[s]} vaut \code{True} si et seulement si $s$ est atteignable. \emph{(Attention à l'ordre de parcours des sommes pour ne pas réutiliser un même $v_i$ deux fois.)}
+
+\Q Écrire une fonction \code{meilleure_selection(v, S)} qui renvoie le plus petit montant atteignable $\ge S$ (donc le montant total optimal à engager), ou \code{-1} s'il n'en existe aucun.
+
+\Q Donner, en la justifiant, la complexité temporelle et spatiale de \code{atteignables} en fonction de $n$ et $C$. Pourquoi qualifie-t-on cet algorithme de \emph{pseudo-polynomial}~?
+
+\Q Démontrer la correction de la récurrence de la Question précédente : montrer, par récurrence sur le nombre $k$ d'éléments déjà traités, l'invariant « \code{acc[s]} vaut \code{True} si et seulement s'il existe un sous-ensemble des $k$ premiers éléments de $v$ de somme $s$ ». Conclure sur la correction de \code{meilleure_selection}.
+
+\Q Justifier la terminaison de \code{atteignables} et de \code{meilleure_selection}.
+
+\vfill
+\begin{center}\small\itshape --- Fin de l'énoncé ---\end{center}
+
+\end{document}

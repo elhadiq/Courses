@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="category">
+    <category><text>$course$/Mastering Bitcoin/Section 14 - Second-Layer Applications (Comprehension)</text></category>
+  </question>
+
+  <question type="numerical">
+    <name><text>S14 C1 — On-chain count</text></name>
+    <questiontext format="html"><text><![CDATA[<p>No matter how many payments flow through it, how many on-chain transactions does a payment channel need?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>One to open (fund), one to close (settle).</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>2</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S14 C2 — Routing</text></name>
+    <questiontext format="html"><text><![CDATA[<p>How can Alice pay Carol when they share no direct channel?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Linked channels form the Lightning Network.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Route the payment through connected nodes (e.g. via Bob)]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Open a channel with every person first]]></text><feedback format="html"><text>Impractical; routing solves it.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Mine a block]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[She cannot pay her at all]]></text><feedback format="html"><text>Lightning routes it.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S14 C3 — Routing fee</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A 1,000,000 msat payment routes through a node charging 1,000 msat base + 100 ppm. What is the fee in msat?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>1000 + 1,000,000 * 100 / 1,000,000 = 1000 + 100 = 1100.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>1100</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S14 C4 — HTLC timeout</text></name>
+    <questiontext format="html"><text><![CDATA[<p>In an HTLC, if the secret is never revealed before the timeout:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>The timeout guarantees a safe refund.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[The sender is refunded]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The receiver keeps the money]]></text><feedback format="html"><text>Not without the preimage.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The coins are burned]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The channel closes forever]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S14 C5 — Off-chain updates</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Commitment transactions that update a channel's balance are exchanged off-chain.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+</quiz>

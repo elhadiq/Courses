@@ -1,0 +1,120 @@
+<style>
+  img{-webkit-user-drag:none;user-drag:none;}
+  @media print{ html,body{display:none!important;} }
+</style>
+<div style="max-width:900px;margin:0 auto;font-family:Georgia,serif;color:#1e293b;line-height:1.85;font-size:16px;">
+
+  <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:30px 36px;margin-bottom:26px;color:#fff;">
+    <p style="color:#f7931a;font-size:12px;letter-spacing:3px;text-transform:uppercase;margin:0 0 6px;font-weight:bold;">Section 8 &middot; Reading</p>
+    <h1 style="font-size:28px;margin:0 0 8px;color:#fff;">Digital Signatures</h1>
+    <p style="margin:0;color:#cbd5e1;font-size:15px;">A signature is how you prove &ldquo;I authorize this&rdquo; without revealing your secret key. This section explains what a signature proves, how signing and verifying work, and two subtle rules that keep Bitcoin safe.</p>
+  </div>
+
+  <div style="background:#fff7ed;border-left:5px solid #f7931a;border-radius:8px;padding:18px 24px;margin-bottom:26px;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#9a3412;">What you will be able to do</p>
+    <ul style="margin:0;">
+      <li>State the three things a digital signature guarantees.</li>
+      <li>Explain signing and verifying in terms of the key pair from Section 4.</li>
+      <li>Say why the random number used when signing must never repeat.</li>
+      <li>Read SIGHASH flags &mdash; which parts of a transaction a signature covers.</li>
+      <li>Understand the low-S rule and why it exists.</li>
+    </ul>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">1. What a signature proves</h2>
+  <p>When Alice signs a transaction, the signature simultaneously guarantees three things to everyone on the network:</p>
+  <ul>
+    <li><strong>Authentication</strong> &mdash; the signature could only have been made by the holder of the private key. It really is Alice.</li>
+    <li><strong>Integrity</strong> &mdash; the exact transaction Alice signed cannot be altered afterward; change one byte and the signature no longer verifies.</li>
+    <li><strong>Non-repudiation</strong> &mdash; Alice cannot later deny she authorized it; only her key could have produced the signature.</li>
+  </ul>
+  <p>Crucially, all of this happens <em>without Alice revealing her private key</em>. She proves she knows the secret without showing it.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">2. Signing and verifying</h2>
+  <p>Recall the key pair from Section 4. Signing uses the <strong>private</strong> key; verifying uses the matching <strong>public</strong> key. The signer feeds the message (a digest of the transaction) plus their private key into a signing algorithm, producing a signature. Anyone can then feed the message, the signature, and the public key into a verify algorithm that answers only true or false.</p>
+
+  <svg viewBox="0 0 840 220" style="width:100%;height:auto;margin:18px 0;font-family:Georgia,serif;">
+    <defs><marker id="s8" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#f7931a"/></marker></defs>
+    <text x="200" y="24" text-anchor="middle" font-size="15" font-weight="bold" fill="#9a3412">SIGN (private key)</text>
+    <rect x="20" y="40" width="150" height="46" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/><text x="95" y="68" text-anchor="middle" font-size="13" fill="#1e3a8a">transaction digest</text>
+    <rect x="20" y="104" width="150" height="46" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/><text x="95" y="132" text-anchor="middle" font-size="13" fill="#991b1b">private key (secret)</text>
+    <rect x="230" y="72" width="140" height="46" rx="8" fill="#fff7ed" stroke="#f7931a" stroke-width="2.5"/><text x="300" y="100" text-anchor="middle" font-size="13" font-weight="bold" fill="#9a3412">signing algo</text>
+    <rect x="430" y="72" width="120" height="46" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/><text x="490" y="100" text-anchor="middle" font-size="13" fill="#065f46">signature</text>
+    <line x1="170" y1="63" x2="228" y2="88" stroke="#f7931a" stroke-width="2" marker-end="url(#s8)"/>
+    <line x1="170" y1="127" x2="228" y2="102" stroke="#f7931a" stroke-width="2" marker-end="url(#s8)"/>
+    <line x1="370" y1="95" x2="428" y2="95" stroke="#f7931a" stroke-width="2" marker-end="url(#s8)"/>
+    <text x="720" y="24" text-anchor="middle" font-size="15" font-weight="bold" fill="#065f46">VERIFY (public key)</text>
+    <rect x="600" y="72" width="120" height="46" rx="8" fill="#fff7ed" stroke="#f7931a" stroke-width="2.5"/><text x="660" y="100" text-anchor="middle" font-size="13" font-weight="bold" fill="#9a3412">verify algo</text>
+    <rect x="600" y="150" width="230" height="40" rx="8" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/><text x="715" y="175" text-anchor="middle" font-size="12" fill="#334155">inputs: digest + signature + public key</text>
+    <rect x="760" y="72" width="70" height="46" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/><text x="795" y="100" text-anchor="middle" font-size="13" font-weight="bold" fill="#065f46">true</text>
+    <line x1="550" y1="95" x2="598" y2="95" stroke="#f7931a" stroke-width="2" marker-end="url(#s8)"/>
+    <line x1="720" y1="95" x2="758" y2="95" stroke="#f7931a" stroke-width="2" marker-end="url(#s8)"/>
+  </svg>
+
+  <p>Bitcoin has used two signing schemes. The original is <strong>ECDSA</strong>. Since the 2021 Taproot upgrade it also supports <strong>Schnorr</strong> signatures, which are simpler, provably secure, and enable neat tricks like combining several signatures into one. Both rely on the same secp256k1 curve from Section 4.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">3. The danger of reused randomness</h2>
+  <p>Signing requires a fresh random number (called a <strong>nonce</strong>) each time. This is not a minor detail: if the same nonce is ever used to sign two different messages, anyone can do simple algebra on the two signatures and <strong>recover the private key</strong>. Real wallets have lost funds to this exact bug. Modern schemes derive the nonce deterministically from the key and message to make reuse impossible.</p>
+
+  <div style="background:#fef2f2;border-left:5px solid #ef4444;border-radius:8px;padding:14px 22px;margin:16px 0;">
+    <p style="margin:0;"><strong>Takeaway.</strong> A signature scheme is only as safe as its randomness. Never roll your own signing code &mdash; use a vetted library.</p>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">4. What does the signature actually sign? SIGHASH flags</h2>
+  <p>A signature commits to a specific view of the transaction. A one-byte <strong>SIGHASH flag</strong> appended to each signature says <em>which parts</em> are covered. The base types:</p>
+
+  <table style="width:100%;border-collapse:collapse;font-size:15px;margin:14px 0;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:9px 14px;">Flag</th><th style="text-align:left;padding:9px 14px;">Value</th><th style="text-align:left;padding:9px 14px;">Commits to&hellip;</th></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">SIGHASH_ALL</td><td style="padding:8px 14px;font-family:'Courier New',monospace;">0x01</td><td style="padding:8px 14px;">All inputs and all outputs (the normal case).</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">SIGHASH_NONE</td><td style="padding:8px 14px;font-family:'Courier New',monospace;">0x02</td><td style="padding:8px 14px;">All inputs, but no outputs.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">SIGHASH_SINGLE</td><td style="padding:8px 14px;font-family:'Courier New',monospace;">0x03</td><td style="padding:8px 14px;">All inputs and only the matching output.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">ANYONECANPAY</td><td style="padding:8px 14px;font-family:'Courier New',monospace;">0x80</td><td style="padding:8px 14px;">A modifier (add to the above): commit to only <em>this</em> input.</td></tr>
+  </table>
+
+  <p>The modifier bit <code>0x80</code> is combined with a base type. So <code>0x81</code> means SIGHASH_ALL + ANYONECANPAY. To decode a flag byte: the low bits (<code>flag &amp; 0x1f</code>) give the base type, and the <code>0x80</code> bit tells you whether ANYONECANPAY is set.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">5. Signature encoding and the low-S rule</h2>
+  <p>An ECDSA signature is a pair of numbers, <code>(r, s)</code>, packaged in a format called <strong>DER</strong>. A DER signature starts with the byte <code>0x30</code>, then a length, then each of <code>r</code> and <code>s</code> preceded by a <code>0x02</code> tag and its own length.</p>
+
+  <p>There is a subtlety: for any valid signature <code>(r, s)</code>, the pair <code>(r, n&minus;s)</code> is <em>also</em> mathematically valid, where <code>n</code> is the curve order. An attacker could flip one into the other, changing the transaction's id without invalidating it &mdash; a problem called <strong>malleability</strong>. Bitcoin fixes this with the <strong>low-S rule</strong>: only signatures whose <code>s</code> value is in the lower half of the range (<code>s &le; n/2</code>) are accepted.</p>
+
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px 24px;margin:16px 0;">
+    <p style="margin:0;font-family:'Courier New',monospace;font-size:15px;color:#0f172a;">signature accepted only if&nbsp;&nbsp;s &le; n / 2</p>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">Glossary for this section</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:15px;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:8px 14px;width:28%;">Term</th><th style="text-align:left;padding:8px 14px;">Meaning</th></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Digital signature</td><td style="padding:8px 14px;">Proof of authorization made with a private key, checkable with the public key.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">ECDSA / Schnorr</td><td style="padding:8px 14px;">The two signing schemes Bitcoin supports.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Nonce</td><td style="padding:8px 14px;">The one-time random number used when signing; must never repeat.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">SIGHASH flag</td><td style="padding:8px 14px;">A byte saying which parts of the transaction the signature covers.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">DER</td><td style="padding:8px 14px;">The byte format for an ECDSA <code>(r, s)</code> signature.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Malleability</td><td style="padding:8px 14px;">Altering a signature's form without invalidating it.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Low-S rule</td><td style="padding:8px 14px;">Only <code>s &le; n/2</code> is accepted, killing that malleability.</td></tr>
+  </table>
+
+  <div style="background:#ecfdf5;border-left:5px solid #10b981;border-radius:8px;padding:16px 22px;margin:24px 0;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#065f46;">Check your understanding</p>
+    <ol style="margin:0;">
+      <li>Which key signs, and which key verifies?</li>
+      <li>What can an attacker recover if you sign two messages with the same nonce? <span style="color:#94a3b8;">(Answer: your private key)</span></li>
+      <li>What does the SIGHASH flag <code>0x83</code> mean? <span style="color:#94a3b8;">(Answer: SINGLE + ANYONECANPAY)</span></li>
+      <li>Why does Bitcoin reject signatures with a high <code>s</code> value?</li>
+    </ol>
+  </div>
+
+  <div style="background:#eef2ff;border-left:5px solid #6366f1;border-radius:8px;padding:16px 22px;margin-top:24px;">
+    <p style="margin:0;"><strong>Practice.</strong> Three exercises: (1) <code>is_low_s</code> &mdash; enforce the low-S rule against a curve order; (2) <code>decode_sighash</code> &mdash; turn a flag byte into its name(s); and (3) <code>der_extract_r</code> &mdash; read the <code>r</code> value out of a DER-encoded signature.</p>
+  </div>
+</div>
+
+<script>
+/* Light deterrent only - not real protection; note: Moodle Page strips this */
+document.addEventListener('dragstart',e=>e.preventDefault());
+document.addEventListener('keydown',function(e){
+  var k=(e.key||'').toLowerCase();
+  if((e.ctrlKey||e.metaKey)&&['s','u','p'].indexOf(k)>-1){e.preventDefault();return false;}
+  if(k==='f12'){e.preventDefault();return false;}
+});
+</script>

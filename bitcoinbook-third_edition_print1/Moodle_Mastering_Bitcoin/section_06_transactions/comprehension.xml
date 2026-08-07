@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="category">
+    <category><text>$course$/Mastering Bitcoin/Section 6 - Transactions (Comprehension)</text></category>
+  </question>
+
+  <question type="numerical">
+    <name><text>S6 C1 — Decode a varint</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What integer do the bytes fd 10 00 encode?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>0xfd means read 2 LE bytes: 10 00 = 0x0010 = 16.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>16</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S6 C2 — Why CompactSize</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Why does Bitcoin use CompactSize instead of a fixed 8-byte count everywhere?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Small counts take one byte; large ones expand.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[It is tiny for small numbers yet can still grow when needed]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It encrypts the count]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It is required by JSON]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It makes transactions larger on purpose]]></text><feedback format="html"><text>The opposite.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S6 C3 — Legacy vsize</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A legacy (non-SegWit) transaction is 250 bytes. What is its virtual size in vbytes?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>For legacy, base=total, so weight=4*size and vsize=size.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>250</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S6 C4 — Witness discount</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Witness bytes are discounted, so they count less toward a transaction's virtual size.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S6 C5 — Endianness</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Interpreted little-endian, what value do the two bytes 02 03 represent?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Least-significant byte first.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[0x0302 = 770]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[0x0203 = 515]]></text><feedback format="html"><text>That would be big-endian.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[5]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[0x2003]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S6 C6 — Weight formula</text></name>
+    <questiontext format="html"><text><![CDATA[<p>How is transaction weight defined?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Then vsize = ceil(weight/4).</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[base_size &times; 3 + total_size]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[base_size + total_size]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[total_size &times; 4]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[base_size &times; 4 &minus; total_size]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+</quiz>

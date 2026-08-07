@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="category">
+    <category><text>$course$/Mastering Bitcoin/Section 11 - The Blockchain (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S11 C1 — Tamper effect</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Editing one old transaction invalidates:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Each block commits to the previous hash.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[That block and every block after it]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Only that one transaction]]></text><feedback format="html"><text>The hash chain breaks forward.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Nothing]]></text><feedback format="html"><text>Hashes would change.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Only the next transaction]]></text><feedback format="html"><text>It affects all later blocks.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S11 C2 — Odd level</text></name>
+    <questiontext format="html"><text><![CDATA[<p>In a merkle tree, what happens to the last hash on a level with an odd number of hashes?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Duplication makes the count even.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[It is duplicated so it can be paired]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It is discarded]]></text><feedback format="html"><text>No, it is duplicated.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It becomes the root]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It is set to zero]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S11 C3 — Proof size</text></name>
+    <questiontext format="html"><text><![CDATA[<p>About how many hashes are needed to prove inclusion in a block of 1,024 transactions?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>log2(1024) = 10.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>10</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S11 C4 — Display order</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Bitcoin displays block and transaction hashes in reversed byte order.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S11 C5 — Root location</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Where is the merkle root stored?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>The header commits to all transactions via the root.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[In the block header]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[In each transaction]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[In the wallet]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[In the mempool]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+</quiz>

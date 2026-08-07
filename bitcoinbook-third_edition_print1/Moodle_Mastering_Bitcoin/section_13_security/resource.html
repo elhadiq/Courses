@@ -1,0 +1,121 @@
+<style>
+  img{-webkit-user-drag:none;user-drag:none;}
+  @media print{ html,body{display:none!important;} }
+</style>
+<div style="max-width:900px;margin:0 auto;font-family:Georgia,serif;color:#1e293b;line-height:1.85;font-size:16px;">
+
+  <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:30px 36px;margin-bottom:26px;color:#fff;">
+    <p style="color:#f7931a;font-size:12px;letter-spacing:3px;text-transform:uppercase;margin:0 0 6px;font-weight:bold;">Section 13 &middot; Reading</p>
+    <h1 style="font-size:28px;margin:0 0 8px;color:#fff;">Bitcoin Security</h1>
+    <p style="margin:0;color:#cbd5e1;font-size:15px;">Bitcoin's protocol is famously hard to break &mdash; but users lose coins to simpler mistakes. This section covers the security principles and habits that actually keep funds safe.</p>
+  </div>
+
+  <div style="background:#fff7ed;border-left:5px solid #f7931a;border-radius:8px;padding:18px 24px;margin-bottom:26px;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#9a3412;">What you will be able to do</p>
+    <ul style="margin:0;">
+      <li>State the core security principle: control of keys is control of coins.</li>
+      <li>Explain why an address checksum protects users, and verify one.</li>
+      <li>Reason about entropy &mdash; what makes a secret hard to guess.</li>
+      <li>Use multisignature and backups to remove single points of failure.</li>
+    </ul>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">1. The core principle</h2>
+  <p>Everything in Bitcoin security reduces to one sentence: <strong>whoever controls the private keys controls the coins.</strong> There is no support line, no chargeback, no password reset. This is empowering and unforgiving in equal measure. Security, then, is mostly about two risks: <em>losing</em> your keys (and locking yourself out) and <em>leaking</em> your keys (and letting a thief in). Good practice defends against both at once.</p>
+
+  <div style="background:#f1f5f9;border:1px solid #cbd5e1;border-radius:10px;padding:16px 24px;margin:16px 0;">
+    <p style="margin:0;"><strong>Golden rule.</strong> Never type your recovery phrase into a website or app that asks for it, never photograph it, never store it in the cloud. Write it on paper (or steel) and keep it physically safe. Almost every theft of an individual's coins traces back to a leaked phrase.</p>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">2. Preventing costly typos: address checksums</h2>
+  <p>A payment to a mistyped address is usually unrecoverable, so Bitcoin addresses carry a built-in <strong>checksum</strong> (recall Base58Check, Section 4). The last four bytes of the data are the first four bytes of its double-SHA256. When you paste an address, the wallet re-computes that checksum; if it does not match, the address is rejected before any coins move. A single wrong character changes the hash and fails the check.</p>
+
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px 24px;margin:16px 0;">
+    <p style="margin:0;font-family:'Courier New',monospace;font-size:14px;color:#0f172a;">valid &hArr; SHA256(SHA256(payload))[:4] == checksum_bytes</p>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">3. Entropy: what makes a secret unguessable</h2>
+  <p>A secret is only as strong as it is <em>unpredictable</em>. We measure that unpredictability in <strong>bits of entropy</strong>. If a secret is drawn from a pool of <code>P</code> equally-likely symbols and is <code>L</code> symbols long, its entropy is:</p>
+
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px 24px;margin:16px 0;">
+    <p style="margin:0;font-family:'Courier New',monospace;font-size:15px;color:#0f172a;">entropy_bits = L &times; log&#8322;(P)</p>
+  </div>
+
+  <p>Each extra bit <em>doubles</em> the number of guesses an attacker needs. A 12-word BIP39 phrase draws 12 words from a 2,048-word list, giving about 12 &times; 11 = <strong>132 bits</strong> &mdash; far beyond any brute-force attack. Compare that with an 8-character password from the 26 lowercase letters: only about 38 bits, crackable in moments. This is why wallets use generated phrases, not human-chosen passwords, to protect keys.</p>
+
+  <table style="width:100%;border-collapse:collapse;font-size:15px;margin:14px 0;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:9px 14px;">Secret</th><th style="text-align:left;padding:9px 14px;">Pool &times; length</th><th style="text-align:left;padding:9px 14px;">Entropy</th></tr>
+    <tr><td style="padding:8px 14px;">8 lowercase letters</td><td style="padding:8px 14px;">26, 8 chars</td><td style="padding:8px 14px;">~38 bits (weak)</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;">10 full-keyboard chars</td><td style="padding:8px 14px;">95, 10 chars</td><td style="padding:8px 14px;">~66 bits</td></tr>
+    <tr><td style="padding:8px 14px;">12-word BIP39 phrase</td><td style="padding:8px 14px;">2048, 12 words</td><td style="padding:8px 14px;">132 bits (strong)</td></tr>
+  </table>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">4. Removing single points of failure</h2>
+  <p>Storing everything in one place means one accident (or one thief) is catastrophic. Two techniques spread the risk:</p>
+  <ul>
+    <li><strong>Multisignature</strong> (Section 7). An <code>m-of-n</code> setup requires several keys to spend. A 2-of-3 kept in three locations means a thief who finds one key gets nothing, and you can lose one key and still recover. In general, an m-of-n tolerates losing up to <code>n &minus; m</code> keys.</li>
+    <li><strong>Cold storage.</strong> Keep the keys that guard savings on a device that never touches the internet (a hardware wallet or an offline computer), so malware cannot reach them. Keep only small &ldquo;spending money&rdquo; on an online (hot) wallet.</li>
+  </ul>
+
+  <p>The diagram shows a 2-of-3 setup with keys kept in three separate places. Any two can sign a spend, so a thief who compromises one location gets nothing, and you can lose one key entirely and still recover.</p>
+
+  <svg viewBox="0 0 820 250" style="width:100%;height:auto;margin:18px 0;font-family:Georgia,serif;">
+    <text x="410" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="#16213e">2-of-3 multisig &mdash; any two keys can spend</text>
+    <!-- three keys -->
+    <rect x="40"  y="55" width="180" height="70" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+    <text x="130" y="82" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">Key 1</text>
+    <text x="130" y="102" text-anchor="middle" font-size="12" fill="#1e3a8a">home hardware wallet</text>
+    <rect x="320" y="55" width="180" height="70" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+    <text x="410" y="82" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">Key 2</text>
+    <text x="410" y="102" text-anchor="middle" font-size="12" fill="#1e3a8a">bank safe deposit box</text>
+    <rect x="600" y="55" width="180" height="70" rx="10" fill="#fef2f2" stroke="#ef4444" stroke-width="2" stroke-dasharray="5 4"/>
+    <text x="690" y="82" text-anchor="middle" font-size="13" font-weight="bold" fill="#991b1b">Key 3</text>
+    <text x="690" y="102" text-anchor="middle" font-size="12" fill="#991b1b">lost or stolen &mdash; ok!</text>
+    <!-- arrows down to vault -->
+    <line x1="130" y1="125" x2="360" y2="175" stroke="#10b981" stroke-width="2"/>
+    <line x1="410" y1="125" x2="410" y2="175" stroke="#10b981" stroke-width="2"/>
+    <line x1="690" y1="125" x2="460" y2="175" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4 4"/>
+    <!-- vault -->
+    <rect x="300" y="178" width="220" height="52" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="2.5"/>
+    <text x="410" y="200" text-anchor="middle" font-size="13" font-weight="bold" fill="#065f46">Coins spend with any 2 signatures</text>
+    <text x="410" y="219" text-anchor="middle" font-size="12" fill="#065f46">tolerates losing 1 key (n &minus; m = 1)</text>
+  </svg>
+
+  <div style="background:#fff7ed;border-left:5px solid #f7931a;border-radius:8px;padding:14px 22px;margin:16px 0;">
+    <p style="margin:0;"><strong>Balance the two risks.</strong> More copies of a backup reduce loss risk but increase theft risk; more secrecy does the opposite. A 2-of-3 multisig is popular precisely because it improves <em>both</em> at once.</p>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">Glossary for this section</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:15px;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:8px 14px;width:28%;">Term</th><th style="text-align:left;padding:8px 14px;">Meaning</th></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Checksum</td><td style="padding:8px 14px;">Bytes that detect a mistyped address.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Entropy (bits)</td><td style="padding:8px 14px;">Measure of unpredictability; each bit doubles the guesses needed.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Cold storage</td><td style="padding:8px 14px;">Keys kept offline, out of malware's reach.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Hot wallet</td><td style="padding:8px 14px;">An online wallet for small, everyday amounts.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Multisignature</td><td style="padding:8px 14px;">Requires m of n keys; tolerates losing n&minus;m.</td></tr>
+  </table>
+
+  <div style="background:#ecfdf5;border-left:5px solid #10b981;border-radius:8px;padding:16px 22px;margin:24px 0;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#065f46;">Check your understanding</p>
+    <ol style="margin:0;">
+      <li>Why is there no &ldquo;forgot password&rdquo; option in Bitcoin?</li>
+      <li>How does a checksum stop a payment to a mistyped address?</li>
+      <li>How many keys can a 3-of-5 multisig lose and still spend? <span style="color:#94a3b8;">(Answer: two)</span></li>
+      <li>Why is a 12-word phrase far safer than an 8-letter password?</li>
+    </ol>
+  </div>
+
+  <div style="background:#eef2ff;border-left:5px solid #6366f1;border-radius:8px;padding:16px 22px;margin-top:24px;">
+    <p style="margin:0;"><strong>Practice.</strong> Three exercises: (1) <code>verify_checksum</code> &mdash; validate a Base58Check-style checksum with <code>hashlib</code>; (2) <code>entropy_bits</code> &mdash; compute a secret's entropy; and (3) <code>keys_lost_tolerated</code> &mdash; how many keys an m-of-n backup can lose.</p>
+  </div>
+</div>
+
+<script>
+/* Light deterrent only - not real protection; note: Moodle Page strips this */
+document.addEventListener('dragstart',e=>e.preventDefault());
+document.addEventListener('keydown',function(e){
+  var k=(e.key||'').toLowerCase();
+  if((e.ctrlKey||e.metaKey)&&['s','u','p'].indexOf(k)>-1){e.preventDefault();return false;}
+  if(k==='f12'){e.preventDefault();return false;}
+});
+</script>

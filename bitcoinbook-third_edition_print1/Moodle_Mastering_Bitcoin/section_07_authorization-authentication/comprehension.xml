@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="category">
+    <category><text>$course$/Mastering Bitcoin/Section 7 - Authorization and Authentication (Comprehension)</text></category>
+  </question>
+
+  <question type="numerical">
+    <name><text>S7 C1 — Stack result</text></name>
+    <questiontext format="html"><text><![CDATA[<p>After running the script 7 OP_DUP OP_ADD, what value is on top of the stack?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>7 is duplicated, then OP_ADD gives 7+7=14.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>14</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S7 C2 — Turing complete?</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Bitcoin Script includes loops and is Turing-complete.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Script has no loops; that guarantees fast, terminating execution.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+    <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S7 C3 — Multisig loss</text></name>
+    <questiontext format="html"><text><![CDATA[<p>In a 2-of-3 multisig, how many keys can you lose and still spend?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>You need any 2 of the 3, so losing 1 is fine.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[One]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Zero]]></text><feedback format="html"><text>You may lose one.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Two]]></text><feedback format="html"><text>You need 2 to sign.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Three]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S7 C4 — OP_RETURN opcode</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which opcode marks an OP_RETURN data output?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>OP_RETURN is byte 0x6a.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[0x6a]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[0x00]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[0xff]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[0x51]]></text><feedback format="html"><text>That is OP_1.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S7 C5 — Data limit</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What is the maximum number of data bytes a standard OP_RETURN output carries?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Up to 80 bytes.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>80</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S7 C6 — Locking script</text></name>
+    <questiontext format="html"><text><![CDATA[<p>The locking script (scriptPubKey) is placed on an output and states the condition to spend it.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+</quiz>

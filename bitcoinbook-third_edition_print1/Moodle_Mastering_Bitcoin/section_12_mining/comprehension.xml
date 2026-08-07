@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="category">
+    <category><text>$course$/Mastering Bitcoin/Section 12 - Mining and Consensus (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S12 C1 — Target size</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A smaller target makes mining:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Fewer hashes fall below a smaller target.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Harder (fewer valid hashes exist)]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Easier]]></text><feedback format="html"><text>Smaller = harder.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Free]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Faster to verify]]></text><feedback format="html"><text>Verification speed is unchanged.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S12 C2 — Asymmetry</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A valid block is hard to find but easy for anyone to verify.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S12 C3 — Retarget interval</text></name>
+    <questiontext format="html"><text><![CDATA[<p>How often does the difficulty target adjust?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>About every two weeks.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Every 2,016 blocks]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Every 210,000 blocks]]></text><feedback format="html"><text>That is the halving.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Every block]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Every 10 minutes]]></text><feedback format="html"><text>That is the block target time.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S12 C4 — Fork resolution</text></name>
+    <questiontext format="html"><text><![CDATA[<p>When two blocks are found at nearly the same time, which branch do nodes keep?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Most-work (the 'longest') chain wins.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[The one with the most accumulated proof-of-work]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The one seen first]]></text><feedback format="html"><text>Work decides, not timing.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The one with the smaller block]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Both, permanently]]></text><feedback format="html"><text>One is abandoned.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S12 C5 — Retarget clamp</text></name>
+    <questiontext format="html"><text><![CDATA[<p>By at most what factor can the difficulty change in a single retargeting period?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>The adjustment is clamped to x1/4 .. x4.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>4</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+</quiz>

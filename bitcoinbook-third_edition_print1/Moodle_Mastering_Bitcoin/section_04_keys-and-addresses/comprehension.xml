@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="category">
+    <category><text>$course$/Mastering Bitcoin/Section 4 - Keys and Addresses (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S4 C1 — Publishing keys</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Why is it safe to publish your public key but never your private key?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>The one-way curve multiplication means the public key can be shared freely.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Deriving the private key from the public key is computationally infeasible]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The public key is encrypted]]></text><feedback format="html"><text>It is not encrypted.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Both keys are equally secret]]></text><feedback format="html"><text>Only the private key is secret.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The public key changes every day]]></text><feedback format="html"><text>It does not.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S4 C2 — Compressed key size</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A compressed public key is 33 bytes: a prefix (0x02 or 0x03) followed by the 32-byte x-coordinate.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Correct: only x plus a parity byte is stored.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S4 C3 — Prefix parity</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A compressed public key begins with the byte 0x03. Its y-coordinate is:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>0x02 means y even, 0x03 means y odd.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Odd]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Even]]></text><feedback format="html"><text>0x02 marks even.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Zero]]></text><feedback format="html"><text>Parity is odd/even, not zero.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Unknown]]></text><feedback format="html"><text>The prefix tells you.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S4 C4 — Checksum</text></name>
+    <questiontext format="html"><text><![CDATA[<p>The Base58Check checksum is:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>It lets wallets detect typos.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[The first 4 bytes of the double SHA-256 of the payload]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The last byte of the address]]></text><feedback format="html"><text>It is 4 bytes of a hash.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A random 4-byte number]]></text><feedback format="html"><text>It is deterministic.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The length of the address]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S4 C5 — HASH160</text></name>
+    <questiontext format="html"><text><![CDATA[<p>HASH160 is defined as RIPEMD160(SHA256(x)).</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S4 C6 — Purpose of checksum</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What does the Base58Check checksum protect against?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>A changed character breaks the checksum and the address is rejected.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Sending coins to a mistyped address]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Someone stealing your private key]]></text><feedback format="html"><text>That is unrelated.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[High transaction fees]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Network congestion]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+</quiz>

@@ -1,0 +1,355 @@
+\documentclass[11pt,a4paper]{article}
+
+%============================================================
+%  Problème de type CNC - Informatique - Filière MP (Maroc)
+%  Thème : Structures de données et algorithmes de Bitcoin
+%  CORRIGÉ
+%============================================================
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{french.ldf}{\usepackage[french]{babel}}{\usepackage[english]{babel}} % french si disponible
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\geometry{margin=2.3cm}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lmodern}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, urlcolor=[RGB]{2,101,115}, linkcolor=black,
+  pdftitle={Corrige - Preparation CNC Informatique MP - Bitcoin},
+  pdfauthor={Pr Agrege El Hadiq Zouhair}}
+
+\definecolor{codebg}{RGB}{247,249,251}
+\definecolor{kw}{RGB}{175,45,45}
+\definecolor{cmt}{RGB}{110,120,130}
+\definecolor{str}{RGB}{20,110,60}
+
+\lstset{
+  language=Python,
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{kw}\bfseries,
+  commentstyle=\color{cmt}\itshape,
+  stringstyle=\color{str},
+  numbers=left, numberstyle=\tiny\color{cmt}, numbersep=8pt,
+  frame=single, rulecolor=\color{gray!40},
+  showstringspaces=false, breaklines=true, columns=fullflexible,
+  extendedchars=true, inputencoding=utf8,
+  literate={é}{{\'e}}1 {è}{{\`e}}1 {à}{{\`a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ç}{{\c c}}1 {'}{{'}}1
+}
+
+\newcounter{qcnt}
+\newcommand{\Q}{\medskip\par\stepcounter{qcnt}\noindent\textbf{Corrigé de la question~\theqcnt.}~}
+\newcommand{\code}[1]{\lstinline!#1!}
+
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Préparation au CNC --- Informatique MP}
+\rhead{\small Corrigé}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\titleformat*{\section}{\large\bfseries\scshape}
+
+\begin{document}
+
+\begin{center}
+{\large\bfseries Préparation au Concours National Commun --- Informatique MP}\\[6pt]
+{\Large\bfseries Épreuve d'Informatique --- Filière MP}\\[3pt]
+{\itshape Structures de données et algorithmes de la blockchain \textsc{Bitcoin}}\\[3pt]
+{\bfseries\scshape Corrigé détaillé}\\[6pt]
+\rule{0.9\linewidth}{0.5pt}\\[6pt]
+{\small Auteur~: \href{https://orcid.org/0000-0002-6108-7176}{\textbf{Pr Agrégé El Hadiq Zouhair}} \quad---\quad \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}} \quad---\quad Tous droits réservés \textcopyright\ cpgeacademy.org}
+\end{center}
+
+\smallskip
+\begin{center}
+\fcolorbox{gray}{gray!5}{\begin{minipage}{0.93\linewidth}
+\small
+\textbf{Avis.} Corrigé d'un problème qui est une \textbf{initiative personnelle} du professeur, à but pédagogique~; ce n'est \textbf{pas} un sujet officiel du Concours National Commun. Une \textbf{nouvelle version} interactive avec \textbf{autocorrecteur des réponses} et un \textbf{cours complet sur Bitcoin} sont disponibles sur \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}}.
+\end{minipage}}
+\end{center}
+
+%============================================================
+\section*{Partie I --- Émission monétaire}
+%============================================================
+
+\Q
+\begin{lstlisting}
+def vers_satoshis(btc):
+    return round(btc * 100_000_000)
+\end{lstlisting}
+
+\Q Un flottant IEEE~754 ne peut représenter exactement la plupart des fractions décimales (par exemple $0{,}1$)~; additionner ou comparer de tels montants introduit des erreurs d'arrondi qui, sur une monnaie, seraient inacceptables. En comptant en satoshis \emph{entiers}, toutes les opérations sont exactes.
+
+\Q
+\begin{lstlisting}
+def subvention(h):
+    halvings = h // 210000
+    if halvings >= 64:
+        return 0
+    return 5_000_000_000 >> halvings
+\end{lstlisting}
+
+\Q La subvention est nulle dès que $\lfloor h/210000\rfloor \ge 64$, c'est-à-dire dès que $h \ge 64\times 210000$. La plus petite telle hauteur est
+\[
+  h^\star = 64\times 210000 = 13\,440\,000.
+\]
+(De plus $s_0 = 5\cdot10^9 < 2^{33}$, donc $s_0\gg 33 = 0$ déjà~; mais la borne institutionnelle des $64$ halvings donne la réponse attendue.)
+
+\Q
+\begin{lstlisting}
+def emission_totale():
+    total = 0
+    subv = 5_000_000_000
+    while subv > 0:
+        total += 210000 * subv
+        subv //= 2
+    return total
+\end{lstlisting}
+À chaque tour, \code{subv} est divisé par deux~; comme $s_0<2^{33}$, la valeur devient nulle après au plus $33$ tours. La somme ne comporte donc qu'un nombre fini de termes non nuls, et la fonction s'exécute en temps $O(1)$ (nombre de tours borné par une constante). On obtient $\Sigma = 2\,099\,999\,997\,690\,000$ satoshis, soit $20\,999\,999{,}9769$~\textsc{BTC}.
+
+\Q Pour tout $k$, $s_0\gg k = \lfloor s_0/2^k\rfloor \le s_0/2^k$. Donc
+\[
+  \Sigma \;=\; \sum_{k\ge 0} 210000\,(s_0\gg k)
+  \;\le\; 210000\, s_0 \sum_{k\ge 0} 2^{-k}
+  \;=\; 210000\, s_0 \times 2
+  \;=\; 210000 \times 5\cdot10^{9}\times 2
+  \;=\; 2{,}1\cdot10^{15}.
+\]
+Or $2{,}1\cdot10^{15} = 21\,000\,000\times 10^{8}$. Ainsi $\Sigma \le 21\,000\,000\times10^8$ satoshis, c'est-à-dire au plus $21$ millions de bitcoins. L'inégalité est même stricte car les parties entières $\lfloor s_0/2^k\rfloor$ sont, dès que $2^k\nmid s_0$, strictement inférieures à $s_0/2^k$.
+
+%============================================================
+\section*{Partie II --- Base58 et CompactSize}
+%============================================================
+
+\Q
+\begin{lstlisting}
+ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+
+def base58(n):
+    chiffres = []
+    while n > 0:
+        n, r = divmod(n, 58)
+        chiffres.append(ALPHABET[r])
+    return "".join(reversed(chiffres))
+\end{lstlisting}
+
+\Q Notons $n_0 = n$ et $n_{j+1} = \lfloor n_j/58\rfloor$ la valeur de \code{n} après $j$ tours. La boucle s'arrête au premier $j$ tel que $n_j = 0$. On a $n_j = \lfloor n/58^{\,j}\rfloor$, qui vaut $0$ si et seulement si $58^{\,j} > n$, soit $j > \log_{58} n$. Le nombre de tours est donc le plus petit entier $> \log_{58} n$, à savoir $\lfloor \log_{58} n\rfloor + 1$. Chaque tour effectue une division euclidienne, d'où une complexité en $\Theta(\log n)$ divisions (soit le nombre de chiffres du résultat).
+
+\Q À chaque tour, la valeur de \code{n} passe de $n_j$ à $n_{j+1}=\lfloor n_j/58\rfloor < n_j$ dès que $n_j\ge 1$. La quantité entière \code{n} est positive et strictement décroissante à chaque itération~: c'est un variant de boucle, ce qui prouve la terminaison.
+
+\Q
+\begin{lstlisting}
+def lire_varint(d):
+    n = d[0]
+    if n < 0xfd:
+        return n
+    elif n == 0xfd:
+        return int.from_bytes(d[1:3], "little")
+    elif n == 0xfe:
+        return int.from_bytes(d[1:5], "little")
+    else:
+        return int.from_bytes(d[1:9], "little")
+\end{lstlisting}
+
+\Q
+\begin{lstlisting}
+def ecrire_varint(n):
+    if n < 0xfd:
+        return bytes([n])
+    elif n <= 0xffff:
+        return bytes([0xfd]) + n.to_bytes(2, "little")
+    elif n <= 0xffffffff:
+        return bytes([0xfe]) + n.to_bytes(4, "little")
+    else:
+        return bytes([0xff]) + n.to_bytes(8, "little")
+\end{lstlisting}
+
+\Q On distingue les quatre cas.
+\begin{itemize}[nosep,leftmargin=1.4em]
+  \item Si $0\le n\le 252$~: \code{ecrire_varint} renvoie l'octet unique $n$. Alors \code{d[0]} $=n<\texttt{0xfd}$, donc \code{lire_varint} renvoie $n$.
+  \item Si $253\le n\le 2^{16}-1$~: on écrit \code{0xfd} puis $n$ sur $2$ octets petit-boutistes. À la lecture, \code{d[0]==0xfd} et \code{int.from_bytes(d[1:3],"little")} $=n$ car \code{to_bytes} et \code{from_bytes} en « little » sont réciproques sur $[0,2^{16}-1]$.
+  \item Cas \code{0xfe} ($2^{16}\le n\le 2^{32}-1$) et cas \code{0xff} ($2^{32}\le n\le 2^{64}-1$)~: identiques, avec $4$ et $8$ octets. Les bornes garantissent que $n$ tient sur le nombre d'octets choisi, et la réciprocité de \code{to_bytes}/\code{from_bytes} donne le résultat.
+\end{itemize}
+Dans tous les cas \code{lire_varint(ecrire_varint(n)) == n}. \hfill$\square$
+
+%============================================================
+\section*{Partie III --- Arbres de Merkle}
+%============================================================
+
+\Q
+\begin{lstlisting}
+import hashlib
+def h(b):
+    return hashlib.sha256(hashlib.sha256(b).digest()).digest()
+
+def racine_merkle(feuilles):
+    niveau = list(feuilles)
+    if len(niveau) == 1:
+        return niveau[0]
+    while len(niveau) > 1:
+        if len(niveau) % 2 == 1:
+            niveau.append(niveau[-1])
+        niveau = [h(niveau[i] + niveau[i+1])
+                  for i in range(0, len(niveau), 2)]
+    return niveau[0]
+\end{lstlisting}
+
+\Q Notons $t$ la taille de la liste au début d'un tour. Après duplication éventuelle, la taille est $2\lceil t/2\rceil$ et le nombre d'appels à $h$ (nombre de paires) est $\lceil t/2\rceil \le \tfrac{t}{2}+1$, tandis que la taille du niveau suivant est exactement $\lceil t/2\rceil$. En partant de $t_0=n$, les tailles successives vérifient $t_{j+1}=\lceil t_j/2\rceil \le t_j/2 + 1$. Le nombre total d'appels est
+\[
+  \sum_{j\ge 0}\Big\lceil \tfrac{t_j}{2}\Big\rceil
+  \;\le\; \sum_{j\ge 0}\Big(\tfrac{t_j}{2}+1\Big).
+\]
+Comme $t_j \le n/2^{\,j}+2$ (récurrence immédiate), la somme des $t_j/2$ est majorée par $\sum_j n/2^{\,j+1} = n$, et le nombre de niveaux est $O(\log n)$, terme négligeable devant $n$. On obtient au total au plus $2n$ appels à $h$, d'où une complexité $O(n)$.
+
+\Q
+\begin{lstlisting}
+def preuve(feuilles, i):
+    niveau = list(feuilles)
+    p = []
+    while len(niveau) > 1:
+        if len(niveau) % 2 == 1:
+            niveau.append(niveau[-1])
+        if i % 2 == 0:            # noeud a gauche : voisin a droite
+            p.append((niveau[i+1], False))
+        else:                     # noeud a droite : voisin a gauche
+            p.append((niveau[i-1], True))
+        niveau = [h(niveau[j] + niveau[j+1])
+                  for j in range(0, len(niveau), 2)]
+        i = i // 2
+    return p
+\end{lstlisting}
+
+\Q
+\begin{lstlisting}
+def verifier(feuille, preuve, racine):
+    c = feuille
+    for voisin, gauche in preuve:
+        if gauche:
+            c = h(voisin + c)
+        else:
+            c = h(c + voisin)
+    return c == racine
+\end{lstlisting}
+
+\Q Raisonnons par récurrence sur la longueur $\ell$ de la preuve.
+\emph{Initialisation} ($\ell=0$)~: l'arbre a une seule feuille et \code{verifier} renvoie \code{feuille == racine}~; si c'est vrai, \code{feuille} est bien l'unique feuille.
+\emph{Hérédité}~: supposons la propriété pour les preuves de longueur $\ell$. Soit une preuve de longueur $\ell+1$ acceptée pour la racine authentique $r$. Le premier repliement produit un condensé $c_1 = h(x)$ où $x$ est la concaténation de \code{feuille} et de son voisin (dans l'ordre indiqué). Or $r$ est aussi obtenue, dans l'arbre authentique, en repliant depuis un certain condensé de premier niveau $c_1'$ le long des $\ell$ voisins restants. Par hypothèse de récurrence appliquée au sous-arbre de racine $r$, l'acceptation impose $c_1 = c_1'$. Comme $c_1' = h(x')$ où $x'$ est la concaténation authentique des deux enfants, on a $h(x)=h(x')$~: sauf à exhiber une collision de $h$, $x=x'$, donc \code{feuille} coïncide avec l'un des deux enfants authentiques, lui-même feuille (ou racine d'un sous-arbre contenant \code{feuille}). En descendant, \code{feuille} figure parmi les feuilles. \hfill$\square$
+
+\Q Le nombre de tours de \code{preuve} est le nombre de niveaux de l'arbre, soit $\lceil \log_2 n\rceil$~; chaque tour ajoute exactement un voisin. La preuve comporte donc $\lceil\log_2 n\rceil = O(\log n)$ condensés. \textbf{Intérêt}~: un client léger qui ne détient que les en-têtes des blocs peut, en recevant une preuve de taille $O(\log n)$ (typiquement $\sim 12$ condensés pour un bloc de quelques milliers de transactions), vérifier qu'une transaction est incluse dans un bloc \emph{sans} télécharger ni stocker les $n$ transactions.
+
+%============================================================
+\section*{Partie IV --- Preuve de travail}
+%============================================================
+
+\Q
+\begin{lstlisting}
+def H(x):
+    return int.from_bytes(h(x), "big")
+
+def valide(nonce, T):
+    return H(entete(nonce)) <= T
+\end{lstlisting}
+
+\Q
+\begin{lstlisting}
+def miner(T):
+    nonce = 0
+    while not valide(nonce, T):
+        nonce += 1
+    return nonce
+\end{lstlisting}
+
+\Q
+\begin{enumerate}[label=(\alph*),nosep,leftmargin=1.6em]
+  \item \code{H(entete(nonce))} est uniforme sur $\{0,\ldots,2^{256}-1\}$~; l'événement « valide » est $\{H\le T\}$, qui contient les $T+1$ valeurs $0,1,\ldots,T$. Sa probabilité vaut donc $\dfrac{T+1}{2^{256}} = p$.
+  \item Les essais étant indépendants et de même probabilité de succès $p$, $N$ suit la \textbf{loi géométrique} de paramètre $p$ (nombre d'essais jusqu'au premier succès inclus)~: $\mathbb{P}(N=k) = (1-p)^{k-1}p$ pour $k\ge 1$, et $\mathbb{E}[N] = \dfrac{1}{p} = \dfrac{2^{256}}{T+1}$.
+\end{enumerate}
+
+\Q Les $k$ premiers essais échouent tous avec probabilité $(1-p)^{k}$ (indépendance). Comme $0<p\le 1$, on a $0\le 1-p<1$, donc $(1-p)^{k}\xrightarrow[k\to+\infty]{}0$. La probabilité que \code{miner} n'ait pas terminé après $k$ essais tend vers $0$~: l'algorithme termine presque sûrement.
+
+\Q
+\begin{lstlisting}
+def bits_vers_cible(bits):
+    exposant = bits >> 24
+    mantisse = bits & 0xffffff
+    return mantisse * (256 ** (exposant - 3))
+\end{lstlisting}
+(Par exemple \code{bits_vers_cible(0x1d00ffff)} redonne la cible du bloc de genèse.)
+
+\Q
+\begin{lstlisting}
+def reajuster(T, reel, vise):
+    bas, haut = vise // 4, 4 * vise
+    reel = max(bas, min(reel, haut))
+    return T * reel // vise
+\end{lstlisting}
+\textbf{Encadrement.} Après bornage, $\dfrac{\texttt{vise}}{4} \le \texttt{reel} \le 4\,\texttt{vise}$ (à l'entier près pour la borne basse $\lfloor\texttt{vise}/4\rfloor$). En multipliant par $\dfrac{T}{\texttt{vise}}>0$~:
+\[
+  \frac{T}{4} \;\le\; \frac{T\cdot \texttt{reel}}{\texttt{vise}} \;\le\; 4\,T.
+\]
+La division entière ne fait que diminuer la valeur~: $T' = \big\lfloor T\cdot\texttt{reel}/\texttt{vise}\big\rfloor \le 4T$, et $T' \ge \big\lfloor T/4\big\rfloor$. La difficulté (inversement proportionnelle à $T$) ne peut donc varier que d'un facteur $4$ à chaque réajustement, ce qui stabilise le rythme d'émission des blocs. \hfill$\square$
+
+%============================================================
+\section*{Partie V --- Sélection des UTXO (programmation dynamique)}
+%============================================================
+
+\Q Le problème de décision « existe-t-il $I$ avec $\sum_{i\in I} v_i = S$~? » est exactement le problème \textbf{Somme de sous-ensemble} (\textsc{Subset-Sum}), qui est \textbf{NP-complet}. Il n'est donc pas connu d'algorithme polynomial en la taille de l'entrée pour le résoudre dans le cas général.
+
+\Q Traitons les éléments un par un. Notons $A_k(s)$ le prédicat « il existe un sous-ensemble des $k$ premiers éléments de somme $s$ ». Alors~:
+\[
+  A_0(s) = [\,s = 0\,], \qquad
+  A_{k+1}(s) =
+  \begin{cases}
+    A_k(s) \ \text{ou}\ A_k(s - v_k) & \text{si } s \ge v_k,\\[3pt]
+    A_k(s) & \text{si } s < v_k.
+  \end{cases}
+\]
+Autrement dit, une somme $s$ est atteignable avec $k+1$ éléments soit sans utiliser $v_k$ (donc $A_k(s)$), soit en l'utilisant (donc $A_k(s-v_k)$).
+
+\Q
+\begin{lstlisting}
+def atteignables(v, C):
+    acc = [False] * (C + 1)
+    acc[0] = True
+    for x in v:
+        # parcours DECROISSANT : chaque x utilise au plus une fois
+        for s in range(C, x - 1, -1):
+            if acc[s - x]:
+                acc[s] = True
+    return acc
+\end{lstlisting}
+Le parcours décroissant de \code{s} garantit qu'au moment où l'on consulte \code{acc[s - x]}, cette case reflète encore l'état \emph{avant} l'incorporation de \code{x} (sinon on pourrait réutiliser \code{x} plusieurs fois).
+
+\Q
+\begin{lstlisting}
+def meilleure_selection(v, S):
+    C = sum(v)
+    if S > C:
+        return -1
+    acc = atteignables(v, C)
+    for s in range(S, C + 1):
+        if acc[s]:
+            return s
+    return -1
+\end{lstlisting}
+
+\Q La fonction \code{atteignables} exécute deux boucles imbriquées~: la boucle externe parcourt les $n$ valeurs, l'interne au plus $C+1$ sommes. Le temps est donc $O(nC)$, et l'espace $O(C)$ (le tableau \code{acc}). On parle d'algorithme \textbf{pseudo-polynomial} car la complexité est polynomiale en la \emph{valeur} $C$ des données, mais $C$ peut être exponentiel en la \emph{taille} de l'entrée (le nombre de bits nécessaires pour écrire les $v_i$)~; ce n'est donc pas un algorithme polynomial au sens de la théorie de la complexité.
+
+\Q Montrons l'invariant par récurrence sur le nombre $k$ d'éléments déjà traités par la boucle externe~: \emph{après le traitement des $k$ premiers éléments, \code{acc[s]} vaut \code{True} si et seulement s'il existe un sous-ensemble des $k$ premiers éléments de somme $s$}, c'est-à-dire $A_k(s)$.
+
+\emph{Initialisation} ($k=0$)~: avant toute itération, \code{acc[0]=True} et \code{acc[s]=False} pour $s\ge 1$, ce qui est exactement $A_0(s) = [s=0]$.
+
+\emph{Hérédité}~: supposons l'invariant vrai après $k$ éléments (état $A_k$). Le traitement de l'élément $x = v_k$ parcourt $s$ de $C$ à $x$ en posant \code{acc[s] = acc[s] or acc[s-x]}. Grâce au sens \emph{décroissant}, la case \code{acc[s-x]} lue n'a pas encore été modifiée durant cette passe~: elle vaut donc $A_k(s-x)$. Après la passe, \code{acc[s]} vaut $A_k(s)\ \text{ou}\ A_k(s-x)$ pour $s\ge x$, et reste $A_k(s)$ pour $s<x$. C'est précisément la récurrence de la question sur $A_{k+1}$. L'invariant est donc vrai après $k+1$ éléments.
+
+\emph{Conclusion}~: après les $n$ éléments, \code{acc[s]} $= A_n(s)$ pour tout $s$. Ainsi \code{meilleure_selection} renvoie le plus petit $s\ge S$ réellement atteignable (ou $-1$ si aucun), ce qui minimise la monnaie rendue $s-S$~: la fonction est correcte. \hfill$\square$
+
+\Q \textbf{Terminaison.} Dans \code{atteignables}, la boucle externe est un \code{for} sur la liste finie \code{v} ($n$ itérations), l'interne un \code{range} fini~; l'algorithme effectue donc un nombre fini d'opérations et termine. Dans \code{meilleure_selection}, l'appel à \code{atteignables} termine, et la dernière boucle est un \code{for} sur un \code{range} fini~; la fonction termine.
+
+\vfill
+\begin{center}\small\itshape --- Fin du corrigé ---\end{center}
+
+\end{document}

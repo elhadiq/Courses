@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="category">
+    <category><text>$course$/Mastering Bitcoin/Section 5 - Wallets (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S5 C1 — What a wallet stores</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What does a Bitcoin wallet actually store?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Coins are on the ledger; the wallet holds the keys.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[The private keys that control your coins]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The coins themselves]]></text><feedback format="html"><text>Coins live on the ledger.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A copy of the whole blockchain]]></text><feedback format="html"><text>That is a full node.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Your bank account details]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S5 C2 — Entropy and words</text></name>
+    <questiontext format="html"><text><![CDATA[<p>256 bits of entropy produce a 24-word BIP39 recovery phrase.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S5 C3 — Word count</text></name>
+    <questiontext format="html"><text><![CDATA[<p>How many words does a BIP39 phrase built from 128 bits of entropy have?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>words = (128 + 128/32)/11 = 132/11 = 12.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>12</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S5 C4 — Hardened offset</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A hardened derivation level adds which value to its index?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Hardened child numbers are >= 2^31.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[2**31 (2,147,483,648)]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[2**32]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[1000]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[100,000]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S5 C5 — Hardened child number</text></name>
+    <questiontext format="html"><text><![CDATA[<p>In the path m/44'/0'/0'/0/0, what is the child number of the level written 44' ?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>44 + 2^31 = 44 + 2147483648 = 2147483692.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>2147483692</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S5 C6 — One seed</text></name>
+    <questiontext format="html"><text><![CDATA[<p>An HD wallet derives all of its keys from a single seed.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+</quiz>

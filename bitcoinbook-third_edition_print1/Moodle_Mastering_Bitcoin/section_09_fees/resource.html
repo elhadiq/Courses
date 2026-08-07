@@ -1,0 +1,126 @@
+<style>
+  img{-webkit-user-drag:none;user-drag:none;}
+  @media print{ html,body{display:none!important;} }
+</style>
+<div style="max-width:900px;margin:0 auto;font-family:Georgia,serif;color:#1e293b;line-height:1.85;font-size:16px;">
+
+  <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:30px 36px;margin-bottom:26px;color:#fff;">
+    <p style="color:#f7931a;font-size:12px;letter-spacing:3px;text-transform:uppercase;margin:0 0 6px;font-weight:bold;">Section 9 &middot; Reading</p>
+    <h1 style="font-size:28px;margin:0 0 8px;color:#fff;">Transaction Fees</h1>
+    <p style="margin:0;color:#cbd5e1;font-size:15px;">Fees are how you bid for scarce block space. This section explains fee rate versus absolute fee, how wallets estimate what to pay, and how to speed up a stuck transaction.</p>
+  </div>
+
+  <div style="background:#fff7ed;border-left:5px solid #f7931a;border-radius:8px;padding:18px 24px;margin-bottom:26px;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#9a3412;">What you will be able to do</p>
+    <ul style="margin:0;">
+      <li>Explain why fees exist and who ultimately pays them.</li>
+      <li>Distinguish the <strong>absolute fee</strong> (satoshis) from the <strong>fee rate</strong> (sat/vB).</li>
+      <li>Compute a fee rate, and the fee needed to hit a target rate.</li>
+      <li>Describe RBF and CPFP for un-sticking a low-fee transaction.</li>
+    </ul>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">1. Why fees exist</h2>
+  <p>Each block can hold only a limited amount of transaction data (about 4 million weight units, Section 6). Far more transactions want in than will fit, so there is a market for space. A transaction offers a <strong>fee</strong> &mdash; recall from Section 2 that the fee is simply inputs minus outputs &mdash; and miners, wanting to earn the most, tend to pick the transactions offering the most value per unit of space. Pay more, get in sooner.</p>
+
+  <p>As the block subsidy shrinks with each halving (Section 1), fees are gradually becoming the main reward that pays miners to keep securing the network.</p>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">2. Absolute fee vs. fee rate</h2>
+  <p>This is the distinction that matters most. Two different measurements:</p>
+  <ul>
+    <li>The <strong>absolute fee</strong> is the total number of satoshis paid: inputs minus outputs. It is what the miner pockets.</li>
+    <li>The <strong>fee rate</strong> is the fee <em>per unit of size</em>, measured in <strong>satoshis per virtual byte (sat/vB)</strong>, using the virtual size from Section 6.</li>
+  </ul>
+  <p>Miners care about the <em>rate</em>, not the total, because space is what they are selling. A 1,000 sat fee on a tiny 100 vB transaction (10 sat/vB) is more attractive than a 1,000 sat fee on a bloated 1,000 vB transaction (1 sat/vB), even though the absolute fee is identical.</p>
+
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px 24px;margin:16px 0;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#334155;">The two formulas</p>
+    <p style="margin:0 0 6px;font-family:'Courier New',monospace;font-size:15px;color:#0f172a;">fee_rate&nbsp;(sat/vB)&nbsp;=&nbsp;absolute_fee&nbsp;&divide;&nbsp;vsize</p>
+    <p style="margin:0;font-family:'Courier New',monospace;font-size:15px;color:#0f172a;">absolute_fee&nbsp;(sat)&nbsp;=&nbsp;fee_rate&nbsp;&times;&nbsp;vsize</p>
+  </div>
+
+  <p><strong>Worked example.</strong> A transaction of 141 vB paying 1,410 sat has a fee rate of 1410 &divide; 141 = <strong>10 sat/vB</strong>. Conversely, if the mempool is busy and you want 20 sat/vB on that same 141 vB transaction, you must pay 20 &times; 141 = <strong>2,820 sat</strong>.</p>
+
+  <p>The picture below shows why the rate wins. Both transactions below pay the same 1,000 sat absolute fee, but the smaller one offers a far higher rate &mdash; so a miner filling limited block space picks it first.</p>
+
+  <svg viewBox="0 0 820 220" style="width:100%;height:auto;margin:18px 0;font-family:Georgia,serif;">
+    <text x="410" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="#16213e">Same absolute fee (1,000 sat), very different fee rate</text>
+    <!-- Tx A small -->
+    <rect x="40" y="60" width="90" height="60" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="2.5"/>
+    <text x="85" y="88" text-anchor="middle" font-size="12" fill="#065f46">Tx A</text>
+    <text x="85" y="106" text-anchor="middle" font-size="12" fill="#065f46">100 vB</text>
+    <text x="85" y="150" text-anchor="middle" font-size="13" font-weight="bold" fill="#065f46">10 sat/vB</text>
+    <text x="85" y="168" text-anchor="middle" font-size="11" fill="#065f46">picked first &#10003;</text>
+    <!-- Tx B big -->
+    <rect x="200" y="60" width="360" height="60" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="2.5"/>
+    <text x="380" y="88" text-anchor="middle" font-size="12" fill="#991b1b">Tx B</text>
+    <text x="380" y="106" text-anchor="middle" font-size="12" fill="#991b1b">1,000 vB</text>
+    <text x="380" y="150" text-anchor="middle" font-size="13" font-weight="bold" fill="#991b1b">1 sat/vB</text>
+    <text x="380" y="168" text-anchor="middle" font-size="11" fill="#991b1b">picked last</text>
+    <!-- block space bar -->
+    <rect x="610" y="55" width="170" height="120" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+    <text x="695" y="48" text-anchor="middle" font-size="12" fill="#334155">limited block space</text>
+    <rect x="620" y="120" width="150" height="48" rx="4" fill="#d1fae5" stroke="#10b981"/>
+    <text x="695" y="149" text-anchor="middle" font-size="11" fill="#065f46">fills with the</text>
+    <text x="695" y="163" text-anchor="middle" font-size="11" fill="#065f46">highest rates first</text>
+  </svg>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">3. Estimating the right fee rate</h2>
+  <p>Pay too little and your transaction waits (maybe for days); pay too much and you waste money. Wallets therefore <strong>estimate</strong> a fee rate from recent network activity &mdash; how full recent blocks were and what rates got confirmed. Bitcoin Core exposes this through <code>estimatesmartfee</code>. Typical guidance: a higher rate for &ldquo;confirm within 1 block,&rdquo; a lower rate for &ldquo;confirm within a day.&rdquo;</p>
+
+  <table style="width:100%;border-collapse:collapse;font-size:15px;margin:14px 0;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:9px 14px;">Urgency</th><th style="text-align:left;padding:9px 14px;">Typical rate (illustrative)</th></tr>
+    <tr><td style="padding:8px 14px;">Next block</td><td style="padding:8px 14px;">high sat/vB</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;">Within ~an hour</td><td style="padding:8px 14px;">medium sat/vB</td></tr>
+    <tr><td style="padding:8px 14px;">Within a day</td><td style="padding:8px 14px;">low sat/vB</td></tr>
+  </table>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">4. Un-sticking a transaction: RBF and CPFP</h2>
+  <p>Suppose you paid too little and your transaction is stuck. Two mechanisms let you rescue it:</p>
+
+  <p><strong>Replace-By-Fee (RBF).</strong> You re-broadcast the <em>same</em> transaction with a higher fee, replacing the stuck one. For the network to accept the replacement, it must genuinely be better. The core rules are simple: the replacement must pay a <em>higher absolute fee</em> <strong>and</strong> a <em>higher fee rate</em> than the original.</p>
+
+  <div style="background:#f1f5f9;border:1px solid #cbd5e1;border-radius:10px;padding:16px 24px;margin:16px 0;">
+    <p style="margin:0;font-family:'Courier New',monospace;font-size:14px;color:#0f172a;">replacement valid &hArr; new_fee &gt; old_fee&nbsp;&nbsp;AND&nbsp;&nbsp;new_rate &gt; old_rate</p>
+  </div>
+
+  <p><strong>Child-Pays-For-Parent (CPFP).</strong> If you <em>received</em> a low-fee transaction and want it confirmed, you cannot change it &mdash; but you can spend its output in a new <em>child</em> transaction that pays a high fee. A miner who wants the child's fee must include the parent too (since the child depends on it), so both confirm together. The child &ldquo;pays for&rdquo; the parent.</p>
+
+  <div style="background:#fff7ed;border-left:5px solid #f7931a;border-radius:8px;padding:14px 22px;margin:16px 0;">
+    <p style="margin:0;"><strong>Rule of thumb.</strong> Use <em>RBF</em> when you are the sender of the stuck transaction; use <em>CPFP</em> when you are the receiver.</p>
+  </div>
+
+  <h2 style="font-size:22px;color:#16213e;border-bottom:2px solid #f7931a;padding-bottom:6px;">Glossary for this section</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:15px;">
+    <tr style="background:#16213e;color:#fff;"><th style="text-align:left;padding:8px 14px;width:28%;">Term</th><th style="text-align:left;padding:8px 14px;">Meaning</th></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Absolute fee</td><td style="padding:8px 14px;">Total satoshis paid (inputs minus outputs).</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">Fee rate</td><td style="padding:8px 14px;">Fee per virtual byte, in sat/vB.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">Fee estimation</td><td style="padding:8px 14px;">Predicting the rate needed for a target confirmation time.</td></tr>
+    <tr style="background:#f8fafc;"><td style="padding:8px 14px;font-weight:bold;">RBF</td><td style="padding:8px 14px;">Replace a stuck transaction with a higher-fee version.</td></tr>
+    <tr><td style="padding:8px 14px;font-weight:bold;">CPFP</td><td style="padding:8px 14px;">Spend a stuck output with a high-fee child to pull both in.</td></tr>
+  </table>
+
+  <div style="background:#ecfdf5;border-left:5px solid #10b981;border-radius:8px;padding:16px 22px;margin:24px 0;">
+    <p style="margin:0 0 8px;font-weight:bold;color:#065f46;">Check your understanding</p>
+    <ol style="margin:0;">
+      <li>A 200 vB transaction pays 3,000 sat. What is its fee rate? <span style="color:#94a3b8;">(Answer: 15 sat/vB)</span></li>
+      <li>You want 8 sat/vB on a 150 vB transaction. What fee do you pay? <span style="color:#94a3b8;">(Answer: 1,200 sat)</span></li>
+      <li>Why do miners prefer fee rate over absolute fee?</li>
+      <li>You are the receiver of a stuck transaction. RBF or CPFP? <span style="color:#94a3b8;">(Answer: CPFP)</span></li>
+    </ol>
+  </div>
+
+  <div style="background:#eef2ff;border-left:5px solid #6366f1;border-radius:8px;padding:16px 22px;margin-top:24px;">
+    <p style="margin:0;"><strong>Practice.</strong> Three exercises: (1) <code>fee_rate</code> &mdash; sat/vB from fee and vsize; (2) <code>fee_for_rate</code> &mdash; satoshis needed for a target rate; and (3) <code>rbf_valid</code> &mdash; check the replace-by-fee rules.</p>
+  </div>
+</div>
+
+<script>
+/* Light deterrent only - not real protection; note: Moodle Page strips this */
+document.addEventListener('dragstart',e=>e.preventDefault());
+document.addEventListener('keydown',function(e){
+  var k=(e.key||'').toLowerCase();
+  if((e.ctrlKey||e.metaKey)&&['s','u','p'].indexOf(k)>-1){e.preventDefault();return false;}
+  if(k==='f12'){e.preventDefault();return false;}
+});
+</script>

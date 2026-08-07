@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="category">
+    <category><text>$course$/Mastering Bitcoin/Section 3 - Bitcoin Core (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S3 C1 — What defines a full node</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What is the defining property of a <strong>full node</strong>?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>A full node independently verifies the whole blockchain against the rules, trusting no one else.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review "What is a full node".</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[It downloads and independently verifies the entire blockchain]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It trusts a central server for the current state]]></text><feedback format="html"><text>There is no central server.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It only stores block headers to save space]]></text><feedback format="html"><text>That describes a lightweight client.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[It mines every block itself]]></text><feedback format="html"><text>Running a node does not require mining.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S3 C2 — Reference implementation</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Bitcoin Core is called the "reference implementation" because its behaviour effectively defines the rules that other software must match.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Correct: if another program disagrees with Bitcoin Core about validity, that program is considered broken.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>It is the reference everyone else matches.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S3 C3 — Reading an RPC response</text></name>
+    <questiontext format="html"><text><![CDATA[<p>In a JSON-RPC response, which field should you check <strong>before</strong> trusting the answer?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Check <code>error</code>: if it is not null, the call failed and <code>result</code> is not meaningful.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review "Talking to a node".</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[error]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[id]]></text><feedback format="html"><text>id only matches replies to requests.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[method]]></text><feedback format="html"><text>method appears in the request, not the reply.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S3 C4 — What listunspent returns</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What does the <code>listunspent</code> RPC call return?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>It lists the wallet's spendable UTXOs, each with an amount and a confirmations count.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review "Reading coins".</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[The wallet's spendable UTXOs, with amounts and confirmations]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Every transaction that has ever occurred on the network]]></text><feedback format="html"><text>That would be the whole blockchain.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A single account balance number]]></text><feedback format="html"><text>Bitcoin has no single balance; it has UTXOs.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S3 C5 — Lightweight clients</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A lightweight (SPV) client verifies the entire blockchain for itself, exactly like a full node.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>False: lightweight clients ask other nodes for data instead of verifying everything themselves.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Only a full node verifies everything.</text></feedback></answer>
+    <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S3 C6 — Confirmed balance</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A wallet holds two UTXOs: 200,000 sat with 8 confirmations, and 30,000 sat with 1 confirmation. Using a minimum of 6 confirmations, what confirmed balance (in satoshis) does it report?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Only the 200,000 sat UTXO has &ge; 6 confirmations, so the confirmed balance is 200,000 sat.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>200000</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+</quiz>

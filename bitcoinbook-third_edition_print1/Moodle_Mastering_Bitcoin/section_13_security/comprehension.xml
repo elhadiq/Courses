@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="category">
+    <category><text>$course$/Mastering Bitcoin/Section 13 - Bitcoin Security (Comprehension)</text></category>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S13 C1 — No reset</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Bitcoin has a 'forgot password' option that can recover lost keys.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>There is no reset — lost keys mean lost coins.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+    <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S13 C2 — Checksums</text></name>
+    <questiontext format="html"><text><![CDATA[<p>An address checksum protects you against:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>A wrong character fails the checksum.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Sending coins to a mistyped address]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Someone guessing your key]]></text><feedback format="html"><text>Different concern.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[A 51% attack]]></text><feedback format="html"><text>Unrelated.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[High fees]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S13 C3 — Multisig tolerance</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A 3-of-5 multisig can lose how many keys and still spend?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>n - m = 5 - 3 = 2.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>2</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S13 C4 — One more bit</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Adding one bit of entropy to a secret:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Entropy is measured in powers of two.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Doubles the number of guesses needed to break it]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Halves the guesses needed]]></text><feedback format="html"><text>The opposite.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Has no effect]]></text><feedback format="html"><text>It matters a lot.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Adds ten guesses]]></text><feedback format="html"><text>It doubles, not adds.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S13 C5 — Cold storage</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Cold storage means keeping keys on a device that never touches the internet.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+</quiz>

@@ -1,0 +1,67 @@
+% ============================================================
+%  Préambule + page de titre — Épreuve type CNC Informatique MP
+%  À inclure au début de l'énoncé ET du corrigé.
+%  Personnaliser : __TITRE_DOC__, __AUTEUR__, __ORCID__, __SITE__, __THEME__.
+%  Repli babel : FR si disponible, sinon EN (compile partout).
+% ============================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{french.ldf}{\usepackage[french]{babel}}{\usepackage[english]{babel}}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}\geometry{margin=2.3cm}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lmodern}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, urlcolor=[RGB]{2,101,115}, linkcolor=black}
+
+\definecolor{codebg}{RGB}{247,249,251}
+\definecolor{kw}{RGB}{175,45,45}
+\definecolor{cmt}{RGB}{110,120,130}
+\definecolor{str}{RGB}{20,110,60}
+\lstset{
+  language=Python, backgroundcolor=\color{codebg}, basicstyle=\ttfamily\small,
+  keywordstyle=\color{kw}\bfseries, commentstyle=\color{cmt}\itshape, stringstyle=\color{str},
+  numbers=left, numberstyle=\tiny\color{cmt}, numbersep=8pt, frame=single, rulecolor=\color{gray!40},
+  showstringspaces=false, breaklines=true, columns=fullflexible, extendedchars=true, inputencoding=utf8,
+  literate={é}{{\'e}}1 {è}{{\`e}}1 {à}{{\`a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ç}{{\c c}}1 {'}{{'}}1
+}
+
+% Numérotation CONTINUE des questions sur tout le sujet (\Q avant chaque question)
+\newcounter{qcnt}
+\newcommand{\Q}{\medskip\par\stepcounter{qcnt}\noindent\textbf{Question~\theqcnt.}~}
+\newcommand{\code}[1]{\lstinline!#1!}
+
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Préparation au CNC --- Informatique MP}
+\rhead{\small __THEME__}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\titleformat*{\section}{\large\bfseries\scshape}
+
+% ---- Page de titre à placer juste après \begin{document} ----
+% \begin{center}
+% {\large\bfseries Préparation au Concours National Commun --- Informatique MP}\\[8pt]
+% \rule{0.9\linewidth}{0.5pt}\\[6pt]
+% {\Large\bfseries Épreuve d'Informatique}\\[4pt]
+% {\bfseries Filière MP --- Durée : 4 heures}\\[6pt]
+% {\itshape __THEME__}\\[6pt]
+% \rule{0.9\linewidth}{0.5pt}\\[8pt]
+% {\small Auteur~: \href{https://orcid.org/__ORCID__}{\textbf{__AUTEUR__}}}\\[3pt]
+% {\small \href{https://__SITE__}{\textbf{__SITE__}} \quad---\quad Tous droits réservés \textcopyright\ __SITE__}
+% \end{center}
+% \medskip
+% \begin{center}
+% \fcolorbox{gray}{gray!5}{\begin{minipage}{0.93\linewidth}\small
+% \textbf{Avis important.} Ce document est une \textbf{initiative personnelle} du professeur,
+% à but strictement pédagogique. Il ne s'agit \textbf{pas} d'un sujet officiel du Concours
+% National Commun~; il s'en inspire uniquement par la forme et l'esprit.
+% \smallskip
+% \textbf{Pour aller plus loin.} Les élèves peuvent traiter une \textbf{nouvelle version} de
+% ce problème dotée d'un \textbf{autocorrecteur des réponses}, et suivre un \textbf{cours
+% complet}, sur \href{https://__SITE__}{\textbf{__SITE__}}.
+% \end{minipage}}
+% \end{center}

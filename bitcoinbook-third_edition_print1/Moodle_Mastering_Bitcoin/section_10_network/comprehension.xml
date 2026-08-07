@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="category">
+    <category><text>$course$/Mastering Bitcoin/Section 10 - The Bitcoin Network (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S10 C1 — Bloom result</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A bloom-filter test finds a 0 at one of an item's positions. What does that mean?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Any 0 bit is a definite negative.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[The item is definitely not in the set]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The item is definitely in the set]]></text><feedback format="html"><text>A 0 rules it out.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The item is probably in the set]]></text><feedback format="html"><text>That is when all bits are 1.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The filter is broken]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S10 C2 — SPV</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A lightweight (SPV) client downloads only block headers, not the full blockchain.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S10 C3 — Handshake</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which messages do two peers exchange during the initial handshake?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>version announces, verack acknowledges.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[version and verack]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[getdata and block]]></text><feedback format="html"><text>Those come later.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[ping and pong]]></text><feedback format="html"><text>That is keepalive.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[inv and tx]]></text><feedback format="html"><text>That is inventory.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S10 C4 — Inventory</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Why do nodes announce inventory (inv) ids before sending full data?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Avoids re-sending known transactions.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[So a peer only downloads items it does not already have]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[To encrypt the data]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[To increase fees]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[To mine faster]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S10 C5 — Resilience</text></name>
+    <questiontext format="html"><text><![CDATA[<p>If a single node disconnects, the whole Bitcoin network stops working.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Any node can leave; the network keeps running.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+    <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  </question>
+
+</quiz>

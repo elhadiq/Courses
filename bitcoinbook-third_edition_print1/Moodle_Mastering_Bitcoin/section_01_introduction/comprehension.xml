@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="category">
+    <category><text>$course$/Mastering Bitcoin/Section 1 - Introduction (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S1 C1 — The problem Bitcoin solves</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What core problem does Bitcoin solve that a simple digital money &ldquo;file&rdquo; could not?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Bitcoin prevents the same coin from being spent twice without relying on a bank or other trusted third party.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review "The problem".</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Double-spending, without needing a trusted middleman]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Making transactions completely free]]></text><feedback format="html"><text>Fees still exist.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Encrypting emails end-to-end]]></text><feedback format="html"><text>That is unrelated to Bitcoin's purpose.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Storing files across many computers]]></text><feedback format="html"><text>Bitcoin stores a ledger, not general files.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S1 C2 — Three meanings of "Bitcoin"</text></name>
+    <questiontext format="html"><text><![CDATA[<p>&ldquo;Bitcoin, the protocol&rdquo; refers to which of the following?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>The protocol is the set of rules defining valid transactions and blocks.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Review "Three meanings of one word".</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[The rulebook for what counts as a valid transaction or block]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The units of value people send]]></text><feedback format="html"><text>That is the currency.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The computers running the software]]></text><feedback format="html"><text>That is the network.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S1 C3 — Satoshi definition</text></name>
+    <questiontext format="html"><text><![CDATA[<p>One bitcoin (BTC) is equal to 100,000,000 satoshis.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Correct: 1 BTC = 10<sup>8</sup> satoshis, and protocol accounting uses whole satoshis.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>1 BTC is 100 million satoshis.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S1 C4 — Halving schedule</text></name>
+    <questiontext format="html"><text><![CDATA[<p>The block subsidy is cut in half every 210,000 blocks (roughly every four years).</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Correct: the subsidy started at 50 BTC and halves every 210,000 blocks.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>It halves every 210,000 blocks.</text></feedback></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S1 C5 — Convert BTC to satoshis</text></name>
+    <questiontext format="html"><text><![CDATA[<p>How many satoshis are in <strong>0.25 BTC</strong>? (Enter the number of satoshis.)</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>0.25 &times; 100,000,000 = 25,000,000 satoshis.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>25000000</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+  <question type="numerical">
+    <name><text>S1 C6 — Total supply cap</text></name>
+    <questiontext format="html"><text><![CDATA[<p>The total number of bitcoins that will ever exist approaches how many <strong>million</strong> BTC? (Enter the number of millions, e.g. 21.)</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>The converging supply schedule approaches, but never exceeds, 21 million BTC.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>21</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+  </question>
+
+</quiz>

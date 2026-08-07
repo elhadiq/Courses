@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>__TITLE__</title>
+<!-- GABARIT présentation thème CPGE. Remplacer __TITLE__, __SUBTITLE__, __RECAP__,
+     __SLIDES__ (les <section class="slide"> de contenu) et les "N" des numéros k / N.
+     Images : coller <img src="../../images/x.png"> puis lancer embed_images_base64.py.
+     Blocage LÉGER inclus : Ctrl+S/U/P/A, F12, glisser d'image, impression.
+     NON bloqués volontairement : le clic droit et la SÉLECTION de texte. -->
+<script>MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--teal:#026573;--dark:#2c3e50;--bg:#e8edf2;--border:#dce3ea;--hl:#e4f1f2;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--dark);display:flex;flex-direction:column;align-items:center;padding:2rem 1rem 5rem;gap:2rem;}
+.slide{background:#fff;width:100%;max-width:940px;border-radius:10px;box-shadow:0 4px 18px rgba(0,0,0,.10);padding:2.2rem 2.8rem 1.8rem;position:relative;}
+.slide-number{position:absolute;bottom:0.7rem;right:1.2rem;font-size:0.72rem;color:#aaa;}
+.slide.title-slide{background:linear-gradient(145deg,#f4f9fc 60%,#d9eef0);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;text-align:center;border-top:6px solid var(--teal);}
+.slide.title-slide h1{font-size:1.9rem;color:var(--dark);margin-bottom:0.4rem;}
+.slide.title-slide .subtitle{font-size:1.15rem;color:#555;}
+h2.frame-title{font-size:1.6rem;color:var(--teal);font-weight:700;margin-bottom:0.7rem;padding-bottom:0.35rem;border-bottom:2px solid #b7dadd;}
+h2.frame-title .tag{font-size:0.7em;font-weight:700;padding:2px 10px;border-radius:12px;color:#fff;vertical-align:middle;margin-left:0.4rem;background:var(--teal);}
+p{line-height:1.7;margin:0.45rem 0;} ul,ol{margin:0.5rem 0 0.5rem 1.4rem;line-height:1.85;}
+ul li::marker,ol li::marker{color:var(--teal);} strong{font-weight:700;} em{font-style:italic;}
+.cols{display:flex;gap:2rem;margin-top:0.8rem;align-items:center;} .col-text{flex:1.1;} .col-side{flex:0.9;}
+.code{background:#0d1117;color:#e6edf3;font-family:'Consolas','Courier New',monospace;font-size:0.9rem;line-height:1.5;padding:0.9rem 1.1rem;border-radius:8px;overflow-x:auto;margin:0.6rem 0;white-space:pre;tab-size:4;}
+.hl-box{background:var(--hl);border-left:4px solid var(--teal);border-radius:0 6px 6px 0;padding:0.7rem 1rem;margin:0.8rem 0;font-size:0.97rem;}
+.hl-box.warn{background:#fef9e7;border-left-color:#f39c12;} .hl-box.bad{background:#fdeef0;border-left-color:#e74c3c;} .hl-box.good{background:#eafaf1;border-left-color:#27ae60;}
+table.ref{border-collapse:collapse;width:100%;margin:0.7rem 0;font-size:0.92rem;}
+table.ref th{background:var(--dark);color:#fff;padding:0.5rem 0.7rem;text-align:left;} table.ref td{border:1px solid var(--border);padding:0.45rem 0.7rem;} table.ref tr:nth-child(even) td{background:#f4f9fc;}
+.mono{font-family:'Consolas','Courier New',monospace;font-size:1.02rem;color:#0d1117;}
+.slide img{max-width:100%;border:1px solid var(--border);border-radius:8px;display:block;margin:0.4rem auto;max-height:52vh;-webkit-user-drag:none;user-drag:none;}
+figure{margin:0.4rem 0;text-align:center;} figcaption{font-size:0.78rem;color:#888;font-style:italic;margin-top:0.3rem;}
+#nav{position:fixed;bottom:1.5rem;right:1.5rem;display:flex;gap:0.4rem;z-index:100;}
+#nav button{background:var(--teal);color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:1.1rem;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);transition:background .2s;}
+#nav button:hover{background:#014a54;} #nav #btn-scroll{border-radius:20px;width:auto;padding:0 14px;font-size:0.78rem;font-weight:700;}
+body.slideshow .slide{display:none;} body.slideshow .slide.active{display:block;} body.slideshow .slide.active.title-slide{display:flex;}
+@media print{ html,body{display:none!important;} }
+</style>
+</head>
+<body>
+
+<section class="slide title-slide"><h1>__TITLE__</h1><p class="subtitle">__SUBTITLE__</p><span class="slide-number">1 / __N__</span></section>
+
+<!-- __SLIDES__ : répéter ce modèle, en numérotant k / __N__
+<section class="slide">
+  <h2 class="frame-title">Titre<span class="tag">Étiquette</span></h2>
+  <p>Texte, maths $O(n\log n)$, ou <span class="mono">code</span>.</p>
+  <div class="hl-box">Idée clé.</div>
+  <span class="slide-number">k / __N__</span>
+</section>
+-->
+
+<section class="slide title-slide"><h1>Recap</h1><p class="subtitle">__RECAP__</p><span class="slide-number">__N__ / __N__</span></section>
+
+<div id="nav">
+  <button id="btn-prev" title="Précédent">&#8592;</button>
+  <button id="btn-scroll" title="Mode diaporama">Slideshow</button>
+  <button id="btn-next" title="Suivant">&#8594;</button>
+</div>
+<script>
+const slides=document.querySelectorAll('.slide');
+let current=0,slideshowMode=false;
+function enter(i){slides[current].classList.remove('active');current=(i+slides.length)%slides.length;slides[current].classList.add('active');slides[current].scrollIntoView({behavior:'smooth',block:'center'});}
+document.getElementById('btn-prev').addEventListener('click',()=>{if(slideshowMode)enter(current-1);});
+document.getElementById('btn-next').addEventListener('click',()=>{if(slideshowMode)enter(current+1);});
+document.getElementById('btn-scroll').addEventListener('click',()=>{slideshowMode=!slideshowMode;document.body.classList.toggle('slideshow',slideshowMode);document.getElementById('btn-scroll').textContent=slideshowMode?'Scroll':'Slideshow';if(slideshowMode)slides[current].classList.add('active');else slides.forEach(s=>s.classList.remove('active'));});
+document.addEventListener('keydown',function(e){
+  if(slideshowMode){
+    if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();enter(current+1);}
+    else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();enter(current-1);}
+    else if(e.key===' '){e.preventDefault();e.shiftKey?enter(current-1):enter(current+1);}
+  } else if(e.key===' '){e.preventDefault();window.scrollBy({top:(e.shiftKey?-1:1)*window.innerHeight*0.85,behavior:'smooth'});}
+});
+/* blocage léger (dissuasion) - ne bloque ni le clic droit ni la sélection */
+document.addEventListener('dragstart',e=>e.preventDefault());
+document.addEventListener('keydown',function(e){
+  var k=(e.key||'').toLowerCase();
+  if((e.ctrlKey||e.metaKey)&&['s','u','p'].indexOf(k)>-1){e.preventDefault();return false;}
+  if(k==='f12'){e.preventDefault();return false;}
+});
+</script>
+</body>
+</html>

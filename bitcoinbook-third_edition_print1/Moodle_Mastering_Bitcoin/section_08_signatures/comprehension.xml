@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+  <question type="category">
+    <category><text>$course$/Mastering Bitcoin/Section 8 - Digital Signatures (Comprehension)</text></category>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S8 C1 — Which key signs</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which key is used to create a signature?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Sign with private, verify with public.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[The private key]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The public key]]></text><feedback format="html"><text>That verifies.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The address]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[The block hash]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S8 C2 — Nonce reuse</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Signing two different messages with the same random nonce can leak your private key.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Correct — a real and dangerous failure.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S8 C3 — SIGHASH 0x83</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What does the SIGHASH flag 0x83 mean?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>0x03 base (SINGLE) plus 0x80 (ANYONECANPAY).</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[SIGHASH_SINGLE + ANYONECANPAY]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[SIGHASH_ALL]]></text><feedback format="html"><text>That is 0x01.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[SIGHASH_NONE]]></text><feedback format="html"><text>That is 0x02.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[ALL + ANYONECANPAY]]></text><feedback format="html"><text>That would be 0x81.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S8 C4 — Low-S purpose</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Bitcoin's low-S rule exists to prevent:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>(r, n-s) is otherwise also valid, changing the txid.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[Signature malleability]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Double-spending]]></text><feedback format="html"><text>Different mechanism.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[High fees]]></text><feedback format="html"><text>No.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[Slow signing]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+  <question type="truefalse">
+    <name><text>S8 C5 — Verification</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Anyone can verify a signature using the signer's public key.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+  </question>
+
+  <question type="multichoice">
+    <name><text>S8 C6 — DER start byte</text></name>
+    <questiontext format="html"><text><![CDATA[<p>A DER-encoded ECDSA signature begins with which byte?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text><![CDATA[<p>DER sequences start with 0x30.</p>]]></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+    <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+    <incorrectfeedback format="html"><text>Not quite — review the lesson.</text></incorrectfeedback>
+    <answer fraction="100" format="html"><text><![CDATA[0x30]]></text><feedback format="html"><text>Correct.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[0x02]]></text><feedback format="html"><text>That tags each integer.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[0x6a]]></text><feedback format="html"><text>That is OP_RETURN.</text></feedback></answer>
+    <answer fraction="0" format="html"><text><![CDATA[0x00]]></text><feedback format="html"><text>No.</text></feedback></answer>
+  </question>
+
+</quiz>
