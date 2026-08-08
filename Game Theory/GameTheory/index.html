@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Theory &mdash; complete handbook</title>
+<meta name="description" content="A game theory handbook in ten chapters: normal form, dominance, Nash equilibrium, mixed strategies, zero-sum games, extensive form and subgame perfection, repeated games, Bayesian games, auctions and mechanism design, bargaining and the Shapley value.">
+<link href="assets/style.css" rel="stylesheet">
+<script src="assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; justify-content: space-between; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz { margin: 26px 0; }
+.viz-title { font-weight: 700; color: var(--primary); font-size: 0.98rem; margin-bottom: 10px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 12px 0 0; border-top: 1px solid var(--color-rule); padding-top: 10px; }
+.viz svg { max-width: 100%; height: auto; }
+.payoff { display: inline-block !important; border-collapse: collapse; margin: 0 auto; }
+.payoff th, .payoff td { border: 1px solid var(--color-rule); padding: 9px 18px; text-align: center; }
+.payoff thead th { background: var(--primary-soft); color: var(--color-text); }
+.payoff th.corner { background: var(--primary); color: #fff; font-size: 0.82rem; font-weight: 600; }
+.payoff tbody th { background: var(--primary-soft); text-align: left; }
+.payoff td { font-family: var(--font-mono); font-size: 0.98rem; }
+.glossary th:first-child, .glossary td:first-child { white-space: nowrap; font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="index.html">Game Theory</a> &middot; Handbook</div><span class="course-code">10 chapters</span></div></header>
+<section class="hero"><div class="container"><h1>Game Theory</h1><p class="subtitle">Strategy &middot; Equilibrium &middot; Information &mdash; from the definition of a game to auctions, mechanism design and coalitions</p><a class="cta" href="lecons/01-foundations/page.html">Start with Chapter 1</a></div></section>
+<section class="section"><h2 class="section-title">Quick access</h2><p class="section-subtitle">Four ways into the handbook, depending on what you are after</p><div class="quick-access"><a class="qa-card" href="lecons/01-foundations/page.html"><span class="qa-label">Start here</span><span class="qa-title">What is a game?</span><span class="qa-sub">Players, strategies, payoffs and the payoff matrix</span></a><a class="qa-card" href="lecons/03-nash-pure/page.html"><span class="qa-label">The core idea</span><span class="qa-title">Nash equilibrium</span><span class="qa-sub">Mutual best responses, and what the concept does not promise</span></a><a class="qa-card" href="lecons/04-mixed-strategies/page.html"><span class="qa-label">When to randomise</span><span class="qa-title">Mixed strategies</span><span class="qa-sub">The indifference principle and Nash's existence theorem</span></a><a class="qa-card" href="lecons/09-auctions/page.html"><span class="qa-label">Applications</span><span class="qa-title">Auctions and design</span><span class="qa-sub">Truthful bidding, revenue equivalence, VCG</span></a></div></section>
+<section class="section"><h2 class="section-title">Part I &middot; Foundations</h2>
+<p class="section-subtitle">What a game is, and how far pure rationality alone can take you.</p><div class="sequences">
+<div class="seq-card"><div class="seq-meta">Chapter 1</div><h3>What Is a Game? Players, Strategies and Payoffs</h3><p class="seq-topics">Build the vocabulary and the payoff matrix that the whole course runs on.</p><p class="seq-topics">8 auto-graded questions &middot; 8 glossary entries</p><div class="seq-actions"><a class="btn primary" href="lecons/01-foundations/page.html">Read</a>
+<a class="btn" href="moodle/01-foundations-quiz.xml">Quiz XML</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">Chapter 2</div><h3>Dominance and Iterated Elimination</h3><p class="seq-topics">Predict behaviour using rationality alone, before any equilibrium concept.</p><p class="seq-topics">8 auto-graded questions &middot; 6 glossary entries</p><div class="seq-actions"><a class="btn primary" href="lecons/02-dominance/page.html">Read</a>
+<a class="btn" href="moodle/02-dominance-quiz.xml">Quiz XML</a>
+</div></div>
+</div></section>
+<section class="section"><h2 class="section-title">Part II &middot; Equilibrium</h2>
+<p class="section-subtitle">The central solution concept, randomisation, and the case of pure conflict.</p><div class="sequences">
+<div class="seq-card"><div class="seq-meta">Chapter 3</div><h3>Nash Equilibrium in Pure Strategies</h3><p class="seq-topics">The central solution concept: mutual best responses, and what it does and does not promise.</p><p class="seq-topics">8 auto-graded questions &middot; 6 glossary entries</p><div class="seq-actions"><a class="btn primary" href="lecons/03-nash-pure/page.html">Read</a>
+<a class="btn" href="moodle/03-nash-pure-quiz.xml">Quiz XML</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">Chapter 4</div><h3>Mixed Strategies and Nash's Existence Theorem</h3><p class="seq-topics">Randomise, compute equilibria by indifference, and see why an equilibrium always exists.</p><p class="seq-topics">8 auto-graded questions &middot; 6 glossary entries</p><div class="seq-actions"><a class="btn primary" href="lecons/04-mixed-strategies/page.html">Read</a>
+<a class="btn" href="moodle/04-mixed-strategies-quiz.xml">Quiz XML</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">Chapter 5</div><h3>Zero-Sum Games and the Minimax Theorem</h3><p class="seq-topics">Pure conflict, security levels, the value of a game, and its link to linear programming.</p><p class="seq-topics">8 auto-graded questions &middot; 7 glossary entries</p><div class="seq-actions"><a class="btn primary" href="lecons/05-zero-sum/page.html">Read</a>
+<a class="btn" href="moodle/05-zero-sum-quiz.xml">Quiz XML</a>
+</div></div>
+</div></section>
+<section class="section"><h2 class="section-title">Part III &middot; Time and information</h2>
+<p class="section-subtitle">Sequential play, repetition, reputation, and playing against unknown types.</p><div class="sequences">
+<div class="seq-card"><div class="seq-meta">Chapter 6</div><h3>Extensive-Form Games, Backward Induction and Subgame Perfection</h3><p class="seq-topics">Put timing back into the model, and throw out equilibria built on empty threats.</p><p class="seq-topics">8 auto-graded questions &middot; 8 glossary entries</p><div class="seq-actions"><a class="btn primary" href="lecons/06-extensive-form/page.html">Read</a>
+<a class="btn" href="moodle/06-extensive-form-quiz.xml">Quiz XML</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">Chapter 7</div><h3>Repeated Games, Reciprocity and the Folk Theorem</h3><p class="seq-topics">How self-interested players sustain cooperation when they expect to meet again.</p><p class="seq-topics">8 auto-graded questions &middot; 7 glossary entries</p><div class="seq-actions"><a class="btn primary" href="lecons/07-repeated-games/page.html">Read</a>
+<a class="btn" href="moodle/07-repeated-games-quiz.xml">Quiz XML</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">Chapter 8</div><h3>Bayesian Games and Incomplete Information</h3><p class="seq-topics">Types, priors, signalling and screening: playing when you do not know who you face.</p><p class="seq-topics">8 auto-graded questions &middot; 10 glossary entries</p><div class="seq-actions"><a class="btn primary" href="lecons/08-bayesian-games/page.html">Read</a>
+<a class="btn" href="moodle/08-bayesian-games-quiz.xml">Quiz XML</a>
+</div></div>
+</div></section>
+<section class="section"><h2 class="section-title">Part IV &middot; Design and cooperation</h2>
+<p class="section-subtitle">Designing the rules, and dividing what a coalition creates.</p><div class="sequences">
+<div class="seq-card"><div class="seq-meta">Chapter 9</div><h3>Auctions and Mechanism Design</h3><p class="seq-topics">Design the rules so that self-interested behaviour produces the outcome you want.</p><p class="seq-topics">8 auto-graded questions &middot; 9 glossary entries</p><div class="seq-actions"><a class="btn primary" href="lecons/09-auctions/page.html">Read</a>
+<a class="btn" href="moodle/09-auctions-quiz.xml">Quiz XML</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">Chapter 10</div><h3>Bargaining, Coalitions and the Shapley Value</h3><p class="seq-topics">When agreements bind: how surplus gets divided and which coalitions hold together.</p><p class="seq-topics">8 auto-graded questions &middot; 8 glossary entries</p><div class="seq-actions"><a class="btn primary" href="lecons/10-bargaining-cooperative/page.html">Read</a>
+<a class="btn" href="moodle/10-bargaining-cooperative-quiz.xml">Quiz XML</a>
+</div></div>
+</div></section>
+<section class="section"><h2 class="section-title">Loading this into Moodle</h2><p class="section-subtitle">Three steps, no plugin required</p><div class="quick-access"><a class="qa-card" href="moodle/all-quizzes.xml"><span class="qa-label">1</span><span class="qa-title">Import the questions</span><span class="qa-sub">Question bank &rarr; Import &rarr; Moodle XML format. Upload all-quizzes.xml once, or one chapter file at a time; categories are created for you.</span></a><a class="qa-card" href="lecons/01-foundations/page.html"><span class="qa-label">2</span><span class="qa-title">Publish the readings</span><span class="qa-sub">Either publish this folder as-is and link each lecons/&hellip;/page.html, or paste the matching moodle/&hellip;-page.html into a Page activity via the HTML source view - that version carries its own styling.</span></a><a class="qa-card" href="moodle/all-quizzes.xml"><span class="qa-label">3</span><span class="qa-title">Build the quizzes</span><span class="qa-sub">Add one Quiz activity per chapter and draw its questions from the matching category.</span></a></div><p class="section-subtitle">All equations use standard LaTeX delimiters, rendered by Moodle&rsquo;s built-in MathJax filter and by MathJax on these pages. 10 chapters, 80 auto-graded questions, all in standard Moodle question types.</p></section>
+<footer class="site-footer"><strong>Game Theory &mdash; complete handbook</strong> &middot; Strategy, equilibrium, information and design<span class="footer-meta">Edition 2025-2026</span></footer>
+</body></html>

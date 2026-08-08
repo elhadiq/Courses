@@ -1,0 +1,1088 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 01 - What Is a Game? Players, Strategies and Payoffs (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 01.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C01 Q1 - Ingredients of a game</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Which triple constitutes the <strong>normal form</strong> of a game?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The normal (strategic) form is exactly (N, S, u): the set of players, each player's strategy set, and each player's payoff function over strategy profiles. Beliefs and timing are not part of the normal form.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Players, strategy sets, payoff functions]]></text><feedback format="html"><text><![CDATA[<p>Right - (N, S, u).</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Players, beliefs, information sets]]></text><feedback format="html"><text><![CDATA[<p>Information sets belong to the extensive form (Chapter 6).</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Actions, timing, probabilities]]></text><feedback format="html"><text><![CDATA[<p>Timing is absent from the normal form by construction.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Players, outcomes, prices]]></text><feedback format="html"><text><![CDATA[<p>Prices are specific to market models, not part of the general definition.</p>]]></text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C01 Q2 - Reading a payoff cell</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In the matrix below, entries are (row player, column player).</p><table border='1' cellpadding='8' style='border-collapse:collapse;'><tr><th></th><th>Left</th><th>Right</th></tr><tr><th>Up</th><td>2, 7</td><td>6, 1</td></tr><tr><th>Down</th><td>4, 4</td><td>0, 9</td></tr></table><p>What does the <strong>column</strong> player earn at (Up, Right)?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>(Up, Right) holds 6, 1. The first number is the row player's payoff and the second is the column player's, so the column player earns 1.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[1]]></text><feedback format="html"><text><![CDATA[<p>Correct - second number of the pair.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[6]]></text><feedback format="html"><text><![CDATA[<p>That is the row player's payoff.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[9]]></text><feedback format="html"><text><![CDATA[<p>That is the column player's payoff at (Down, Right).</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[7]]></text><feedback format="html"><text><![CDATA[<p>That is the column player's payoff at (Up, Left).</p>]]></text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C01 Q3 - Best response</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Using the same matrix (Up/Down against Left/Right, payoffs 2,7 / 6,1 / 4,4 / 0,9), what is the <strong>row player's best response</strong> to Right?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Fix the column at Right. The row player gets 6 from Up and 0 from Down. Since 6 &gt; 0, Up is the best response. Note that against Left the answer is Down (4 &gt; 2), so this player has no single strategy that is best against everything.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Up, because 6 &gt; 0]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Down, because 4 &gt; 2]]></text><feedback format="html"><text><![CDATA[<p>That comparison is the response to Left, not Right.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Down, because 9 &gt; 1]]></text><feedback format="html"><text><![CDATA[<p>Those are the column player's payoffs.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Either, the payoffs are equal]]></text><feedback format="html"><text><![CDATA[<p>They are 6 and 0.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C01 Q4 - Rationality and selfishness</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Assuming players are rational is the same as assuming players are selfish.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>False. Rationality says a player maximises their own payoff function. That function can place high value on other people's wellbeing, on fairness, or on keeping a promise. Selfishness is a claim about what is inside the payoff function; rationality is a claim about how it is used.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C01 Q5 - Identify the game</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In a two-player game, each player prefers to do the opposite of the other; the worst outcome by far for both is when both act aggressively, and each would rather yield than crash. Which classic game is this?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>This is Chicken (also called Hawk-Dove). Its signature is a mutually catastrophic cell and two asymmetric outcomes in which one player yields. Contrast the Stag Hunt, where the danger is being the only cooperator, not mutual aggression.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Chicken (Hawk-Dove)]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Prisoner's Dilemma]]></text><feedback format="html"><text><![CDATA[<p>There the aggressive action is best regardless of the opponent.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Stag Hunt]]></text><feedback format="html"><text><![CDATA[<p>There the best outcome is mutual cooperation, and the risk is being alone.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Matching Pennies]]></text><feedback format="html"><text><![CDATA[<p>That game is zero-sum with no catastrophic joint cell.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C01 Q6 - Strategy versus action</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In a game where players move one after another, a strategy must specify an action at every point where the player might be called on to move, including points that will not be reached if the strategy is followed.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True. A strategy is a complete contingent plan. This is not pedantry: the plans specified off the equilibrium path are exactly what make threats credible or not, which is the whole content of subgame perfection in Chapter 6.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C01 Q7 - Counting strategy profiles</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Three players play simultaneously. Player 1 has 2 strategies, player 2 has 3, player 3 has 4. How many distinct strategy profiles does the game have?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>A profile picks one strategy per player independently, so the count is the product 2 x 3 x 4 = 24. Equivalently, the payoff function of each player must specify 24 numbers.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>24</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C01 Q8 - The dilemma in the Prisoner's Dilemma</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In the Prisoner's Dilemma with payoffs (C,C) = 3,3; (C,D) = 0,5; (D,C) = 5,0; (D,D) = 1,1, what exactly is paradoxical?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The paradox is a clash between individual and collective rationality. Defect strictly beats Cooperate for each player against each opponent action, so rational play gives (1, 1); yet (3, 3) is available and better for both. Nothing about the reasoning is wrong - the structure of the payoffs is what produces the bad outcome.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Each player's individually optimal choice leads to an outcome both players like less than an available alternative]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The players cannot compute their best responses]]></text><feedback format="html"><text><![CDATA[<p>The computation is trivial; that is not the difficulty.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The game has no best responses at all]]></text><feedback format="html"><text><![CDATA[<p>Best responses exist and are unique.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Payoffs sum to zero, so cooperation is impossible]]></text><feedback format="html"><text><![CDATA[<p>The game is not zero-sum: 3 + 3 differs from 1 + 1.</p>]]></text></feedback></answer>
+</question>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 02 - Dominance and Iterated Elimination (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 02.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C02 Q1 - Definition of strict dominance</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Strategy X strictly dominates strategy Y for a player when:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Strict dominance requires X to beat Y against <em>every</em> possible profile of the opponents - not on average, not usually. That universal quantifier is what makes the deletion of Y safe without any assumption about beliefs.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[X gives a strictly higher payoff than Y against every possible opponent profile]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[X gives a higher expected payoff than Y under the player's beliefs]]></text><feedback format="html"><text><![CDATA[<p>That makes X a best response, not a dominant strategy.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[X gives a higher payoff than Y in most opponent profiles]]></text><feedback format="html"><text><![CDATA[<p>'Most' is not enough; the exception may be the realised one.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[X gives the highest payoff in the game]]></text><feedback format="html"><text><![CDATA[<p>Dominance compares two strategies, not all outcomes.</p>]]></text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C02 Q2 - One round of elimination</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Row player chooses U or D, column player chooses L or R.</p><table border='1' cellpadding='8' style='border-collapse:collapse;'><tr><th></th><th>L</th><th>R</th></tr><tr><th>U</th><td>3, 2</td><td>1, 5</td></tr><tr><th>D</th><td>2, 1</td><td>0, 4</td></tr></table><p>Which strategy is strictly dominated?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Compare the row player's payoffs: U gives 3 against L and 1 against R; D gives 2 and 0. U beats D in both columns, so D is strictly dominated. For the column player, R gives 5 and 4 against L's 2 and 1, so L is dominated too - the game reduces to (U, R).</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[D, for the row player]]></text><feedback format="html"><text><![CDATA[<p>Correct - 3 &gt; 2 and 1 &gt; 0.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[U, for the row player]]></text><feedback format="html"><text><![CDATA[<p>U is the dominating strategy, not the dominated one.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[R, for the column player]]></text><feedback format="html"><text><![CDATA[<p>R is better in both rows for the column player.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[No strategy is dominated]]></text><feedback format="html"><text><![CDATA[<p>Both players have a dominated strategy here.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C02 Q3 - Order independence</text></name>
+  <questiontext format="html"><text><![CDATA[<p>The set of strategies surviving iterated elimination of <em>strictly</em> dominated strategies does not depend on the order in which strategies are removed.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True, and this is a theorem rather than a convenience. It fails for weak dominance: eliminating weakly dominated strategies in different orders can leave different sets, so the procedure must be reported together with its order.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C02 Q4 - Weak dominance</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Eliminating weakly dominated strategies is order-independent in the same way as strict elimination.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>False. Weak elimination is order-dependent and can delete profiles in which no player would actually want to deviate. This is why textbook results are almost always stated for strict dominance.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C02 Q5 - Dominance by a mixture</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Player 1's payoffs against player 2's two columns are: A = (6, 0), B = (0, 6), C = (2, 2). Which statement is correct?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Neither A nor B dominates C, since each loses in one column. But the mixture \(\sigma = \tfrac{1}{2}A + \tfrac{1}{2}B\) gives an expected payoff of \(\tfrac{1}{2}(6) + \tfrac{1}{2}(0) = 3\) in both columns, and \(3 \gt  2\). So C is strictly dominated by a mixed strategy, and any check for dominance must include mixtures.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[C is strictly dominated by the mixture \(\tfrac{1}{2}A + \tfrac{1}{2}B\)]]></text><feedback format="html"><text><![CDATA[<p>Correct - expected 3 in both columns.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[C is not dominated, since no pure strategy dominates it]]></text><feedback format="html"><text><![CDATA[<p>Mixtures count as dominating strategies.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[C strictly dominates both A and B]]></text><feedback format="html"><text><![CDATA[<p>C loses 2 against 6 in one column each time.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A strictly dominates C]]></text><feedback format="html"><text><![CDATA[<p>A gives 0 against the second column, less than C's 2.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C02 Q6 - Levels of reasoning</text></name>
+  <questiontext format="html"><text><![CDATA[<p>A game is solved by exactly 4 rounds of iterated elimination of strictly dominated strategies. How many levels of 'rationality' must be common knowledge for the argument to go through - counting round 1 as level 1?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Each round consumes one further level of the hierarchy: round 1 uses rationality, round 2 uses knowledge of rationality, round 3 knowledge of that, and so on. Four rounds therefore need 4 levels. Experimental subjects in games like the beauty contest typically display only 1 to 3 levels.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>4</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C02 Q7 - Rationalizability</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In a two-player game, the set of rationalizable strategies coincides with:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Bernheim (1984) and Pearce (1984) showed that in two-player games rationalizability and survival of IESDS give the same set. Rationalizability is therefore the exact behavioural content of common knowledge of rationality, and it is generally a strictly larger set than the set of Nash equilibrium strategies.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[The set surviving iterated elimination of strictly dominated strategies]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The set of Nash equilibrium strategies]]></text><feedback format="html"><text><![CDATA[<p>Nash is strictly stronger: it also requires beliefs to be correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The set of weakly dominant strategies]]></text><feedback format="html"><text><![CDATA[<p>Those often do not exist at all.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The set of Pareto-efficient strategy profiles]]></text><feedback format="html"><text><![CDATA[<p>Efficiency is a welfare notion, unrelated to this procedure.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C02 Q8 - Existence of dominant strategies</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Every finite game has at least one player with a strictly dominant strategy.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>False. Matching Pennies is the standard counterexample: for each player, whether Heads or Tails is better depends entirely on what the opponent does. Dominance arguments are powerful when available but they are frequently unavailable, which is precisely why Nash equilibrium was needed.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 03 - Nash Equilibrium in Pure Strategies (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 03.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C03 Q1 - Definition</text></name>
+  <questiontext format="html"><text><![CDATA[<p>A strategy profile is a Nash equilibrium exactly when:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The definition is unilateral: hold everyone else fixed and check that the remaining player cannot gain by deviating alone. Nothing is required about joint deviations, efficiency, or uniqueness.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[No player can increase their payoff by changing strategy alone, holding the others fixed]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The sum of all players' payoffs is maximised]]></text><feedback format="html"><text><![CDATA[<p>That is social efficiency, a different criterion.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[No group of players can gain by deviating together]]></text><feedback format="html"><text><![CDATA[<p>That is a strong equilibrium, a much more demanding notion.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Every player uses a strictly dominant strategy]]></text><feedback format="html"><text><![CDATA[<p>Dominant strategies rarely exist; equilibria still can.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C03 Q2 - Counting pure equilibria</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Consider this game (row payoff, column payoff):</p><table border='1' cellpadding='8' style='border-collapse:collapse;'><tr><th></th><th>L</th><th>R</th></tr><tr><th>U</th><td>2, 1</td><td>0, 0</td></tr><tr><th>D</th><td>0, 0</td><td>1, 2</td></tr></table><p>How many Nash equilibria in <strong>pure</strong> strategies does it have?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Two: (U, L) and (D, R). At (U, L) the row player would drop from 2 to 0 by moving and the column player from 1 to 0. The same check works at (D, R). The off-diagonal cells give 0 to both, and either player alone can improve. There is also a mixed equilibrium, but the question asks only about pure ones.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>2</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="truefalse">
+  <name><text>C03 Q3 - Efficiency</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Every Nash equilibrium is Pareto efficient.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>False, and the Prisoner's Dilemma is the standard counterexample: the unique equilibrium (Defect, Defect) gives (1, 1) while (3, 3) is feasible and preferred by both. Nash equilibrium predicts behaviour; it makes no welfare promise.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C03 Q4 - Cournot output</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Two firms face inverse demand \(P = 120 - Q\) where \(Q = q_1 + q_2\), and each has constant unit cost \(c = 30\). In the Cournot-Nash equilibrium, how much does <strong>each</strong> firm produce?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The symmetric Cournot equilibrium is \(q^{*} = \dfrac{a - c}{3} = \dfrac{120 - 30}{3} = 30\) for each firm. Total output is 60 and the price is \(120 - 60 = 60\), so each firm earns \((60 - 30)\times 30 = 900\).</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>30</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C03 Q5 - Cournot price</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Same setting: \(P = 120 - Q\), \(c = 30\), two Cournot firms. What is the <strong>equilibrium market price</strong>?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Each firm produces 30 so \(Q = 60\) and \(P = 120 - 60 = 60\). Compare the collusive outcome: total 45, price 75. Competition lowers the price - good for consumers, bad for the firms, and the firms cannot sustain the higher price without a binding agreement.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>60</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C03 Q6 - Multiplicity</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Battle of the Sexes has two pure Nash equilibria. What does game theory say about which one occurs?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Nash equilibrium is silent on selection. Schelling's notion of a focal point - a shared salience such as tradition, precedent, or a small asymmetry in the story - is the usual explanation for how players coordinate. Refinements like subgame perfection help in sequential games but not in a symmetric simultaneous one.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[The concept does not select between them; salience, convention or communication may]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The Pareto-dominant one always occurs]]></text><feedback format="html"><text><![CDATA[<p>Neither equilibrium here Pareto dominates the other.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The one with the larger payoff sum always occurs]]></text><feedback format="html"><text><![CDATA[<p>Both sum to 3 here, and in general the concept makes no such claim.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Neither occurs; players must mix]]></text><feedback format="html"><text><![CDATA[<p>A mixed equilibrium also exists, but the pure ones are equally valid predictions.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C03 Q7 - Beliefs</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Nash equilibrium requires that each player's belief about the opponents' play be correct, whereas rationalizability requires only that beliefs be consistent with common knowledge of rationality.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True. This is the precise sense in which Nash equilibrium is stronger than rationalizability. Correct beliefs are plausible after repeated play or with an established convention, less so in a genuinely novel one-shot encounter.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C03 Q8 - Verifying a candidate</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Someone claims (U, L) is a Nash equilibrium of a 3x3 game. What is the minimum you must check?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>You check unilateral deviations only: the row player's other two rows against column L, and the column player's other two columns against row U - four comparisons. You do not need to evaluate the other cells or any joint deviation.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[That the row player gains nothing from the other 2 rows given L, and the column player gains nothing from the other 2 columns given U]]></text><feedback format="html"><text><![CDATA[<p>Correct - four comparisons.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[That the payoffs at (U, L) are the largest in the whole matrix]]></text><feedback format="html"><text><![CDATA[<p>Equilibrium payoffs are often far from the largest.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[That no pair of simultaneous deviations improves both players]]></text><feedback format="html"><text><![CDATA[<p>That is a stronger, different condition.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[That U and L are dominant strategies]]></text><feedback format="html"><text><![CDATA[<p>Sufficient but not necessary.</p>]]></text></feedback></answer>
+</question>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 04 - Mixed Strategies and Nash's Existence Theorem (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 04.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C04 Q1 - Whose indifference</text></name>
+  <questiontext format="html"><text><![CDATA[<p>When solving for a mixed Nash equilibrium of a 2x2 game, a player's mixing probabilities are chosen so that:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Each player's probabilities make the <em>opponent</em> indifferent. If they did not, the opponent would have a strictly better reply and would shift all weight onto it, breaking the equilibrium. Your own indifference is a consequence of the opponent's choice of probabilities, not something you engineer.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[The opponent is indifferent between their pure strategies]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The player maximises their own expected payoff over probabilities]]></text><feedback format="html"><text><![CDATA[<p>Expected payoff is linear in one's own probability, so this alone does not pin an interior mix.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Both players receive the same expected payoff]]></text><feedback format="html"><text><![CDATA[<p>Equilibrium payoffs are typically unequal.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The variance of the player's payoff is minimised]]></text><feedback format="html"><text><![CDATA[<p>Risk attitudes are already inside the payoff numbers.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C04 Q2 - Matching Pennies probability</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In Matching Pennies (payoffs \(+1\) to the matcher, \(-1\) to the mismatcher), with what probability does each player choose Heads in the unique Nash equilibrium? Give a decimal.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Setting player 2's payoff from Heads equal to that from Tails gives \(1 - 2p = 2p - 1\), hence \(p = 0.5\). By symmetry both mix half and half, and each earns an expected \(0\).</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.5</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C04 Q3 - Battle of the Sexes, Alex's mix</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In Battle of the Sexes with payoffs \((\text{Opera},\text{Opera}) = (2,1)\), \((\text{Football},\text{Football}) = (1,2)\) and \((0,0)\) off the diagonal, what probability does <strong>Alex</strong> place on Opera in the mixed equilibrium? Give a decimal to two places.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Alex's probability \(p\) is set to make Bailey indifferent: Bailey gets \(p\) from Opera and \(2(1-p)\) from Football, so \(p = 2 - 2p\) and \(p = \tfrac{2}{3} \approx 0.67\). Symmetrically Bailey plays Opera with probability \(\tfrac{1}{3}\).</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.67</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.02</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C04 Q4 - Total equilibria</text></name>
+  <questiontext format="html"><text><![CDATA[<p>How many Nash equilibria in total (pure and mixed) does Battle of the Sexes have?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Three: the two pure equilibria (Opera, Opera) and (Football, Football), plus the mixed one at \(p = \tfrac{2}{3}\), \(q = \tfrac{1}{3}\). A classical result says almost every finite game has an odd number of equilibria, which is a useful sanity check on your count.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>3</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C04 Q5 - What Nash's theorem guarantees</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Nash's theorem states that every finite game has at least one Nash equilibrium. Which qualification is essential?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Existence is guaranteed only once mixed strategies are allowed. Matching Pennies has no pure equilibrium, so the theorem would simply be false for pure strategies. Mixing is what makes the best-response correspondence convex-valued and lets Kakutani's theorem apply.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[The equilibrium may require mixed strategies]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The equilibrium is unique]]></text><feedback format="html"><text><![CDATA[<p>Battle of the Sexes has three.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The equilibrium is Pareto efficient]]></text><feedback format="html"><text><![CDATA[<p>The Prisoner's Dilemma refutes this.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The equilibrium can be computed in polynomial time]]></text><feedback format="html"><text><![CDATA[<p>The problem is PPAD-complete; no such algorithm is known.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C04 Q6 - Payoff in the support</text></name>
+  <questiontext format="html"><text><![CDATA[<p>If a player mixes between three pure strategies with positive probability in equilibrium, all three must give the same expected payoff against the opponents' strategies.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True - this is the indifference principle. If one strategy in the support paid strictly more, moving all the probability onto it would raise the player's expected payoff, contradicting equilibrium. Strategies outside the support must pay no more than those inside.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C04 Q7 - Interpretation</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Which reading of a mixed equilibrium does <em>not</em> require any player to literally use a randomising device?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Both the population reading (a fraction of a large population plays each pure strategy) and Harsanyi's purification (small private payoff shocks make each individual's behaviour pure, while others see a distribution) avoid literal randomisation. Harsanyi's argument is the standard defence of mixed equilibria against the charge of implausibility.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[The population interpretation, and Harsanyi's purification via small private payoff shocks]]></text><feedback format="html"><text><![CDATA[<p>Correct - both avoid literal coin-flipping.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The literal randomisation interpretation]]></text><feedback format="html"><text><![CDATA[<p>That one is precisely about using a device.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The indifference principle]]></text><feedback format="html"><text><![CDATA[<p>That is a computational condition, not an interpretation.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The fixed-point interpretation]]></text><feedback format="html"><text><![CDATA[<p>That describes the existence proof, not behaviour.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C04 Q8 - Expected payoff against a mixture</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Player 1's payoffs from strategy \(A\) are \(6\) against \(L\) and \(0\) against \(R\). Player 2 plays \(L\) with probability \(0.25\) and \(R\) with probability \(0.75\). What is player 1's expected payoff from \(A\)?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>\(u_1(A, \sigma_2) = 0.25 \times 6 + 0.75 \times 0 = 1.5\). Expected payoff is always linear in the opponent's probabilities, which is exactly why a player who is not indifferent would shift all weight to one side.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>1.5</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 05 - Zero-Sum Games and the Minimax Theorem (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 05.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C05 Q1 - Definition</text></name>
+  <questiontext format="html"><text><![CDATA[<p>A two-player game is zero-sum when:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The defining property is that in every cell the payoffs sum to zero (or, equivalently up to a harmless constant shift, to the same constant). It is a property of every cell, not of the equilibrium alone.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[The two players' payoffs sum to zero in every cell]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The equilibrium payoffs are both zero]]></text><feedback format="html"><text><![CDATA[<p>The value can be any number, as in the example with v = 1.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Neither player can gain from the game]]></text><feedback format="html"><text><![CDATA[<p>One player can have a strictly positive value.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Both players have dominant strategies]]></text><feedback format="html"><text><![CDATA[<p>Unrelated; Matching Pennies has none.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C05 Q2 - Maximin</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Player 1's payoffs (player 2 receives the negative of each):</p><table border='1' cellpadding='8' style='border-collapse:collapse;'><tr><th></th><th>X</th><th>Y</th><th>Z</th></tr><tr><th>A</th><td>4</td><td>3</td><td>5</td></tr><tr><th>B</th><td>2</td><td>1</td><td>6</td></tr><tr><th>C</th><td>3</td><td>0</td><td>7</td></tr></table><p>What is player 1's <strong>maximin</strong> value?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Row minima are 3 (row A), 1 (row B) and 0 (row C). The maximin is the largest of these, 3, achieved by playing A. Column maxima are 4, 3, 7, so the minimax is also 3 - the game has a saddle point at (A, Y) and its value is 3.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>3</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C05 Q3 - Minimax</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Using the same matrix, what is the <strong>minimax</strong> value?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Column maxima are 4, 3, 7. The minimax is their smallest, 3, at column Y. Since maximin = minimax = 3, the game has a value of 3 in pure strategies and (A, Y) is a saddle point.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>3</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="truefalse">
+  <name><text>C05 Q4 - The inequality</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In any finite two-player zero-sum game, the maximin value is always less than or equal to the minimax value.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True, and it holds before any mixing is allowed. Intuitively, being able to move second cannot hurt. The minimax theorem says the two coincide once mixed strategies are permitted.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C05 Q5 - Solving a 2x2</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Player 1's payoffs: Top gives \(3\) against Left and \(-1\) against Right; Bottom gives \(-2\) against Left and \(4\) against Right. What is the <strong>value</strong> of this zero-sum game?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Player 1 mixes with probability \(p\) on Top so that the two columns are equal: \(5p - 2 = 4 - 5p\) gives \(p = 0.6\), and the payoff is \(3(0.6) - 2(0.4) = 1\). Player 2 mixes with \(q = 0.5\) on Left and gets the same number, so \(v = 1\).</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>1</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C05 Q6 - Optimal mixture</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In the same 2x2 game, with what probability does player 1 play <strong>Top</strong> in the optimal mixed strategy? Give a decimal.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Equalising the value of the two columns for player 1: \(3p - 2(1-p) = -p + 4(1-p)\), i.e. \(5p - 2 = 4 - 5p\), so \(p = 0.6\).</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.6</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C05 Q7 - What is special about zero-sum</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Which property holds in every finite two-player <em>zero-sum</em> game but fails in general games?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>All equilibria of a zero-sum game give the same payoffs (the value) and equilibrium strategies are interchangeable, so there is no equilibrium-selection problem. In Battle of the Sexes, by contrast, different equilibria give very different payoffs and mixing strategies across equilibria gives a non-equilibrium.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[All Nash equilibria give the same payoffs, and equilibrium strategies are interchangeable]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A pure-strategy equilibrium always exists]]></text><feedback format="html"><text><![CDATA[<p>Matching Pennies has none.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The equilibrium is Pareto efficient]]></text><feedback format="html"><text><![CDATA[<p>In zero-sum games every outcome is trivially efficient, so this does not distinguish anything useful about equilibria.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Every player has a dominant strategy]]></text><feedback format="html"><text><![CDATA[<p>Usually false.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C05 Q8 - Computation</text></name>
+  <questiontext format="html"><text><![CDATA[<p>The value and optimal strategies of a finite two-player zero-sum game can be computed in polynomial time by linear programming.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True. Each player's problem is a linear program and the two are duals of each other, so the minimax theorem is a form of LP strong duality. This contrasts sharply with general two-player games, where finding a Nash equilibrium is PPAD-complete.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 06 - Extensive-Form Games, Backward Induction and Subgame Perfection (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 06.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C06 Q1 - Backward induction</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In the entry game (entrant chooses In or Out; if In, the incumbent chooses Fight giving \((-2, -2)\) or Accommodate giving \((2, 5)\); Out gives \((0, 10)\)), what does backward induction predict?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Start at the incumbent's node: \(5 \gt  -2\), so Accommodate. Folding back, the entrant compares 2 from entering with 0 from staying out and enters. The prediction is (In, Accommodate) with payoffs (2, 5).</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[In, then Accommodate: payoffs (2, 5)]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Out, then Fight: payoffs (0, 10)]]></text><feedback format="html"><text><![CDATA[<p>That is a Nash equilibrium but relies on a non-credible threat.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[In, then Fight: payoffs \((-2, -2)\)]]></text><feedback format="html"><text><![CDATA[<p>The incumbent would never choose \(-2\) over \(5\).</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The game has no solution by backward induction]]></text><feedback format="html"><text><![CDATA[<p>It is finite with perfect information, so Zermelo applies.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C06 Q2 - Nash versus SPNE</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Every subgame perfect Nash equilibrium is a Nash equilibrium, but not every Nash equilibrium is subgame perfect.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True. SPNE requires Nash behaviour in the whole game <em>and</em> in every subgame, so it is a strictly stronger requirement. The entry game's (Out, Fight) is Nash but not subgame perfect.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C06 Q3 - Non-credible threat</text></name>
+  <questiontext format="html"><text><![CDATA[<p>What makes the incumbent's threat to fight non-credible?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Credibility is about incentives at the moment of action, not about what was announced. If entry occurs, fighting yields \(-2\) and accommodating yields \(5\), so the incumbent would not carry out the threat. This is exactly what subgame perfection checks.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[If entry actually happened, fighting would give the incumbent a strictly lower payoff than accommodating]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The incumbent has no way to communicate the threat]]></text><feedback format="html"><text><![CDATA[<p>Communication is not the issue; incentives are.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Fighting is a strictly dominated strategy in the strategic form]]></text><feedback format="html"><text><![CDATA[<p>It is not strictly dominated there, which is why the Nash concept misses the problem.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The entrant cannot observe the incumbent's move]]></text><feedback format="html"><text><![CDATA[<p>The entrant moves first and needs no observation.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C06 Q4 - Counting strategies</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Player 1 moves first with 2 possible actions. Player 2 then moves, observing player 1's choice, and has 3 actions available at each of player 1's two nodes. How many distinct <strong>strategies</strong> does player 2 have?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>A strategy for player 2 assigns an action to each of the two information sets, so there are 3 x 3 = 9 strategies. This blow-up is why the strategic form of even a small tree can be large.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>9</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C06 Q5 - Stackelberg leader</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Inverse demand \(P = 100 - Q\), unit cost \(c = 10\), firm 1 moves first. What quantity does the <strong>leader</strong> produce?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The leader anticipates \(q_2 = (a - c - q_1)/2\) and maximises, giving \(q_1^{*} = \dfrac{a - c}{2} = 45\). The follower then produces \(\dfrac{a - c}{4} = 22.5\). Both Cournot firms would have produced 30 each.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>45</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C06 Q6 - Stackelberg follower</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Same setting (\(P = 100 - Q\), \(c = 10\), sequential choice). What quantity does the <strong>follower</strong> produce?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>\(q_2^{*} = \dfrac{a - c}{4} = 22.5\). The follower is squeezed below its Cournot output of 30 because the leader's commitment to 45 leaves less residual demand.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>22.5</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="truefalse">
+  <name><text>C06 Q7 - Commitment</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Deliberately restricting your own future options can raise your payoff.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True, and this is one of the most useful ideas in the subject. Removing an option changes what others expect you to do at future nodes. Burning bridges, signing penalty clauses, and delegating to a hard-line negotiator all work by making a threat credible that would otherwise not be.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C06 Q8 - Centipede</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Backward induction in the centipede game predicts the first player takes immediately, yet experimental subjects usually pass for several rounds. The best reading of this gap is:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Backward induction needs common knowledge of rationality to survive at nodes that would only be reached if someone had already deviated from it. Once a player passes, the assumption that generated the prediction is in doubt. Experimental evidence also shows limited depth of reasoning and genuine other-regarding preferences.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Backward induction relies on common knowledge of rationality holding even at nodes that would only be reached after a deviation from it]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The game has no subgame perfect equilibrium]]></text><feedback format="html"><text><![CDATA[<p>It has one, computed by backward induction.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Subjects cannot compute the equilibrium because it is PPAD-complete]]></text><feedback format="html"><text><![CDATA[<p>The tree is small and the computation is easy.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Backward induction is mathematically invalid in finite trees]]></text><feedback format="html"><text><![CDATA[<p>It is valid; the question is whether its assumptions describe people.</p>]]></text></feedback></answer>
+</question>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 07 - Repeated Games, Reciprocity and the Folk Theorem (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 07.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C07 Q1 - Finite repetition</text></name>
+  <questiontext format="html"><text><![CDATA[<p>The Prisoner's Dilemma is repeated exactly 20 times and both players know it. What is the unique subgame perfect equilibrium?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Backward induction from round 20: with no future, both defect. That makes round 19 effectively terminal, and so on to round 1. Defection in every round is the unique SPNE. What matters is the <em>known</em> last round, not the finiteness of expected play.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Both players defect in every round]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Both cooperate until round 19, then defect]]></text><feedback format="html"><text><![CDATA[<p>Round 19 unravels for the same reason as round 20.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Both cooperate in every round]]></text><feedback format="html"><text><![CDATA[<p>There is no future to protect in the last round.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Players alternate cooperation and defection]]></text><feedback format="html"><text><![CDATA[<p>No mechanism supports alternation here.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C07 Q2 - Present value</text></name>
+  <questiontext format="html"><text><![CDATA[<p>A player receives a payoff of 6 every period forever, with discount factor \(\delta = 0.75\). What is the present value of this stream?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The geometric sum gives \(\dfrac{6}{1 - 0.75} = \dfrac{6}{0.25} = 24\). This formula is the workhorse of every repeated-game computation.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>24</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C07 Q3 - Critical discount factor</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In a Prisoner's Dilemma with \(T = 5\), \(R = 3\), \(P = 1\), \(S = 0\), what is the smallest discount factor \(\delta\) for which grim trigger sustains cooperation? Give a decimal.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>\(\delta^{*} = \dfrac{T - R}{T - P} = \dfrac{5 - 3}{5 - 1} = 0.5\). Equivalently, \(\dfrac{3}{1-\delta} \ge 5 + \dfrac{\delta}{1-\delta}\) reduces to \(3 \ge 5 - 4\delta\).</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.5</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C07 Q4 - Axelrod's properties</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Axelrod credited tit-for-tat's tournament success to four properties. Which property does <strong>grim trigger</strong> lack?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Grim trigger is nice, retaliatory and clear, but never forgiving: one defection - even an accidental one - condemns the relationship to permanent punishment. In noisy environments this makes grim trigger far worse than tit-for-tat or tit-for-two-tats.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Forgiveness]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Niceness]]></text><feedback format="html"><text><![CDATA[<p>Grim trigger never defects first.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Retaliation]]></text><feedback format="html"><text><![CDATA[<p>Its retaliation is maximal.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Clarity]]></text><feedback format="html"><text><![CDATA[<p>It is very easy to describe and predict.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C07 Q5 - Tit-for-tat dominance</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Tit-for-tat is a dominant strategy in the infinitely repeated Prisoner's Dilemma.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>False. Against a player who always defects, tit-for-tat loses the first round and only matches thereafter, so Always Defect would have done better. Tit-for-tat performs well in populations of reciprocators, which is a statement about environments, not dominance.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C07 Q6 - Folk theorem</text></name>
+  <questiontext format="html"><text><![CDATA[<p>The folk theorem for infinitely repeated games says that, for players patient enough:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Any feasible payoff vector strictly above every player's minmax level can be supported as a subgame perfect equilibrium. The result explains how norms and reputations become self-enforcing, but it also means the theory has very little predictive bite without further restrictions.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Essentially any feasible payoff vector above the minmax can be supported as a subgame perfect equilibrium]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Only the efficient outcome can be supported]]></text><feedback format="html"><text><![CDATA[<p>Many inefficient outcomes are supportable too.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Only the stage-game Nash equilibrium can be supported]]></text><feedback format="html"><text><![CDATA[<p>That is the finite-repetition result.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Cooperation is impossible without an external enforcer]]></text><feedback format="html"><text><![CDATA[<p>The theorem shows the opposite.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C07 Q7 - What restores cooperation in finite games</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Introducing a small probability that one player is a committed cooperator can restore long stretches of cooperation in a finitely repeated Prisoner's Dilemma.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True. Kreps, Milgrom, Roberts and Wilson (1982) showed that a little incomplete information about types gives rational players an incentive to build a reputation for cooperating, sustaining cooperation until near the end. This is the bridge to Chapter 8.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C07 Q8 - Higher temptation</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Same Prisoner's Dilemma but the temptation payoff rises to T = 7 (still R = 3, P = 1, S = 0). What is the new critical discount factor for grim trigger? Give a decimal to two places.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>\(\delta^{*} = \dfrac{T-R}{T-P} = \dfrac{7-3}{7-1} = \dfrac{2}{3} \approx 0.67\). A bigger prize for cheating requires more patience to keep cooperation alive.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.67</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.02</tolerance></answer>
+</question>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 08 - Bayesian Games and Incomplete Information (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 08.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C08 Q1 - Incomplete versus imperfect</text></name>
+  <questiontext format="html"><text><![CDATA[<p>A firm does not know its rival's production cost. This is an example of:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Not knowing the rival's payoff function is incomplete information. Imperfect information would mean not observing what the rival has <em>done</em> - a different problem, handled by information sets in the extensive form.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Incomplete information]]></text><feedback format="html"><text><![CDATA[<p>Correct - a payoff function is unknown.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Imperfect information]]></text><feedback format="html"><text><![CDATA[<p>That refers to unobserved moves, not unknown payoffs.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Perfect information]]></text><feedback format="html"><text><![CDATA[<p>Something important is unknown, so this fails.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A zero-sum game]]></text><feedback format="html"><text><![CDATA[<p>Unrelated to the information structure.</p>]]></text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C08 Q2 - What a strategy is</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In a Bayesian game, a player's strategy is:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>A Bayesian strategy is a <em>function</em> from the player's own type to an action: it says what to do for each possible piece of private information. This is why a two-type player effectively makes two choices and why equilibrium requires solving one condition per type.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[A function mapping each of the player's possible types to an action]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A single action chosen before types are drawn]]></text><feedback format="html"><text><![CDATA[<p>The player observes their own type before acting.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A probability distribution over the opponents' types]]></text><feedback format="html"><text><![CDATA[<p>That is a belief, not a strategy.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A mapping from the opponents' types to actions]]></text><feedback format="html"><text><![CDATA[<p>Opponents' types are not observed.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C08 Q3 - Entry threshold</text></name>
+  <questiontext format="html"><text><![CDATA[<p>An entrant earns \(-2\) if the incumbent fights, \(+2\) if it accommodates, and \(0\) by staying out. A tough incumbent (probability \(\mu\)) always fights; a soft one always accommodates. Below what value of \(\mu\) does the entrant enter? Give a decimal.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Expected payoff from entering is \(-2\mu + 2(1-\mu) = 2 - 4\mu\), which is positive exactly when \(\mu \lt  0.5\). Above that belief the entrant stays out - which is precisely why an incumbent has an incentive to invest in a reputation for toughness.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.5</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C08 Q4 - Separating equilibrium</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In Spence's education model, an equilibrium in which only high-ability workers acquire the degree is called:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>This is a separating equilibrium: the action fully reveals the type, so employers can infer ability from the diploma. If all types acquired the degree it would be pooling and the signal would carry no information.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[A separating equilibrium]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A pooling equilibrium]]></text><feedback format="html"><text><![CDATA[<p>Pooling means all types take the same action.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A subgame perfect equilibrium]]></text><feedback format="html"><text><![CDATA[<p>That is a refinement of a different kind.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A dominant strategy equilibrium]]></text><feedback format="html"><text><![CDATA[<p>Nothing here is dominant.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C08 Q5 - Signalling requires productivity</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In Spence's model, education can function as a credible signal only if it actually raises the worker's productivity.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>False, and that is the striking part of the model. The signal works because education is <em>cheaper</em> for high-ability workers, so only they find it worth acquiring. Even a completely unproductive credential can separate types if the cost difference is large enough - which raises uncomfortable questions about the social value of credentials.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C08 Q6 - Adverse selection</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In Akerlof's market for lemons, why can the market collapse?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Because buyers cannot verify quality, they pay only the expected quality of what is on offer. That price is below the value of above-average cars, whose owners withdraw; the average falls; the price falls; and the process repeats. Warranties, certification and reputations exist to break this loop.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Buyers pay only average quality, so above-average sellers withdraw, lowering the average further]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Sellers do not know the quality of their own cars]]></text><feedback format="html"><text><![CDATA[<p>Sellers are the informed side here.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[There are too many buyers relative to sellers]]></text><feedback format="html"><text><![CDATA[<p>The failure is informational, not a matter of numbers.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Buyers are irrational]]></text><feedback format="html"><text><![CDATA[<p>Buyers behave perfectly rationally given their information.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C08 Q7 - Screening</text></name>
+  <questiontext format="html"><text><![CDATA[<p>An insurer offering a menu of contracts - a low premium with a high deductible, and a high premium with full cover - is engaged in screening.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True. The uninformed party (the insurer) moves first with a menu designed so that different risk types self-select. Signalling is the mirror image, with the informed party moving first to reveal its type.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C08 Q8 - Counting Bayesian strategies</text></name>
+  <questiontext format="html"><text><![CDATA[<p>A player has 3 possible types and 4 available actions, and observes their own type before acting. How many pure strategies does this player have?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>A strategy assigns one of 4 actions to each of 3 types, so there are \(4^{3} = 64\) pure strategies. The number of strategies grows exponentially in the number of types, which is why Bayesian games are solved type by type rather than by enumerating strategies.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>64</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 09 - Auctions and Mechanism Design (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 09.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C09 Q1 - Second-price dominance</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In a sealed-bid second-price auction with private values, why is bidding your true value weakly dominant?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Your bid determines only whether you win, never the price, which is the highest rival bid. Overbidding can only make you win at a price above your value; underbidding can only make you lose an auction you would have won at a profit. No beliefs about rivals are required.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Your bid affects only whether you win, not what you pay, so misreporting can only cause bad wins or lost profitable wins]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Bidding truthfully maximises the seller's revenue]]></text><feedback format="html"><text><![CDATA[<p>Dominance is about your own payoff, not the seller's.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[All bidders have the same valuation]]></text><feedback format="html"><text><![CDATA[<p>Values are private and differ.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The auction is zero-sum]]></text><feedback format="html"><text><![CDATA[<p>It is not, and the argument does not use this.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C09 Q2 - First-price bid</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Four risk-neutral bidders have values drawn independently and uniformly from [0, 1]. In the symmetric equilibrium of a first-price sealed-bid auction, what does a bidder with value 0.8 bid?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The equilibrium bid function is \(b(v) = \dfrac{n-1}{n} v\). With \(n = 4\) that is \(0.75 \times 0.8 = 0.6\). As n grows the shading shrinks, because the risk of losing a profitable auction rises.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.6</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C09 Q3 - Expected revenue</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Same setting: 4 bidders, values uniform on [0, 1]. What is the seller's expected revenue in <em>any</em> of the four standard auctions? Give a decimal.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>By revenue equivalence, expected revenue equals the expected second-highest value, which for \(n\) uniform draws is \(\dfrac{n-1}{n+1} = \dfrac{3}{5} = 0.6\). Note that this coincides numerically with the previous answer only by construction of the example.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.6</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C09 Q4 - Strategic equivalence</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Which pairing of auction formats is strategically equivalent under independent private values?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The Dutch auction is equivalent to the first-price sealed-bid auction: in both, a bidder commits to a single number and pays it, learning nothing useful along the way. The English auction is equivalent to the second-price auction, because the winner effectively pays the point at which the last rival dropped out.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Dutch and first-price sealed bid; English and second-price sealed bid]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Dutch and second-price sealed bid; English and first-price sealed bid]]></text><feedback format="html"><text><![CDATA[<p>The pairings are the other way round.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[All four are strategically identical]]></text><feedback format="html"><text><![CDATA[<p>They yield equal expected revenue but call for different strategies.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[None are equivalent]]></text><feedback format="html"><text><![CDATA[<p>Both equivalences are standard results.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C09 Q5 - Revenue equivalence limits</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Revenue equivalence continues to hold when bidders are risk averse.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>False. With risk-averse bidders the first-price auction raises more, because bidders bid higher to reduce the risk of losing. Revenue equivalence also fails with asymmetric bidders, budget constraints, collusion and interdependent values - which is precisely why format choice matters in practice.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C09 Q6 - Winner's curse</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In a common-value auction, the winner's curse arises because:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Winning selects the most optimistic estimate, so the fact of winning is itself evidence that your estimate was too high. Rational bidders correct for this by shading, and by shading more when there are more rivals. The phenomenon is documented in oil-lease and corporate-takeover data.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[The winner is the bidder with the most optimistic estimate, so winning is evidence of over-estimation]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The winner always pays more than the second-highest bid]]></text><feedback format="html"><text><![CDATA[<p>That is false in a second-price auction and not the mechanism of the curse.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Bidders have different true values for the object]]></text><feedback format="html"><text><![CDATA[<p>Common values means the true value is the same for all.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The seller sets a reserve price above the true value]]></text><feedback format="html"><text><![CDATA[<p>Reserve prices are a separate issue.</p>]]></text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C09 Q7 - Revelation principle</text></name>
+  <questiontext format="html"><text><![CDATA[<p>The revelation principle says that:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Any outcome that some mechanism achieves in equilibrium can also be achieved by a direct mechanism in which agents report their types truthfully. This lets the designer restrict attention to truthful direct mechanisms without loss of generality, which is what makes mechanism design tractable.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Any outcome achievable in equilibrium by some mechanism is achievable by a truthful direct mechanism]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Truthful reporting is always a dominant strategy in every mechanism]]></text><feedback format="html"><text><![CDATA[<p>Far from it; that is the property a designer must engineer.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Every mechanism reveals the agents' types to the designer]]></text><feedback format="html"><text><![CDATA[<p>Many mechanisms reveal nothing.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Auctions always reveal the true value of the object]]></text><feedback format="html"><text><![CDATA[<p>Unrelated to the principle.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C09 Q8 - Gibbard-Satterthwaite</text></name>
+  <questiontext format="html"><text><![CDATA[<p>The Gibbard-Satterthwaite theorem implies that with three or more outcomes, any deterministic, onto and strategy-proof voting rule must be a dictatorship.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True. This impossibility result is why mechanism design so often introduces money (as in VCG), restricts preference domains (as in single-peaked preferences or matching markets), or settles for Bayesian rather than dominant-strategy incentive compatibility.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 10 - Bargaining, Coalitions and the Shapley Value (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 10.</p>]]></text></info>
+</question>
+<question type="numerical">
+  <name><text>C10 Q1 - Nash bargaining with an outside option</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Two parties divide 100. Party 1's disagreement payoff is 20 and party 2's is 0; utilities are linear in money. Under the Nash bargaining solution, how much does <strong>party 1</strong> receive?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Maximise \((x-20)(100-x)\). The first-order condition \(120 - 2x = 0\) gives \(x = 60\). The rule is: guarantee each party its disagreement payoff, then split the remaining surplus of 80 evenly, giving 20 + 40 = 60.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>60</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C10 Q2 - Which axiom</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Which of the following is <em>not</em> one of Nash's four bargaining axioms?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Nash's axioms are Pareto efficiency, symmetry, invariance to affine transformations of utility, and independence of irrelevant alternatives. Envy-freeness belongs to fair-division theory and plays no role here.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Envy-freeness]]></text><feedback format="html"><text><![CDATA[<p>Correct - not a Nash bargaining axiom.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Pareto efficiency]]></text><feedback format="html"><text><![CDATA[<p>It is one of the four.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Symmetry]]></text><feedback format="html"><text><![CDATA[<p>It is one of the four.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Independence of irrelevant alternatives]]></text><feedback format="html"><text><![CDATA[<p>It is one of the four, and the most debated.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C10 Q3 - Rubinstein share</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In Rubinstein's alternating-offers game over a pie of size 1 with common discount factor \(\delta = 0.5\), what share does the <strong>first proposer</strong> receive in the unique subgame perfect equilibrium? Give a decimal to two places.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The proposer receives \(\dfrac{1}{1+\delta} = \dfrac{1}{1.5} \approx 0.67\). Impatience is costly, so the ability to move first is worth more when players are impatient. As \(\delta \to 1\) the shares converge to 0.5 each, matching the Nash bargaining solution.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.67</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.02</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C10 Q4 - The core</text></name>
+  <questiontext format="html"><text><![CDATA[<p>An allocation is in the core of a coalitional game when:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Core membership means the whole value is distributed and no coalition, however small, could guarantee its own members more by leaving. It is a stability condition against group deviations, in contrast with Nash equilibrium's unilateral deviations.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[It distributes the full value of the grand coalition and no coalition can guarantee its members more by breaking away]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Every player receives the same amount]]></text><feedback format="html"><text><![CDATA[<p>That is equal division, not the core.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[It maximises the sum of payoffs]]></text><feedback format="html"><text><![CDATA[<p>Efficiency is only one of the core's conditions.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[It is the Shapley value]]></text><feedback format="html"><text><![CDATA[<p>The Shapley value can lie outside the core.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C10 Q5 - Shapley value</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Three players have \(v(\emptyset) = v(1) = v(2) = v(3) = 0\), \(v(12) = 90\), \(v(13) = 80\), \(v(23) = 70\) and \(v(123) = 120\). What is player <strong>1</strong>'s Shapley value?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Player 1's marginal contributions across the six orderings are \(0, 0, 90, 50, 80, 50\); their average is \(\phi_1 = 270/6 = 45\). Players 2 and 3 receive 40 and 35, and the three shares sum to 120 as efficiency requires.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>45</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C10 Q6 - Shapley value, player 3</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Using the same characteristic function, what is player <strong>3</strong>'s Shapley value?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Player 3's marginal contributions are \(30, 80, 30, 70, 0, 0\), averaging \(\phi_3 = 210/6 = 35\). Player 3 is the weakest partner - the pair (2,3) creates the least value - and receives the smallest share.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>35</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="truefalse">
+  <name><text>C10 Q7 - Shapley and the core</text></name>
+  <questiontext format="html"><text><![CDATA[<p>The Shapley value always lies inside the core when the core is non-empty.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>False. In the three-firm example the core is the single point \((50, 40, 30)\) while the Shapley value is \((45, 40, 35)\). Players 1 and 2 would receive only 85 under Shapley yet can guarantee themselves 90 alone. Fairness axioms and stability against blocking are genuinely different requirements. (They do coincide in the special class of convex games.)</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C10 Q8 - The null player axiom</text></name>
+  <questiontext format="html"><text><![CDATA[<p>The Shapley value's null-player axiom says that:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>A player who adds nothing to any coalition - whose marginal contribution is zero everywhere - receives zero. This is the axiom that makes the Shapley value a meaningful attribution of credit, and it is why SHAP values in machine learning assign zero to a feature that never changes the prediction.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[A player whose marginal contribution to every coalition is zero receives a payoff of zero]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A player who acts alone receives zero]]></text><feedback format="html"><text><![CDATA[<p>Singleton value is unrelated to the axiom.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Every player must receive a strictly positive amount]]></text><feedback format="html"><text><![CDATA[<p>The axiom says the opposite in the relevant case.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The grand coalition always forms]]></text><feedback format="html"><text><![CDATA[<p>That is closer to the efficiency axiom.</p>]]></text></feedback></answer>
+</question>
+</quiz>

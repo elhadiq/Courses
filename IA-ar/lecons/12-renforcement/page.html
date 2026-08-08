@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الفصل 12 &mdash; التعلّم بالتعزيز</title>
+<meta name="description" content="السيرورة الماركوفية، بلمان، التكرار على القيم، تعلّم Q.">
+<link href="../../assets/style.css" rel="stylesheet">
+<link href="../../assets/rtl.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+
+.src-ar { margin: 26px 0 8px; border-top: 2px solid var(--color-rule); padding-top: 16px; }
+.src-ar h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--primary); }
+.src-ar .src-note { color: var(--color-muted); font-size: 0.9rem; margin: 0 0 12px; }
+.src-ar ul { list-style: none; padding: 0; margin: 0; }
+.src-ar li { margin: 0 0 14px; padding-right: 14px; border-right: 3px solid var(--primary-soft-2);
+             line-height: 1.7; font-size: 0.95rem; }
+.src-ar li .pourquoi { display: block; color: var(--color-muted); font-size: 0.9em;
+                       margin-top: 3px; }
+.src-ar li a.lien { word-break: break-all; font-size: 0.88em; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><a class="lang-switch" href="../../../IA/lecons/12-renforcement/page.html" hreflang="fr" title="Version fran&ccedil;aise">FR</a><div class="breadcrumb"><a href="../../index.html">الذكاء الاصطناعي</a> &middot; مُقرَّر</div><span class="course-code">برنامج MP/PSI &middot; الفترة الثانية</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">القسم الرابع &middot; الفصل 12</div>
+<h1>الفصل 12 &mdash; التعلّم بالفعل</h1>
+<div class="lesson-sub">سيرورة القرار الماركوفية، ومعادلة بلمان، والتكرار على القيم، وتعلّم Q، والاستكشاف في مقابل الاستثمار.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">المُلحَق المرافق</div><p>تقييم سياسة، والتكرار على القيم، وتعلّم Q، والاختيار بين الاستكشاف والاستثمار، مفصَّلة <strong><a href="../../../IA/lecons/12-renforcement/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">خطوة بخطوة في المُلحَق</a></strong>.</p></div>
+
+<h2>12.1 لا مُراقَب ولا غير مُراقَب</h2>
+
+<p>كان التعلّم المُراقَب يتلقّى الجواب الصحيح لكلّ مُدخَل. والتعلّم غير المُراقَب لا يتلقّى أيّ جواب. أمّا التعزيز فيحتلّ موضعاً ثالثاً: إذ يتلقّى الوكيل إشارةً رقمية تقول إلى أيّ حدٍّ هذا جيّد، دون أن تقول أبداً ما كان ينبغي فعله.</p>
+
+<figure class="viz"><div class="viz-title">الحلقة، مع المكافأة</div>
+<svg viewBox="0 0 760 300" role="img" style="width:100%;height:auto;display:block;"><rect x="80" y="100" width="210" height="100" rx="10" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:2.5;"/><text x="185" y="140" text-anchor="middle" style="fill:var(--primary);font-size:15px;font-weight:700;font-family:inherit;">الوكيل</text><text x="185" y="166" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">يختار \(a_t\)</text><rect x="470" y="100" width="210" height="100" rx="10" style="fill:var(--viz-ref);fill-opacity:0.45;stroke:var(--viz-axis);stroke-width:2.5;"/><text x="575" y="140" text-anchor="middle" style="fill:var(--color-text);font-size:15px;font-weight:700;font-family:inherit;">البيئة</text><text x="575" y="166" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">انتقالات ومكافآت</text><path d="M 290 128 C 360 96, 400 96, 464 128" style="fill:none;stroke:var(--primary);stroke-width:3;"/><path d="M 456 118 L 472 128 L 454 136 Z" style="fill:var(--primary);"/><text x="378" y="90" text-anchor="middle" style="fill:var(--primary);font-size:13px;font-weight:700;font-family:inherit;">فعل \(a_t\)</text><path d="M 470 172 C 410 204, 370 204, 292 172" style="fill:none;stroke:var(--accent);stroke-width:3;"/><path d="M 306 164 L 288 172 L 306 182 Z" style="fill:var(--accent);"/><text x="378" y="228" text-anchor="middle" style="fill:var(--accent);font-size:13px;font-weight:700;font-family:inherit;">حالة جديدة \(s_{t+1}\) ومكافأة \(r_{t+1}\)</text><text x="380" y="38" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">حلقة الفصل 2، بإشارةٍ إضافية: المكافأة</text><text x="380" y="272" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">لا يعرف الوكيل الانتقالات ولا دالّة المكافأة: فهو لا يرى إلّا ما يقع له.</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 12.1.</strong> إنّها حلقة الفصل 2، مزيدةً بإشارةٍ عددية. وترافقها ثلاث صعوبات: فالمُرتَجَع <em>تقويمي</em> لا تعليمي؛ وهو <em>مؤجَّل</em>، إذ قد تصل مكافأة نقلةٍ جيّدة بعد مئة خطوة؛ والبيانات تتوقّف على الأفعال المختارة، وهذا يكسر فرضيّة الاستقلال في الفصول 9 إلى 11.</figcaption></figure>
+
+<div class="box def"><div class="box-title">تعريف &mdash; سيرورة القرار الماركوفية</div>
+<p>خماسيّةٌ \((S, A, T, R, \gamma)\): مجموعة حالات، ومجموعة أفعال، ودالّة انتقال \(T(s, a, s') = P(s' \mid s, a)\)، ودالّة مكافأة \(R\)، ومعامل خصم \(\gamma \in [0, 1[\).</p>
+<p>و<strong>السياسة</strong> \(\pi : S \to A\) تصف فعلاً لكلّ حالة. وقيمتها هي أمل المجموع المخصوم للمكافآت</p>
+<div class="eq">\[V^{\pi}(s) = \mathbb{E}\!\left[\sum_{t=0}^{\infty} \gamma^{t} R(s_t) \;\middle|\; s_0 = s, \pi\right]\]</div>
+<p>والمعامل \(\gamma\) ليس تجميلاً: فهو يجعل المجموع منتهياً على أفقٍ لا نهائي، لأنّ \(\sum \gamma^{t} R_{\max} = R_{\max}/(1-\gamma)\). وهو يترجم أيضاً تفضيلاً للحاضر، تماماً كمعدّل خصمٍ في المالية.</p></div>
+
+<h2>12.2 معادلة بلمان</h2>
+
+<div class="box thm"><div class="box-title">مبرهنة &mdash; معادلة أمثلية بلمان</div>
+<p>تحقّق دالّة القيمة المثلى، لكلّ حالة \(s\)،</p>
+<div class="eq">\[V^{*}(s) = R(s) + \gamma \max_{a \in A}\ \sum_{s'} T(s, a, s')\, V^{*}(s')\]</div>
+<p>والسياسة المثلى هي التي تحقّق هذه الأعظمية <a class="cite" href="#ref-bellman1957">[1]</a>.</p>
+<p>والمُؤثّر \(B\) المُعرَّف بالطرف الأيمن <strong>انكماشٌ</strong> نسبته \(\gamma\) من أجل نظيم الأعظمية: \(\lVert BV - BW \rVert_{\infty} \le \gamma\lVert V - W \rVert_{\infty}\). ومبرهنة النقطة الثابتة لباناخ تعطي عندئذٍ ثلاث نتائج دفعةً واحدة: الحلّ موجود، وهو وحيد، والتكرار \(V \leftarrow BV\) يتقارب نحوه هندسياً، مهما كانت نقطة الانطلاق.</p></div>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 12.1 &mdash; التكرار على القيم</div><div class="algo-io"><b>المُدخل:</b> سيرورة \((S, A, T, R, \gamma)\) مع \(\gamma \in\ [0,1[\)، وعتبة \(\epsilon\)<br><b>المُخرج:</b> \(V^{*}\) إلى غاية \(\epsilon\)، والسياسة المثلى \(\pi^{*}\)</div><ol class="algo-corps"><li>\(V(s) \leftarrow 0\) <b class="kw">لكلّ</b> \(s \in S\)</li><li><b class="kw">كرّر</b></li><li class="n1">\(\delta \leftarrow 0\)</li><li class="n1"><b class="kw">لكلّ</b> \(s \in S\) غير نهائية <b class="kw">نفّذ</b></li><li class="n2">\(\displaystyle V'(s) \leftarrow R(s) + \gamma \max_{a \in A}\ \sum_{s' \in S} T(s,a,s')\,V(s')\)</li><li class="n2">\(\delta \leftarrow \max\big(\delta,\ |V'(s) - V(s)|\big)\)</li><li class="n1">\(V \leftarrow V'\)</li><li><b class="kw">إلى أن</b> \(\delta \lt \epsilon\)</li><li>\(\displaystyle \pi^{*}(s) \leftarrow \operatorname*{argmax}_{a \in A}\ \sum_{s'} T(s,a,s')\,V(s')\)</li><li><b class="kw">أرجِع</b> \((V,\ \pi^{*})\)</li></ol><p class="algo-note">المُؤثّر \(B\) المُعرَّف بالسطر 5 يحقّق \(\lVert BV - BW\rVert_{\infty} \le \gamma \lVert V - W\rVert_{\infty}\): فهو انكماش. ومبرهنة النقطة الثابتة لباناخ تعطي الوجود والوحدانية والتقارب الهندسي، مهما كانت \(V\) الابتدائية. واستخراج \(\pi^{*}\) قبل التقارب خطأ.</p></div>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">عالمٌ من 4 في 3 خانات مع عائق، وخانةٍ رابحة وخانةٍ خاسرة. والتنقّلات تنجح ثماني مرّاتٍ من عشر؛ ومرّةً من عشرٍ ينحرف الوكيل يساراً، ومرّةً من عشرٍ يميناً. والمؤشّر الأوّل يحدّد المكافأة المتلقّاة عند كلّ خطوة.</p>
+<div id="jxg1" class="viz-board" style="height:520px;"></div>
+<p class="viz-caption"><strong>الشكل 12.2.</strong> بكلفة \(-0{,}04\) لكلّ خطوة، تساوي قيمة خانة الانطلاق 0,651 وتلتفّ السياسة بحذرٍ حول الخانة الخاسرة: فمن الخانة التي تحتها مباشرةً، يُفضّل الوكيل الذهاب يساراً، ولو أطال الطريق، بدل المخاطرة بانحرافٍ قاتل. ارفع الكلفة إلى \(-2\): يُلقي الوكيل بنفسه في الخانة الخاسرة لاختصار معاناته &mdash; وذلك عقلاني بالنظر إلى المكافأة التي أُعطِيت له. وأعِدها إلى 0: فلا شيء يستعجل، وتصير السياسة غير مبالية بالالتفافات. <em>دالّة المكافأة ليست تفصيلاً في الضبط: بل هي توصيف المسألة.</em></p></div>
+
+<h2>12.3 حين يكون النموذج مجهولاً</h2>
+
+<p>يفترض التكرار على القيم معرفة \(T\) وM41. والوكيل الحقيقي لا يعرفهما: فلا يملك إلّا ما يعيشه. وثلاث عائلاتٍ من الطرائق تجيب عن هذه الوضعية.</p>
+
+<figure class="viz"><div class="viz-title">ثلاث طرائق لتقدير قيمة</div>
+<svg viewBox="0 0 760 364" role="img" style="width:100%;height:auto;display:block;"><rect x="20" y="56" width="228" height="196" rx="10" style="fill:var(--primary);fill-opacity:0.09;stroke:var(--primary);stroke-width:2.2;"/><text x="134" y="84" text-anchor="middle" style="fill:var(--primary);font-size:13.5px;font-weight:700;font-family:inherit;">البرمجة الديناميكية</text><circle cx="44" cy="112" r="3.2" style="fill:var(--primary);"/><text x="58" y="116" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">النموذج معلوم</text><circle cx="44" cy="144" r="3.2" style="fill:var(--primary);"/><text x="58" y="148" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">لا حاجة إلى أيّ تفاعل</text><circle cx="44" cy="176" r="3.2" style="fill:var(--primary);"/><text x="58" y="180" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تمسح كلّ الحالات</text><circle cx="44" cy="208" r="3.2" style="fill:var(--primary);"/><text x="58" y="212" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">دقيقة، لكن غير واقعية</text><rect x="266" y="56" width="228" height="196" rx="10" style="fill:var(--accent);fill-opacity:0.09;stroke:var(--accent);stroke-width:2.2;"/><text x="380" y="84" text-anchor="middle" style="fill:var(--accent);font-size:13.5px;font-weight:700;font-family:inherit;">مونت-كارلو</text><circle cx="290" cy="112" r="3.2" style="fill:var(--accent);"/><text x="304" y="116" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">النموذج مجهول</text><circle cx="290" cy="144" r="3.2" style="fill:var(--accent);"/><text x="304" y="148" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تنتظر نهاية الحَلَقة</text><circle cx="290" cy="176" r="3.2" style="fill:var(--accent);"/><text x="304" y="180" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">بلا تحيّز، شديدة التغيّر</text><circle cx="290" cy="208" r="3.2" style="fill:var(--accent);"/><text x="304" y="212" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تقتضي حَلَقاتٍ منتهية</text><rect x="512" y="56" width="228" height="196" rx="10" style="fill:var(--viz-ok);fill-opacity:0.09;stroke:var(--viz-ok);stroke-width:2.2;"/><text x="626" y="84" text-anchor="middle" style="fill:var(--viz-ok);font-size:13.5px;font-weight:700;font-family:inherit;">الفروق الزمنية</text><circle cx="536" cy="112" r="3.2" style="fill:var(--viz-ok);"/><text x="550" y="116" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">النموذج مجهول</text><circle cx="536" cy="144" r="3.2" style="fill:var(--viz-ok);"/><text x="550" y="148" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تتعلّم منذ الخطوة التالية</text><circle cx="536" cy="176" r="3.2" style="fill:var(--viz-ok);"/><text x="550" y="180" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">متحيّزة، قليلة التغيّر</text><circle cx="536" cy="208" r="3.2" style="fill:var(--viz-ok);"/><text x="550" y="212" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعمل باستمرار</text><text x="380" y="30" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">ثلاث طرائق لتقدير قيمة حالة</text><text x="380" y="284" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;"><tspan x="380" dy="0">ينتمي تعلّم Q إلى العائلة الثالثة: فهو يصحّح تقديره عند كلّ خطوة، انطلاقاً من تقديره هو</tspan><tspan x="380" dy="16">التالي.</tspan></text><text x="380" y="340" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;"><tspan x="380" dy="0">التعلّم من تقديرٍ بدل نتيجةٍ مرصودة يبدو دائرياً: ومبرهنة التقارب تقول إنّه</tspan><tspan x="380" dy="16">ليس كذلك.</tspan></text></svg>
+<figcaption class="viz-caption"><strong>الشكل 12.3.</strong> تقتضي البرمجة الديناميكية النموذج. ومونت-كارلو تنتظر نهاية الحَلَقة وتُوسِّط المكاسب المرصودة: بلا تحيّز، لكن شديدة التغيّر، وغير قابلة للتطبيق إن كانت المهمّة لا تنتهي أبداً. والفروق الزمنية تصحّح التقدير منذ الخطوة التالية، انطلاقاً من تقديرها هي للحالة المبلوغة <a class="cite" href="#ref-sutton1988">[2]</a>.</figcaption></figure>
+
+<div class="box def"><div class="box-title">الدالّة Q</div>
+<p>بدل قيمة حالة، نقدّر قيمة زوج حالة-فعل: فـM42 هو المكسب المُنتظَر إن نُفِّذ \(a\) في \(s\) ثمّ عُمِل على النحو الأمثل. ولدينا \(V^{*}(s) = \max_a Q^{*}(s,a)\)، وقبل كلّ شيء تُقرأ السياسة المثلى مباشرةً في \(Q\) &mdash; <em>بلا حاجةٍ إلى النموذج</em>. وهذه كلّ الفائدة: فمع \(V\) وحدها، سيقتضي اختيار فعلٍ معرفة إلى أين يقود.</p></div>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 12.2 &mdash; تعلّم Q</div><div class="algo-io"><b>المُدخل:</b> نفاذٌ إلى العالم، وخطوة \(\alpha\)، ومعدّل استكشاف \(\varepsilon\)، ومعامل \(\gamma\)، وعدد حَلَقات \(M\)<br><b>المُخرج:</b> سياسةٌ جَشِعة تجاه \(Q\)</div><ol class="algo-corps"><li>\(Q(s,a) \leftarrow 0\) <b class="kw">لكلّ</b> \((s,a) \in S \times A\)</li><li><b class="kw">لكلّ</b> \(m = 1\) <b class="kw">إلى أن</b> \(M\) <b class="kw">نفّذ</b></li><li class="n1">\(s \leftarrow s_0\)</li><li class="n1"><b class="kw">طالما</b> <i class="va">s</i> ليست نهائية <b class="kw">نفّذ</b></li><li class="n2">\(u \sim \mathcal{U}([0,1[)\)</li><li class="n2">\(a \leftarrow \begin{cases} \text{action tir\acute{e}e au hasard} & \text{si } u \lt \varepsilon\\ \operatorname*{argmax}_{a'} Q(s,a') & \text{sinon}\end{cases}\)</li><li class="n2">نفّذ \(a\)، ولاحِظ \(r\) وM62</li><li class="n2">\(\displaystyle Q(s,a) \leftarrow Q(s,a) + \alpha\Big[\underbrace{r + \gamma \max_{a'} Q(s',a')}_{\text{cible}} - Q(s,a)\Big]\)</li><li class="n2">\(s \leftarrow s'\)</li><li><b class="kw">أرجِع</b> \(\pi(s) = \operatorname*{argmax}_{a} Q(s,a)\)</li></ol><p class="algo-note">يستعمل الهدفُ \(\max_{a'} Q(s',a')\)، مهما كان الفعل المُلعَب فعلاً بعده: وهذا ما يجعل الطريقة <em>خارج السياسة</em>. وتحت زياراتٍ لا نهائية وM67 وM68، لدينا \(Q \to Q^{*}\) شبه أكيد.</p></div>
+
+<div class="box thm"><div class="box-title">مبرهنة &mdash; تقارب تعلّم Q</div>
+<p>إذا زِيرَ كلّ زوج حالة-فعل عدداً لا نهائياً من المرّات وحقّقت خطوات التعلّم \(\sum_t \alpha_t = \infty\) وM71، فإنّ \(Q\) يتقارب شبه أكيدٍ نحو \(Q^{*}\) <a class="cite" href="#ref-watkins1992">[3]</a>.</p>
+<p>ملاحظتان. أوّلاً، يحدث التقارب <em>مهما كانت السياسة المتّبَعة أثناء التعلّم</em>، بشرط أن تستكشف بما يكفي: وهذا ما يُسمّى التعلّم خارج السياسة. ثانياً، شرط «عدداً لا نهائياً من المرّات» نظري؛ وهو لا يفرض عملياً إلّا الاستكشاف مدّةً كافية.</p></div>
+
+<h2>12.4 الاستكشاف في مقابل الاستثمار</h2>
+
+<p>الوكيل الذي يلعب دائماً أفضل فعلٍ يعرفه لن يتعلّم أبداً أنّ آخر كان أفضل. والوكيل الذي يستكشف دائماً لا يستثمر ما يعرفه أبداً. وهذه المعضلة التي عبرت المُقرَّر كلّه &mdash; وقد ظهرت في الفصل 5 مع البحث بالمعاينة العشوائية &mdash; تجد هنا صياغتها الأوضح.</p>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">تعلّم Q على العالم نفسه، دون معرفة النموذج. والمنحنى هو المكسب الوسطي لكلّ حَلَقة؛ والسياسة المُحصَّلة مقارنةٌ بسياسة الشكل 12.2.</p>
+<div id="jxg2" class="viz-board" style="height:440px;"></div>
+<p class="viz-caption"><strong>الشكل 12.4.</strong> النتيجة مفيدة ومخالفة للبداهة. فبلا استكشاف، يحصل الوكيل على <em>أفضل مكسبٍ وسطي</em> (0,657) لكن على سياسةٍ صحيحة في 7 خاناتٍ فقط: فهو يُحسِن تنفيذ أوّل استراتيجيةٍ وجدها، ويجهل كلّ شيءٍ عن المناطق التي لا يزورها أبداً. ومع 30 % من الاستكشاف، يكتشف السياسة المثلى على الخانات التسع، لكنّ مكسبه الوسطي يهبط إلى 0,497 &mdash; فهو يدفع ثمن استكشافاته. وبعد ذلك ينهار كلّ شيء. <em>فالمكسب أثناء التعلّم وجودةُ ما يُتعلَّم هدفان متمايزان</em>، ويجب معرفة أيّهما نقيس.</p></div>
+
+<div class="box tip"><div class="box-title">ثلاث استراتيجيات للاستكشاف</div>
+<ul>
+<li><strong>الاستكشاف \(\varepsilon\)-الجَشِع</strong>: اللعب عشوائياً باحتمال \(\varepsilon\). بسيط ومتين، ونجعل \(\varepsilon\) يتناقص مع الزمن.</li>
+<li><strong>التفاؤل الابتدائي</strong>: تهيئة \(Q\) بقيمٍ مرتفعة. فيبدو كلّ فعلٍ لم يُجرَّب ممتازاً، ومن ثمّ يستكشف الوكيل <em>بلا صدفة</em>، ثمّ يصحّح نفسه.</li>
+<li><strong>حدود الثقة</strong>: إضافة علاوةٍ إلى كلّ فعلٍ تتناقص بعدد مرّات تجريبه. وهذه بالضبط قاعدة UCB في الفصل 5.</li>
+</ul></div>
+
+<h2>12.5 ما يحدث حين تكون الحالات أكثر من اللازم</h2>
+
+<p>جدولٌ \(Q\) يقتضي مُدخَلاً لكلّ زوج حالة-فعل. ففي الطاولة، ثمّة \(10^{20}\) وضعية؛ وفي غو، \(10^{170}\). فنستبدل بالجدول عندئذٍ <strong>دالّةً مقارِبة</strong> \(Q(s,a;\theta)\)، وهي عادةً شبكةٌ من الفصل 11.</p>
+
+<div class="box warn"><div class="box-title">الثالوث المميت</div>
+قرنُ ثلاثة مكوّنات &mdash; تقريب الدالّة، والتعلّم خارج السياسة، والتحديث انطلاقاً من التقدير الذاتي &mdash; قد يجعل التعلّم <em>يتباعد</em>، حتّى في مسائل بسيطة <a class="cite" href="#ref-sutton2018">[4]</a>. وتعلّم Q العميق يجمع هذه المكوّنات الثلاثة بالضبط. وتقنيّتان تُثبِّتانه عملياً: إعادة تشغيل انتقالاتٍ ماضية مسحوبة عشوائياً، وهذا يكسر الترابط الزمني، وتجميد الشبكة التي تُحسَب بها الغاية دورياً <a class="cite" href="#ref-mnih2015">[5]</a>. وليست أيٌّ منهما ضماناً.</div>
+
+<p>وقد أنتجت هذه الطرائق أكثر نتائج الحقل إبهاراً: إتقان نحو خمسين لعبة فيديو انطلاقاً من البكسلات وحدها <a class="cite" href="#ref-mnih2015">[5]</a>، ثمّ غو انطلاقاً من اللعب ضدّ النفس، بلا أيّ مباراةٍ بشرية <a class="cite" href="#ref-silver2017">[6]</a>. وتبقى باهظة الكلفة جدّاً في التفاعلات: فحيث يتعلّم إنسانٌ لعبةً في بضع عشرات المباريات، تطلب هذه الأنظمة ملايينها.</p>
+
+<div class="box warn"><div class="box-title">تحريف المكافأة</div>
+يُحسِّن الوكيل <em>بالضبط</em> المكافأة المكتوبة، لا النيّة أبداً. فقد اكتشف قاربُ سباقٍ افتراضي أنّه يكسب نقاطاً أكثر بالدوران بلا انتهاء في بحيرةٍ لجمع علاواتٍ ممّا يكسبه بإنهاء السباق. وليس ذلك خللاً: بل هو الجواب الصحيح عن سؤالٍ سيّئ. ونجد بالضبط تحذير الفصل 2 عن مقياس الأداء، بعواقب أظهر.</div>
+
+<h2>الخلاصة</h2>
+<ul>
+<li>يتعلّم التعزيز من إشارةٍ تقويمية مؤجَّلة، وعلى بياناتٍ يُنتجها الوكيل نفسه.</li>
+<li>توصّف معادلة بلمان القيمة المثلى؛ والمُؤثّر المرافق انكماش، ومن هنا الوجود والوحدانية والتقارب <a class="cite" href="#ref-bellman1957">[1]</a>.</li>
+<li>تتيح الدالّة \(Q\) الفعلَ دون معرفة النموذج، وهو ما لا تتيحه \(V\) وحدها.</li>
+<li>يتقارب تعلّم Q نحو الأمثل تحت استكشافٍ كافٍ، مهما كانت السياسة المتّبَعة <a class="cite" href="#ref-watkins1992">[3]</a>.</li>
+<li>المكسب أثناء التعلّم وجودة السياسة المتعلَّمة هدفان متمايزان، متعارضان غالباً.</li>
+<li>تقريب الدالّة يجعل التوسّع ممكناً والتقارب غير مضمون <a class="cite" href="#ref-sutton2018">[4]</a>.</li>
+</ul>
+
+<h2>المراجع</h2>
+<ol class="reflist">
+<li id="ref-bellman1957">Bellman, R. (1957). <em>Dynamic Programming</em>. Princeton University Press. R&eacute;&eacute;dition 2010, DOI: 10.1515/9781400835386. <a href="https://doi.org/10.1515/9781400835386">https://doi.org/10.1515/9781400835386</a></li>
+<li id="ref-sutton1988">Sutton, R. S. (1988). Learning to predict by the methods of temporal differences. <em>Machine Learning</em>, 3, 9&ndash;44. DOI: 10.1007/BF00115009. <a href="https://doi.org/10.1007/BF00115009">https://doi.org/10.1007/BF00115009</a></li>
+<li id="ref-watkins1992">Watkins, C. J. C. H. &amp; Dayan, P. (1992). Q-learning. <em>Machine Learning</em>, 8, 279&ndash;292. DOI: 10.1007/BF00992698. <a href="https://doi.org/10.1007/BF00992698">https://doi.org/10.1007/BF00992698</a></li>
+<li id="ref-sutton2018">Sutton, R. S. &amp; Barto, A. G. (2018). <em>Reinforcement Learning: An Introduction</em> (الطبعة 2). MIT Press. ISBN 978-0-262-03924-6. <a href="http://incompleteideas.net/book/the-book-2nd.html">http://incompleteideas.net/book/the-book-2nd.html</a></li>
+<li id="ref-mnih2015">Mnih, V., Kavukcuoglu, K., Silver, D. <em>et al.</em> (2015). Human-level control through deep reinforcement learning. <em>Nature</em>, 518, 529&ndash;533. DOI: 10.1038/nature14236. <a href="https://doi.org/10.1038/nature14236">https://doi.org/10.1038/nature14236</a></li>
+<li id="ref-silver2017">Silver, D., Schrittwieser, J., Simonyan, K. <em>et al.</em> (2017). Mastering the game of Go without human knowledge. <em>Nature</em>, 550, 354&ndash;359. DOI: 10.1038/nature24270. <a href="https://doi.org/10.1038/nature24270">https://doi.org/10.1038/nature24270</a></li>
+<li id="ref-tesauro1995">Tesauro, G. (1995). Temporal difference learning and TD-Gammon. <em>Communications of the ACM</em>, 38(3), 58&ndash;68. DOI: 10.1145/203330.203343. <a href="https://doi.org/10.1145/203330.203343">https://doi.org/10.1145/203330.203343</a></li>
+<li id="ref-howard1960">Howard, R. A. (1960). <em>Dynamic Programming and Markov Processes</em>. MIT Press. <a href="https://archive.org/details/dynamicprogrammi0000howa">https://archive.org/details/dynamicprogrammi0000howa</a></li>
+</ol>
+
+<section class="src-ar">
+<h3>مصادر بالعربية</h3>
+<p class="src-note">مصادر للاستزادة، لا مراجع لما ورد أعلاه: المراجع الأصلية للفصل مذكورةٌ في القائمة السابقة بلغتها. وقد عُوينت كلّ صفحةٍ من صفحات الناشرين للتحقّق من العنوان والمترجم ورخصة الإتاحة.</p>
+<ul>
+<li>راسل، ستيوارت. <em>ذكاء اصطناعي متوافق مع البشر: حتّى لا تفرض الآلات سيطرتها على العالم</em>. ترجمة مصطفى محمد فؤاد وأسامة إسماعيل عبد العليم. مؤسسة هنداوي (بترخيصٍ من المؤلّف). نحو 103 آلاف كلمة، متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/25350464/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/25350464/</a><span class="pourquoi">المؤلّف نفسه صاحب المرجع الأساسي لهذا المُقرَّر؛ والكتاب مبنيٌّ كلّه على فكرة الوكيل العقلاني ومقياس الأداء، وعلى ما يحدث حين يُساء وضعه.</span></li>
+<li>بودن، مارجريت إيه. <em>الذكاء الاصطناعي: مقدّمة قصيرة جدًّا</em>. ترجمة إبراهيم سند أحمد، مراجعة هاني فتحي سليمان. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). نحو 43 ألف كلمة، متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/48149074/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/48149074/</a><span class="pourquoi">أقرب كتابٍ عربيٍّ مجّاني إلى روح الفصل الأوّل: التعريفات، والتاريخ، والحدود، والنقاش الفلسفي.</span></li>
+</ul>
+</section>
+<p>وأوّل نجاحٍ لافت لهذه الطرائق يسبق النتائج الحديثة بعشرين سنة: فبرنامج طاولةٍ مدرَّب بالفروق الزمنية ضدّ نفسه بلغ منذ 1995 مستوى أفضل اللاعبين البشر <a class="cite" href="#ref-tesauro1995">[7]</a>. والبديل عن التكرار على القيم، المسمّى التكرار على السياسات، كثيراً ما يتقارب في دوراتٍ أقلّ بكثير <a class="cite" href="#ref-howard1960">[8]</a>.</p>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../11-reseaux-neurones/page.html">\(\leftarrow\) الفصل 11 &mdash; الشبكات العصبية</a>
+<a href="../../../IA/lecons/12-renforcement/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">المُلحَق الخوارزمي</a>
+<a href="../../index.html">فهرس المُقرَّر</a>
+<a href="../13-generative/page.html">الفصل 13 &mdash; الذكاء الاصطناعي التوليدي \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>الذكاء الاصطناعي &mdash; الأقسام التحضيرية MP/PSI</strong> &middot; البحث والألعاب والقيود والتعلّم<span class="footer-meta">طبعة 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">تعذّر تحميل الشكل التفاعلي. تحقّق من اتصالك بالشبكة.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ========== Monde en grille 4 x 3 : iteration sur les valeurs ============= */
+var LARG12 = 4, HAUT12 = 3;
+var MUR = '1,1';
+var TERM = {'3,2': 1.0, '3,1': -1.0};
+function estCase(x, y){
+  return x >= 0 && y >= 0 && x < LARG12 && y < HAUT12 && (x + ',' + y) !== MUR;
+}
+function estTerm(x, y){ return (x + ',' + y) in TERM; }
+var DIRS = [[0,1],[1,0],[0,-1],[-1,0]];      /* haut, droite, bas, gauche */
+var NOMDIR = ['haut', 'droite', 'bas', 'gauche'];
+/* modele stochastique : 0.8 dans la direction voulue, 0.1 a gauche, 0.1 a droite */
+function transitions(x, y, a){
+  var res = [];
+  var probas = [0.8, 0.1, 0.1];
+  var alt = [a, (a + 3) % 4, (a + 1) % 4];
+  for (var k = 0; k < 3; k++){
+    var d = DIRS[alt[k]];
+    var nx = x + d[0], ny = y + d[1];
+    if (!estCase(nx, ny)) { nx = x; ny = y; }   /* on reste sur place contre un mur */
+    res.push({x: nx, y: ny, p: probas[k]});
+  }
+  return res;
+}
+function iterationValeurs(gamma, cout, nIter){
+  var V = {}, x, y;
+  for (x = 0; x < LARG12; x++) for (y = 0; y < HAUT12; y++){
+    if (!estCase(x, y)) { continue; }
+    V[x + ',' + y] = estTerm(x, y) ? TERM[x + ',' + y] : 0;
+  }
+  var etats = [{V: copier(V), politique: politiqueDe(V, gamma, cout), delta: Infinity}];
+  for (var it = 0; it < nIter; it++){
+    var W = copier(V), delta = 0;
+    for (x = 0; x < LARG12; x++) for (y = 0; y < HAUT12; y++){
+      if (!estCase(x, y) || estTerm(x, y)) { continue; }
+      var best = -Infinity;
+      for (var a = 0; a < 4; a++){
+        var q = 0, t = transitions(x, y, a);
+        for (var k = 0; k < t.length; k++){ q += t[k].p * V[t[k].x + ',' + t[k].y]; }
+        if (q > best) { best = q; }
+      }
+      W[x + ',' + y] = cout + gamma * best;
+      delta = Math.max(delta, Math.abs(W[x + ',' + y] - V[x + ',' + y]));
+    }
+    V = W;
+    etats.push({V: copier(V), politique: politiqueDe(V, gamma, cout), delta: delta});
+    if (delta < 1e-9) { break; }
+  }
+  return etats;
+}
+function copier(o){ var r = {}; for (var k in o){ r[k] = o[k]; } return r; }
+function politiqueDe(V, gamma, cout){
+  var pol = {};
+  for (var x = 0; x < LARG12; x++) for (var y = 0; y < HAUT12; y++){
+    if (!estCase(x, y) || estTerm(x, y)) { continue; }
+    var best = -Infinity, ba = 0;
+    for (var a = 0; a < 4; a++){
+      var q = 0, t = transitions(x, y, a);
+      for (var k = 0; k < t.length; k++){ q += t[k].p * V[t[k].x + ',' + t[k].y]; }
+      if (q > best) { best = q; ba = a; }
+    }
+    pol[x + ',' + y] = ba;
+  }
+  return pol;
+}
+var CACHE12 = {};
+function vi(gamma, cout){
+  var k = gamma.toFixed(2) + '|' + cout.toFixed(2);
+  if (!(k in CACHE12)) { CACHE12[k] = iterationValeurs(gamma, cout, 60); }
+  return CACHE12[k];
+}
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-1.2, 5.4, 5.6, -2.6], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: true
+});
+var sCout = b1.create('slider', [[-1.0, -1.2], [1.4, -1.2], [-2.0, -0.04, 0.0]], {
+  name: 'الكلفة لكل خطوة', snapWidth: 0.02, precision: 2,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }}
+});
+var sIt12 = b1.create('slider', [[2.4, -1.2], [5.4, -1.2], [0, 60, 60]], {
+  name: 'iteration', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function cout12(){ return Math.round(sCout.Value() * 50) / 50; }
+function etat12(){
+  var e = vi(0.99, cout12());
+  return e[Math.min(Math.round(sIt12.Value()), e.length - 1)];
+}
+b1.create('curve', [[0],[0]], {strokeColor: PAL.ref, strokeWidth: 1, highlight: false,
+  fixed: true}).updateDataArray = function(){
+  var X = [], Y = [];
+  for (var i = 0; i <= LARG12; i++){ X.push(i, i, NaN); Y.push(0, HAUT12, NaN); }
+  for (var j = 0; j <= HAUT12; j++){ X.push(0, LARG12, NaN); Y.push(j, j, NaN); }
+  this.dataX = X; this.dataY = Y;
+};
+b1.create('curve', [[1, 2, 2, 1, 1], [1, 1, 2, 2, 1]], {
+  strokeWidth: 0, fillColor: PAL.muted, fillOpacity: 0.5, highlight: false, fixed: true});
+for (var x = 0; x < LARG12; x++){
+  for (var y = 0; y < HAUT12; y++){
+    (function(cx, cy){
+      if (!estCase(cx, cy)) { return; }
+      var cle = cx + ',' + cy;
+      b1.create('curve', [[cx+0.04, cx+0.96, cx+0.96, cx+0.04, cx+0.04],
+                          [cy+0.04, cy+0.04, cy+0.96, cy+0.96, cy+0.04]], {
+        strokeWidth: 0, highlight: false, fixed: true,
+        fillColor: function(){
+          var v = etat12().V[cle];
+          return v >= 0 ? cssv('--viz-ok', '#16a34a') : cssv('--viz-bad', '#dc2626'); },
+        fillOpacity: function(){
+          var v = etat12().V[cle];
+          return Math.min(0.55, Math.abs(v) * 0.5); }});
+      b1.create('text', [cx + 0.5, cy + 0.62, function(){
+        return etat12().V[cle].toFixed(3);
+      }], {fontSize: 13, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+           strokeColor: PAL.text});
+      b1.create('text', [cx + 0.5, cy + 0.30, function(){
+        if (estTerm(cx, cy)) { return 'terminal'; }
+        var p = etat12().politique[cle];
+        return NOMDIR[p];
+      }], {fontSize: 11.5, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+           strokeColor: function(){ return cssv('--primary-dark', '#014a55'); }});
+    })(x, y);
+  }
+}
+b1.create('text', [-1.1, 5.1, function(){
+  var e = vi(0.99, cout12()), n = Math.min(Math.round(sIt12.Value()), e.length - 1);
+  return 'الكلفة لكل خطوة: ' + cout12().toFixed(2) + '   |   تكرار ' + n + ' من '
+       + (e.length - 1) + '   |   اقصى تغير: '
+       + (isFinite(e[n].delta) ? e[n].delta.toFixed(5) : 'البداية');
+}], {fontSize: 14, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-1.1, 4.7, function(){
+  var e = vi(0.99, cout12()), f = e[e.length-1];
+  return 'البداية في الاسفل على اليسار: والسياسة المثلى تقول هناك ' + NOMDIR[f.politique['0,0']] + '.';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-1.1, -2.0, function(){
+  var f = vi(0.99, cout12());
+  var pol = f[f.length-1].politique;
+  if (cout12() > -0.015) {
+    return 'كلفة شبه منعدمة: الوكيل غير مستعجل، فيتجنب الخطر ولو دار طويلا.';
+  }
+  if (cout12() < -1.0) {
+    return 'كلفة مرتفعة جدا: يفضل الوكيل ان يلقي بنفسه في الخانة السالبة للاختصار.';
+  }
+  return 'كلفة معتدلة: يلتف الوكيل بحذر حول الخانة السالبة.';
+}], {fontSize: 13, strokeColor: function(){ return cssv('--primary','#026573'); },
+     fixed: true, highlight: false});
+
+/* ========== Q-apprentissage : exploration contre exploitation ============= */
+function aleaQ(g){ var s = g; return function(){ s = (s*1103515245+12345)%2147483648; return s/2147483648; }; }
+function qApprentissage(epsilon, alpha, nEpisodes, graine){
+  var rnd = aleaQ(graine), Q = {}, x, y, a;
+  for (x = 0; x < LARG12; x++) for (y = 0; y < HAUT12; y++){
+    if (!estCase(x, y)) { continue; }
+    Q[x + ',' + y] = [0, 0, 0, 0];
+  }
+  var courbe = [], somme = 0;
+  for (var ep = 0; ep < nEpisodes; ep++){
+    x = 0; y = 0;
+    var total = 0;
+    for (var pas = 0; pas < 60; pas++){
+      if (estTerm(x, y)) { break; }
+      var cle = x + ',' + y;
+      if (rnd() < epsilon){ a = Math.floor(rnd() * 4); }
+      else {
+        a = 0;
+        for (var k = 1; k < 4; k++){ if (Q[cle][k] > Q[cle][a]) { a = k; } }
+      }
+      /* tirage de la transition reelle */
+      var t = transitions(x, y, a), u = rnd(), cum = 0, nx = x, ny = y;
+      for (var i = 0; i < t.length; i++){
+        cum += t[i].p;
+        if (u <= cum){ nx = t[i].x; ny = t[i].y; break; }
+      }
+      var r = estTerm(nx, ny) ? TERM[nx + ',' + ny] : -0.04;
+      total += r;
+      var suiv = nx + ',' + ny;
+      var maxQ = 0;
+      if (!estTerm(nx, ny)){
+        maxQ = Math.max(Q[suiv][0], Q[suiv][1], Q[suiv][2], Q[suiv][3]);
+      }
+      Q[cle][a] += alpha * (r + 0.99 * maxQ - Q[cle][a]);
+      x = nx; y = ny;
+    }
+    somme += total;
+    if (ep % 20 === 0) { courbe.push({ep: ep, moy: somme / (ep + 1)}); }
+  }
+  /* politique finale */
+  var pol = {}, bonnes = 0, total2 = 0;
+  var ref = vi(0.99, -0.04);
+  var polOpt = ref[ref.length-1].politique;
+  for (var k2 in Q){
+    var p = k2.split(',');
+    if (estTerm(+p[0], +p[1])) { continue; }
+    var best = 0;
+    for (var k3 = 1; k3 < 4; k3++){ if (Q[k2][k3] > Q[k2][best]) { best = k3; } }
+    pol[k2] = best; total2++;
+    if (best === polOpt[k2]) { bonnes++; }
+  }
+  return {courbe: courbe, pol: pol, bonnes: bonnes, total: total2};
+}
+var CACHEQ = {};
+function qa(eps, alpha){
+  var k = eps.toFixed(2) + '|' + alpha.toFixed(2);
+  if (!(k in CACHEQ)) { CACHEQ[k] = qApprentissage(eps, alpha, 4000, 20250806); }
+  return CACHEQ[k];
+}
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-900, 0.72, 4600, -1.05], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sEps = b2.create('slider', [[100, -0.72], [1900, -0.72], [0.0, 0.15, 0.60]], {
+  name: 'exploration', snapWidth: 0.05, precision: 2,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+var sAl = b2.create('slider', [[2500, -0.72], [4300, -0.72], [0.05, 0.20, 0.80]], {
+  name: 'خطوة التعلم', snapWidth: 0.05, precision: 2,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+function eps12(){ return Math.round(sEps.Value() * 20) / 20; }
+function alpha12(){ return Math.round(sAl.Value() * 20) / 20; }
+b2.create('segment', [[0, 0], [4000, 0]], {strokeColor: PAL.axis, strokeWidth: 1.4,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b2.create('segment', [[0, -0.55], [0, 0.65]], {strokeColor: PAL.axis, strokeWidth: 1.4,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+var cQ = b2.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--primary', '#026573'); }, strokeWidth: 3,
+  highlight: false, fixed: true});
+cQ.updateDataArray = function(){
+  var r = qa(eps12(), alpha12()), X = [], Y = [];
+  for (var i = 0; i < r.courbe.length; i++){ X.push(r.courbe[i].ep); Y.push(r.courbe[i].moy); }
+  this.dataX = X; this.dataY = Y;
+};
+for (var g = 1000; g <= 4000; g += 1000){
+  (function(k){ b2.create('text', [k, -0.06, String(k)], {fontSize: 11, anchorX: 'middle',
+    strokeColor: PAL.muted, fixed: true, highlight: false}); })(g);
+}
+b2.create('text', [2000, -0.90, 'episodes'], {fontSize: 12.5, anchorX: 'middle',
+  strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-850, 0.68, function(){
+  var r = qa(eps12(), alpha12());
+  return 'Exploration ' + eps12().toFixed(2) + '، خطوة ' + alpha12().toFixed(2)
+       + '   |   سياسة صحيحة في ' + r.bonnes + ' من ' + r.total + ' cases'
+       + '   |   المكسب الوسطي النهائي ' + r.courbe[r.courbe.length-1].moy.toFixed(3);
+}], {fontSize: 13, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-850, 0.58, function(){
+  if (eps12() < 0.03) {
+    return 'بلا استكشاف، يكرر الوكيل اول استراتيجية وجدها ولا يتعلم شيئا في مكان آخر.';
+  }
+  if (eps12() > 0.45) {
+    return 'افراط في الاستكشاف: يعمل الوكيل عشوائيا مرة من اثنتين، فينهار مكسبه الوسطي.';
+  }
+  return 'مفاضلة معقولة بين استثمار ما ينجح وتجريب شيء آخر.';
+}], {fontSize: 12.5, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-850, -1.0,
+  'السياسة مقارنة بالمحصلة بالتكرار على القيم، الذي يعرف النموذج.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

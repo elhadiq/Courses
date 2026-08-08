@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مقدّمة عامّة</title>
+<meta name="description" content="مقدّمة عامّة: حلقة الوكيل والبيئة، وخريطة الفصول الأربعة عشر.">
+<link href="../../assets/style.css" rel="stylesheet">
+<link href="../../assets/rtl.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+
+.src-ar { margin: 26px 0 8px; border-top: 2px solid var(--color-rule); padding-top: 16px; }
+.src-ar h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--primary); }
+.src-ar .src-note { color: var(--color-muted); font-size: 0.9rem; margin: 0 0 12px; }
+.src-ar ul { list-style: none; padding: 0; margin: 0; }
+.src-ar li { margin: 0 0 14px; padding-right: 14px; border-right: 3px solid var(--primary-soft-2);
+             line-height: 1.7; font-size: 0.95rem; }
+.src-ar li .pourquoi { display: block; color: var(--color-muted); font-size: 0.9em;
+                       margin-top: 3px; }
+.src-ar li a.lien { word-break: break-all; font-size: 0.88em; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><a class="lang-switch" href="../../../IA/lecons/00-introduction/page.html" hreflang="fr" title="Version fran&ccedil;aise">FR</a><div class="breadcrumb"><a href="../../index.html">الذكاء الاصطناعي</a> &middot; مُقرَّر</div><span class="course-code">برنامج MP/PSI &middot; الفترة الثانية</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">افتتاحية</div>
+<h1>مقدّمة عامّة</h1>
+<div class="lesson-sub">ما الذي يغطّيه تعبير «الذكاء الاصطناعي»، وكيف نُظّم هذا المُقرَّر، ومن أين يُؤخذ.</div>
+</div></section>
+<main class="lesson-content">
+
+<h2>لماذا هذا المُقرَّر</h2>
+
+<p>قليلةٌ هي الكلمات التي خُدِمت كثيراً وشاخت بسوءٍ مثل كلمة <em>الذكاء الاصطناعي</em>. فهي تدلّ تارةً على حقل بحثٍ عمره سبعون سنة، وتارةً على عائلةٍ من التقنيات الإحصائية، وتارةً على حُجّةٍ تجارية، وتارةً على قلقٍ جماعي. وليس هذا الالتباس مسألة مفرداتٍ فحسب: إنّه يحجب عن النظر أنّ تحت هذه الكلمة الواحدة تختبئ مسائل رياضية متمايزة، لكلٍّ منها فرضيّاتها وضماناتها وحدودها المُبرهَنة.</p>
+
+<p>يسلك هذا المُقرَّر النقيض من العرض السريع. يعالج أربعة عشر فصلاً، كلٌّ منها متمركز حول صنفٍ محدَّد من المسائل، وفي كلّ مرّة بالمطلب نفسه: تعريف، وخوارزمية، وبرهان على ما تضمنه، وقياس لما تكلّفه، ومثال صريح على ما تعجز عنه. لن تجد فيه وعداً ولا نبوءة، بل نتائج مؤرَّخة قابلة للتحقّق، منسوبة إلى مصدرها الأصلي.</p>
+
+<div class="box tip"><div class="box-title">ما ستُحسِن فعله في النهاية</div>
+<ul>
+<li>أن تتعرّف على صنف المسائل الذي تنتمي إليه مهمّة ملموسة، ومن ثمّ على عائلة الخوارزميات التي تناسبها.</li>
+<li>أن تُبرهن أنّ خوارزمية تُرجِع جواباً صحيحاً، وأنّها تتوقّف، وبأيّ ثمن.</li>
+<li>أن تميّز ضماناً رياضياً من ملاحظةٍ تجريبية، وملاحظةً تجريبية من ادّعاءٍ إعلاني.</li>
+<li>أن تُقيّم نظاماً متعلِّماً دون أن تكذب على نفسك.</li>
+</ul></div>
+
+<h2>فكرةٌ واحدة، أربع عشرة مرّة</h2>
+
+<p>ينتظم المُقرَّر كلّه حول تخطيطٍ واحد: <strong>وكيل</strong> يُدرِك <strong>بيئةً</strong> ويؤثّر فيها، ساعياً إلى تعظيم مقياس أداء. وما نسمّيه الذكاء الاصطناعي هو مجموع الطرائق التي تتيح حساب السهم الأعلى &mdash; الفعل &mdash; انطلاقاً من السهم الأسفل &mdash; الإدراك.</p>
+
+<figure class="viz"><div class="viz-title">حلقة الوكيل والبيئة</div>
+<svg viewBox="0 0 760 300" role="img" style="width:100%;height:auto;display:block;"><rect x="70" y="90" width="230" height="120" rx="10" style="fill:var(--primary);fill-opacity:0.12;stroke:var(--primary);stroke-width:2.5;"/><text x="185" y="140" text-anchor="middle" style="fill:var(--primary);font-size:15px;font-weight:700;font-family:inherit;">الوكيل</text><text x="185" y="168" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">ما نُصمّمه نحن</text><rect x="460" y="90" width="230" height="120" rx="10" style="fill:var(--viz-ref);fill-opacity:0.35;stroke:var(--viz-axis);stroke-width:2.5;"/><text x="575" y="140" text-anchor="middle" style="fill:var(--color-text);font-size:15px;font-weight:700;font-family:inherit;">البيئة</text><text x="575" y="168" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">ما نخضع له</text><path d="M 300 122 C 370 92, 400 92, 452 122" style="fill:none;stroke:var(--primary);stroke-width:3;"/><path d="M 444 112 L 460 122 L 442 130 Z" style="fill:var(--primary);"/><text x="378" y="86" text-anchor="middle" style="fill:var(--primary);font-size:13.5px;font-weight:700;font-family:inherit;">أفعال</text><path d="M 460 178 C 400 208, 370 208, 302 178" style="fill:none;stroke:var(--accent);stroke-width:3;"/><path d="M 316 170 L 298 178 L 316 188 Z" style="fill:var(--accent);"/><text x="378" y="228" text-anchor="middle" style="fill:var(--accent);font-size:13.5px;font-weight:700;font-family:inherit;">مُدرَكات</text><text x="380" y="42" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">مادّة هذا المُقرَّر كلّها تسع في هذه الحلقة</text><text x="380" y="272" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">البحث والاستدلال والتعلّم: ثلاث طرائق لاختيار السهم الأعلى من الأسفل</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 0.1.</strong> هذه الحلقة هي البنية الوحيدة المشتركة بين كلّ الفصول. والذي يتغيّر من فصل إلى آخر هو طبيعة البيئة (معلومة أو مجهولة، حتميّة أو عشوائية، منفردة أو بوجود خصم) والكيفية التي يقرّر بها الوكيل.</figcaption></figure>
+
+<p>قُدِّمت ثلاثة أجوبة كبرى عن هذا السؤال، وهي التي تُنظّم المُقرَّر.</p>
+
+<table>
+<thead><tr><th>الجواب</th><th>فرضيّة الانطلاق</th><th>ما يحسبه</th><th>الفصول</th></tr></thead>
+<tbody>
+<tr><td><strong>البحث</strong></td><td>العالم معلوم ويوصَف بحالات وانتقالات</td><td>متتالية أفعال تقود إلى حالة مرغوبة</td><td>3 إلى 6</td></tr>
+<tr><td><strong>الاستدلال</strong></td><td>العالم يوصَف بقضايا، بعضها يقيني وبعضها احتمالي</td><td>ما يلزم منطقياً أو احتمالياً عمّا نعلمه</td><td>7 و8</td></tr>
+<tr><td><strong>التعلّم</strong></td><td>العالم غير معلوم، لكن لدينا أمثلة على سلوكه</td><td>دالّة تُعمِّم على حالات لم تُرَ قطّ</td><td>9 إلى 13</td></tr>
+</tbody></table>
+
+<p>لم تتعاقب هذه الأجوبة الثلاثة بأن يحلّ بعضها محلّ بعض: بل هي متعايشة، والأنظمة الأنجع اليوم تجمع بينها. فالبرنامج الذي هزم أفضل لاعبي «غو» يقرن بحثاً شجرياً من الفصل 5 بشبكاتٍ متعلَّمة من الفصل 11؛ وحلّال القيود الصناعي يجمع انتشار الفصل 6 بمُرشِدات إحصائية.</p>
+
+<h2>كيف بُني المُقرَّر</h2>
+
+<figure class="viz"><div class="viz-title">الأقسام الخمسة</div>
+<svg viewBox="0 0 760 278" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">خمسة أقسام وأربعة عشر فصلاً: صعوبة المسألة تتصاعد من اليسار إلى اليمين</text><rect x="14.0" y="62.0" width="148.6" height="104.0" rx="9" style="fill:var(--primary);fill-opacity:0.07;stroke:var(--primary);stroke-width:2;"/><text x="88.3" y="84.0" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;font-family:inherit;letter-spacing:0.8px;">القسم الأول</text><text x="88.3" y="103.0" text-anchor="middle" style="fill:var(--color-text);font-size:12.5px;font-weight:700;font-family:inherit;">الأسس</text><text x="88.3" y="124.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">1 &mdash; ما الذكاء الاصطناعي؟</text><text x="88.3" y="148.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">2 &mdash; الوكلاء والبيئات</text><path d="M 165.6 114.0 L 169.7 114.0" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 166.7 109.0 L 176.7 114.0 L 166.7 119.0 Z" style="fill:var(--viz-axis);"/><rect x="178.7" y="62.0" width="135.6" height="152.0" rx="9" style="fill:var(--primary);fill-opacity:0.10;stroke:var(--primary);stroke-width:2;"/><text x="246.5" y="84.0" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;font-family:inherit;letter-spacing:0.8px;">القسم الثاني</text><text x="246.5" y="103.0" text-anchor="middle" style="fill:var(--color-text);font-size:12.5px;font-weight:700;font-family:inherit;">الحلّ بالبحث</text><text x="246.5" y="124.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">3 &mdash; البحث في فضاء الحالات</text><text x="246.5" y="148.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">4 &mdash; الميتاهيوريستيّات</text><text x="246.5" y="172.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">5 &mdash; ألعاب اللاعبَين</text><text x="246.5" y="196.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">6 &mdash; القيود</text><path d="M 317.3 138.0 L 321.4 138.0" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 318.4 133.0 L 328.4 138.0 L 318.4 143.0 Z" style="fill:var(--viz-axis);"/><rect x="330.4" y="62.0" width="147.5" height="104.0" rx="9" style="fill:var(--primary);fill-opacity:0.13;stroke:var(--primary);stroke-width:2;"/><text x="404.1" y="84.0" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;font-family:inherit;letter-spacing:0.8px;">القسم الثالث</text><text x="404.1" y="103.0" text-anchor="middle" style="fill:var(--color-text);font-size:12.5px;font-weight:700;font-family:inherit;">التمثيل والاستدلال</text><text x="404.1" y="124.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">7 &mdash; المنطق وSAT</text><text x="404.1" y="148.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">8 &mdash; الاحتمالات</text><path d="M 480.9 114.0 L 485.0 114.0" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 482.0 109.0 L 492.0 114.0 L 482.0 119.0 Z" style="fill:var(--viz-axis);"/><rect x="494.0" y="62.0" width="134.2" height="152.0" rx="9" style="fill:var(--primary);fill-opacity:0.16;stroke:var(--primary);stroke-width:2;"/><text x="561.1" y="84.0" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;font-family:inherit;letter-spacing:0.8px;">القسم الرابع</text><text x="561.1" y="103.0" text-anchor="middle" style="fill:var(--color-text);font-size:12.5px;font-weight:700;font-family:inherit;">التعلّم</text><text x="561.1" y="124.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">9 &mdash; التعلّم المُراقَب</text><text x="561.1" y="148.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">10 &mdash; التعلّم غير المُراقَب</text><text x="561.1" y="172.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">11 &mdash; الشبكات العصبية</text><text x="561.1" y="196.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">12 &mdash; التعلّم بالتعزيز</text><path d="M 631.2 138.0 L 635.3 138.0" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 632.3 133.0 L 642.3 138.0 L 632.3 143.0 Z" style="fill:var(--viz-axis);"/><rect x="644.3" y="62.0" width="101.7" height="104.0" rx="9" style="fill:var(--primary);fill-opacity:0.19;stroke:var(--primary);stroke-width:2;"/><text x="695.1" y="84.0" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;font-family:inherit;letter-spacing:0.8px;">القسم الخامس</text><text x="695.1" y="103.0" text-anchor="middle" style="fill:var(--color-text);font-size:12.5px;font-weight:700;font-family:inherit;">اليوم</text><text x="695.1" y="124.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">13 &mdash; نماذج توليدية</text><text x="695.1" y="148.0" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">14 &mdash; الأخلاقيات</text><text x="380" y="242" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">يفترض القسمان الثاني والثالث أنّ معرفة العالم <tspan style="font-weight:700;">مُعطاة</tspan> ؛ أمّا القسم الرابع فيجعلها <tspan style="font-weight:700;">مُتعلَّمة</tspan>.</text><text x="380" y="264" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">كلّ فصل قابل للقراءة منفرداً، لكنّ الترتيب يبني معجماً مشتركاً.</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 0.2.</strong> الترتيب ليس زمنياً بل منطقياً: كلّ قسم يرفع فرضيّةً كان القسم السابق يفترضها. القسم الثاني يفترض العالم معلوماً بتمامه؛ والقسم الثالث يقبل اللايقين؛ والقسم الرابع يتخلّى عن معرفة العالم ويكتفي بأمثلة منه.</figcaption></figure>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">مرّر الفأرة فوق فصل: تُضاء متطلّباته السابقة بلونٍ داكن، والفصول التي يفتح الطريق إليها بلونٍ فاتح. ونقرةٌ تفتح الفصل.</p>
+<div id="jxg1" class="viz-board" style="height:480px;"></div>
+<p class="viz-caption"><strong>الشكل 0.3.</strong> مبيان التبعيّات، قابل للتصفّح بالفأرة. وهو شبه خطّي، وذلك مقصود: كلّ فصل يُعيد استعمال معجم سابقه. واستثناءان جديران بالانتباه: الفصل 12 يحتاج إلى الاستدلال الاحتمالي والشبكات العصبية معاً، والفصل 14 لا يُفهم إلّا بعد معرفة الكيفية التي تُبنى بها فعلاً نماذج الفصول 9 إلى 13.</p></div>
+
+<h3>بنية الفصل الواحد</h3>
+
+<p>يتبع كلّ فصل التقسيم نفسه، لتعرف دائماً أين تبحث.</p>
+
+<ul>
+<li> <strong>تعريف صوري</strong> للمسألة، في إطارٍ أزرق.</li>
+<li> <strong>مبرهنات</strong> وبراهينها، في إطارٍ أخضر: هذه هي الضمانات، وهي ما يميّز طريقةً من وصفةٍ جاهزة.</li>
+<li> <strong>أُطُر تحذير</strong> برتقالية، تُحصي الأخطاء التي تُرتَكب فعلاً.</li>
+<li> <strong>شيفرة زائفة</strong> واحدة أو أكثر، مستقلّة عن أيّ لغة برمجة.</li>
+<li> <strong>أشكال تفاعلية</strong> تُعالَج باليد لا تُشاهَد: فصلٌ يُقرأ دون لمس المؤشّرات لم يُقرأ إلّا نصفه.</li>
+<li> <strong>تحليل</strong> للصحّة والانتهاء والتعقيد.</li>
+<li> <strong>خلاصة</strong> و<strong>ثبت مراجع</strong> يُحيل إلى المقالات الأصلية.</li>
+</ul>
+
+<div class="box method"><div class="box-title">الشيفرة الزائفة، ولماذا لا برنامج</div>
+<p>لا تعرض الفصول قطّ برنامجاً بلغةٍ بعينها. فالخوارزمية ليست نصّ برنامج: إنّها طريقة، والبرنامج ليس إلّا تجسيداً ممكناً لها. والشيفرة الزائفة المستعملة هنا تُقرأ بصوتٍ مرتفع وتُنقَل إلى أيّ لغة كانت. واصطلاحها أدنى ما يكون: السهم <code>&lt;-</code> يُقرأ «يتلقّى»، والكلمات المفتاحية بالخطّ العريض، والتعليقات بعد الشرطتين المائلتين بالخطّ المائل.</p>
+<p>أمّا البرمجة الفعلية فلها موضعها، لكن في مكانٍ آخر: في التمارين ذاتية التصحيح، حيث تُختبَر بدل أن تُتأمَّل.</p></div>
+
+<div class="box method"><div class="box-title">المُلحَق الخوارزمي</div>
+كلّ فصل مشفوع بمُلحَق يستعيد خوارزمياته المركزية الأربع أو الخمس، بلا أدنى ترميز: ما تتلقّاه، وما تنتجه، وخطواتها بالترتيب الذي كنّا سننفّذها به يدوياً، ومثالاً مبسوطاً في جدولٍ بأرقامٍ حقيقية، ثمّ لماذا يكون الجواب صحيحاً، ولماذا يتوقّف الإجراء، وما يكلّفه، وأين ينكسر. وهناك ينبغي الذهاب حين تستعصي صيغة.</div>
+
+<h2>كيف تشتغل</h2>
+
+<p>يُقرأ المُقرَّر بالترتيب، لكنّه <em>يُشتغَل عليه</em> في ثلاث مرّات متتالية على كلّ فصل، والتجربة تُظهِر أنّ تخطّي الثانية هو أغلى ما يكلّف.</p>
+
+<table>
+<thead><tr><th>المرّة</th><th>ما نفعله</th><th>كيف نعرف أنّه تُحصِّل</th></tr></thead>
+<tbody>
+<tr><td>1. القراءة</td><td>قراءة الفصل مع معالجة كلّ شكلٍ تفاعلي، دون تدوين شيء</td><td>تستطيع أن تشرح لأحدٍ ما الذي يحلّه الفصل ولماذا هو صعب</td></tr>
+<tr><td>2. البسط</td><td>إعادة عمل جداول المُلحَق المبسوطة يدوياً، على الورق ودون نظر</td><td>جداولك تطابق جداول المُقرَّر، سطراً بسطر</td></tr>
+<tr><td>3. البرمجة</td><td>معالجة التمارين ذاتية التصحيح المرافقة</td><td>تنجح حالات الاختبار المخفيّة، لا الأمثلة وحدها</td></tr>
+</tbody></table>
+
+<div class="box warn"><div class="box-title">مَزلَقٌ منهجي</div>
+الإحساس بالفهم أثناء القراءة خادع، ولا سيّما في هذا الحقل حيث الأفكار بسيطة والتفاصيل شرسة. والاختبار الصادق ليس «هل أفهم؟» بل «هل أقدر على بسط الخوارزمية يدوياً على مثالٍ لم أره قطّ؟». ولهذا يقترح كلّ مُلحَق مثالاً يمكن التحقّق منه ذهنياً: إنّه مصنوع ليُعاد لا ليُقرأ.</div>
+
+<h2>ما لا يفعله هذا المُقرَّر</h2>
+
+<p>ثلاث مصارحات خير من وعدٍ واحد.</p>
+
+<p><strong>لا يتنبّأ بالمستقبل.</strong> فتاريخ الحقل، المرويّ في الفصل 1، متتاليةٌ من تنبّؤات واثقة وخاطئة، في الاتجاهين معاً. وسنلتزم بما هو ثابت.</p>
+
+<p><strong>لا يعالج هندسة الأنظمة الكبرى.</strong> تدريب نموذجٍ على آلاف المعالجات، وخدمة ملايين الطلبات، وتصنيع تدفّق بيانات: تلك مِهَن، وهي تفترض أوّلاً معرفة المبادئ المعروضة هنا.</p>
+
+<p><strong>لا يُغني عن الرياضيات.</strong> الاحتمالات والجبر الخطّي والتحليل ليست أدواتٍ ملحقة بهذا الحقل: إنّها لغته. والفصلان 8 و11 سيجعلان ذلك ملموساً جدّاً.</p>
+
+<div class="box example"><div class="box-title">من أين تبدأ إن كنت مستعجلاً</div>
+الفصل 1 لتفهم عمّا نتكلّم، والفصل 3 لأوّل خوارزمية غير تافهة، والفصل 9 لبّ ما يُسمّى اليوم ذكاءً اصطناعياً، والفصل 14 لتعرف ما هو على المحكّ. تُقرأ الأربعة في أمسيةٍ لكلٍّ منها. لكنّ الشكل التفاعلي أعلاه سيقول لك بالضبط ما ينقصك لمقاربة فصلٍ بعينه.</div>
+
+<h2>المصادر</h2>
+<p>المراجع العامّة للمُقرَّر مجموعة هنا؛ ويضيف كلّ فصل مراجعه الخاصّة بموضوعه.</p>
+<ol class="reflist">
+<li id="ref-russell2020">Russell, S. &amp; Norvig, P. (2020). <em>Artificial Intelligence: A Modern Approach</em> (الطبعة 4). Pearson. ISBN 978-0-13-461099-3. <a href="https://aima.cs.berkeley.edu/">https://aima.cs.berkeley.edu/</a></li>
+<li id="ref-nilsson2009">Nilsson, N. J. (2009). <em>The Quest for Artificial Intelligence: A History of Ideas and Achievements</em>. Cambridge University Press. DOI: 10.1017/CBO9780511819346. <a href="https://doi.org/10.1017/CBO9780511819346">https://doi.org/10.1017/CBO9780511819346</a></li>
+<li id="ref-turing1950">Turing, A. M. (1950). Computing machinery and intelligence. <em>Mind</em>, LIX(236), 433&ndash;460. DOI: 10.1093/mind/LIX.236.433. <a href="https://doi.org/10.1093/mind/LIX.236.433">https://doi.org/10.1093/mind/LIX.236.433</a></li>
+</ol>
+
+<section class="src-ar">
+<h3>مصادر بالعربية</h3>
+<p class="src-note">مصادر للاستزادة، لا مراجع لما ورد أعلاه: المراجع الأصلية للفصل مذكورةٌ في القائمة السابقة بلغتها. وقد عُوينت كلّ صفحةٍ من صفحات الناشرين للتحقّق من العنوان والمترجم ورخصة الإتاحة.</p>
+<ul>
+<li>بودن، مارجريت إيه. <em>الذكاء الاصطناعي: مقدّمة قصيرة جدًّا</em>. ترجمة إبراهيم سند أحمد، مراجعة هاني فتحي سليمان. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). نحو 43 ألف كلمة، متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/48149074/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/48149074/</a><span class="pourquoi">أقرب كتابٍ عربيٍّ مجّاني إلى روح الفصل الأوّل: التعريفات، والتاريخ، والحدود، والنقاش الفلسفي.</span></li>
+<li>داسجوبتا، سوبراتا. <em>علم الكمبيوتر: مقدّمة قصيرة جدًّا</em>. ترجمة إبراهيم سند أحمد، مراجعة عبد الفتاح عبد الله أحمد. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/13726364/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/13726364/</a><span class="pourquoi">فصلُ «التفكير الخوارزمي» فيه يقدّم بالعربية مفهوم الخوارزمية وتكلفتها، وهو ما يفترضه هذا الفصل مكتسَباً.</span></li>
+<li>المنظمة العربية للتربية والثقافة والعلوم، مكتب تنسيق التعريب. <em>المعجم الموحّد لمصطلحات تقانة المعلومات</em> (عربي &ndash; إنجليزي &ndash; فرنسي). مطبعة النجاح الجديدة، الرباط، 2011. ISBN 978-9954-00-742-6.<br><a class="lien" href="https://archive.org/details/ALECSO2011AREN" hreflang="ar" target="_blank" rel="noopener">https://archive.org/details/ALECSO2011AREN</a><span class="pourquoi">المرجع المعتمَد في تعريب المصطلحات؛ ثلاثيّ اللغة، وهو ما يجعله مفيداً للانتقال بين هذا المُقرَّر ونسخته الفرنسية.</span></li>
+</ul>
+</section>
+<p>تخطيط الوكيل والبيئة، وتقسيم المسائل إلى بحثٍ واستدلالٍ وتعلّم، يتبعان التنظيم الذي صار معياراً منذ راسل ونورفيغ <a class="cite" href="#ref-russell2020">[1]</a> ؛ والتاريخ المفصّل للحقل هو تاريخ نيلسون <a class="cite" href="#ref-nilsson2009">[2]</a>، والنصّ المؤسِّس يبقى نصّ تورينغ <a class="cite" href="#ref-turing1950">[3]</a>.</p>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../../index.html">فهرس المُقرَّر</a>
+<a href="../01-qu-est-ce-que-l-ia/page.html">الفصل 1 &mdash; ما الذكاء الاصطناعي؟ \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>الذكاء الاصطناعي &mdash; الأقسام التحضيرية MP/PSI</strong> &middot; البحث والألعاب والقيود والتعلّم<span class="footer-meta">طبعة 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">تعذّر تحميل الشكل التفاعلي. تحقّق من اتصالك بالشبكة.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ====== Carte interactive du manuel : chapitres cliquables a la souris ===== */
+var CHAPS = [
+  {n:1,  t:'ما الذكاء الاصطناعي؟',       p:[],     c:0, x:0.55, y:4.35, d:'01-qu-est-ce-que-l-ia'},
+  {n:2,  t:'Agents',                     p:[1],    c:0, x:0.55, y:3.15, d:'02-agents'},
+  {n:3,  t:'البحث في الحالات',          p:[2],    c:1, x:2.75, y:4.65, d:'03-recherche'},
+  {n:4,  t:'الميتاهيوريستيّات',           p:[3],    c:1, x:2.75, y:3.45, d:'04-metaheuristiques'},
+  {n:5,  t:'Jeux',                       p:[3],    c:1, x:2.75, y:2.25, d:'05-jeux'},
+  {n:6,  t:'Contraintes',                p:[3],    c:1, x:2.75, y:1.05, d:'06-contraintes'},
+  {n:7,  t:'Logique',                    p:[6],    c:2, x:4.95, y:4.05, d:'07-logique'},
+  {n:8,  t:'الاحتمالات',               p:[7],    c:2, x:4.95, y:2.85, d:'08-probabiliste'},
+  {n:9,  t:'التعلّم المراقَب',                  p:[8],    c:3, x:7.15, y:4.65, d:'09-apprentissage'},
+  {n:10, t:'غير المراقَب',              p:[9],    c:3, x:7.15, y:3.45, d:'10-non-supervise'},
+  {n:11, t:'الشبكات العصبية',        p:[9],    c:3, x:7.15, y:2.25, d:'11-reseaux-neurones'},
+  {n:12, t:'Renforcement',               p:[8,11], c:3, x:7.15, y:1.05, d:'12-renforcement'},
+  {n:13, t:'التوليدي',              p:[11],   c:4, x:9.35, y:3.45, d:'13-generative'},
+  {n:14, t:'الأخلاقيات',                    p:[13],   c:4, x:9.35, y:2.25, d:'14-ethique'}
+];
+var PARTIES = ['الأول: الأسس', 'الثاني: البحث', 'الثالث: الاستدلال', 'الرابع: التعلّم', 'الخامس: اليوم'];
+var COLX = [0.55, 2.75, 4.95, 7.15, 9.35];
+var COL = ['--primary', '--viz-blue', '--accent', '--viz-ok', '--viz-cmp'];
+var DEMI_L = 0.86, DEMI_H = 0.40;
+
+/* Chapitre designe par le curseur ; a defaut, le premier du manuel. */
+var SURVOL = 0;
+function courant(){ return SURVOL || 1; }
+
+function fiche(n){
+  for (var i = 0; i < CHAPS.length; i++){ if (CHAPS[i].n === n) { return CHAPS[i]; } }
+  return null;
+}
+function amont(n){
+  var vus = {}, pile = [n];
+  while (pile.length){
+    var m = pile.pop();
+    if (vus[m]) { continue; }
+    vus[m] = true;
+    var f = fiche(m);
+    for (var i = 0; i < f.p.length; i++){ pile.push(f.p[i]); }
+  }
+  return vus;
+}
+function aval(n){
+  var vus = {}, change = true;
+  vus[n] = true;
+  while (change){
+    change = false;
+    for (var i = 0; i < CHAPS.length; i++){
+      if (vus[CHAPS[i].n]) { continue; }
+      for (var k = 0; k < CHAPS[i].p.length; k++){
+        if (vus[CHAPS[i].p[k]]) { vus[CHAPS[i].n] = true; change = true; }
+      }
+    }
+  }
+  return vus;
+}
+var CACHE_A = {}, CACHE_V = {};
+function etat(n){
+  var c = courant();
+  if (n === c) { return 2; }
+  if (!(c in CACHE_A)) { CACHE_A[c] = amont(c); CACHE_V[c] = aval(c); }
+  if (CACHE_A[c][n]) { return 1; }      /* prerequis */
+  return CACHE_V[c][n] ? 3 : 0;         /* accessible ensuite, ou sans lien direct */
+}
+
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-0.95, 6.15, 11.4, -0.85], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+
+/* ---- aretes de prerequis */
+for (var i = 0; i < CHAPS.length; i++){
+  for (var k = 0; k < CHAPS[i].p.length; k++){
+    (function(dest, src){
+      var a = fiche(src), b = fiche(dest);
+      b1.create('segment', [[a.x + DEMI_L, a.y], [b.x - DEMI_L, b.y]], {
+        strokeColor: function(){
+          var ea = etat(src), eb = etat(dest);
+          return (ea <= 2 && eb <= 2 && (ea === 2 || eb === 2 || (ea === 1 && eb === 1)))
+                 ? cssv('--primary', '#026573') : PAL.ref();
+        },
+        strokeWidth: function(){
+          var ea = etat(src), eb = etat(dest);
+          return (ea <= 2 && eb <= 2 && (ea === 2 || eb === 2 || (ea === 1 && eb === 1))) ? 3 : 1.3;
+        },
+        straightFirst: false, straightLast: false, highlight: false, fixed: true});
+    })(CHAPS[i].n, CHAPS[i].p[k]);
+  }
+}
+
+/* ---- boites de chapitre, sensibles a la souris */
+for (var i = 0; i < CHAPS.length; i++){
+  (function(f){
+    var boite = b1.create('polygon', [
+      [f.x - DEMI_L, f.y - DEMI_H], [f.x + DEMI_L, f.y - DEMI_H],
+      [f.x + DEMI_L, f.y + DEMI_H], [f.x - DEMI_L, f.y + DEMI_H]], {
+      withLines: true, vertices: {visible: false, fixed: true},
+      borders: {
+        strokeColor: function(){
+          var e = etat(f.n);
+          return (e === 2 || e === 1) ? cssv('--primary', '#026573') : PAL.axis(); },
+        strokeWidth: function(){ return etat(f.n) === 2 ? 3.2 : 1.5; },
+        highlight: false, fixed: true},
+      fillColor: function(){ return cssv(COL[f.c], '#026573'); },
+      fillOpacity: function(){
+        var e = etat(f.n);
+        return e === 2 ? 0.9 : (e === 1 ? 0.34 : (e === 3 ? 0.14 : 0.05));
+      },
+      highlightFillOpacity: function(){
+        var e = etat(f.n);
+        return e === 2 ? 0.9 : (e === 1 ? 0.34 : (e === 3 ? 0.14 : 0.05));
+      },
+      fixed: true, hasInnerPoints: true, highlight: true
+    });
+    /* survol : le curseur designe le chapitre et allume ses prerequis */
+    boite.on('over', function(){ SURVOL = f.n; b1.update(); });
+    boite.on('out',  function(){ if (SURVOL === f.n) { SURVOL = 0; b1.update(); } });
+    /* clic : ouverture du chapitre */
+    boite.on('down', function(){ window.location.href = '../' + f.d + '/page.html'; });
+    b1.create('text', [f.x, f.y + 0.11, String(f.n)], {
+      fontSize: 15, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+      cssStyle: 'pointer-events:none;',
+      strokeColor: function(){ return etat(f.n) === 2 ? PAL.bg() : PAL.text(); }});
+    b1.create('text', [f.x, f.y - 0.16, f.t], {
+      fontSize: 9.5, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+      cssStyle: 'pointer-events:none;',
+      strokeColor: function(){ return etat(f.n) === 2 ? PAL.bg() : PAL.muted(); }});
+  })(CHAPS[i]);
+}
+for (var i = 0; i < 5; i++){
+  (function(k){
+    b1.create('text', [COLX[k], 5.55, PARTIES[k]], {
+      fontSize: 12, anchorX: 'middle', fixed: true, highlight: false,
+      strokeColor: function(){ return cssv(COL[k], '#026573'); }});
+  })(i);
+}
+b1.create('text', [-0.9, 6.05, function(){
+  var f = fiche(courant());
+  return 'Chapitre ' + f.n + ' : ' + f.t
+       + (SURVOL ? '   —  انقر لفتحه' : '   —  مرّر الفأرة فوق فصل');
+}], {fontSize: 14, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-0.9, -0.35, function(){
+  var pre = [], suite = [];
+  for (var i = 0; i < CHAPS.length; i++){
+    if (etat(CHAPS[i].n) === 1) { pre.push(CHAPS[i].n); }
+    if (etat(CHAPS[i].n) === 3) { suite.push(CHAPS[i].n); }
+  }
+  pre.sort(function(a,b){ return a-b; }); suite.sort(function(a,b){ return a-b; });
+  return 'يُقرأ قبله: ' + (pre.length ? pre.join(', ') : 'rien')
+       + '   |   يمهّد لـ: ' + (suite.length ? suite.join(', ') : 'rien')
+       + '   |   أقصر مسار: ' + (pre.length + 1) + ' chapitres';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-0.9, -0.72,
+  'مرّر الفأرة فوق فصل: تُضاء متطلّباته السابقة بلونٍ داكن، والفصول التي يفتح الطريق إليها بلونٍ فاتح. انقر لفتحه.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update();
+
+})();
+</script>
+</body></html>

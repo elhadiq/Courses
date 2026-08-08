@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الفصل 13 &mdash; الذكاء الاصطناعي التوليدي</title>
+<meta name="description" content="النماذج التوليدية، الانحدارية الذاتية، الانتشار، الانتباه، المحوّلات.">
+<link href="../../assets/style.css" rel="stylesheet">
+<link href="../../assets/rtl.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+
+.src-ar { margin: 26px 0 8px; border-top: 2px solid var(--color-rule); padding-top: 16px; }
+.src-ar h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--primary); }
+.src-ar .src-note { color: var(--color-muted); font-size: 0.9rem; margin: 0 0 12px; }
+.src-ar ul { list-style: none; padding: 0; margin: 0; }
+.src-ar li { margin: 0 0 14px; padding-right: 14px; border-right: 3px solid var(--primary-soft-2);
+             line-height: 1.7; font-size: 0.95rem; }
+.src-ar li .pourquoi { display: block; color: var(--color-muted); font-size: 0.9em;
+                       margin-top: 3px; }
+.src-ar li a.lien { word-break: break-all; font-size: 0.88em; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><a class="lang-switch" href="../../../IA/lecons/13-generative/page.html" hreflang="fr" title="Version fran&ccedil;aise">FR</a><div class="breadcrumb"><a href="../../index.html">الذكاء الاصطناعي</a> &middot; مُقرَّر</div><span class="course-code">برنامج MP/PSI &middot; الفترة الثانية</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">القسم الخامس &middot; الفصل 13</div>
+<h1>الفصل 13 &mdash; النماذج التوليدية والنماذج اللغوية الكبرى</h1>
+<div class="lesson-sub">نمذجة توزيع، والمرمّزات الذاتية التغايرية، والنماذج التخاصمية، والانتشار، والانتباه، والمحوّلات.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">المُلحَق المرافق</div><p>المعاينة الانحدارية الذاتية، وحساب الانتباه، والتدريب التخاصمي، وقياس الحيرة، مفصَّلة <strong><a href="../../../IA/lecons/13-generative/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">خطوة بخطوة في المُلحَق</a></strong>.</p></div>
+
+<h2>13.1 التمييز أم التوليد</h2>
+
+<p>كانت الفصول 9 إلى 12 تتعلّم <em>القرار</em>: التصنيف، والتنبّؤ، والفعل. أمّا النموذج التوليدي فيتّخذ هدفاً مختلفاً: تعلّم التوزيع \(P(x)\) نفسه، بحيث نستطيع سحب أمثلةٍ جديدة ومعقولة منه.</p>
+
+<figure class="viz"><div class="viz-title">هدفان متمايزان</div>
+<svg viewBox="0 0 760 320" role="img" style="width:100%;height:auto;display:block;"><text x="190" y="30" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">نموذج تمييزي</text><text x="570" y="30" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">نموذج توليدي</text><rect x="46" y="52" width="288" height="196" rx="10" style="fill:var(--primary);fill-opacity:0.06;stroke:var(--primary);stroke-width:2;"/><path d="M 80 230 L 300 78" style="fill:none;stroke:var(--primary);stroke-width:3;"/><circle cx="100" cy="100" r="5" style="fill:var(--accent);"/><circle cx="130" cy="88" r="5" style="fill:var(--accent);"/><circle cx="150" cy="120" r="5" style="fill:var(--accent);"/><circle cx="112" cy="140" r="5" style="fill:var(--accent);"/><circle cx="160" cy="92" r="5" style="fill:var(--accent);"/><circle cx="230" cy="200" r="5" style="fill:var(--viz-blue);"/><circle cx="262" cy="178" r="5" style="fill:var(--viz-blue);"/><circle cx="210" cy="230" r="5" style="fill:var(--viz-blue);"/><circle cx="276" cy="214" r="5" style="fill:var(--viz-blue);"/><circle cx="246" cy="236" r="5" style="fill:var(--viz-blue);"/><text x="190" y="272" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">يتعلّم \(P(\text{classe} \mid x)\): حدّاً</text><text x="190" y="294" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">لا يُحسِن إنتاج نقطةٍ جديدة</text><rect x="426" y="52" width="288" height="196" rx="10" style="fill:var(--accent);fill-opacity:0.06;stroke:var(--accent);stroke-width:2;"/><circle cx="510" cy="118" r="52" style="fill:var(--accent);fill-opacity:0.10;"/><circle cx="510" cy="118" r="38" style="fill:var(--accent);fill-opacity:0.16;"/><circle cx="510" cy="118" r="24" style="fill:var(--accent);fill-opacity:0.24;"/><circle cx="510" cy="118" r="12" style="fill:var(--accent);fill-opacity:0.34;"/><circle cx="630" cy="200" r="52" style="fill:var(--viz-blue);fill-opacity:0.10;"/><circle cx="630" cy="200" r="38" style="fill:var(--viz-blue);fill-opacity:0.16;"/><circle cx="630" cy="200" r="24" style="fill:var(--viz-blue);fill-opacity:0.24;"/><circle cx="630" cy="200" r="12" style="fill:var(--viz-blue);fill-opacity:0.34;"/><circle cx="504" cy="112" r="5" style="fill:var(--accent);"/><circle cx="520" cy="126" r="5" style="fill:var(--accent);"/><circle cx="498" cy="128" r="5" style="fill:var(--accent);"/><circle cx="626" cy="196" r="5" style="fill:var(--viz-blue);"/><circle cx="640" cy="206" r="5" style="fill:var(--viz-blue);"/><circle cx="620" cy="210" r="5" style="fill:var(--viz-blue);"/><text x="570" y="272" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">يتعلّم \(P(x)\) أو \(P(x \mid \text{classe})\): كثافةً</text><text x="570" y="294" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">يُحسِن سحب نقطةٍ جديدة لم تُرَ قطّ</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 13.1.</strong> يتعلّم النموذج التمييزي حدّاً؛ وهو لا يُحسِن إنتاج شيء. ويتعلّم النموذج التوليدي كثافة؛ وهو يُحسِن الإنتاج، ويمكن استعماله أيضاً في التصنيف بقاعدة بايز. وتُدفَع كلفة هذه المرونة: فنمذجة التوزيع كلّه أصعب بكثير من تعلّم حدٍّ له، وفي المهامّ التمييزية الخالصة يفوز النموذج التمييزي عموماً.</figcaption></figure>
+
+<div class="box def"><div class="box-title">ثلاثة استعمالات، وفكرةٌ واحدة</div>
+<ul>
+<li><strong>الإنتاج</strong>: معاينة \(x \sim P(x)\).</li>
+<li><strong>التقويم</strong>: حساب \(P(x)\) لكشف ما هو شاذّ &mdash; احتيال، أو عطب، أو معطىً فاسد.</li>
+<li><strong>الإتمام</strong>: حساب \(P(x_{\text{manquant}} \mid x_{\text{connu}})\)، وهذا يشمل الترجمة، والإجابة عن سؤال، وإزالة الضجيج.</li>
+</ul></div>
+
+<h2>13.2 النماذج الانحدارية الذاتية</h2>
+
+<p>الصعوبة أنّ \(x\) يعيش في بُعدٍ كبير جدّاً. والتحليل السلسلي يلتفّ عليها بدقّة، بلا أيّ تقريب:</p>
+
+<div class="eq">\[P(x_1, \dots, x_n) = \prod_{t=1}^{n} P(x_t \mid x_1, \dots, x_{t-1})\]</div>
+
+<p>فنمذجة توزيعٍ على متتاليات بأكملها تؤول إذن إلى التنبّؤ بالعنصر التالي &mdash; وهي مسألة تصنيفٍ عادية، من الفصل 9. وتلك كلّ حيلة النماذج اللغوية الكبرى: <em>فهدف التدريب مراقبةٌ مجّانية</em>، لأنّ الجواب الصحيح هو الكلمة التالية من النصّ.</p>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 13.1 &mdash; معاينة نموذجٍ انحداري ذاتي</div><div class="algo-io"><b>المُدخل:</b> نموذج \(P_\theta\)، وبادئة \(x_{1:k}\)، وطول \(L\)، وحرارة \(T \gt 0\)<br><b>المُخرج:</b> متتالية \(x_{1:k+L}\)</div><ol class="algo-corps"><li><b class="kw">لكلّ</b> \(t = k+1\) <b class="kw">إلى أن</b> \(k+L\) <b class="kw">نفّذ</b></li><li class="n1">\(z \leftarrow \log P_\theta(\,\cdot \mid x_{1:t-1})\)          <span class="cm">// نتيجة لكل عنصر ممكن</span></li><li class="n1">\(\displaystyle p_v \leftarrow \frac{\exp(z_v / T)}{\sum_{v'} \exp(z_{v'} / T)}\)          <span class="cm">// T صغيرة: الفوارق مضخمة</span></li><li class="n1">\(x_t \sim p\)</li><li><b class="kw">أرجِع</b> \(x_{1:k+L}\)</li></ol><p class="algo-note">التحليل \(P(x_{1:n}) = \prod_t P(x_t \mid x_{1:t-1})\) مطابقةٌ دقيقة: فنمذجة توزيعٍ على متتاليات تؤول إلى التنبّؤ بالعنصر التالي. وM21 يعطي العنصر الأرجح، وM22 القانون المنتظم: فالحرارة لا تغيّر النموذج، بل قراءته فقط.</p></div>
+
+<div class="box def"><div class="box-title">الحيرة</div>
+<p>المقياس المعياري لجودة نموذجٍ لغوي هو \(\exp\!\big(-\tfrac{1}{n}\sum_t \ln P(x_t \mid x_{\lt t})\big)\)، وهو أُسّي الإنتروبيا المتقاطعة الوسطى. ويُؤوَّل <em>عددَ الخيارات المتساوية الاحتمال وسطياً</em> التي يتردّد بينها النموذج في كلّ خطوة. وحيرةٌ قدرها 4 على أبجديةٍ من 24 حرفاً تعني أنّ النموذج اختزل اللايقين بمعامل 6.</p></div>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">نموذج لغويٍّ بحرفين، مُتعلَّمٌ على متن من 190 حرفاً. والمؤشّرات تضبط حرارة المعاينة، وتنعيم الاحتمالات، والسحب العشوائي.</p>
+<div id="jxg1" class="viz-board" style="height:500px;"></div>
+<p class="viz-caption"><strong>الشكل 13.2.</strong> عند الحرارة 0,3، يكرّر النموذج «البحر ال البحر ال»: فهو يختار الأرجح دائماً. وعند الحرارة 1، يُنتج هذياناً تطفو فيه كلماتٌ حقيقية من المتن. وعند الحرارة 2، يتفكّك كلّ شيء. ويؤدّي التنعيم دوراً آخر: فعند الصفر، لا تكون ممكنةً إلّا الانتقالات المرصودة؛ وعند 2، ينسى النموذج ما تعلّمه وترتفع الحيرة من 4,1 إلى 10,2. <em>ويختلف هذا النموذج الضئيل عن نموذجٍ لغويٍّ كبير بحجم السياق وبالبنية، لا بالمبدأ.</em></p></div>
+
+<h2>13.3 ثلاث عائلات أخرى</h2>
+
+<figure class="viz"><div class="viz-title">أربع طرائق لنمذجة توزيع</div>
+<svg viewBox="0 0 760 300" role="img" style="width:100%;height:auto;display:block;"><rect x="16" y="54" width="172" height="168" rx="9" style="fill:var(--primary);fill-opacity:0.09;stroke:var(--primary);stroke-width:2.2;"/><text x="102" y="84" text-anchor="middle" style="fill:var(--primary);font-size:13px;font-weight:700;font-family:inherit;">انحداري ذاتي</text><text x="102" y="112" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">يُنتج عنصراً</text><text x="102" y="130" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">بعد</text><text x="102" y="148" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">الآخر</text><text x="102" y="172" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">احتمالية دقيقة،</text><text x="102" y="189" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">والتوليد</text><text x="102" y="206" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">بطيء</text><rect x="200" y="54" width="172" height="168" rx="9" style="fill:var(--viz-blue);fill-opacity:0.09;stroke:var(--viz-blue);stroke-width:2.2;"/><text x="286" y="84" text-anchor="middle" style="fill:var(--viz-blue);font-size:13px;font-weight:700;font-family:inherit;">مرمّز ذاتي تغايري</text><text x="286" y="112" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">يضغط ثمّ</text><text x="286" y="130" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">يُعيد البناء</text><text x="286" y="172" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">فضاء كامن</text><text x="286" y="189" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">قابل للاستعمال، ومُخرَجات</text><text x="286" y="206" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">ضبابية</text><rect x="384" y="54" width="172" height="168" rx="9" style="fill:var(--accent);fill-opacity:0.09;stroke:var(--accent);stroke-width:2.2;"/><text x="470" y="84" text-anchor="middle" style="fill:var(--accent);font-size:13px;font-weight:700;font-family:inherit;">نموذج تخاصمي</text><text x="470" y="112" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">شبكتان</text><text x="470" y="130" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">تتواجهان</text><text x="470" y="172" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">مُخرَجات حادّة،</text><text x="470" y="189" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">وتدريب</text><text x="470" y="206" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">غير مستقرّ</text><rect x="568" y="54" width="172" height="168" rx="9" style="fill:var(--viz-ok);fill-opacity:0.09;stroke:var(--viz-ok);stroke-width:2.2;"/><text x="654" y="84" text-anchor="middle" style="fill:var(--viz-ok);font-size:13px;font-weight:700;font-family:inherit;">انتشار</text><text x="654" y="112" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">يُضجِّج ثمّ يتعلّم</text><text x="654" y="130" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">إزالة</text><text x="654" y="148" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">الضجيج</text><text x="654" y="172" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">جودة</text><text x="654" y="189" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">عالية،</text><text x="654" y="206" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">وتوليد</text><text x="654" y="223" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">مكلف</text><text x="380" y="30" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">أربع طرائق لنمذجة توزيع، وأربع مفاضلات مختلفة</text><text x="380" y="258" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">لا واحدة منها أفضل على الإطلاق: فالاختيار يتوقّف على ما نريد فعله بالنموذج.</text><text x="380" y="282" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">فنموذجٌ يعطي احتماليةً دقيقة يتيح كشف الشاذّ؛ ونموذجٌ تخاصمي لا يتيح ذلك.</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 13.3.</strong> كلّ عائلةٍ تعقد مفاضلةً مختلفة بين جودة المُخرَجات، واستقرار التدريب، وسرعة الإنتاج، وإمكان حساب احتمالية.</figcaption></figure>
+
+<p><strong>المرمّز الذاتي التغايري</strong> يتعلّم في آنٍ واحد ضغطَ معطىً نحو فضاءٍ كامن صغير البُعد وإعادةَ بنائه، مع إجبار التوزيع الكامن على مشابهة قانونٍ طبيعي. فيمكن عندئذٍ التوليد بسحب نقطةٍ كامنة عشوائياً. والهدف المُحسَّن حدٌّ أدنى للاحتمالية <a class="cite" href="#ref-kingma2014">[1]</a>. ومُخرَجاته ضبابية عادةً، لأنّ الخطأ التربيعي المتوسّط يدفع إلى إنتاج متوسّط عمليات إعادة البناء الممكنة.</p>
+
+<p>و<strong>النموذج التخاصمي</strong> يواجه بين شبكتين: مولّدٍ يُنتج مزيّفات، ومميّزٍ يحاول تمييزها من الحقيقية. وعند التوازن النظري، ينطبق التوزيع المولَّد على الحقيقي <a class="cite" href="#ref-goodfellow2014">[2]</a>. وعملياً، التوازن غير مستقرّ، وأشيع العيوب هو <em>انهيار الأنماط</em>: فيجد المولّد بضع مُخرَجاتٍ تخدع المميّز ويكفّ عن التنويع.</p>
+
+<p>و<strong>نماذج الانتشار</strong> تسير على نحوٍ آخر: نضيف ضجيجاً إلى صورةٍ بخطواتٍ صغيرة حتّى الحصول على ضجيجٍ خالص، ونتعلّم عكس كلّ خطوة. فالتوليد هو الانطلاق من الضجيج وإزالته تدريجياً <a class="cite" href="#ref-ho2020">[3]</a>. والتدريب مستقرّ، والجودة ممتازة، لكنّ الإنتاج يتطلّب عشراتٍ إلى مئاتٍ من المرورات.</p>
+
+<h2>13.4 الانتباه والمحوّلات</h2>
+
+<p>كانت نماذج المتتاليات التكرارية تعالج العناصر واحداً واحداً، وهذا يمنع أيّ توازٍ ويجعل المعلومة تتلاشى على المسافات الطويلة. والانتباه يحلّ المشكلين معاً <a class="cite" href="#ref-vaswani2017">[4]</a>.</p>
+
+<div class="box def"><div class="box-title">تعريف &mdash; الانتباه بالجداء السلّمي المُصاغ بالسلّم</div>
+<div class="eq">\[\operatorname{Attention}(Q, K, V) = \operatorname{softmax}\!\left(\frac{QK^{\mathsf{T}}}{\sqrt{d_k}}\right) V\]</div>
+<p>كلّ موضعٍ يُنتج ثلاثة متّجهات من تمثيله: <em>استعلاماً</em> (ما يبحث عنه)، و<em>مفتاحاً</em> (ما يُوجَد به)، و<em>قيمةً</em> (ما ينقله). والجداء السلّمي بين الاستعلام والمفاتيح يقيس الملاءمة؛ والأُسّي المنظَّم يجعل منه توزيعاً مجموعه 1؛ والمُخرَج هو المتوسّط الموزون للقيم.</p></div>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 13.2 &mdash; الانتباه بالجداء السلّمي المُصاغ بالسلّم</div><div class="algo-io"><b>المُدخل:</b> \(Q \in \mathbb{R}^{m \times d_k}\)، وM26، وM27<br><b>المُخرج:</b> مصفوفةٌ من \(\mathbb{R}^{m \times d_v}\)</div><ol class="algo-corps"><li>\(\displaystyle S \leftarrow \frac{QK^{\mathsf{T}}}{\sqrt{d_k}}\)          <span class="cm">// والا تنمو النتائج مع d_k</span></li><li>\(S \leftarrow S - \max_{\text{ligne}} S\)          <span class="cm">// استقرار عددي</span></li><li>\(\displaystyle P_{ij} \leftarrow \frac{\exp(S_{ij})}{\sum_{j'} \exp(S_{ij'})}\)          <span class="cm">// مجموع كل سطر يساوي 1</span></li><li><b class="kw">أرجِع</b> \(PV\)</li></ol><p class="algo-note">كلّ موضعٍ يُنتج \(q\) وM34 وM35 بثلاثة تطبيقاتٍ خطّية متعلَّمة من التمثيل نفسه: ما يبحث عنه، وما يُوجَد به، وما ينقله. <strong>الكلفة:</strong> \(\Theta(m\,p\,d_k)\)، أي مربّع طول السياق.</p></div>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">خمس كلمات، كلٌّ منها مُمثَّلة بعددين. المؤشّر الأوّل يختار الكلمة التي «تنظر»، والثاني يضبط حدّة التوزيع.</p>
+<div id="jxg2" class="viz-board" style="height:480px;"></div>
+<p class="viz-caption"><strong>الشكل 13.4.</strong> كلمة «قطّ» تركّز 98 % من انتباهها على نفسها: فتمثيلها مختلف جدّاً عن غيرها. وفعلا «ينام» و«يأكل» يتقاسمان انتباههما، لتقارب تمثيليهما. غيّر الحدّة: فعند 1، يكون الانتباه شبه منتظم ولا تقدّم الآلية شيئاً؛ وعند 40، تتدهور إلى انتقاءٍ صارم. والقسمة على جذر البُعد تفيد بالضبط في إبقاء هذا الضبط في مجالٍ نافع حين يكبر البُعد.</p></div>
+
+<div class="box tip"><div class="box-title">ما ليس عليه الانتباه</div>
+كثيراً ما تُقدَّم خرائط الانتباه تفسيراتٍ لاستدلال النموذج. وذلك تجاوز: فأعمالٌ عديدة أظهرت أنّ بالإمكان تعديل أوزان الانتباه تعديلاً معتبراً دون تغيير التنبّؤ، وهذا يمنع قراءتها سبباً له <a class="cite" href="#ref-jain2019">[5]</a>. فالانتباه آليّة حسابٍ لا تبرير.</div>
+
+<h2>13.5 النماذج اللغوية الكبرى</h2>
+
+<p>النموذج اللغوي الكبير محوّلٌ انحداري ذاتي مدرَّب على كمّيةٍ هائلة من النصّ للتنبّؤ بالعنصر التالي. لا أكثر، على مستوى المبدأ. وملاحظتان تجريبيّتان تفسّران مسارها.</p>
+
+<div class="box thm"><div class="box-title">قوانين السلّم</div>
+<p>تتبع خسارةُ التدريب تقريباً قانونَ قوّةٍ بدلالة عدد الوسائط وكمّية البيانات والحساب المستثمَر، على عدّة رتبٍ من القدر <a class="cite" href="#ref-kaplan2020">[6]</a>. وهذه <em>انتظاماتٌ تجريبية</em>، لا مبرهنات: وقد صُحِّحت مرّةً من قبل، حين تبيّن أنّ نماذج تلك الحقبة كانت ناقصة التدريب بوضوحٍ في البيانات بالنسبة إلى حجمها <a class="cite" href="#ref-hoffmann2022">[7]</a>. ولا شيء يضمن امتدادها.</p></div>
+
+<div class="box warn"><div class="box-title">أربعة حدود ينبغي معرفتها بدقّة</div>
+<p><strong>الهدف هو الاحتمالية لا الحقيقة.</strong> فنموذجٌ مدرَّب على إنتاج نصٍّ معقول يُنتج نصّاً معقولاً، بما في ذلك حين يكون خاطئاً. وليس ذلك خللاً: بل هو بالضبط ما طُلِب.</p>
+<p><strong>لا فصل بين ما هو معلوم وما هو مُختلَق.</strong> فالنموذج لا يملك أيّ آليّةٍ داخلية تميّز واقعةً محفوظة من استيفاءٍ معقول.</p>
+<p><strong>تلوّث التقييمات.</strong> تغطّي بيانات التدريب جزءاً واسعاً من الويب؛ فيصير من الصعب جدّاً ضمان ألّا يرد فيها مرجعٌ تقييمي، وهذا يجعل كثيراً من النتائج المنشورة غير قابلةٍ للتأويل.</p>
+<p><strong>الجدل حول الفهم.</strong> يذهب بعضهم إلى أنّ التنبّؤ بالكلمة التالية عند هذا المستوى يقتضي لزوماً شكلاً من نموذجٍ للعالم؛ ويذهب آخرون إلى أنّ النظام يعالج صوراً بلا نفاذٍ إلى المعنى، وأنّ الاتّساق الظاهر آتٍ من القارئ الذي يؤوّل <a class="cite" href="#ref-bender2021">[8]</a>. والجدل لم يُحسَم، وهو امتدادٌ مباشر لجدل الغرفة الصينية في الفصل 1.</p></div>
+
+<h2>الخلاصة</h2>
+<ul>
+<li>يتعلّم النموذج التوليدي توزيعاً لا حدّاً: فيستطيع الإنتاج، وتقويم الشاذّ، والإتمام.</li>
+<li>يردّ التحليل السلسلي نمذجةَ متتاليةٍ بدقّة إلى التنبّؤ بالعنصر التالي، بمراقبةٍ مجّانية.</li>
+<li>الحرارة لا تغيّر النموذج، بل طريقة معاينته فقط.</li>
+<li>المرمّزات الذاتية التغايرية <a class="cite" href="#ref-kingma2014">[1]</a>، والنماذج التخاصمية <a class="cite" href="#ref-goodfellow2014">[2]</a>، والانتشار <a class="cite" href="#ref-ho2020">[3]</a> تعقد ثلاث مفاضلاتٍ مختلفة.</li>
+<li>يزن الانتباه المواضع بالجداء السلّمي؛ وليس ذلك تفسيراً للاستدلال <a class="cite" href="#ref-jain2019">[5]</a>.</li>
+<li>قوانين السلّم انتظاماتٌ تجريبية، صُحِّحت مرّةً من قبل <a class="cite" href="#ref-hoffmann2022">[7]</a>.</li>
+</ul>
+
+<h2>المراجع</h2>
+<ol class="reflist">
+<li id="ref-kingma2014">Kingma, D. P. &amp; Welling, M. (2014). Auto-encoding variational Bayes. <em>Proceedings of ICLR 2014</em>. arXiv&nbsp;: 1312.6114. <a href="https://arxiv.org/abs/1312.6114">https://arxiv.org/abs/1312.6114</a></li>
+<li id="ref-goodfellow2014">Goodfellow, I., Pouget-Abadie, J., Mirza, M. <em>et al.</em> (2014). Generative adversarial nets. <em>Advances in Neural Information Processing Systems 27</em>. <a href="https://papers.nips.cc/paper/5423-generative-adversarial-nets">https://papers.nips.cc/paper/5423-generative-adversarial-nets</a></li>
+<li id="ref-ho2020">Ho, J., Jain, A. &amp; Abbeel, P. (2020). Denoising diffusion probabilistic models. <em>Advances in Neural Information Processing Systems 33</em>. arXiv&nbsp;: 2006.11239. <a href="https://arxiv.org/abs/2006.11239">https://arxiv.org/abs/2006.11239</a></li>
+<li id="ref-vaswani2017">Vaswani, A., Shazeer, N., Parmar, N. <em>et al.</em> (2017). Attention is all you need. <em>Advances in Neural Information Processing Systems 30</em>. arXiv&nbsp;: 1706.03762. <a href="https://arxiv.org/abs/1706.03762">https://arxiv.org/abs/1706.03762</a></li>
+<li id="ref-jain2019">Jain, S. &amp; Wallace, B. C. (2019). Attention is not explanation. <em>Proceedings of NAACL-HLT 2019</em>, 3543&ndash;3556. DOI: 10.18653/v1/N19-1357. <a href="https://doi.org/10.18653/v1/N19-1357">https://doi.org/10.18653/v1/N19-1357</a></li>
+<li id="ref-kaplan2020">Kaplan, J., McCandlish, S., Henighan, T. <em>et al.</em> (2020). Scaling laws for neural language models. arXiv&nbsp;: 2001.08361. <a href="https://arxiv.org/abs/2001.08361">https://arxiv.org/abs/2001.08361</a></li>
+<li id="ref-hoffmann2022">Hoffmann, J., Borgeaud, S., Mensch, A. <em>et al.</em> (2022). Training compute-optimal large language models. arXiv&nbsp;: 2203.15556. <a href="https://arxiv.org/abs/2203.15556">https://arxiv.org/abs/2203.15556</a></li>
+<li id="ref-bender2021">Bender, E. M., Gebru, T., McMillan-Major, A. &amp; Shmitchell, S. (2021). On the dangers of stochastic parrots: can language models be too big? <em>Proceedings of FAccT 2021</em>, 610&ndash;623. DOI: 10.1145/3442188.3445922. <a href="https://doi.org/10.1145/3442188.3445922">https://doi.org/10.1145/3442188.3445922</a></li>
+<li id="ref-shannon1948">Shannon, C. E. (1948). A mathematical theory of communication. <em>Bell System Technical Journal</em>, 27(3), 379&ndash;423. DOI: 10.1002/j.1538-7305.1948.tb01338.x. <a href="https://doi.org/10.1002/j.1538-7305.1948.tb01338.x">https://doi.org/10.1002/j.1538-7305.1948.tb01338.x</a></li>
+</ol>
+
+<section class="src-ar">
+<h3>مصادر بالعربية</h3>
+<p class="src-note">مصادر للاستزادة، لا مراجع لما ورد أعلاه: المراجع الأصلية للفصل مذكورةٌ في القائمة السابقة بلغتها. وقد عُوينت كلّ صفحةٍ من صفحات الناشرين للتحقّق من العنوان والمترجم ورخصة الإتاحة.</p>
+<ul>
+<li>بودن، مارجريت إيه. <em>الذكاء الاصطناعي: مقدّمة قصيرة جدًّا</em>. ترجمة إبراهيم سند أحمد، مراجعة هاني فتحي سليمان. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). نحو 43 ألف كلمة، متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/48149074/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/48149074/</a><span class="pourquoi">أقرب كتابٍ عربيٍّ مجّاني إلى روح الفصل الأوّل: التعريفات، والتاريخ، والحدود، والنقاش الفلسفي.</span></li>
+<li>هولمز، دون إي. <em>البيانات الضخمة: مقدّمة قصيرة جدًّا</em>. ترجمة أحمد عبد المنعم، مراجعة هبة عبد المولى أحمد. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/70929638/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/70929638/</a><span class="pourquoi">يضع البيانات التي تتغذّى عليها هذه الطرائق في سياقها، ويناقش حدودها الأخلاقية.</span></li>
+<li>فلوريدي، لوتشانو. <em>المعلومات: مقدّمة قصيرة جدًّا</em>. ترجمة محمد سعد طنطاوي، مراجعة علا عبد الفتاح يس. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/29257536/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/29257536/</a><span class="pourquoi">يقدّم بالعربية مفهوم المعلومة والإنتروبيا، وهو الأساس الذي تستند إليه مقاييس هذا الفصل.</span></li>
+</ul>
+</section>
+<p>وفكرة توليد النصّ بسحب الحرف التالي حسب التواترات المرصودة &mdash; وهي بالضبط الشكل 13.2 &mdash; واردةٌ أصلاً في المقال المؤسِّس لنظرية المعلومة <a class="cite" href="#ref-shannon1948">[9]</a>، سنة 1948.</p>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../12-renforcement/page.html">\(\leftarrow\) الفصل 12 &mdash; التعلّم بالتعزيز</a>
+<a href="../../../IA/lecons/13-generative/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">المُلحَق الخوارزمي</a>
+<a href="../../index.html">فهرس المُقرَّر</a>
+<a href="../14-ethique/page.html">الفصل 14 &mdash; الأخلاقيات والمجتمع \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>الذكاء الاصطناعي &mdash; الأقسام التحضيرية MP/PSI</strong> &middot; البحث والألعاب والقيود والتعلّم<span class="footer-meta">طبعة 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">تعذّر تحميل الشكل التفاعلي. تحقّق من اتصالك بالشبكة.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ======= Figure : echantillonnage d'un modele de langue caractere par caractere === */
+/* Modele bigramme appris sur un petit corpus francais fixe. */
+var CORPUS = "القط ينام على البساط. الفأر يأكل الجبن. الكلب يجري في الحديقة. "
+           + "الفأر ينام في البساط. القط يأكل الفأر. الكلب ينام على البساط. "
+           + "البنت تقرأ الكتاب. الكتاب يتكلم عن البحر. البحر أزرق والبحر كبير.";
+var ALPHA = (function(){
+  var vus = {}, l = [];
+  for (var i = 0; i < CORPUS.length; i++){ if (!vus[CORPUS[i]]) { vus[CORPUS[i]] = true; l.push(CORPUS[i]); } }
+  l.sort();
+  return l;
+})();
+var IDX = {};
+for (var i = 0; i < ALPHA.length; i++){ IDX[ALPHA[i]] = i; }
+var N = ALPHA.length;
+var COMPTES = (function(){
+  var m = [];
+  for (var a = 0; a < N; a++){ var r = []; for (var b = 0; b < N; b++){ r.push(0); } m.push(r); }
+  for (var k = 0; k + 1 < CORPUS.length; k++){
+    m[IDX[CORPUS[k]]][IDX[CORPUS[k+1]]]++;
+  }
+  return m;
+})();
+function proba(a, temperature, lissage){
+  var p = [], somme = 0, b;
+  for (b = 0; b < N; b++){
+    var c = COMPTES[a][b] + lissage;
+    p.push(c);
+    somme += c;
+  }
+  for (b = 0; b < N; b++){ p[b] = p[b] / somme; }
+  if (Math.abs(temperature - 1) > 1e-9){
+    var s2 = 0;
+    for (b = 0; b < N; b++){ p[b] = Math.pow(p[b], 1 / temperature); s2 += p[b]; }
+    for (b = 0; b < N; b++){ p[b] = p[b] / s2; }
+  }
+  return p;
+}
+function aleaG(g){ var s = g; return function(){ s = (s*1103515245+12345)%2147483648; return s/2147483648; }; }
+function engendrer(temperature, lissage, longueur, graine){
+  var rnd = aleaG(graine), a = IDX['ا'], sortie = 'ا';
+  for (var k = 0; k < longueur; k++){
+    var p = proba(a, temperature, lissage), u = rnd(), cum = 0, b = N - 1;
+    for (var j = 0; j < N; j++){ cum += p[j]; if (u <= cum){ b = j; break; } }
+    sortie += ALPHA[b];
+    a = b;
+  }
+  return sortie;
+}
+/* Perplexite du modele sur le corpus : mesure objective de la qualite. */
+function perplexite(lissage){
+  var somme = 0, n = 0;
+  for (var k = 0; k + 1 < CORPUS.length; k++){
+    var p = proba(IDX[CORPUS[k]], 1, lissage);
+    somme += -Math.log(Math.max(1e-12, p[IDX[CORPUS[k+1]]]));
+    n++;
+  }
+  return Math.exp(somme / n);
+}
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-0.06, 1.28, 1.06, -0.62], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sTemp = b1.create('slider', [[0.02, -0.16], [0.46, -0.16], [0.2, 1.0, 2.5]], {
+  name: 'temperature', snapWidth: 0.1, precision: 1,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }}
+});
+var sLiss = b1.create('slider', [[0.56, -0.16], [1.00, -0.16], [0.0, 0.10, 2.0]], {
+  name: 'lissage', snapWidth: 0.05, precision: 2,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sGr = b1.create('slider', [[0.02, -0.38], [0.46, -0.38], [1, 3, 12]], {
+  name: 'tirage', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function temp13(){ return Math.round(sTemp.Value() * 10) / 10; }
+function liss13(){ return Math.round(sLiss.Value() * 20) / 20; }
+function gr13(){ return Math.round(sGr.Value()) * 7919 + 11; }
+b1.create('text', [-0.05, 1.22, function(){
+  return 'Temperature ' + temp13().toFixed(1) + '   |   تنعيم ' + liss13().toFixed(2)
+       + '   |   حيرة النموذج على متنه: ' + perplexite(liss13()).toFixed(2)
+       + ' (على ' + N + ' حرفا ممكنا)';
+}], {fontSize: 13, strokeColor: PAL.text, fixed: true, highlight: false});
+for (var ligne = 0; ligne < 4; ligne++){
+  (function(l){
+    b1.create('text', [-0.05, 1.06 - l * 0.13, function(){
+      var t = engendrer(temp13(), liss13(), 240, gr13() + l * 37);
+      return t.slice(l * 60, (l + 1) * 60);
+    }], {fontSize: 15, fixed: true, highlight: false,
+         strokeColor: function(){ return cssv('--primary-dark', '#014a55'); }});
+  })(ligne);
+}
+b1.create('text', [-0.05, 0.44, function(){
+  if (temp13() < 0.5) { return 'حرارة منخفضة: يكرر النموذج المتتاليات الاكثر تواترا، بلا مفاجأة.'; }
+  if (temp13() > 1.7) { return 'حرارة مرتفعة: تصير الحروف النادرة محتملة، فيتفكك النص.'; }
+  return 'حرارة متوسطة: مفاضلة بين الوفاء للمتن والتنويع.';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-0.05, 0.30, function(){
+  if (liss13() < 0.02) { return 'تنعيم منعدم: لا تكون ممكنة الا الانتقالات المرصودة في المتن؛ فلا يستطيع النموذج اختلاق شيء.'; }
+  if (liss13() > 1.0) { return 'تنعيم قوي: تصير كل الانتقالات شبه متساوية الاحتمال، فينسى النموذج ما تعلمه.'; }
+  return 'تنعيم معتدل: تبقى الانتقالات التي لم ترصد ممكنة، لكنها نادرة.';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-0.05, -0.56,
+  'نموذج ثنائي الحروف على متن من 190 حرفا: ابسط النماذج اللغوية، وفيه اصلا الضبوط نفسها التي في نموذج كبير.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+/* ======= Figure : l'attention, calculee sur un exemple minuscule ========== */
+var MOTS = ['ال', 'chat', 'qui', 'dort', 'mange'];
+/* vecteurs a 2 dimensions, choisis a la main pour que l'exemple parle */
+var VEC = {
+  'ال':    [0.10, 0.05],
+  'chat':  [0.90, 0.20],
+  'qui':   [0.15, 0.30],
+  'dort':  [0.25, 0.85],
+  'mange': [0.35, 0.80]
+};
+function attention(iRequete, echelle){
+  var q = VEC[MOTS[iRequete]], scores = [], somme = 0, k;
+  for (k = 0; k < MOTS.length; k++){
+    var v = VEC[MOTS[k]];
+    scores.push(Math.exp(echelle * (q[0]*v[0] + q[1]*v[1])));
+  }
+  for (k = 0; k < MOTS.length; k++){ somme += scores[k]; }
+  for (k = 0; k < MOTS.length; k++){ scores[k] = scores[k] / somme; }
+  return scores;
+}
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-1.6, 6.0, 6.6, -2.6], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sReq = b2.create('slider', [[-1.2, -1.3], [1.6, -1.3], [0, 4, 4]], {
+  name: 'الكلمة الراهنة', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sEch = b2.create('slider', [[2.8, -1.3], [6.4, -1.3], [1, 12, 40]], {
+  name: 'nettete', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function req(){ return Math.round(sReq.Value()); }
+function ech(){ return Math.round(sEch.Value()); }
+for (var m = 0; m < MOTS.length; m++){
+  (function(k){
+    b2.create('curve', [[k*1.2, k*1.2+1.0, k*1.2+1.0, k*1.2, k*1.2],
+                        [2.0, 2.0, 2.7, 2.7, 2.0]], {
+      strokeWidth: function(){ return k === req() ? 3 : 1.4; },
+      strokeColor: function(){ return k === req() ? cssv('--primary','#026573') : PAL.axis(); },
+      fillColor: function(){ return cssv('--primary', '#026573'); },
+      fillOpacity: function(){ return attention(req(), ech())[k] * 0.9; },
+      highlight: false, fixed: true});
+    b2.create('text', [k*1.2 + 0.5, 2.35, MOTS[k]], {fontSize: 14, anchorX: 'middle',
+      anchorY: 'middle', strokeColor: PAL.text, fixed: true, highlight: false});
+    b2.create('text', [k*1.2 + 0.5, 1.72, function(){
+      return (100 * attention(req(), ech())[k]).toFixed(0) + ' %';
+    }], {fontSize: 13, anchorX: 'middle', fixed: true, highlight: false,
+         strokeColor: function(){ return cssv('--primary-dark', '#014a55'); }});
+    /* barre de poids */
+    b2.create('curve', [
+      function(){ return [k*1.2 + 0.1, k*1.2 + 0.1 + 0.8 * attention(req(), ech())[k],
+                          k*1.2 + 0.1 + 0.8 * attention(req(), ech())[k], k*1.2 + 0.1, k*1.2 + 0.1]; },
+      function(){ return [0.9, 0.9, 1.3, 1.3, 0.9]; }], {
+      strokeWidth: 0, fillColor: function(){ return cssv('--accent', '#f59e0b'); },
+      fillOpacity: 0.8, highlight: false, fixed: true});
+  })(m);
+}
+b2.create('text', [-1.5, 5.6, function(){
+  return 'الكلمة الراهنة: ' + MOTS[req()]
+       + '   |   حدة ' + ech()
+       + '   |   النسب المئوية مجموعها 100: فهي توزيع للانتباه.';
+}], {fontSize: 14, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-1.5, 5.1, function(){
+  var a = attention(req(), ech()), best = 0;
+  for (var k = 1; k < MOTS.length; k++){ if (a[k] > a[best]) { best = k; } }
+  return 'الكلمة الاكثر نظرا هي « ' + MOTS[best] + ' » بنسبة ' + (100*a[best]).toFixed(0) + ' %.';
+}], {fontSize: 13, fixed: true, highlight: false,
+     strokeColor: function(){ return cssv('--primary','#026573'); }});
+b2.create('text', [-1.5, 4.6, function(){
+  if (ech() <= 3) { return 'حدة ضعيفة: يتوزع الانتباه شبه منتظم، فلا تقدم الآلية شيئا.'; }
+  if (ech() >= 30) { return 'حدة قوية: يتركز الانتباه على كلمة واحدة، كانتقاء صارم.'; }
+  return 'حدة متوسطة: تهيمن بضع كلمات، وتساهم الاخرى قليلا.';
+}], {fontSize: 12.5, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-1.5, -2.0,
+  'كل كلمة ممثلة هنا بعددين فقط؛ ونموذج حقيقي يستعمل آلافا منها.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-1.5, -2.4,
+  'الحساب هو نفسه: جداء سلمي، وصياغة بالسلم، واسي منظم.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

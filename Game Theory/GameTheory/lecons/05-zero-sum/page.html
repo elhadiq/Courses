@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 5 &mdash; Zero-Sum Games and the Minimax Theorem</title>
+<meta name="description" content="Pure conflict, security levels, the value of a game, and its link to linear programming.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; justify-content: space-between; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz { margin: 26px 0; }
+.viz-title { font-weight: 700; color: var(--primary); font-size: 0.98rem; margin-bottom: 10px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 12px 0 0; border-top: 1px solid var(--color-rule); padding-top: 10px; }
+.viz svg { max-width: 100%; height: auto; }
+.payoff { display: inline-block !important; border-collapse: collapse; margin: 0 auto; }
+.payoff th, .payoff td { border: 1px solid var(--color-rule); padding: 9px 18px; text-align: center; }
+.payoff thead th { background: var(--primary-soft); color: var(--color-text); }
+.payoff th.corner { background: var(--primary); color: #fff; font-size: 0.82rem; font-weight: 600; }
+.payoff tbody th { background: var(--primary-soft); text-align: left; }
+.payoff td { font-family: var(--font-mono); font-size: 0.98rem; }
+.glossary th:first-child, .glossary td:first-child { white-space: nowrap; font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Game Theory</a> &middot; Chapter 05</div><span class="course-code">Part II &middot; Equilibrium</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Part II &middot; Equilibrium &middot; Chapter 5</div>
+<h1>Chapter 5 &mdash; Zero-Sum Games and the Minimax Theorem</h1>
+<div class="lesson-sub">Pure conflict, security levels, the value of a game, and its link to linear programming.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">What you will be able to do</div><ul><li>Recognise a zero-sum game and write it with a single payoff matrix.</li><li>Compute maximin and minimax values and locate a saddle point when one exists.</li><li>State the minimax theorem and its consequences: unique value and interchangeable equilibria.</li><li>Solve a 2x2 zero-sum game by equalising, obtaining both optimal mixtures and the value.</li><li>Explain why zero-sum equilibria are computable by linear programming.</li></ul></div>
+
+<h2>1. Pure conflict</h2>
+<p>A two-player game is <strong>zero-sum</strong> (or strictly competitive) if the payoffs in every cell add to zero: \(u_2(s) = -u_1(s)\) for all \(s\). Nothing is lost by adding a constant, so 'constant-sum' games behave identically. In such games there is nothing to negotiate: every gain of mine is exactly your loss. Poker between two players, penalty kicks, and the classical model of a military engagement are the standard examples. Because one payoff table determines everything, we write only player 1's payoffs and call player 1 the <em>maximiser</em> and player 2 the <em>minimiser</em>.</p>
+
+<h2>2. Security levels: maximin and minimax</h2>
+<p>Write \(a_{ij}\) for player 1's payoff in row \(i\), column \(j\). Ask a cautious question: if I choose row \(i\), what is the worst that can happen to me? The worst is \(\min_j a_{ij}\). The best I can guarantee, whatever the opponent does, is the largest of these minima.</p>
+<div class="eq">\[ \underline{v} \;=\; \max_i \min_j a_{ij} \qquad\text{(maximin, player 1's security level)} \]</div><div class="eq">\[ \overline{v} \;=\; \min_j \max_i a_{ij} \qquad\text{(minimax, player 2's security level)} \]</div><div class="eq">\[ \text{and always}\quad \underline{v} \;\le\; \overline{v}. \]</div>
+<p>The inequality is easy to see and worth internalising: the player who must commit second has an advantage, so being able to react cannot hurt. When the two coincide, the common value is called the <strong>value</strong> of the game, and the cell that achieves it is a <strong>saddle point</strong>.</p>
+<figure class="viz"><div class="viz-title">A game with a saddle point (player 1's payoffs)</div><div style="text-align:center;overflow-x:auto;"><table class="payoff"><thead><tr><th class="corner">Player 1 \ Player 2</th><th>X</th><th>Y</th><th>Z</th></tr></thead><tbody><tr><th>A</th><td>4</td><td>3</td><td>5</td></tr><tr><th>B</th><td>2</td><td>1</td><td>6</td></tr><tr><th>C</th><td>3</td><td>0</td><td>7</td></tr></tbody></table></div><p class="viz-caption">Row minima are 3, 1, 0 so the maximin is 3 at row A. Column maxima are 4, 3, 7 so the minimax is 3 at column Y. They agree: the value is 3 and (A, Y) is a saddle point - and a Nash equilibrium in pure strategies.</p></figure>
+
+<h2>3. The minimax theorem</h2>
+<p>Most zero-sum games have no saddle point in pure strategies - Matching Pennies has \(\underline{v} = -1\) and \(\overline{v} = +1\). Von Neumann's theorem (1928) says that the gap always closes once mixing is allowed.</p>
+<div class="box thm"><div class="box-title">Theorem &mdash; minimax (von Neumann, 1928)</div><p style='margin:0;'>For every finite two-player zero-sum game,</p><div class="eq">\[ \max_{\sigma_1 \in \Delta(S_1)} \min_{\sigma_2 \in \Delta(S_2)} u_1(\sigma_1, \sigma_2) \;=\; \min_{\sigma_2 \in \Delta(S_2)} \max_{\sigma_1 \in \Delta(S_1)} u_1(\sigma_1, \sigma_2) \;=\; v. \]</div><p style='margin:0;'>The number \(v\) is the <strong>value</strong> of the game; each player has an optimal mixed strategy guaranteeing it.</p></div>
+<p>This is the sharpest result in the subject, and it predates Nash by more than twenty years. Its consequences are strong. In a zero-sum game <em>all</em> Nash equilibria give the same payoffs, namely \(v\); equilibrium strategies are <em>interchangeable</em>, so if \((\sigma, \tau)\) and \((\sigma', \tau')\) are both equilibria then so are \((\sigma, \tau')\) and \((\sigma', \tau)\); and there is no coordination problem at all. None of these properties survive outside the zero-sum world - which is exactly why non-zero-sum games are harder.</p>
+
+<h2>4. Solving a 2x2 zero-sum game</h2>
+<figure class="viz"><div class="viz-title">No saddle point (player 1's payoffs)</div><div style="text-align:center;overflow-x:auto;"><table class="payoff"><thead><tr><th class="corner">Player 1 \ Player 2</th><th>Left</th><th>Right</th></tr></thead><tbody><tr><th>Top</th><td>3</td><td>-1</td></tr><tr><th>Bottom</th><td>-2</td><td>4</td></tr></tbody></table></div><p class="viz-caption">Row minima \(-1\) and \(-2\) give \(\underline{v} = -1\); column maxima 3 and 4 give \(\overline{v} = 3\). The gap must be closed by mixing.</p></figure>
+<p>Let player 1 play Top with probability \(p\). Player 2 will play whichever column is worse for player 1, so player 1 chooses \(p\) to equalise the two columns:</p>
+<div class="eq">\[ \underbrace{3p - 2(1-p)}_{\text{against Left}} = \underbrace{-p + 4(1-p)}_{\text{against Right}} \;\Longleftrightarrow\; 5p - 2 = 4 - 5p \;\Longleftrightarrow\; p = 0.6, \]</div><div class="eq">\[ \text{guaranteeing } \; 3(0.6) - 2(0.4) = 1. \]</div>
+<p>Let player 2 play Left with probability \(q\), chosen to equalise player 1's two rows: \(3q - (1-q) = -2q + 4(1-q)\), that is \(4q - 1 = 4 - 6q\), giving \(q = 0.5\), and player 1's payoff is again \(1\). The two computations agreeing at \(1\) is the minimax theorem in action: the value of the game is \(\mathbf{v = 1}\), favouring player 1.</p>
+
+<h2>5. Linear programming and duality</h2>
+<p>Finding the value is a linear program. Player 1 solves</p>
+<div class="eq">\[ \max_{p,\,v} \; v \quad \text{subject to} \quad \sum_i p_i a_{ij} \ge v \;\; \forall j, \qquad \sum_i p_i = 1, \qquad p_i \ge 0, \]</div><div class="eq">\[ \text{while player 2 solves} \quad \min_{q,\,w} \; w \quad \text{subject to} \quad \sum_j q_j a_{ij} \le w \;\; \forall i, \qquad \sum_j q_j = 1, \qquad q_j \ge 0. \]</div>
+<p>The second problem is exactly the <strong>dual</strong> of the first. The minimax theorem is therefore equivalent to LP strong duality, and any LP solver computes the value and optimal strategies in polynomial time. This is a striking contrast with general non-zero-sum games, where equilibrium computation is PPAD-complete: <em>pure conflict is computationally easy; mixed motives are hard</em>.</p>
+
+<h2>6. A caution about applying zero-sum thinking</h2>
+<div class="box warn"><div class="box-title">Careful</div><p>Real interactions are rarely zero-sum, and treating them as if they were is a well-documented error. Trade, negotiation, and most workplace conflicts contain joint gains that the zero-sum frame makes invisible. Before importing the minimax machinery, check that payoffs really do sum to a constant in every cell.</p></div>
+
+<h2>Glossary</h2>
+<table class="glossary"><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Zero-sum game</td><td>A two-player game whose payoffs sum to zero (or a constant) in every cell.</td></tr><tr><td>Security level</td><td>The payoff a player can guarantee regardless of the opponent's choice.</td></tr><tr><td>Maximin</td><td>\(\underline{v} = \max_i \min_j a_{ij}\); player 1's security level.</td></tr><tr><td>Minimax</td><td>\(\overline{v} = \min_j \max_i a_{ij}\); player 2's security level.</td></tr><tr><td>Saddle point</td><td>A cell that is simultaneously the minimum of its row and the maximum of its column.</td></tr><tr><td>Value of the game</td><td>The common maximin and minimax payoff guaranteed by the minimax theorem.</td></tr><tr><td>Interchangeability</td><td>In zero-sum games, mixing and matching optimal strategies from different equilibria still gives an equilibrium.</td></tr></tbody></table>
+<div class="keypoints"><h3>Check your understanding</h3><ol><li>What is always true of the maximin compared to the minimax? <span style='color:var(--color-muted);'>(Answer: \(\underline{v} \le \overline{v}\))</span></li><li>In the 3x3 example, what is the value and where is the saddle point? <span style='color:var(--color-muted);'>(Answer: \(v = 3\), at \((A, Y)\))</span></li><li>In the 2x2 example, what is \(p\) and what is the value? <span style='color:var(--color-muted);'>(Answer: \(p = 0.6\) and \(v = 1\))</span></li><li>Why is a zero-sum equilibrium computationally easy to find? <span style='color:var(--color-muted);'>(Answer: It is a linear program, and the minimax theorem is LP duality)</span></li></ol></div>
+<div class="box tip"><div class="box-title">Practice</div><p>The chapter quiz asks you to compute row minima and column maxima, decide whether a saddle point exists, solve a 2x2 game by equalising, and identify which properties are special to zero-sum games.</p></div>
+</main>
+<nav class="lesson-nav"><a href="../04-mixed-strategies/page.html">&larr; Chapter 04 &middot; Mixed Strategies and Nash's Existence Theorem</a><a href="../06-extensive-form/page.html">Chapter 06 &middot; Extensive-Form Games, Backward Induction and Subgame Perfection &rarr;</a></nav>
+<footer class="site-footer"><strong>Game Theory &mdash; complete handbook</strong> &middot; Strategy, equilibrium, information and design<span class="footer-meta">Edition 2025-2026</span></footer>
+</body></html>

@@ -1,0 +1,104 @@
+<style>
+.gt{--primary:#026573;--primary-dark:#014a55;--primary-light:#2a8c9a;--primary-soft:#e6f1f3;
+ --primary-soft-2:#d0e4e8;--accent:#f59e0b;--color-text:#1f2937;--color-muted:#6b7280;
+ --color-rule:#e2e8eb;--box-bg:#fff;--def-bg:#e6f1f3;--def-br:#026573;--def-fg:#014a55;
+ --thm-bg:#f5f1ff;--thm-br:#7c3aed;--thm-fg:#6d28d9;--prop-bg:#eff6ff;--prop-br:#2563eb;
+ --prop-fg:#1d4ed8;--method-bg:#ecfdf5;--method-br:#059669;--method-fg:#047857;
+ --warn-bg:#fef2f2;--warn-br:#dc2626;--warn-fg:#b91c1c;--tip-bg:#fffbeb;--tip-br:#f59e0b;
+ --tip-fg:#b45309;--example-bg:#f8fafc;--example-br:#64748b;--example-fg:#475569;
+ --viz-axis:#94a3b8;--viz-bad:#dc2626;--radius:10px;
+ --font-serif:"Source Serif Pro","Iowan Old Style",Georgia,serif;
+ --font-sans:"Inter",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+ --font-mono:"JetBrains Mono","SF Mono",Consolas,monospace;
+ font-family:var(--font-serif);color:var(--color-text);line-height:1.75;font-size:1.02rem;
+ max-width:900px;margin:0 auto;}
+.gt h1,.gt h2,.gt h3{font-family:var(--font-sans);color:var(--primary-dark);line-height:1.3;}
+.gt h2{font-size:1.42rem;margin:1.9em 0 .7em;padding-bottom:.3em;
+ border-bottom:2px solid var(--primary-soft-2);}
+.gt h3{font-size:1.14rem;margin:1.5em 0 .5em;}
+.gt p{margin:0 0 1em;}
+.gt ul,.gt ol{margin:0 0 1em;padding-left:1.4em;}
+.gt li{margin-bottom:.4em;}
+.gt a{color:var(--primary);}
+.gt .lead{border-left:4px solid var(--primary);background:var(--primary-soft);
+ padding:14px 20px;border-radius:0 var(--radius) var(--radius) 0;margin:0 0 1.6em;}
+.gt .lead .lead-label{font-family:var(--font-sans);font-size:.74rem;letter-spacing:.09em;
+ text-transform:uppercase;font-weight:700;color:var(--primary-dark);display:block;margin-bottom:4px;}
+.gt .lead h1{font-size:1.6rem;margin:0 0 6px;}
+.gt .lead .lead-sub{color:var(--color-muted);font-size:.97rem;margin:0;}
+.gt .box{background:var(--box-bg);border:1px solid var(--color-rule);border-left-width:4px;
+ border-radius:var(--radius);padding:14px 20px;margin:1.4em 0;}
+.gt .box>.box-title{font-family:var(--font-sans);font-weight:700;font-size:.95rem;margin-bottom:6px;}
+.gt .box>*:last-child{margin-bottom:0;}
+.gt .box.def{background:var(--def-bg);border-left-color:var(--def-br);}
+.gt .box.def>.box-title{color:var(--def-fg);}
+.gt .box.thm{background:var(--thm-bg);border-left-color:var(--thm-br);}
+.gt .box.thm>.box-title{color:var(--thm-fg);}
+.gt .box.prop{background:var(--prop-bg);border-left-color:var(--prop-br);}
+.gt .box.prop>.box-title{color:var(--prop-fg);}
+.gt .box.method{background:var(--method-bg);border-left-color:var(--method-br);}
+.gt .box.method>.box-title{color:var(--method-fg);}
+.gt .box.warn{background:var(--warn-bg);border-left-color:var(--warn-br);}
+.gt .box.warn>.box-title{color:var(--warn-fg);}
+.gt .box.tip{background:var(--tip-bg);border-left-color:var(--tip-br);}
+.gt .box.tip>.box-title{color:var(--tip-fg);}
+.gt .box.example{background:var(--example-bg);border-left-color:var(--example-br);}
+.gt .box.example>.box-title{color:var(--example-fg);}
+.gt .eq{margin:1.1em 0;overflow-x:auto;text-align:center;}
+.gt .keypoints{background:var(--primary-soft);border:1px solid var(--primary-soft-2);
+ border-radius:var(--radius);padding:16px 22px;margin:2em 0;}
+.gt .keypoints h3{margin-top:0;}
+.gt .viz{margin:1.6em 0;}
+.gt .viz-title{font-family:var(--font-sans);font-weight:700;color:var(--primary);
+ font-size:.95rem;margin-bottom:8px;}
+.gt .viz-caption{color:var(--color-muted);font-size:.9rem;margin:10px 0 0;
+ border-top:1px solid var(--color-rule);padding-top:9px;}
+.gt table{border-collapse:collapse;width:100%;font-size:.96rem;margin:0;}
+.gt th,.gt td{border:1px solid var(--color-rule);padding:8px 14px;text-align:left;
+ vertical-align:top;}
+.gt thead th{background:var(--primary-soft);}
+.gt .payoff{width:auto;margin:0 auto;}
+.gt .payoff th,.gt .payoff td{text-align:center;}
+.gt .payoff th.corner{background:var(--primary);color:#fff;font-size:.8rem;}
+.gt .payoff tbody th{background:var(--primary-soft);text-align:left;}
+.gt .payoff td{font-family:var(--font-mono);}
+.gt .glossary td:first-child{white-space:nowrap;font-weight:600;}
+.gt svg{max-width:100%;height:auto;}
+</style>
+<div class="gt">
+<div class="lead"><span class="lead-label">Part II &middot; Equilibrium &middot; Chapter 3</span><h1>Nash Equilibrium in Pure Strategies</h1><p class="lead-sub">The central solution concept: mutual best responses, and what it does and does not promise.</p></div>
+<div class="box method"><div class="box-title">What you will be able to do</div><ul><li>State the definition of Nash equilibrium and verify a candidate profile from the definition.</li><li>Find all pure Nash equilibria of a matrix game with the underline method.</li><li>Explain why a Nash equilibrium can be Pareto dominated, using the Prisoner's Dilemma.</li><li>Derive best-response functions and solve the Cournot duopoly for its equilibrium quantities.</li><li>Discuss multiplicity, focal points, and the correctness-of-beliefs assumption.</li></ul></div>
+
+<h2>1. The idea: no regrets, given what the others did</h2>
+<p>Dominance solves few games. We need a concept that applies everywhere. John Nash's answer (1950) is disarmingly simple: look for a strategy profile at which <strong>no single player, acting alone, would want to change their strategy</strong>, taking everyone else's strategy as given.</p>
+<div class="box def"><div class="box-title">Definition - Nash equilibrium</div><p style='margin:0;'>A profile \(s^{*} = (s_1^{*}, \dots, s_n^{*})\) is a <strong>Nash equilibrium</strong> if for every player \(i\) and every alternative \(s_i\):</p><div class="eq">\[ u_i(s_i^{*},\, s_{-i}^{*}) \;\ge\; u_i(s_i,\, s_{-i}^{*}). \]</div><p style='margin:0;'>Equivalently: \(s_i^{*} \in BR_i(s_{-i}^{*})\) for every \(i\) - every player's strategy is a best response to the others' strategies.</p></div>
+<p>Three readings help. As a <em>stability</em> condition: if the profile were somehow reached, nobody has a private reason to move away. As a <em>consistency of beliefs</em> condition: each player is optimising against a correct forecast of the others. As a <em>self-enforcing agreement</em>: if the players could talk before playing but could not sign a binding contract, only a Nash profile could survive the conversation - any other suggestion contains at least one player with a private incentive to break the deal.</p>
+
+<h2>2. Finding pure equilibria in a matrix: the underline method</h2>
+<p>For each column, underline the row player's largest payoff; for each row, underline the column player's largest. A cell with both numbers underlined is a Nash equilibrium in pure strategies. The procedure is nothing more than the definition applied cell by cell, but doing it mechanically prevents mistakes.</p>
+<figure class="viz"><div class="viz-title">Battle of the Sexes</div><div style="text-align:center;overflow-x:auto;"><table class="payoff"><thead><tr><th class="corner">Alex \ Bailey</th><th>Opera</th><th>Football</th></tr></thead><tbody><tr><th>Opera</th><td>2, 1</td><td>0, 0</td></tr><tr><th>Football</th><td>0, 0</td><td>1, 2</td></tr></tbody></table></div><p class="viz-caption">Two pure equilibria: (Opera, Opera) and (Football, Football).</p></figure>
+<p>Check (Opera, Opera): Alex switching to Football drops from 2 to 0; Bailey switching drops from 1 to 0. Neither deviates, so it is an equilibrium. The same argument works at (Football, Football). The off-diagonal cells are not equilibria: at (Opera, Football) both get 0 and either could improve alone.</p>
+<div class="box warn"><div class="box-title">Careful</div><p><strong>Multiplicity is the norm, not the exception.</strong> Battle of the Sexes has two pure equilibria (and a third in mixed strategies, Chapter 4). Nash equilibrium tells you which profiles are stable; it does not tell you which one gets played. That gap is filled by conventions, communication, focal points (Schelling), or refinements such as subgame perfection.</p></div>
+
+<h2>3. Equilibrium need not be efficient</h2>
+<p>The Prisoner's Dilemma has the unique Nash equilibrium (Defect, Defect) with payoffs (1, 1), while (3, 3) is available. So a Nash equilibrium can be <strong>Pareto dominated</strong> - there can be another outcome that every player strictly prefers. Nash equilibrium is a positive concept (what will happen), not a normative one (what should happen). Much of applied economics is the study of institutions that change the game so that its equilibrium becomes efficient.</p>
+
+<h2>4. Continuous strategies: the Cournot duopoly</h2>
+<p>Strategies need not be finite. Two firms simultaneously choose quantities \(q_1\) and \(q_2\) of an identical good. The market price falls with total output: \(P = a - (q_1 + q_2)\). Each firm has constant unit cost \(c\). Firm 1's profit is</p>
+<div class="eq">\[ \pi_1(q_1, q_2) = \bigl[\, a - q_1 - q_2 - c \,\bigr] \, q_1. \]</div>
+<p>Differentiate with respect to \(q_1\), holding \(q_2\) fixed - this is exactly the 'best response' operation - and set the derivative to zero: \(\partial \pi_1 / \partial q_1 = a - 2q_1 - q_2 - c = 0\), giving the <strong>best-response function</strong></p>
+<div class="eq">\[ q_1 = \frac{a - c - q_2}{2} \qquad \text{and symmetrically} \qquad q_2 = \frac{a - c - q_1}{2}. \]</div>
+<p>A Nash equilibrium is a point where the two best-response lines cross - each firm is optimising against what the other is actually doing. Solving the pair by symmetry gives</p>
+<div class="box prop"><div class="box-title">Cournot-Nash equilibrium</div><div class="eq">\[ q_1^{*} = q_2^{*} = \frac{a - c}{3}. \]</div></div>
+<p>Take \(a = 100\) and \(c = 10\). Each firm produces 30, total output is 60, the price is 40 and each firm earns \((40 - 10) \times 30 = \mathbf{900}\). Now compare with collusion: a monopolist would produce \((a - c)/2 = 45\) in total, sell at 55, and earn 2025, i.e. 1012.5 per firm if the cartel split output. Competition destroys 112.5 of profit per firm - and the cartel is not a Nash equilibrium, because at a total of 45 each firm's best response is to expand. Cournot is a Prisoner's Dilemma with continuous strategies.</p>
+<figure class="viz"><div class="viz-title">Best responses in the Cournot duopoly</div><div style="text-align:center;"><svg viewBox='0 0 700 300' style='width:100%;max-width:700px;height:auto;font-family:var(--font-sans);' xmlns='http://www.w3.org/2000/svg'><line x1='70' y1='250' x2='620' y2='250' stroke='var(--viz-axis)' stroke-width='2'/><line x1='70' y1='250' x2='70' y2='30' stroke='var(--viz-axis)' stroke-width='2'/><text x='615' y='274' font-size='14' text-anchor='end' fill='var(--color-muted)'>q&#8322;</text><text x='44' y='42' font-size='14' fill='var(--color-muted)'>q&#8321;</text><line x1='70' y1='150' x2='550' y2='250' stroke='var(--primary)' stroke-width='3'/><text x='470' y='205' font-size='13' fill='var(--primary)' text-anchor='middle'>BR&#8321;: q&#8321; = (a-c-q&#8322;)/2</text><line x1='70' y1='50' x2='310' y2='250' stroke='var(--accent)' stroke-width='3'/><text x='300' y='58' font-size='13' fill='var(--accent)'>BR&#8322;: q&#8322; = (a-c-q&#8321;)/2</text><line x1='230' y1='183' x2='230' y2='250' stroke='var(--viz-bad)' stroke-width='1' stroke-dasharray='4 3'/><line x1='70' y1='183' x2='230' y2='183' stroke='var(--viz-bad)' stroke-width='1' stroke-dasharray='4 3'/><circle cx='230' cy='183' r='7' fill='var(--viz-bad)'/><text x='246' y='170' font-size='13' fill='var(--viz-bad)'>Nash: q&#8321; = q&#8322; = (a-c)/3</text></svg></div><p class="viz-caption">The two best-response lines. Their intersection is the Cournot-Nash equilibrium.</p></figure>
+
+<h2>5. What Nash equilibrium assumes, and what it does not</h2>
+<p>The concept assumes each player's belief about the others is <em>correct</em>. That is a strong assumption. It is plausible when the game has been played many times and behaviour has settled down, when there is a public convention, or when the game is dominance solvable so that beliefs are pinned by reasoning alone. It is far less plausible in a novel one-shot interaction, and this is why rationalizability (Chapter 2) is sometimes the more honest prediction.</p>
+<p>Nash equilibrium also does not assume players cooperate, communicate or randomise jointly. It only requires unilateral stability. Profiles that are stable against <em>group</em> deviations - the strong equilibrium and the core - are studied in Chapter 10.</p>
+
+<h2>Glossary</h2>
+<table class="glossary"><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Nash equilibrium</td><td>A strategy profile in which each player's strategy is a best response to the others'.</td></tr><tr><td>Best-response function</td><td>The map from opponents' strategies to the set of strategies maximising a player's payoff.</td></tr><tr><td>Pareto dominance</td><td>Outcome A Pareto dominates B if every player weakly prefers A and at least one strictly prefers it.</td></tr><tr><td>Focal point</td><td>An equilibrium selected by shared cultural or contextual salience rather than by payoffs (Schelling).</td></tr><tr><td>Cournot competition</td><td>Simultaneous quantity choice by firms facing a downward-sloping inverse demand curve.</td></tr><tr><td>Coordination game</td><td>A game with several Nash equilibria in which players gain from matching each other's choice.</td></tr></tbody></table>
+<div class="keypoints"><h3>Check your understanding</h3><ol><li>Is (Opera, Football) in Battle of the Sexes an equilibrium? <span style='color:#6b7280;'>(Answer: No - both get 0 and either alone can improve)</span></li><li>In the Prisoner's Dilemma, is the unique Nash equilibrium Pareto efficient? <span style='color:#6b7280;'>(Answer: No - (3,3) is better for both)</span></li><li>With \(a = 100\) and \(c = 10\), what is each Cournot firm's equilibrium output? <span style='color:#6b7280;'>(Answer: \(\tfrac{100-10}{3} = 30\))</span></li><li>Why is the joint-monopoly output split not a Nash equilibrium in Cournot? <span style='color:#6b7280;'>(Answer: Each firm's best response to the low total is to expand)</span></li></ol></div>
+<div class="box tip"><div class="box-title">Practice</div><p>The chapter quiz has you verify the definition on specific cells, count pure equilibria in a matrix, compute a Cournot equilibrium numerically, and separate the claim 'is an equilibrium' from the claim 'is a good outcome'.</p></div>
+</div>

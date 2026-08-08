@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 10 - Bargaining, Coalitions and the Shapley Value (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 10.</p>]]></text></info>
+</question>
+<question type="numerical">
+  <name><text>C10 Q1 - Nash bargaining with an outside option</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Two parties divide 100. Party 1's disagreement payoff is 20 and party 2's is 0; utilities are linear in money. Under the Nash bargaining solution, how much does <strong>party 1</strong> receive?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Maximise \((x-20)(100-x)\). The first-order condition \(120 - 2x = 0\) gives \(x = 60\). The rule is: guarantee each party its disagreement payoff, then split the remaining surplus of 80 evenly, giving 20 + 40 = 60.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>60</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C10 Q2 - Which axiom</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Which of the following is <em>not</em> one of Nash's four bargaining axioms?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Nash's axioms are Pareto efficiency, symmetry, invariance to affine transformations of utility, and independence of irrelevant alternatives. Envy-freeness belongs to fair-division theory and plays no role here.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Envy-freeness]]></text><feedback format="html"><text><![CDATA[<p>Correct - not a Nash bargaining axiom.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Pareto efficiency]]></text><feedback format="html"><text><![CDATA[<p>It is one of the four.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Symmetry]]></text><feedback format="html"><text><![CDATA[<p>It is one of the four.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Independence of irrelevant alternatives]]></text><feedback format="html"><text><![CDATA[<p>It is one of the four, and the most debated.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C10 Q3 - Rubinstein share</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In Rubinstein's alternating-offers game over a pie of size 1 with common discount factor \(\delta = 0.5\), what share does the <strong>first proposer</strong> receive in the unique subgame perfect equilibrium? Give a decimal to two places.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The proposer receives \(\dfrac{1}{1+\delta} = \dfrac{1}{1.5} \approx 0.67\). Impatience is costly, so the ability to move first is worth more when players are impatient. As \(\delta \to 1\) the shares converge to 0.5 each, matching the Nash bargaining solution.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.67</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.02</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C10 Q4 - The core</text></name>
+  <questiontext format="html"><text><![CDATA[<p>An allocation is in the core of a coalitional game when:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Core membership means the whole value is distributed and no coalition, however small, could guarantee its own members more by leaving. It is a stability condition against group deviations, in contrast with Nash equilibrium's unilateral deviations.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[It distributes the full value of the grand coalition and no coalition can guarantee its members more by breaking away]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Every player receives the same amount]]></text><feedback format="html"><text><![CDATA[<p>That is equal division, not the core.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[It maximises the sum of payoffs]]></text><feedback format="html"><text><![CDATA[<p>Efficiency is only one of the core's conditions.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[It is the Shapley value]]></text><feedback format="html"><text><![CDATA[<p>The Shapley value can lie outside the core.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C10 Q5 - Shapley value</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Three players have \(v(\emptyset) = v(1) = v(2) = v(3) = 0\), \(v(12) = 90\), \(v(13) = 80\), \(v(23) = 70\) and \(v(123) = 120\). What is player <strong>1</strong>'s Shapley value?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Player 1's marginal contributions across the six orderings are \(0, 0, 90, 50, 80, 50\); their average is \(\phi_1 = 270/6 = 45\). Players 2 and 3 receive 40 and 35, and the three shares sum to 120 as efficiency requires.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>45</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C10 Q6 - Shapley value, player 3</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Using the same characteristic function, what is player <strong>3</strong>'s Shapley value?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Player 3's marginal contributions are \(30, 80, 30, 70, 0, 0\), averaging \(\phi_3 = 210/6 = 35\). Player 3 is the weakest partner - the pair (2,3) creates the least value - and receives the smallest share.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>35</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="truefalse">
+  <name><text>C10 Q7 - Shapley and the core</text></name>
+  <questiontext format="html"><text><![CDATA[<p>The Shapley value always lies inside the core when the core is non-empty.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>False. In the three-firm example the core is the single point \((50, 40, 30)\) while the Shapley value is \((45, 40, 35)\). Players 1 and 2 would receive only 85 under Shapley yet can guarantee themselves 90 alone. Fairness axioms and stability against blocking are genuinely different requirements. (They do coincide in the special class of convex games.)</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C10 Q8 - The null player axiom</text></name>
+  <questiontext format="html"><text><![CDATA[<p>The Shapley value's null-player axiom says that:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>A player who adds nothing to any coalition - whose marginal contribution is zero everywhere - receives zero. This is the axiom that makes the Shapley value a meaningful attribution of credit, and it is why SHAP values in machine learning assign zero to a feature that never changes the prediction.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[A player whose marginal contribution to every coalition is zero receives a payoff of zero]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A player who acts alone receives zero]]></text><feedback format="html"><text><![CDATA[<p>Singleton value is unrelated to the axiom.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Every player must receive a strictly positive amount]]></text><feedback format="html"><text><![CDATA[<p>The axiom says the opposite in the relevant case.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The grand coalition always forms]]></text><feedback format="html"><text><![CDATA[<p>That is closer to the efficiency axiom.</p>]]></text></feedback></answer>
+</question>
+</quiz>

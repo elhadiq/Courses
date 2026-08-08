@@ -1,0 +1,101 @@
+<style>
+.gt{--primary:#026573;--primary-dark:#014a55;--primary-light:#2a8c9a;--primary-soft:#e6f1f3;
+ --primary-soft-2:#d0e4e8;--accent:#f59e0b;--color-text:#1f2937;--color-muted:#6b7280;
+ --color-rule:#e2e8eb;--box-bg:#fff;--def-bg:#e6f1f3;--def-br:#026573;--def-fg:#014a55;
+ --thm-bg:#f5f1ff;--thm-br:#7c3aed;--thm-fg:#6d28d9;--prop-bg:#eff6ff;--prop-br:#2563eb;
+ --prop-fg:#1d4ed8;--method-bg:#ecfdf5;--method-br:#059669;--method-fg:#047857;
+ --warn-bg:#fef2f2;--warn-br:#dc2626;--warn-fg:#b91c1c;--tip-bg:#fffbeb;--tip-br:#f59e0b;
+ --tip-fg:#b45309;--example-bg:#f8fafc;--example-br:#64748b;--example-fg:#475569;
+ --viz-axis:#94a3b8;--viz-bad:#dc2626;--radius:10px;
+ --font-serif:"Source Serif Pro","Iowan Old Style",Georgia,serif;
+ --font-sans:"Inter",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+ --font-mono:"JetBrains Mono","SF Mono",Consolas,monospace;
+ font-family:var(--font-serif);color:var(--color-text);line-height:1.75;font-size:1.02rem;
+ max-width:900px;margin:0 auto;}
+.gt h1,.gt h2,.gt h3{font-family:var(--font-sans);color:var(--primary-dark);line-height:1.3;}
+.gt h2{font-size:1.42rem;margin:1.9em 0 .7em;padding-bottom:.3em;
+ border-bottom:2px solid var(--primary-soft-2);}
+.gt h3{font-size:1.14rem;margin:1.5em 0 .5em;}
+.gt p{margin:0 0 1em;}
+.gt ul,.gt ol{margin:0 0 1em;padding-left:1.4em;}
+.gt li{margin-bottom:.4em;}
+.gt a{color:var(--primary);}
+.gt .lead{border-left:4px solid var(--primary);background:var(--primary-soft);
+ padding:14px 20px;border-radius:0 var(--radius) var(--radius) 0;margin:0 0 1.6em;}
+.gt .lead .lead-label{font-family:var(--font-sans);font-size:.74rem;letter-spacing:.09em;
+ text-transform:uppercase;font-weight:700;color:var(--primary-dark);display:block;margin-bottom:4px;}
+.gt .lead h1{font-size:1.6rem;margin:0 0 6px;}
+.gt .lead .lead-sub{color:var(--color-muted);font-size:.97rem;margin:0;}
+.gt .box{background:var(--box-bg);border:1px solid var(--color-rule);border-left-width:4px;
+ border-radius:var(--radius);padding:14px 20px;margin:1.4em 0;}
+.gt .box>.box-title{font-family:var(--font-sans);font-weight:700;font-size:.95rem;margin-bottom:6px;}
+.gt .box>*:last-child{margin-bottom:0;}
+.gt .box.def{background:var(--def-bg);border-left-color:var(--def-br);}
+.gt .box.def>.box-title{color:var(--def-fg);}
+.gt .box.thm{background:var(--thm-bg);border-left-color:var(--thm-br);}
+.gt .box.thm>.box-title{color:var(--thm-fg);}
+.gt .box.prop{background:var(--prop-bg);border-left-color:var(--prop-br);}
+.gt .box.prop>.box-title{color:var(--prop-fg);}
+.gt .box.method{background:var(--method-bg);border-left-color:var(--method-br);}
+.gt .box.method>.box-title{color:var(--method-fg);}
+.gt .box.warn{background:var(--warn-bg);border-left-color:var(--warn-br);}
+.gt .box.warn>.box-title{color:var(--warn-fg);}
+.gt .box.tip{background:var(--tip-bg);border-left-color:var(--tip-br);}
+.gt .box.tip>.box-title{color:var(--tip-fg);}
+.gt .box.example{background:var(--example-bg);border-left-color:var(--example-br);}
+.gt .box.example>.box-title{color:var(--example-fg);}
+.gt .eq{margin:1.1em 0;overflow-x:auto;text-align:center;}
+.gt .keypoints{background:var(--primary-soft);border:1px solid var(--primary-soft-2);
+ border-radius:var(--radius);padding:16px 22px;margin:2em 0;}
+.gt .keypoints h3{margin-top:0;}
+.gt .viz{margin:1.6em 0;}
+.gt .viz-title{font-family:var(--font-sans);font-weight:700;color:var(--primary);
+ font-size:.95rem;margin-bottom:8px;}
+.gt .viz-caption{color:var(--color-muted);font-size:.9rem;margin:10px 0 0;
+ border-top:1px solid var(--color-rule);padding-top:9px;}
+.gt table{border-collapse:collapse;width:100%;font-size:.96rem;margin:0;}
+.gt th,.gt td{border:1px solid var(--color-rule);padding:8px 14px;text-align:left;
+ vertical-align:top;}
+.gt thead th{background:var(--primary-soft);}
+.gt .payoff{width:auto;margin:0 auto;}
+.gt .payoff th,.gt .payoff td{text-align:center;}
+.gt .payoff th.corner{background:var(--primary);color:#fff;font-size:.8rem;}
+.gt .payoff tbody th{background:var(--primary-soft);text-align:left;}
+.gt .payoff td{font-family:var(--font-mono);}
+.gt .glossary td:first-child{white-space:nowrap;font-weight:600;}
+.gt svg{max-width:100%;height:auto;}
+</style>
+<div class="gt">
+<div class="lead"><span class="lead-label">Part IV &middot; Design and cooperation &middot; Chapter 10</span><h1>Bargaining, Coalitions and the Shapley Value</h1><p class="lead-sub">When agreements bind: how surplus gets divided and which coalitions hold together.</p></div>
+<div class="box method"><div class="box-title">What you will be able to do</div><ul><li>Contrast cooperative and non-cooperative game theory.</li><li>Compute the Nash bargaining solution and show how the disagreement point shifts it.</li><li>State the Rubinstein alternating-offers result and its limit as players become patient.</li><li>Define the core and determine it for a small characteristic-function game.</li><li>Compute Shapley values from marginal contributions and explain fairness versus stability.</li></ul></div>
+
+<h2>1. When binding agreements are possible</h2>
+<p>Every chapter so far has been <strong>non-cooperative</strong>: players act individually and no promise binds unless it is self-enforcing. <strong>Cooperative game theory</strong> takes the opposite starting point. Contracts are enforceable, so the question is not 'what will each player do?' but 'which coalitions will form, and how will they divide what they create?' The two branches are complements, not rivals: cooperative theory abstracts away the bargaining process to focus on the outcome, and much modern work seeks non-cooperative foundations for cooperative solutions.</p>
+
+<h2>2. The Nash bargaining solution</h2>
+<p>Two parties can share a surplus if they agree; if they fail, each receives a <strong>disagreement point</strong> \(d = (d_1, d_2)\). Nash (1950) asked which division satisfies four reasonable axioms - Pareto efficiency, symmetry, invariance to affine rescaling of utilities, and independence of irrelevant alternatives - and proved that exactly one rule does.</p>
+<div class="box def"><div class="box-title">Definition - the Nash bargaining solution</div><p style='margin:0;'>The <strong>Nash bargaining solution</strong> maximises the Nash product</p><div class="eq">\[ (u^{*}_1, u^{*}_2) \;=\; \arg\max_{(u_1, u_2) \in F,\; u \ge d} \; (u_1 - d_1)(u_2 - d_2). \]</div></div>
+<p>Two parties split 100 with linear utility and \(d = (0,0)\): maximising \(x(100 - x)\) gives \(x = 50\), an even split. Now suppose party 1 has an outside option worth 20, so \(d = (20, 0)\). Maximising \((x - 20)(100 - x)\) gives \(x = \mathbf{60}\). The outside option is worth 20 to have, and a further 10 in bargaining power - a precise statement of the intuition that your alternatives determine your leverage.</p>
+<p>Rubinstein (1982) gave the non-cooperative counterpart. Two players alternate offers over a pie of size 1 with common discount factor \(\delta\) per round; delay is costly. The unique subgame perfect equilibrium has the first proposer offering and immediately receiving \(\dfrac{1}{1+\delta}\), leaving \(\dfrac{\delta}{1+\delta}\). With \(\delta = 0.9\) the proposer takes about \(0.526\). As \(\delta \to 1\) the split approaches equality, and the Rubinstein outcome converges to the Nash bargaining solution - a bridge between the two branches.</p>
+
+<h2>3. Coalitional games and the core</h2>
+<p>With more than two players we describe the situation by a <strong>characteristic function</strong> v that assigns to each coalition S the total value its members can guarantee themselves. An <em>imputation</em> is a division x of v(N) among all players.</p>
+<div class="box def"><div class="box-title">Definition - the core</div><div class="eq">\[ \mathcal{C}(v) = \Bigl\{ x \in \mathbb{R}^{n} : \sum_{i \in N} x_i = v(N), \;\; \sum_{i \in S} x_i \ge v(S) \;\; \text{for every } S \subseteq N \Bigr\} \]</div><p style='margin:6px 0 0;'>An allocation in the core cannot be blocked: no group of players can walk away and do better on their own.</p></div>
+<p>Consider three firms with \(v(\emptyset) = v(1) = v(2) = v(3) = 0\), \(v(12) = 90\), \(v(13) = 80\), \(v(23) = 70\) and \(v(123) = 120\). Adding the three pairwise constraints gives \(2(x_1 + x_2 + x_3) \ge 240\), i.e. \(120 \ge 120\) - so all three must hold with equality. Solving the system yields the core as the single point \((50, 40, 30)\).</p>
+<div class="box warn"><div class="box-title">Careful</div><p>The core can also be empty. In a three-player majority game where any two players can claim the whole pie (v(S) = 1 for every pair and for the grand coalition, 0 for singletons), every proposed division leaves some pair able to block. Emptiness is not a modelling error - it is a real prediction of instability.</p></div>
+
+<h2>4. The Shapley value</h2>
+<p>The core answers 'what is stable?' but is often empty or huge. Shapley (1953) asked instead 'what is fair?' and characterised a unique allocation by four axioms: efficiency (the whole value is distributed), symmetry (players with identical contributions get equal shares), the null-player property (a player who adds nothing to every coalition gets nothing) and additivity (the value of a sum of games is the sum of the values).</p>
+<div class="box def"><div class="box-title">The Shapley value</div><div class="eq">\[ \phi_i(v) \;=\; \frac{1}{n!} \sum_{\pi \in \Pi(N)} \Bigl[ v\bigl(S_i^{\pi} \cup \{i\}\bigr) - v\bigl(S_i^{\pi}\bigr) \Bigr] \;=\; \sum_{S \subseteq N \setminus \{i\}} \frac{|S|!\,(n - |S| - 1)!}{n!} \bigl[ v(S \cup \{i\}) - v(S) \bigr], \]</div><p style='margin:6px 0 0;'>where \(S_i^{\pi}\) is the set of players preceding \(i\) in the ordering \(\pi\).</p></div>
+<p>Apply it to the three firms above. The six orderings give player 1 the marginal contributions 0, 0, 90, 50, 80, 50, whose average is <strong>45</strong>. Player 2 receives 90, 40, 0, 0, 40, 70, averaging <strong>40</strong>; player 3 gets 30, 80, 30, 70, 0, 0, averaging <strong>35</strong>. The shares sum to 120, as efficiency requires.</p>
+<figure class="viz"><table><thead><tr><th>Player</th><th>Shapley value</th><th>Core allocation</th></tr></thead><tbody><tr><td>1</td><td>45</td><td>50</td></tr><tr><td>2</td><td>40</td><td>40</td></tr><tr><td>3</td><td>35</td><td>30</td></tr></tbody></table><p class="viz-caption">Here the Shapley value lies <em>outside</em> the core: player 1 and player 2 together receive 85 under Shapley but could guarantee themselves 90 by acting alone. Fairness and stability are genuinely different criteria and can point in different directions.</p></figure>
+<p>Despite that tension the Shapley value is widely used, precisely because it always exists and is always unique: in cost allocation among municipalities sharing infrastructure, in measuring voting power (the Shapley-Shubik index), and - a recent and now very common application - in machine learning, where SHAP values attribute a model's prediction to its input features by treating the features as players in a cooperative game.</p>
+
+<h2>5. Where to go next</h2>
+<p>Three directions extend this course naturally. <strong>Evolutionary game theory</strong> (Maynard Smith) replaces rational choice with replication: strategies that do well become more common, and the stability concept is the evolutionarily stable strategy. <strong>Behavioural game theory</strong> (Camerer) confronts the predictions with laboratory data and models bounded reasoning, fairness and level-k thinking. <strong>Algorithmic game theory</strong> (Nisan, Roughgarden, Tardos) studies computation and efficiency of equilibria - the price of anarchy, mechanism design under computational constraints, and learning dynamics that converge to equilibrium.</p>
+
+<h2>Glossary</h2>
+<table class="glossary"><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Cooperative game</td><td>A game in which binding agreements between players are possible.</td></tr><tr><td>Disagreement point</td><td>The payoff vector that results if bargaining fails; it anchors the solution.</td></tr><tr><td>Nash bargaining solution</td><td>The feasible pair maximising \((u_1 - d_1)(u_2 - d_2)\).</td></tr><tr><td>Rubinstein bargaining</td><td>Alternating offers with discounting; its unique SPNE gives the proposer \(\tfrac{1}{1+\delta}\).</td></tr><tr><td>Characteristic function</td><td>A map \(v : 2^{N} \to \mathbb{R}\) with \(v(\emptyset)=0\), assigning to each coalition the value its members can guarantee.</td></tr><tr><td>Core</td><td>The set of efficient allocations no coalition can improve on by deviating.</td></tr><tr><td>Shapley value</td><td>\(\phi_i(v)\): the average marginal contribution of player \(i\) over all \(n!\) orderings; the unique allocation satisfying four fairness axioms.</td></tr><tr><td>Shapley-Shubik index</td><td>The Shapley value applied to a voting game, measuring a voter's power.</td></tr></tbody></table>
+<div class="keypoints"><h3>Check your understanding</h3><ol><li>Two parties split 100 with \(d = (30, 0)\). What does party 1 receive under Nash bargaining? <span style='color:#6b7280;'>(Answer: Maximise \((x-30)(100-x)\): \(x = 65\))</span></li><li>In Rubinstein bargaining with \(\delta = 0.5\), what share does the proposer get? <span style='color:#6b7280;'>(Answer: \(\tfrac{1}{1.5} = \tfrac{2}{3}\))</span></li><li>What makes an allocation lie in the core? <span style='color:#6b7280;'>(Answer: No coalition can guarantee its members more by deviating)</span></li><li>Is the Shapley value always in the core? <span style='color:#6b7280;'>(Answer: No - the three-firm example shows a case where it is not)</span></li></ol></div>
+<div class="box tip"><div class="box-title">Practice</div><p>The chapter quiz asks you to compute a Nash bargaining split with an outside option, a Rubinstein share, a core condition, and a Shapley value from marginal contributions.</p></div>
+</div>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 04 - Mixed Strategies and Nash's Existence Theorem (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 04.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C04 Q1 - Whose indifference</text></name>
+  <questiontext format="html"><text><![CDATA[<p>When solving for a mixed Nash equilibrium of a 2x2 game, a player's mixing probabilities are chosen so that:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Each player's probabilities make the <em>opponent</em> indifferent. If they did not, the opponent would have a strictly better reply and would shift all weight onto it, breaking the equilibrium. Your own indifference is a consequence of the opponent's choice of probabilities, not something you engineer.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[The opponent is indifferent between their pure strategies]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The player maximises their own expected payoff over probabilities]]></text><feedback format="html"><text><![CDATA[<p>Expected payoff is linear in one's own probability, so this alone does not pin an interior mix.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Both players receive the same expected payoff]]></text><feedback format="html"><text><![CDATA[<p>Equilibrium payoffs are typically unequal.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The variance of the player's payoff is minimised]]></text><feedback format="html"><text><![CDATA[<p>Risk attitudes are already inside the payoff numbers.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C04 Q2 - Matching Pennies probability</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In Matching Pennies (payoffs \(+1\) to the matcher, \(-1\) to the mismatcher), with what probability does each player choose Heads in the unique Nash equilibrium? Give a decimal.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Setting player 2's payoff from Heads equal to that from Tails gives \(1 - 2p = 2p - 1\), hence \(p = 0.5\). By symmetry both mix half and half, and each earns an expected \(0\).</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.5</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C04 Q3 - Battle of the Sexes, Alex's mix</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In Battle of the Sexes with payoffs \((\text{Opera},\text{Opera}) = (2,1)\), \((\text{Football},\text{Football}) = (1,2)\) and \((0,0)\) off the diagonal, what probability does <strong>Alex</strong> place on Opera in the mixed equilibrium? Give a decimal to two places.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Alex's probability \(p\) is set to make Bailey indifferent: Bailey gets \(p\) from Opera and \(2(1-p)\) from Football, so \(p = 2 - 2p\) and \(p = \tfrac{2}{3} \approx 0.67\). Symmetrically Bailey plays Opera with probability \(\tfrac{1}{3}\).</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.67</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.02</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C04 Q4 - Total equilibria</text></name>
+  <questiontext format="html"><text><![CDATA[<p>How many Nash equilibria in total (pure and mixed) does Battle of the Sexes have?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Three: the two pure equilibria (Opera, Opera) and (Football, Football), plus the mixed one at \(p = \tfrac{2}{3}\), \(q = \tfrac{1}{3}\). A classical result says almost every finite game has an odd number of equilibria, which is a useful sanity check on your count.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>3</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C04 Q5 - What Nash's theorem guarantees</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Nash's theorem states that every finite game has at least one Nash equilibrium. Which qualification is essential?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Existence is guaranteed only once mixed strategies are allowed. Matching Pennies has no pure equilibrium, so the theorem would simply be false for pure strategies. Mixing is what makes the best-response correspondence convex-valued and lets Kakutani's theorem apply.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[The equilibrium may require mixed strategies]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The equilibrium is unique]]></text><feedback format="html"><text><![CDATA[<p>Battle of the Sexes has three.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The equilibrium is Pareto efficient]]></text><feedback format="html"><text><![CDATA[<p>The Prisoner's Dilemma refutes this.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The equilibrium can be computed in polynomial time]]></text><feedback format="html"><text><![CDATA[<p>The problem is PPAD-complete; no such algorithm is known.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C04 Q6 - Payoff in the support</text></name>
+  <questiontext format="html"><text><![CDATA[<p>If a player mixes between three pure strategies with positive probability in equilibrium, all three must give the same expected payoff against the opponents' strategies.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True - this is the indifference principle. If one strategy in the support paid strictly more, moving all the probability onto it would raise the player's expected payoff, contradicting equilibrium. Strategies outside the support must pay no more than those inside.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C04 Q7 - Interpretation</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Which reading of a mixed equilibrium does <em>not</em> require any player to literally use a randomising device?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Both the population reading (a fraction of a large population plays each pure strategy) and Harsanyi's purification (small private payoff shocks make each individual's behaviour pure, while others see a distribution) avoid literal randomisation. Harsanyi's argument is the standard defence of mixed equilibria against the charge of implausibility.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[The population interpretation, and Harsanyi's purification via small private payoff shocks]]></text><feedback format="html"><text><![CDATA[<p>Correct - both avoid literal coin-flipping.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The literal randomisation interpretation]]></text><feedback format="html"><text><![CDATA[<p>That one is precisely about using a device.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The indifference principle]]></text><feedback format="html"><text><![CDATA[<p>That is a computational condition, not an interpretation.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The fixed-point interpretation]]></text><feedback format="html"><text><![CDATA[<p>That describes the existence proof, not behaviour.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C04 Q8 - Expected payoff against a mixture</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Player 1's payoffs from strategy \(A\) are \(6\) against \(L\) and \(0\) against \(R\). Player 2 plays \(L\) with probability \(0.25\) and \(R\) with probability \(0.75\). What is player 1's expected payoff from \(A\)?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>\(u_1(A, \sigma_2) = 0.25 \times 6 + 0.75 \times 0 = 1.5\). Expected payoff is always linear in the opponent's probabilities, which is exactly why a player who is not indifferent would shift all weight to one side.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>1.5</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+</quiz>

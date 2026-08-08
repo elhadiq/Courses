@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 05 - Zero-Sum Games and the Minimax Theorem (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 05.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C05 Q1 - Definition</text></name>
+  <questiontext format="html"><text><![CDATA[<p>A two-player game is zero-sum when:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The defining property is that in every cell the payoffs sum to zero (or, equivalently up to a harmless constant shift, to the same constant). It is a property of every cell, not of the equilibrium alone.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[The two players' payoffs sum to zero in every cell]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The equilibrium payoffs are both zero]]></text><feedback format="html"><text><![CDATA[<p>The value can be any number, as in the example with v = 1.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Neither player can gain from the game]]></text><feedback format="html"><text><![CDATA[<p>One player can have a strictly positive value.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Both players have dominant strategies]]></text><feedback format="html"><text><![CDATA[<p>Unrelated; Matching Pennies has none.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C05 Q2 - Maximin</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Player 1's payoffs (player 2 receives the negative of each):</p><table border='1' cellpadding='8' style='border-collapse:collapse;'><tr><th></th><th>X</th><th>Y</th><th>Z</th></tr><tr><th>A</th><td>4</td><td>3</td><td>5</td></tr><tr><th>B</th><td>2</td><td>1</td><td>6</td></tr><tr><th>C</th><td>3</td><td>0</td><td>7</td></tr></table><p>What is player 1's <strong>maximin</strong> value?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Row minima are 3 (row A), 1 (row B) and 0 (row C). The maximin is the largest of these, 3, achieved by playing A. Column maxima are 4, 3, 7, so the minimax is also 3 - the game has a saddle point at (A, Y) and its value is 3.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>3</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C05 Q3 - Minimax</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Using the same matrix, what is the <strong>minimax</strong> value?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Column maxima are 4, 3, 7. The minimax is their smallest, 3, at column Y. Since maximin = minimax = 3, the game has a value of 3 in pure strategies and (A, Y) is a saddle point.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>3</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="truefalse">
+  <name><text>C05 Q4 - The inequality</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In any finite two-player zero-sum game, the maximin value is always less than or equal to the minimax value.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True, and it holds before any mixing is allowed. Intuitively, being able to move second cannot hurt. The minimax theorem says the two coincide once mixed strategies are permitted.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C05 Q5 - Solving a 2x2</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Player 1's payoffs: Top gives \(3\) against Left and \(-1\) against Right; Bottom gives \(-2\) against Left and \(4\) against Right. What is the <strong>value</strong> of this zero-sum game?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Player 1 mixes with probability \(p\) on Top so that the two columns are equal: \(5p - 2 = 4 - 5p\) gives \(p = 0.6\), and the payoff is \(3(0.6) - 2(0.4) = 1\). Player 2 mixes with \(q = 0.5\) on Left and gets the same number, so \(v = 1\).</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>1</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C05 Q6 - Optimal mixture</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In the same 2x2 game, with what probability does player 1 play <strong>Top</strong> in the optimal mixed strategy? Give a decimal.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Equalising the value of the two columns for player 1: \(3p - 2(1-p) = -p + 4(1-p)\), i.e. \(5p - 2 = 4 - 5p\), so \(p = 0.6\).</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.6</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C05 Q7 - What is special about zero-sum</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Which property holds in every finite two-player <em>zero-sum</em> game but fails in general games?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>All equilibria of a zero-sum game give the same payoffs (the value) and equilibrium strategies are interchangeable, so there is no equilibrium-selection problem. In Battle of the Sexes, by contrast, different equilibria give very different payoffs and mixing strategies across equilibria gives a non-equilibrium.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[All Nash equilibria give the same payoffs, and equilibrium strategies are interchangeable]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A pure-strategy equilibrium always exists]]></text><feedback format="html"><text><![CDATA[<p>Matching Pennies has none.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The equilibrium is Pareto efficient]]></text><feedback format="html"><text><![CDATA[<p>In zero-sum games every outcome is trivially efficient, so this does not distinguish anything useful about equilibria.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Every player has a dominant strategy]]></text><feedback format="html"><text><![CDATA[<p>Usually false.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C05 Q8 - Computation</text></name>
+  <questiontext format="html"><text><![CDATA[<p>The value and optimal strategies of a finite two-player zero-sum game can be computed in polynomial time by linear programming.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True. Each player's problem is a linear program and the two are duals of each other, so the minimax theorem is a form of LP strong duality. This contrasts sharply with general two-player games, where finding a Nash equilibrium is PPAD-complete.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+</quiz>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 07 - Repeated Games, Reciprocity and the Folk Theorem (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 07.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C07 Q1 - Finite repetition</text></name>
+  <questiontext format="html"><text><![CDATA[<p>The Prisoner's Dilemma is repeated exactly 20 times and both players know it. What is the unique subgame perfect equilibrium?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Backward induction from round 20: with no future, both defect. That makes round 19 effectively terminal, and so on to round 1. Defection in every round is the unique SPNE. What matters is the <em>known</em> last round, not the finiteness of expected play.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Both players defect in every round]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Both cooperate until round 19, then defect]]></text><feedback format="html"><text><![CDATA[<p>Round 19 unravels for the same reason as round 20.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Both cooperate in every round]]></text><feedback format="html"><text><![CDATA[<p>There is no future to protect in the last round.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Players alternate cooperation and defection]]></text><feedback format="html"><text><![CDATA[<p>No mechanism supports alternation here.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C07 Q2 - Present value</text></name>
+  <questiontext format="html"><text><![CDATA[<p>A player receives a payoff of 6 every period forever, with discount factor \(\delta = 0.75\). What is the present value of this stream?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The geometric sum gives \(\dfrac{6}{1 - 0.75} = \dfrac{6}{0.25} = 24\). This formula is the workhorse of every repeated-game computation.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>24</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C07 Q3 - Critical discount factor</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In a Prisoner's Dilemma with \(T = 5\), \(R = 3\), \(P = 1\), \(S = 0\), what is the smallest discount factor \(\delta\) for which grim trigger sustains cooperation? Give a decimal.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>\(\delta^{*} = \dfrac{T - R}{T - P} = \dfrac{5 - 3}{5 - 1} = 0.5\). Equivalently, \(\dfrac{3}{1-\delta} \ge 5 + \dfrac{\delta}{1-\delta}\) reduces to \(3 \ge 5 - 4\delta\).</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.5</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C07 Q4 - Axelrod's properties</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Axelrod credited tit-for-tat's tournament success to four properties. Which property does <strong>grim trigger</strong> lack?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Grim trigger is nice, retaliatory and clear, but never forgiving: one defection - even an accidental one - condemns the relationship to permanent punishment. In noisy environments this makes grim trigger far worse than tit-for-tat or tit-for-two-tats.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Forgiveness]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Niceness]]></text><feedback format="html"><text><![CDATA[<p>Grim trigger never defects first.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Retaliation]]></text><feedback format="html"><text><![CDATA[<p>Its retaliation is maximal.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Clarity]]></text><feedback format="html"><text><![CDATA[<p>It is very easy to describe and predict.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C07 Q5 - Tit-for-tat dominance</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Tit-for-tat is a dominant strategy in the infinitely repeated Prisoner's Dilemma.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>False. Against a player who always defects, tit-for-tat loses the first round and only matches thereafter, so Always Defect would have done better. Tit-for-tat performs well in populations of reciprocators, which is a statement about environments, not dominance.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C07 Q6 - Folk theorem</text></name>
+  <questiontext format="html"><text><![CDATA[<p>The folk theorem for infinitely repeated games says that, for players patient enough:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Any feasible payoff vector strictly above every player's minmax level can be supported as a subgame perfect equilibrium. The result explains how norms and reputations become self-enforcing, but it also means the theory has very little predictive bite without further restrictions.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Essentially any feasible payoff vector above the minmax can be supported as a subgame perfect equilibrium]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Only the efficient outcome can be supported]]></text><feedback format="html"><text><![CDATA[<p>Many inefficient outcomes are supportable too.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Only the stage-game Nash equilibrium can be supported]]></text><feedback format="html"><text><![CDATA[<p>That is the finite-repetition result.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Cooperation is impossible without an external enforcer]]></text><feedback format="html"><text><![CDATA[<p>The theorem shows the opposite.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C07 Q7 - What restores cooperation in finite games</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Introducing a small probability that one player is a committed cooperator can restore long stretches of cooperation in a finitely repeated Prisoner's Dilemma.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True. Kreps, Milgrom, Roberts and Wilson (1982) showed that a little incomplete information about types gives rational players an incentive to build a reputation for cooperating, sustaining cooperation until near the end. This is the bridge to Chapter 8.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C07 Q8 - Higher temptation</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Same Prisoner's Dilemma but the temptation payoff rises to T = 7 (still R = 3, P = 1, S = 0). What is the new critical discount factor for grim trigger? Give a decimal to two places.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>\(\delta^{*} = \dfrac{T-R}{T-P} = \dfrac{7-3}{7-1} = \dfrac{2}{3} \approx 0.67\). A bigger prize for cheating requires more patience to keep cooperation alive.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.67</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.02</tolerance></answer>
+</question>
+</quiz>

@@ -1,0 +1,105 @@
+<style>
+.gt{--primary:#026573;--primary-dark:#014a55;--primary-light:#2a8c9a;--primary-soft:#e6f1f3;
+ --primary-soft-2:#d0e4e8;--accent:#f59e0b;--color-text:#1f2937;--color-muted:#6b7280;
+ --color-rule:#e2e8eb;--box-bg:#fff;--def-bg:#e6f1f3;--def-br:#026573;--def-fg:#014a55;
+ --thm-bg:#f5f1ff;--thm-br:#7c3aed;--thm-fg:#6d28d9;--prop-bg:#eff6ff;--prop-br:#2563eb;
+ --prop-fg:#1d4ed8;--method-bg:#ecfdf5;--method-br:#059669;--method-fg:#047857;
+ --warn-bg:#fef2f2;--warn-br:#dc2626;--warn-fg:#b91c1c;--tip-bg:#fffbeb;--tip-br:#f59e0b;
+ --tip-fg:#b45309;--example-bg:#f8fafc;--example-br:#64748b;--example-fg:#475569;
+ --viz-axis:#94a3b8;--viz-bad:#dc2626;--radius:10px;
+ --font-serif:"Source Serif Pro","Iowan Old Style",Georgia,serif;
+ --font-sans:"Inter",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+ --font-mono:"JetBrains Mono","SF Mono",Consolas,monospace;
+ font-family:var(--font-serif);color:var(--color-text);line-height:1.75;font-size:1.02rem;
+ max-width:900px;margin:0 auto;}
+.gt h1,.gt h2,.gt h3{font-family:var(--font-sans);color:var(--primary-dark);line-height:1.3;}
+.gt h2{font-size:1.42rem;margin:1.9em 0 .7em;padding-bottom:.3em;
+ border-bottom:2px solid var(--primary-soft-2);}
+.gt h3{font-size:1.14rem;margin:1.5em 0 .5em;}
+.gt p{margin:0 0 1em;}
+.gt ul,.gt ol{margin:0 0 1em;padding-left:1.4em;}
+.gt li{margin-bottom:.4em;}
+.gt a{color:var(--primary);}
+.gt .lead{border-left:4px solid var(--primary);background:var(--primary-soft);
+ padding:14px 20px;border-radius:0 var(--radius) var(--radius) 0;margin:0 0 1.6em;}
+.gt .lead .lead-label{font-family:var(--font-sans);font-size:.74rem;letter-spacing:.09em;
+ text-transform:uppercase;font-weight:700;color:var(--primary-dark);display:block;margin-bottom:4px;}
+.gt .lead h1{font-size:1.6rem;margin:0 0 6px;}
+.gt .lead .lead-sub{color:var(--color-muted);font-size:.97rem;margin:0;}
+.gt .box{background:var(--box-bg);border:1px solid var(--color-rule);border-left-width:4px;
+ border-radius:var(--radius);padding:14px 20px;margin:1.4em 0;}
+.gt .box>.box-title{font-family:var(--font-sans);font-weight:700;font-size:.95rem;margin-bottom:6px;}
+.gt .box>*:last-child{margin-bottom:0;}
+.gt .box.def{background:var(--def-bg);border-left-color:var(--def-br);}
+.gt .box.def>.box-title{color:var(--def-fg);}
+.gt .box.thm{background:var(--thm-bg);border-left-color:var(--thm-br);}
+.gt .box.thm>.box-title{color:var(--thm-fg);}
+.gt .box.prop{background:var(--prop-bg);border-left-color:var(--prop-br);}
+.gt .box.prop>.box-title{color:var(--prop-fg);}
+.gt .box.method{background:var(--method-bg);border-left-color:var(--method-br);}
+.gt .box.method>.box-title{color:var(--method-fg);}
+.gt .box.warn{background:var(--warn-bg);border-left-color:var(--warn-br);}
+.gt .box.warn>.box-title{color:var(--warn-fg);}
+.gt .box.tip{background:var(--tip-bg);border-left-color:var(--tip-br);}
+.gt .box.tip>.box-title{color:var(--tip-fg);}
+.gt .box.example{background:var(--example-bg);border-left-color:var(--example-br);}
+.gt .box.example>.box-title{color:var(--example-fg);}
+.gt .eq{margin:1.1em 0;overflow-x:auto;text-align:center;}
+.gt .keypoints{background:var(--primary-soft);border:1px solid var(--primary-soft-2);
+ border-radius:var(--radius);padding:16px 22px;margin:2em 0;}
+.gt .keypoints h3{margin-top:0;}
+.gt .viz{margin:1.6em 0;}
+.gt .viz-title{font-family:var(--font-sans);font-weight:700;color:var(--primary);
+ font-size:.95rem;margin-bottom:8px;}
+.gt .viz-caption{color:var(--color-muted);font-size:.9rem;margin:10px 0 0;
+ border-top:1px solid var(--color-rule);padding-top:9px;}
+.gt table{border-collapse:collapse;width:100%;font-size:.96rem;margin:0;}
+.gt th,.gt td{border:1px solid var(--color-rule);padding:8px 14px;text-align:left;
+ vertical-align:top;}
+.gt thead th{background:var(--primary-soft);}
+.gt .payoff{width:auto;margin:0 auto;}
+.gt .payoff th,.gt .payoff td{text-align:center;}
+.gt .payoff th.corner{background:var(--primary);color:#fff;font-size:.8rem;}
+.gt .payoff tbody th{background:var(--primary-soft);text-align:left;}
+.gt .payoff td{font-family:var(--font-mono);}
+.gt .glossary td:first-child{white-space:nowrap;font-weight:600;}
+.gt svg{max-width:100%;height:auto;}
+</style>
+<div class="gt">
+<div class="lead"><span class="lead-label">Part II &middot; Equilibrium &middot; Chapter 4</span><h1>Mixed Strategies and Nash's Existence Theorem</h1><p class="lead-sub">Randomise, compute equilibria by indifference, and see why an equilibrium always exists.</p></div>
+<div class="box method"><div class="box-title">What you will be able to do</div><ul><li>Define a mixed strategy and compute expected payoffs against a mixture.</li><li>Apply the indifference principle to solve 2x2 games for their mixed equilibria.</li><li>Explain why each player's probabilities are set to make the opponent indifferent.</li><li>State Nash's existence theorem and outline the fixed-point argument behind it.</li><li>Distinguish the literal, population and beliefs interpretations of mixing.</li></ul></div>
+
+<h2>1. Why randomise at all</h2>
+<p>Matching Pennies has no pure equilibrium. Whatever cell you propose, one player wants to move, and then the other wants to move, and you cycle forever. Something is missing from our strategy sets. What is missing is the option to be <strong>unpredictable</strong>. A tennis player who always serves wide will be broken; a tax authority that always audits the same profession will be gamed. Unpredictability is not a failure of decision-making, it is the decision.</p>
+<div class="box def"><div class="box-title">Definition - mixed strategy</div><p style='margin:0;'>A <strong>mixed strategy</strong> \(\sigma_i \in \Delta(S_i)\) is a probability distribution over player \(i\)'s pure strategies. Payoffs are extended by expectation:</p><div class="eq">\[ u_i(\sigma) \;=\; \sum_{s \in S} \Bigl( \prod_{j} \sigma_j(s_j) \Bigr) u_i(s). \]</div><p style='margin:0;'>A pure strategy is the special case \(\sigma_i(s_i) = 1\) for one action.</p></div>
+
+<h2>2. The indifference principle - the one computational tool you need</h2>
+<p>Suppose in equilibrium a player puts strictly positive probability on two pure strategies, say A and B. If A gave a strictly higher expected payoff than B, the player would gain by shifting all the weight from B to A - so the profile would not be an equilibrium. Therefore:</p>
+<div class="box thm"><div class="box-title">Indifference principle</div><p style='margin:0;'>If \(\sigma^{*}\) is a Nash equilibrium, then for every player \(i\)</p><div class="eq">\[ u_i(s_i, \sigma_{-i}^{*}) = u_i(\sigma_i^{*}, \sigma_{-i}^{*}) \;\;\text{ for all } s_i \in \operatorname{supp}(\sigma_i^{*}), \qquad u_i(s_i, \sigma_{-i}^{*}) \le u_i(\sigma_i^{*}, \sigma_{-i}^{*}) \;\;\text{ otherwise.} \]</div><p style='margin:0;'>Every pure strategy played with positive probability yields <strong>the same expected payoff</strong>, and no unused pure strategy yields more.</p></div>
+<div class="box warn"><div class="box-title">Careful</div><p>The consequence is the fact students find most counterintuitive, and it is worth pausing on: <strong>each player's mixing probabilities are chosen to make the *opponent* indifferent</strong>, not themselves. You randomise in the exact proportions that leave your rival with no reason to prefer one reply over another.</p></div>
+
+<h2>3. Worked example: Matching Pennies</h2>
+<figure class="viz"><div class="viz-title">Matching Pennies</div><div style="text-align:center;overflow-x:auto;"><table class="payoff"><thead><tr><th class="corner">Player 1 \ Player 2</th><th>Heads</th><th>Tails</th></tr></thead><tbody><tr><th>Heads</th><td>1, -1</td><td>-1, 1</td></tr><tr><th>Tails</th><td>-1, 1</td><td>1, -1</td></tr></tbody></table></div></figure>
+<p>Let player 1 play Heads with probability \(p\). Player 2's expected payoffs are</p>
+<div class="eq">\[ u_2(\text{Heads}) = -p + (1-p) = 1 - 2p, \qquad u_2(\text{Tails}) = p - (1-p) = 2p - 1. \]</div>
+<p>Setting them equal gives \(1 - 2p = 2p - 1\), so \(\;\mathbf{p = \tfrac{1}{2}}\). By symmetry player 2 also plays Heads with probability \(\tfrac{1}{2}\), and the equilibrium value to each player is \(0\). The equilibrium is unique.</p>
+
+<h2>4. Worked example: Battle of the Sexes</h2>
+<figure class="viz"><div class="viz-title">Battle of the Sexes</div><div style="text-align:center;overflow-x:auto;"><table class="payoff"><thead><tr><th class="corner">Alex \ Bailey</th><th>Opera</th><th>Football</th></tr></thead><tbody><tr><th>Opera</th><td>2, 1</td><td>0, 0</td></tr><tr><th>Football</th><td>0, 0</td><td>1, 2</td></tr></tbody></table></div></figure>
+<p>Let Alex play Opera with probability \(p\) and Bailey play Opera with probability \(q\).</p>
+<div class="box example"><p style='margin:0 0 4px;'><strong>Make Bailey indifferent:</strong></p><div class="eq">\[ \underbrace{p \cdot 1 + (1-p)\cdot 0}_{\text{Opera}} = \underbrace{p \cdot 0 + (1-p)\cdot 2}_{\text{Football}} \;\Longrightarrow\; p = 2 - 2p \;\Longrightarrow\; p = \tfrac{2}{3}. \]</div><p style='margin:8px 0 4px;'><strong>Make Alex indifferent:</strong></p><div class="eq">\[ \underbrace{2q}_{\text{Opera}} = \underbrace{1 - q}_{\text{Football}} \;\Longrightarrow\; q = \tfrac{1}{3}. \]</div></div>
+<p>So the mixed equilibrium is \(\bigl(\tfrac{2}{3}, \tfrac{1}{3}\bigr)\) on Opera for Alex and Bailey respectively. Alex's expected payoff is \(2q = \tfrac{2}{3}\) and Bailey's is \(p = \tfrac{2}{3}\) - <em>worse for both</em> than either pure equilibrium, because with probability \(\tfrac{2}{3}\cdot\tfrac{2}{3} + \tfrac{1}{3}\cdot\tfrac{1}{3} = \tfrac{5}{9}\) the two end up in different places and get nothing. Adding mixed strategies gives this game three equilibria in total.</p>
+
+<h2>5. Nash's existence theorem</h2>
+<div class="box thm"><div class="box-title">Theorem &mdash; existence (Nash, 1950)</div><p>Every finite game - finitely many players, each with finitely many pure strategies - has at least one Nash equilibrium in mixed strategies.</p></div>
+<p>The proof is a fixed-point argument. Collect all players' mixed strategies into one profile \(\sigma \in \Delta = \prod_i \Delta(S_i)\), a compact convex set. Define the best-response correspondence \(BR(\sigma) = \prod_i \arg\max_{\sigma_i'} u_i(\sigma_i', \sigma_{-i})\). Expected payoffs are linear in each player's own probabilities, so \(BR(\sigma)\) is non-empty, convex-valued and has a closed graph. Kakutani's fixed-point theorem then yields a \(\sigma^{*}\) with \(\sigma^{*} \in BR(\sigma^{*})\) - and a fixed point of the best-response correspondence is precisely a Nash equilibrium. Convexity is where mixing earns its keep: with only pure strategies the best-response set can jump, and no fixed point need exist. Matching Pennies is exactly that failure.</p>
+<p>Two cautions. The theorem guarantees existence, not uniqueness, and not that the equilibrium is easy to find: computing a Nash equilibrium of a two-player game is PPAD-complete (Daskalakis, Goldberg and Papadimitriou, 2009), so no efficient general algorithm is known. Infinite games need extra structure - continuous payoffs and compact convex strategy sets, as in Glicksberg's theorem - and can otherwise fail to have equilibria.</p>
+
+<h2>6. Reading a mixed equilibrium honestly</h2>
+<p>Three interpretations coexist and it is worth knowing which one you mean. <em>Literal randomisation:</em> the player really does flip a weighted coin - a natural reading in poker or in tax auditing. <em>Population interpretation:</em> a large population of players each playing a pure strategy, with 2/3 of them choosing Opera; an opponent drawn at random faces the mixture. <em>Beliefs interpretation (Harsanyi):</em> the probabilities describe the opponent's <em>uncertainty</em> about a player who is in fact acting purely, given tiny unobserved variations in payoffs. The last reading dissolves much of the discomfort with the indifference condition.</p>
+
+<h2>Glossary</h2>
+<table class="glossary"><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Mixed strategy</td><td>A probability distribution \(\sigma_i \in \Delta(S_i)\) over a player's pure strategies.</td></tr><tr><td>Support</td><td>The set of pure strategies assigned strictly positive probability by a mixed strategy.</td></tr><tr><td>Indifference principle</td><td>In equilibrium, all pure strategies in the support give equal expected payoff, and none outside gives more.</td></tr><tr><td>Expected payoff</td><td>The probability-weighted average of payoffs over all strategy profiles that may occur.</td></tr><tr><td>Kakutani fixed-point theorem</td><td>A set-valued fixed-point theorem; the engine of Nash's existence proof.</td></tr><tr><td>PPAD-complete</td><td>A complexity class capturing the difficulty of computing Nash equilibria; no polynomial algorithm is known.</td></tr></tbody></table>
+<div class="keypoints"><h3>Check your understanding</h3><ol><li>In Matching Pennies, what probability does each player place on Heads? <span style='color:#6b7280;'>(Answer: \(p = \tfrac{1}{2}\), giving each an expected payoff of \(0\))</span></li><li>In Battle of the Sexes, whose indifference determines Alex's probability \(p\)? <span style='color:#6b7280;'>(Answer: Bailey's - you set \(p\) so that Bailey is indifferent)</span></li><li>Why do mixed equilibria always exist in finite games? <span style='color:#6b7280;'>(Answer: Mixing convexifies best-response sets, so Kakutani's theorem applies)</span></li><li>Is the mixed equilibrium of Battle of the Sexes better or worse for the players than the pure ones? <span style='color:#6b7280;'>(Answer: Worse: 2/3 each instead of 2 and 1)</span></li></ol></div>
+<div class="box tip"><div class="box-title">Practice</div><p>The chapter quiz asks you to compute mixing probabilities by indifference, evaluate expected payoffs, count equilibria including mixed ones, and state exactly what Nash's theorem does and does not guarantee.</p></div>
+</div>

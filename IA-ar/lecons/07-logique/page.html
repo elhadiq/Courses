@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الفصل 7 &mdash; المنطق والبرهنة</title>
+<meta name="description" content="منطق القضايا، اللزوم، قاعدة الحلّ، DPLL، SAT، المحمولات.">
+<link href="../../assets/style.css" rel="stylesheet">
+<link href="../../assets/rtl.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+
+.src-ar { margin: 26px 0 8px; border-top: 2px solid var(--color-rule); padding-top: 16px; }
+.src-ar h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--primary); }
+.src-ar .src-note { color: var(--color-muted); font-size: 0.9rem; margin: 0 0 12px; }
+.src-ar ul { list-style: none; padding: 0; margin: 0; }
+.src-ar li { margin: 0 0 14px; padding-right: 14px; border-right: 3px solid var(--primary-soft-2);
+             line-height: 1.7; font-size: 0.95rem; }
+.src-ar li .pourquoi { display: block; color: var(--color-muted); font-size: 0.9em;
+                       margin-top: 3px; }
+.src-ar li a.lien { word-break: break-all; font-size: 0.88em; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><a class="lang-switch" href="../../../IA/lecons/07-logique/page.html" hreflang="fr" title="Version fran&ccedil;aise">FR</a><div class="breadcrumb"><a href="../../index.html">الذكاء الاصطناعي</a> &middot; مُقرَّر</div><span class="course-code">برنامج MP/PSI &middot; الفترة الثانية</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">القسم الثالث &middot; الفصل 7</div>
+<h1>الفصل 7 &mdash; تمثيل المعارف والاستدلال</h1>
+<div class="lesson-sub">منطق القضايا، والنماذج واللزوم، وقاعدة الحلّ، وDPLL، ومنطق المحمولات، وحدود المقاربة الرمزية.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">المُلحَق المرافق</div><p>جدول الصدق، والتحويل إلى الصورة الناظمية العطفية، وقاعدة الحلّ، وDPLL، مفصَّلة <strong><a href="../../../IA/lecons/07-logique/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">خطوة بخطوة في المُلحَق</a></strong>، مع مثالٍ مبسوط يدوياً لكلٍّ منها.</p></div>
+
+<h2>7.1 لماذا منطق</h2>
+
+<p>كانت الفصول السابقة تعامل حالة العالم صندوقاً أسود: رأسَ مبيان، أو تشكيلة شبكة، أو متّجه إحداثيات. أمّا الوكيل الذي عليه الاستدلال على عالمٍ معقّد فيحتاج إلى شيءٍ آخر: <strong>تمثيلٍ تقريري</strong>، يكون فيه كلّ واقعةٍ قضيّةً منفصلة، يمكن إضافتها أو حذفها أو التحقّق منها باستقلالٍ عن سواها.</p>
+
+<div class="box tip"><div class="box-title">التجزيئية، الحجّة الحاسمة</div>
+إضافة معرفةٍ إلى وكيلٍ منطقي هي إضافة جملةٍ إلى قاعدته. أمّا إضافة معرفةٍ إلى وكيلٍ مبرمَجٍ بصلابة فتفترض إعادة قراءة البرنامج. وهذه الخاصّية &mdash; لا أيّ تفوّقٍ للمنطق على الأعداد &mdash; هي التي تفسّر المكانة التي يشغلها في هذا الحقل منذ 1958.</div>
+
+<h2>7.2 التركيب، الدلالة، اللزوم</h2>
+
+<div class="box def"><div class="box-title">تعريف &mdash; منطق القضايا</div>
+<p><strong>التركيب.</strong> مجموعة قابلة للعدّ من المتغيّرات القضوية \(p, q, r, \dots\)؛ والصيغ تُبنى بالروابط \(\lnot\) وM2 وM3 وM4 وM5.</p>
+<p><strong>الدلالة.</strong> <strong>التأويل</strong> \(I\) تطبيقٌ من مجموعة المتغيّرات في \(\{\text{vrai}, \text{faux}\}\). ويمتدّ إلى الصيغ بجداول الروابط. والتأويل الذي يجعل صيغةً \(\varphi\) صحيحة هو <strong>نموذجٌ</strong> لـM9، ويُرمَز له \(I \models \varphi\).</p>
+<p>الصيغة <strong>قابلة للإرضاء</strong> إذا كان لها نموذجٌ واحد على الأقلّ، و<strong>صالحة</strong> (أو حشو) إذا كان كلّ تأويلٍ نموذجاً لها، و<strong>غير قابلة للإرضاء</strong> إذا لم يكن أيّ تأويلٍ كذلك.</p></div>
+
+<div class="box def"><div class="box-title">تعريف &mdash; اللزوم المنطقي</div>
+<p>لتكن \(\Gamma\) مجموعة صيغٍ وM12 صيغة. نقول إنّ \(\varphi\) <strong>لازمةٌ</strong> عن \(\Gamma\)، ونكتب \(\Gamma \models \varphi\)، إذا كان كلّ نموذجٍ لـM16 نموذجاً لـM17.</p>
+<p>وهو مفهومٌ <em>دلاليّ</em>: يتكلّم عن عوالم ممكنة، لا عن معالجة رموزٍ أبداً. وهو لا يقول كيف نتحقّق من أيّ شيء.</p></div>
+
+<div class="box thm"><div class="box-title">مبرهنة &mdash; الردّ إلى القابلية للإرضاء</div>
+<p>\(\Gamma \models \varphi\) إذا وفقط إذا كانت \(\Gamma \cup \{\lnot\varphi\}\) غير قابلة للإرضاء.</p>
+<p><em>البرهان.</em> إذا كان \(\Gamma \models \varphi\)، فلا نموذج لـM21 يجعل \(\varphi\) خاطئة، فلا نموذج يُرضي \(\Gamma \cup \{\lnot\varphi\}\) إذن. وعكسياً، إذا كانت هذه المجموعة غير قابلة للإرضاء، فكلّ نموذجٍ لـM24 يجعل \(\lnot\varphi\) خاطئة، ومن ثمّ \(\varphi\) صحيحة. \(\square\)</p>
+<p>هذه المبرهنة التي تبدو بسيطة هي محور الفصل كلّه: فهي تردّ سؤال «هل يلزم هذا؟»، المتناول لعددٍ لا نهائي من العوالم الممكنة، إلى سؤال «هل لهذه المجموعة نموذج؟»، وهو ما نُحسِن مهاجمته ببحث.</p></div>
+
+<h2>7.3 الصحّة والتمام</h2>
+
+<p><strong>نظام الاستدلال</strong> مجموعة قواعد تركيبية خالصة تتيح اشتقاق صيغٍ من أخرى. ونكتب \(\Gamma \vdash \varphi\) حين تُشتَقّ \(\varphi\) من \(\Gamma\). وخاصّيّتان تربطان هذا الرمز بسابقه، وهما وحدهما ما يُحسَب.</p>
+
+<figure class="viz"><div class="viz-title">عالمان، ومبرهنتان</div>
+<svg viewBox="0 0 760 330" role="img" style="width:100%;height:auto;display:block;"><rect x="30" y="60" width="290" height="200" rx="10" style="fill:var(--primary);fill-opacity:0.08;stroke:var(--primary);stroke-width:2.2;"/><rect x="440" y="60" width="290" height="200" rx="10" style="fill:var(--accent);fill-opacity:0.08;stroke:var(--accent);stroke-width:2.2;"/><text x="175" y="88" text-anchor="middle" style="fill:var(--primary);font-size:15px;font-weight:700;font-family:inherit;">التركيب</text><text x="585" y="88" text-anchor="middle" style="fill:var(--accent);font-size:15px;font-weight:700;font-family:inherit;">الدلالة</text><text x="52" y="122" style="fill:var(--color-text);font-size:13px;font-family:inherit;">متتاليات رموز</text><text x="462" y="122" style="fill:var(--color-text);font-size:13px;font-family:inherit;">عوالم ممكنة</text><text x="52" y="156" style="fill:var(--color-text);font-size:13px;font-family:inherit;">قواعد للتكوين السليم</text><text x="462" y="156" style="fill:var(--color-text);font-size:13px;font-family:inherit;">قيمة صدقٍ لكلّ عالم</text><text x="52" y="190" style="fill:var(--color-text);font-size:13px;font-family:inherit;">مفهوم <tspan style="font-weight:700;">البرهنة</tspan></text><text x="462" y="190" style="fill:var(--color-text);font-size:13px;font-family:inherit;">مفهوم <tspan style="font-weight:700;">اللزوم</tspan></text><text x="52" y="224" style="fill:var(--color-text);font-size:13px;font-family:inherit;">آليّ خالص</text><text x="462" y="224" style="fill:var(--color-text);font-size:13px;font-family:inherit;">يتناول المعنى</text><path d="M 322 138 L 436 138" style="fill:none;stroke:var(--viz-ok);stroke-width:2.5;"/><path d="M 428 132 L 440 138 L 428 144 Z" style="fill:var(--viz-ok);"/><text x="379" y="128" text-anchor="middle" style="fill:var(--viz-ok);font-size:12px;font-weight:700;font-family:inherit;">الصحّة</text><path d="M 436 190 L 322 190" style="fill:none;stroke:var(--viz-blue);stroke-width:2.5;"/><path d="M 332 184 L 318 190 L 332 196 Z" style="fill:var(--viz-blue);"/><text x="379" y="212" text-anchor="middle" style="fill:var(--viz-blue);font-size:12px;font-weight:700;font-family:inherit;">التمام</text><text x="380" y="30" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">عالمان يفرّق بينهما كلّ شيء، ومبرهنتان تربطانهما</text><text x="380" y="292" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">الصحّة: كلّ ما يُبرهَن صحيحٌ في كلّ مكان. التمام: كلّ ما هو صحيحٌ في كلّ مكان يُبرهَن.</text><text x="380" y="314" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">بلا صحّة تكون الطريقة خاطئة؛ وبلا تمامٍ تكون ناقصةً فقط.</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 7.1.</strong> النظام <strong>الصحيح</strong> لا يبرهن إلّا لوازم: فـM31 يستلزم \(\Gamma \models \varphi\). والنظام <strong>التامّ</strong> يبرهن كلّ اللوازم: فـM33 يستلزم \(\Gamma \vdash \varphi\). والنظام غير الصحيح غير قابل للاستعمال، لأنّه يكذب؛ أمّا النظام غير التامّ فيبقى مفيداً، إنّما يصمت أحياناً.</figcaption></figure>
+
+<p>أبسط الطرائق &mdash; بناء جدول الصدق كاملاً والتحقّق من كلّ سطر &mdash; صحيحةٌ وتامّة. وهي أيضاً غير قابلة للاستعمال: فـM35 متغيّراً تعطي \(2^{n}\) سطراً، أي أكثر من ألف مليار في أربعين متغيّراً. وكلّ ما يلي هو تحصيل النتيجة نفسها دون بناء هذا الجدول.</p>
+
+<h2>7.4 الصورة الناظمية العطفية وقاعدة الحلّ</h2>
+
+<div class="box def"><div class="box-title">تعريف &mdash; الصورة الناظمية العطفية</div>
+<p><strong>العدد الأوّلي المنطقي</strong> متغيّرٌ أو نفيه؛ و<strong>الفقرة</strong> فصلُ أعدادٍ أوّلية منطقية؛ والصيغة في <strong>صورةٍ ناظمية عطفية</strong> إذا كانت عطفَ فقرات. وكلّ صيغةٍ قضوية تقبل صورةً ناظمية عطفية مكافئة منطقياً، تُحصَّل بحذف الاستلزامات، وإنزال النفي، والتوزيع.</p>
+<p>انتبه: قد يُنمّي هذا التحويل حجم الصيغة نموّاً أُسّياً. وتحويل تسايتين يتجنّب ذلك، بثمن متغيّراتٍ إضافية، ويُرجِع صيغةً <em>متكافئة القابلية للإرضاء</em> فقط &mdash; وهذا يكفي لأنّ القابلية للإرضاء هي ما نختبره.</p></div>
+
+<div class="box thm"><div class="box-title">مبرهنة &mdash; قاعدة الحلّ</div>
+<p>من فقرتين \(C \lor \ell\) وM38، نستنتج <strong>الحالّة</strong> \(C \lor D\). وهذه القاعدة صحيحة، وهي <em>تامّة للدحض</em>: فمجموعة فقراتٍ غير قابلة للإرضاء إذا وفقط إذا اشتُقّت منها الفقرة الفارغة بتطبيقاتٍ متكرّرة لقاعدة الحلّ <a class="cite" href="#ref-robinson1965">[1]</a>.</p>
+<p>وفي المقابل فهي <em>ليست</em> تامّةً بالمعنى العادي: فمن \(p\) لا نشتقّ \(p \lor q\) بقاعدة الحلّ. وهذا لا يهمّ، لأنّ مبرهنة الردّ تردّ كلّ سؤال لزومٍ إلى دحض.</p></div>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 7.1 &mdash; قاعدة الحلّ القضوية</div><div class="algo-io"><b>المُدخل:</b> قاعدة \(\Gamma\)، وسؤال \(\varphi\)<br><b>المُخرج:</b> صحيح إذا \(\Gamma \models \varphi\)، وخطأ في غير ذلك</div><ol class="algo-corps"><li>\(\mathcal{C} \leftarrow \mathrm{Fnc}(\Gamma \cup \{\lnot\varphi\})\)          <span class="cm">// ندحض النفي</span></li><li><b class="kw">كرّر</b></li><li class="n1">\(\mathcal{N} \leftarrow \varnothing\)</li><li class="n1"><b class="kw">لكلّ</b> \((C, D) \in \mathcal{C}^{2}\) <b class="kw">وكلّ</b> \(\ell \in C\) <b class="kw">بحيث</b> \(\lnot\ell \in D\) <b class="kw">نفّذ</b></li><li class="n2">\(R \leftarrow (C \setminus \{\ell\}) \cup (D \setminus \{\lnot\ell\})\)          <span class="cm">// الحالة</span></li><li class="n2"><b class="kw">إذا</b> \(R = \varnothing\) <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> صحيح          <span class="cm">// فقرة فارغة</span></li><li class="n2">\(\mathcal{N} \leftarrow \mathcal{N} \cup \{R\}\)</li><li class="n1"><b class="kw">إذا</b> \(\mathcal{N} \subseteq \mathcal{C}\) <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> خطأ          <span class="cm">// تشبع</span></li><li class="n1">\(\mathcal{C} \leftarrow \mathcal{C} \cup \mathcal{N}\)</li></ol><p class="algo-note"><strong>مبرهنة.</strong> \(\Gamma \models \varphi\) إذا وفقط إذا كانت \(\Gamma \cup \{\lnot\varphi\}\) غير قابلة للإرضاء، وقاعدة الحلّ تامّة للدحض: فتُشتَقّ الفقرة الفارغة عندئذٍ لزوماً.</p></div>
+
+<h2>7.5 DPLL والحلّالات الحديثة</h2>
+
+<p>تولّد قاعدة الحلّ عدداً هائلاً من الفقرات الوسيطة. أمّا المقاربة المهيمنة اليوم فتسير على نحوٍ آخر: فهي تبحث مباشرةً عن نموذجٍ بالتراجع، مستثمرةً ملاحظةً بسيطة. فإن لم يبقَ لفقرةٍ إلّا عددٌ أوّلي منطقي واحد غير محدَّد ولم تكن مُرضاةً بعد، فقيمة هذا العدد <em>مفروضة</em>. وليس ذلك اختياراً: بل معاينة.</p>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 7.2 &mdash; DPLL</div><div class="algo-io"><b>المُدخل:</b> مجموعة فقرات \(\mathcal{C}\) على \(n\) متغيّراً<br><b>المُخرج:</b> إسنادٌ \(\mathcal{A}\) يُرضي \(\mathcal{C}\)، أو الإخفاق</div><ol class="algo-corps"><li><b class="kw">دالّة</b> <span class="fn">Dpll</span>\((\mathcal{C},\ \mathcal{A})\)</li><li class="n1">\(\mathcal{A} \leftarrow\) <span class="fn">انشر‌الأحادية</span>\((\mathcal{C},\ \mathcal{A})\)</li><li class="n1"><b class="kw">إذا</b> \(\exists\, C \in \mathcal{C}\) خاطئة تحت \(\mathcal{A}\) <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> إخفاق</li><li class="n1"><b class="kw">إذا</b> \(|\mathcal{A}| = n\) <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> \(\mathcal{A}\)</li><li class="n1">\(x \leftarrow\) متغيّر غير مُسنَد</li><li class="n1">\(r \leftarrow\) <span class="fn">Dpll</span>\((\mathcal{C},\ \mathcal{A} \cup \{x = \top\})\)</li><li class="n1"><b class="kw">إذا</b> \(r \neq\) إخفاق <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> <i class="va">r</i></li><li class="n1"><b class="kw">أرجِع</b> <span class="fn">Dpll</span>\((\mathcal{C},\ \mathcal{A} \cup \{x = \bot\})\)</li><li>&nbsp;</li><li><b class="kw">دالّة</b> <span class="fn">انشر‌الأحادية</span>\((\mathcal{C},\ \mathcal{A})\)</li><li class="n1"><b class="kw">طالما</b> \(\exists\, C \in \mathcal{C}\) غير مُرضاة ولا يوجد فيها حرٌّ إلّا عددٌ أوّلي منطقي واحد \(\ell\) <b class="kw">نفّذ</b></li><li class="n2">\(\mathcal{A} \leftarrow \mathcal{A} \cup \{\ell = \top\}\)          <span class="cm">// لا اختيار: انها معاينة</span></li><li class="n1"><b class="kw">أرجِع</b> \(\mathcal{A}\)</li></ol><p class="algo-note">الانتشار الأحادي هو المكوّن الوحيد الذي يميّز DPLL عن تعداد: فهو لا يقوم بأيّ اختيار. وعلى صيغة الشكل 7.2، ينقل من 17 عقدة إلى 2. <strong>المتناقص:</strong> \(n - |\mathcal{A}|\).</p></div>
+
+<p>يعود الإجراء إلى ديفيس وبوتنام سنة 1960 <a class="cite" href="#ref-davis1960">[2]</a>، في صيغةٍ كانت تحذف المتغيّرات واحداً واحداً وتُشبِع الذاكرة؛ ثمّ استبدل بها ديفيس ولوغمان ولوفلاند بعد سنتين التراجعَ، وذاكرته خطّية <a class="cite" href="#ref-davis1962">[3]</a>.</p>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">صيغةٌ من سبع فقرات على خمسة متغيّرات. المؤشّر الأوّل يفعّل الانتشار الأحادي، والثاني يبسط البحث عقدةً عقدة.</p>
+<div id="jxg1" class="viz-board" style="height:520px;"></div>
+<p class="viz-caption"><strong>الشكل 7.2.</strong> بلا انتشار، يزور التعداد <strong>17 عقدة</strong>: فهو يختار كلّ متغيّرٍ بدوره ويكتشف التعارضات في أسفل الشجرة. ومع الانتشار، تكفي <strong>2</strong>، والنموذج الموجود هو نفسه. ولا يأتي المكسب من أيّ مُرشِدةٍ لطيفة: بل من أنّنا كففنا عن الاختيار حيث لا شيء نختاره.</p></div>
+
+<div class="box tip"><div class="box-title">ما تضيفه الحلّالات الصناعية</div>
+ثلاث آليّات تفصل DPLL المدرسي عن حلّالٍ قادرٍ على معالجة ملايين المتغيّرات. <strong>تعلّم الفقرات</strong>: فعند كلّ تعارض، نحلّل سببه ونضيف فقرةً تمنعه في مكانٍ آخر من الشجرة <a class="cite" href="#ref-marques1999">[4]</a>. و<strong>التراجعات غير الزمنية</strong>: فنصعد مباشرةً إلى المستوى المسؤول عن التعارض، بدل المستوى السابق. و<strong>مُرشِدات التفرّع الديناميكية</strong>، التي تُفضّل المتغيّرات المتورّطة حديثاً في تعارضات <a class="cite" href="#ref-moskewicz2001">[5]</a>. وهذه الحلّالات تتحقّق اليوم من دارات إلكترونية وبرامج حقيقية.</div>
+
+<h2>7.6 الكلفة: SAT صعبة تامّة بمعنى NP</h2>
+
+<div class="box thm"><div class="box-title">مبرهنة كوك وليفين</div>
+<p>مسألة قابلية صيغةٍ قضوية للإرضاء صعبة تامّة بمعنى NP <a class="cite" href="#ref-cook1971">[6]</a>. وتبقى كذلك حين تحوي كلّ الفقرات ثلاثة أعدادٍ أوّلية منطقية بالضبط؛ وتصير في المقابل كثيرة الحدود حين تحوي اثنين على الأكثر.</p>
+<p>هذه النتيجة التاريخية أوّل مسألةٍ بُرهِن أنّها صعبة تامّة بمعنى NP، وهي تُستعمَل منذئذٍ نقطة انطلاقٍ لكلّ براهين التمام بمعنى NP الأخرى &mdash; بما فيها برهان التلوين بثلاثة ألوان المذكور في الفصل 6.</p></div>
+
+<p>وكما في الفصل 6، لا تتبع الصعوبة <em>الوسطى</em> صعوبةَ أسوأ الحالات. فمن أجل صيغٍ عشوائية ذات ثلاثة أعدادٍ أوّلية منطقية، تحكم النسبةُ بين عدد الفقرات وعدد المتغيّرات كلَّ شيء: فتحت عتبةٍ معيّنة تكون كلّها تقريباً قابلة للإرضاء وتُحلّ بسرعة؛ وفوقها لا يكون أيٌّ منها كذلك تقريباً ويُبرهَن التناقض بسرعة. وتبلغ الكلفة ذروتها عند العتبة بالضبط <a class="cite" href="#ref-mitchell1992">[7]</a>.</p>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">يحرّك المؤشّر النسبة بين عدد الفقرات وعدد المتغيّرات. وكلّ نقطةٍ هي متوسّط 25 صيغة مسحوبة عشوائياً.</p>
+<div id="jxg2" class="viz-board" style="height:440px;"></div>
+<p class="viz-caption"><strong>الشكل 7.3.</strong> الظاهرتان مرئيّتان: احتمال القابلية للإرضاء يهوي من 100 % إلى 0 %، وكلفة الحلّ تمرّ بأعظمية في وسط هذا الهبوط. <strong>ولا بدّ من مصارحتين.</strong> أوّلاً، هذه القياسات تتناول 18 متغيّراً فقط: والعتبة القريبة المُثبَتة في الأدبيات تقع نحو 4,27، وعند هذا الحجم تظهر مزاحةً نحو اليمين. ثانياً، 25 سحباً لكلّ نقطة تترك ضجيجاً مرئياً &mdash; فالمنحنى ليس رتيباً تماماً. الظاهرة حقيقية؛ ولا يصير وضوحها صريحاً إلّا مع مئات المتغيّرات وآلاف السحوب.</p></div>
+
+<h2>7.7 منطق المحمولات، وثمنه</h2>
+
+<p>لا يُحسِن منطق القضايا قول «كلّ البشر فانون»: إذ سيلزم متغيّرٌ لكلّ إنسان. أمّا منطق المحمولات فيضيف <em>كائناتٍ</em> و<em>علاقاتٍ</em> ومُسوِّرَين، وهذا يتيح كتابة \(\forall x\,(\text{Humain}(x) \Rightarrow \text{Mortel}(x))\).</p>
+
+<figure class="viz"><div class="viz-title">قوّة التعبير في مقابل القابلية للفصل</div>
+<svg viewBox="0 0 760 336" role="img" style="width:100%;height:auto;display:block;"><rect x="60" y="60" width="620" height="62" rx="8" style="fill:var(--viz-ok);fill-opacity:0.12;stroke:var(--viz-ok);stroke-width:2.2;"/><text x="84" y="86" style="fill:var(--color-text);font-size:13px;font-family:inherit;">منطق القضايا</text><text x="84" y="108" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">متغيّرات صحيحة أو خاطئة، بلا بنيةٍ داخلية</text><text x="660" y="96" text-anchor="end" style="fill:var(--viz-ok);font-size:12.5px;font-weight:700;font-family:inherit;">قابل للفصل، صعب تامّ بمعنى NP</text><path d="M 370 122 L 370 136" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 364 132 L 370 140 L 376 132 Z" style="fill:var(--viz-axis);"/><rect x="60" y="142" width="620" height="62" rx="8" style="fill:var(--accent);fill-opacity:0.12;stroke:var(--accent);stroke-width:2.2;"/><text x="84" y="168" style="fill:var(--color-text);font-size:13px;font-family:inherit;">منطق المحمولات</text><text x="84" y="190" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">كائنات وعلاقات ومُسوِّرات: «كلّ» و«يوجد»</text><text x="660" y="178" text-anchor="end" style="fill:var(--accent);font-size:12.5px;font-weight:700;font-family:inherit;">قابل للفصل نصفياً فقط</text><path d="M 370 204 L 370 218" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 364 214 L 370 222 L 376 214 Z" style="fill:var(--viz-axis);"/><rect x="60" y="224" width="620" height="62" rx="8" style="fill:var(--viz-bad);fill-opacity:0.12;stroke:var(--viz-bad);stroke-width:2.2;"/><text x="84" y="250" style="fill:var(--color-text);font-size:13px;font-family:inherit;">حسابيات الرتبة الأولى</text><text x="84" y="272" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">لا نظام صحيح يبرهن كلّ القضايا الصحيحة</text><text x="660" y="260" text-anchor="end" style="fill:var(--viz-bad);font-size:12.5px;font-weight:700;font-family:inherit;">غير قابل للإتمام</text><text x="380" y="30" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">كلّما عبّرت اللغة أكثر، قلّ ما تستطيع الآلة فصله</text><text x="380" y="312" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;"><tspan x="380" dy="0">قابل للفصل نصفياً: إن كانت القضية لازمةً عن المقدّمات، توقّف البحث وبرهنها؛ وإلّا فقد لا يتوقّف</tspan><tspan x="380" dy="16">أبداً.</tspan></text></svg>
+<figcaption class="viz-caption"><strong>الشكل 7.4.</strong> يُدفَع ثمن مكسب قوّة التعبير في القابلية للحساب بالضبط. فقد برهن غودل سنة 1930 أنّ منطق المحمولات تامّ: فكلّ لزومٍ دلالي قابل للبرهنة <a class="cite" href="#ref-godel1930">[8]</a>. وبرهن تشرش وتورينغ بعد ستّ سنوات أنّه <em>غير قابل للفصل</em>: فلا خوارزمية تستطيع، لكلّ صيغة، أن تجيب في زمنٍ منتهٍ <a class="cite" href="#ref-turing1936">[9]</a>. والنتيجتان متوافقتان: فإجراء بحثٍ ينتهي إلى إيجاد البرهان حين يوجد، لكنّه قد يبحث بلا انتهاء حين لا يوجد.</figcaption></figure>
+
+<div class="box warn"><div class="box-title">ثلاثة حدود للمقاربة المنطقية، معروفة منذ الثمانينيات</div>
+<p><strong>مشكل الإطار.</strong> وصفُ ما يغيّره فعلٌ سهل؛ أمّا وصف كلّ ما <em>لا</em> يغيّره <em> </em> فيتطلّب عدداً هائلاً من القضايا. فتحريك فنجانٍ لا يغيّر لون الجدران، ولا الساعة، ولا موضع القمر <a class="cite" href="#ref-mccarthy1969">[10]</a>.</p>
+<p><strong>اللارتابة.</strong> في المنطق الكلاسيكي، لا تحذف إضافةُ مقدّمةٍ نتيجةً أبداً. أمّا استدلال الحسّ المشترك فيفعل العكس تماماً: «تيتي طائر، إذن تيتي يطير»؛ ثمّ «تيتي بطريق» تحذف النتيجة. وثمّة منطقيّات لارتيبة، بثمن تعقيدٍ أكبر.</p>
+<p><strong>الكلّ أو لا شيء.</strong> الصيغة صحيحة أو خاطئة. والعالم الحقيقي مصنوع من «دائماً تقريباً» و«محتمل نوعاً ما». وهذا بالضبط موضوع الفصل التالي.</p></div>
+
+<h2>الخلاصة</h2>
+<ul>
+<li>التمثيل التقريري يجعل المعرفة قابلة للتجزيء: فنضيف جملةً لا سطر برنامج.</li>
+<li>اللزوم دلاليّ، والبرهنة تركيبية؛ والصحّة والتمام هما الجسران بينهما.</li>
+<li>كلّ سؤال لزومٍ يؤول إلى سؤال قابليةٍ للإرضاء بنفيٍ بسيط.</li>
+<li>قاعدة الحلّ تامّة للدحض <a class="cite" href="#ref-robinson1965">[1]</a>؛ وDPLL يبحث عن نموذج، والانتشار الأحادي يقوم بجُلّ العمل <a class="cite" href="#ref-davis1962">[3]</a>.</li>
+<li>SAT صعبة تامّة بمعنى NP <a class="cite" href="#ref-cook1971">[6]</a>، لكنّ الأمثلة الصعبة فعلاً تتمركز حول عتبة <a class="cite" href="#ref-mitchell1992">[7]</a>.</li>
+<li>منطق المحمولات تامّ وغير قابل للفصل: فهو يجد كلّ برهانٍ موجود، دون أن يضمن التوقّف أبداً <a class="cite" href="#ref-godel1930">[8]</a><a class="cite" href="#ref-turing1936">[9]</a>.</li>
+</ul>
+
+<h2>المراجع</h2>
+<ol class="reflist">
+<li id="ref-robinson1965">Robinson, J. A. (1965). A machine-oriented logic based on the resolution principle. <em>Journal of the ACM</em>, 12(1), 23&ndash;41. DOI: 10.1145/321250.321253. <a href="https://doi.org/10.1145/321250.321253">https://doi.org/10.1145/321250.321253</a></li>
+<li id="ref-davis1960">Davis, M. &amp; Putnam, H. (1960). A computing procedure for quantification theory. <em>Journal of the ACM</em>, 7(3), 201&ndash;215. DOI: 10.1145/321033.321034. <a href="https://doi.org/10.1145/321033.321034">https://doi.org/10.1145/321033.321034</a></li>
+<li id="ref-davis1962">Davis, M., Logemann, G. &amp; Loveland, D. (1962). A machine program for theorem-proving. <em>Communications of the ACM</em>, 5(7), 394&ndash;397. DOI: 10.1145/368273.368557. <a href="https://doi.org/10.1145/368273.368557">https://doi.org/10.1145/368273.368557</a></li>
+<li id="ref-marques1999">Marques-Silva, J. P. &amp; Sakallah, K. A. (1999). GRASP: a search algorithm for propositional satisfiability. <em>IEEE Transactions on Computers</em>, 48(5), 506&ndash;521. DOI: 10.1109/12.769433. <a href="https://doi.org/10.1109/12.769433">https://doi.org/10.1109/12.769433</a></li>
+<li id="ref-moskewicz2001">Moskewicz, M. W., Madigan, C. F., Zhao, Y., Zhang, L. &amp; Malik, S. (2001). Chaff: engineering an efficient SAT solver. <em>Proceedings of the 38th Design Automation Conference</em>, 530&ndash;535. DOI: 10.1145/378239.379017. <a href="https://doi.org/10.1145/378239.379017">https://doi.org/10.1145/378239.379017</a></li>
+<li id="ref-cook1971">Cook, S. A. (1971). The complexity of theorem-proving procedures. <em>Proceedings of the Third Annual ACM Symposium on Theory of Computing</em>, 151&ndash;158. DOI: 10.1145/800157.805047. <a href="https://doi.org/10.1145/800157.805047">https://doi.org/10.1145/800157.805047</a></li>
+<li id="ref-mitchell1992">Mitchell, D., Selman, B. &amp; Levesque, H. (1992). Hard and easy distributions of SAT problems. <em>Proceedings of AAAI-92</em>, 459&ndash;465. <a href="https://cdn.aaai.org/AAAI/1992/AAAI92-071.pdf">https://cdn.aaai.org/AAAI/1992/AAAI92-071.pdf</a></li>
+<li id="ref-godel1930">G&ouml;del, K. (1930). Die Vollst&auml;ndigkeit der Axiome des logischen Funktionenkalk&uuml;ls. <em>Monatshefte f&uuml;r Mathematik und Physik</em>, 37, 349&ndash;360. DOI: 10.1007/BF01696781. <a href="https://doi.org/10.1007/BF01696781">https://doi.org/10.1007/BF01696781</a></li>
+<li id="ref-turing1936">Turing, A. M. (1936). On computable numbers, with an application to the Entscheidungsproblem. <em>Proceedings of the London Mathematical Society</em>, s2-42(1), 230&ndash;265. DOI: 10.1112/plms/s2-42.1.230. <a href="https://doi.org/10.1112/plms/s2-42.1.230">https://doi.org/10.1112/plms/s2-42.1.230</a></li>
+<li id="ref-mccarthy1969">McCarthy, J. &amp; Hayes, P. J. (1969). Some philosophical problems from the standpoint of artificial intelligence. In <em>Machine Intelligence 4</em>, Edinburgh University Press, 463&ndash;502. <a href="https://www-formal.stanford.edu/jmc/mcchay69.pdf">https://www-formal.stanford.edu/jmc/mcchay69.pdf</a></li>
+</ol>
+
+<section class="src-ar">
+<h3>مصادر بالعربية</h3>
+<p class="src-note">مصادر للاستزادة، لا مراجع لما ورد أعلاه: المراجع الأصلية للفصل مذكورةٌ في القائمة السابقة بلغتها. وقد عُوينت كلّ صفحةٍ من صفحات الناشرين للتحقّق من العنوان والمترجم ورخصة الإتاحة.</p>
+<ul>
+<li>بودن، مارجريت إيه. <em>الذكاء الاصطناعي: مقدّمة قصيرة جدًّا</em>. ترجمة إبراهيم سند أحمد، مراجعة هاني فتحي سليمان. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). نحو 43 ألف كلمة، متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/48149074/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/48149074/</a><span class="pourquoi">أقرب كتابٍ عربيٍّ مجّاني إلى روح الفصل الأوّل: التعريفات، والتاريخ، والحدود، والنقاش الفلسفي.</span></li>
+<li>فلوريدي، لوتشانو. <em>المعلومات: مقدّمة قصيرة جدًّا</em>. ترجمة محمد سعد طنطاوي، مراجعة علا عبد الفتاح يس. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/29257536/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/29257536/</a><span class="pourquoi">يقدّم بالعربية مفهوم المعلومة والإنتروبيا، وهو الأساس الذي تستند إليه مقاييس هذا الفصل.</span></li>
+</ul>
+</section>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../06-contraintes/page.html">\(\leftarrow\) الفصل 6 &mdash; إرضاء القيود</a>
+<a href="../../../IA/lecons/07-logique/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">المُلحَق الخوارزمي</a>
+<a href="../../index.html">فهرس المُقرَّر</a>
+<a href="../08-probabiliste/page.html">الفصل 8 &mdash; الاستدلال الاحتمالي \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>الذكاء الاصطناعي &mdash; الأقسام التحضيرية MP/PSI</strong> &middot; البحث والألعاب والقيود والتعلّم<span class="footer-meta">طبعة 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">تعذّر تحميل الشكل التفاعلي. تحقّق من اتصالك بالشبكة.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ================= Figure : arbre de recherche de DPLL ==================== */
+/* Formule fixe sur 5 variables (1..5). Un litteral negatif est note -k. */
+var CLAUSES = [
+  [1, 2, -3], [-1, 3], [-2, -3, 4], [-4, 5], [-1, -5], [2, -4, -5], [1, -2, 3]
+];
+var NVAR = 5;
+var NOMS7 = ['a', 'b', 'c', 'd', 'e'];
+function litNom(l){ return (l < 0 ? 'ليس ' : '') + NOMS7[Math.abs(l) - 1]; }
+
+/* Evalue une clause sous une affectation partielle : 1 vraie, 0 fausse, -1 indeterminee. */
+function etatClause(cl, aff){
+  var indetermines = 0;
+  for (var i = 0; i < cl.length; i++){
+    var v = Math.abs(cl[i]), s = cl[i] > 0;
+    if (!(v in aff)) { indetermines++; }
+    else if (aff[v] === s) { return 1; }
+  }
+  return indetermines > 0 ? -1 : 0;
+}
+/* DPLL avec ou sans propagation unitaire. Renvoie la trace des noeuds visites. */
+function dpll(propagation){
+  var noeuds = [], solution = null;
+  function copier(o){ var r = {}; for (var k in o){ r[k] = o[k]; } return r; }
+  function unitaires(aff){
+    /* renvoie la liste des affectations forcees, ou null si conflit */
+    var forcees = [], change = true;
+    var a = copier(aff);
+    while (change){
+      change = false;
+      for (var i = 0; i < CLAUSES.length; i++){
+        var cl = CLAUSES[i], libre = null, nlibres = 0, satisfaite = false;
+        for (var j = 0; j < cl.length; j++){
+          var v = Math.abs(cl[j]), s = cl[j] > 0;
+          if (!(v in a)) { nlibres++; libre = cl[j]; }
+          else if (a[v] === s) { satisfaite = true; }
+        }
+        if (satisfaite) { continue; }
+        if (nlibres === 0) { return null; }
+        if (nlibres === 1){
+          a[Math.abs(libre)] = libre > 0;
+          forcees.push(libre);
+          change = true;
+        }
+      }
+    }
+    return {aff: a, forcees: forcees};
+  }
+  function explorer(aff, prof, indice, forcees){
+    var conflit = false;
+    for (var i = 0; i < CLAUSES.length; i++){
+      if (etatClause(CLAUSES[i], aff) === 0) { conflit = true; }
+    }
+    var complete = true;
+    for (var v = 1; v <= NVAR; v++){ if (!(v in aff)) { complete = false; } }
+    var succes = !conflit && complete;
+    noeuds.push({prof: prof, indice: indice, aff: copier(aff),
+                 conflit: conflit, succes: succes, forcees: forcees || []});
+    if (conflit) { return false; }
+    if (succes){ solution = copier(aff); return true; }
+    var choisie = 1;
+    for (var v = 1; v <= NVAR; v++){ if (!(v in aff)) { choisie = v; break; } }
+    for (var b = 0; b < 2; b++){
+      var suivante = copier(aff);
+      suivante[choisie] = (b === 0);
+      var f = [];
+      if (propagation){
+        var u = unitaires(suivante);
+        if (u === null){
+          noeuds.push({prof: prof + 1, indice: indice * 2 + b, aff: suivante,
+                       conflit: true, succes: false, forcees: []});
+          continue;
+        }
+        suivante = u.aff; f = u.forcees;
+      }
+      if (explorer(suivante, prof + 1, indice * 2 + b, f)) { return true; }
+    }
+    return false;
+  }
+  var depart = {}, f0 = [];
+  if (propagation){
+    var u0 = unitaires(depart);
+    if (u0 !== null){ depart = u0.aff; f0 = u0.forcees; }
+  }
+  explorer(depart, 0, 0, f0);
+  return {noeuds: noeuds, solution: solution};
+}
+var TRACE7 = [dpll(false), dpll(true)];
+
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-0.9, 6.4, 17.4, -3.4], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sProp = b1.create('slider', [[0.2, -1.5], [5.4, -1.5], [0, 1, 1]], {
+  name: 'انتشار أحادي', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sPas7 = b1.create('slider', [[7.0, -1.5], [17.0, -1.5], [0, 40, 40]], {
+  name: 'خطوة', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function prop(){ return Math.round(sProp.Value()); }
+function trace7(){ return TRACE7[prop()]; }
+function pas7(){ return Math.min(Math.round(sPas7.Value()), trace7().noeuds.length); }
+function noeudVu(prof, indice){
+  var t = trace7(), n = pas7();
+  for (var i = 0; i < n; i++){
+    if (t.noeuds[i].prof === prof && t.noeuds[i].indice === indice) { return t.noeuds[i]; }
+  }
+  return null;
+}
+function px7(prof, indice){
+  var n = Math.pow(2, prof);
+  return (indice + 0.5) * (16.6 / n);
+}
+function py7(prof){ return 5.0 - prof * 1.35; }
+/* aretes et noeuds jusqu'a la profondeur 4 */
+for (var p = 0; p < 4; p++){
+  for (var i = 0; i < Math.pow(2, p); i++){
+    for (var b = 0; b < 2; b++){
+      (function(pp, ii, bb){
+        b1.create('segment', [[px7(pp, ii), py7(pp) - 0.22],
+                              [px7(pp + 1, ii * 2 + bb), py7(pp + 1) + 0.22]], {
+          strokeColor: function(){ return noeudVu(pp + 1, ii * 2 + bb) ? cssv('--primary','#026573') : PAL.ref(); },
+          strokeWidth: function(){ return noeudVu(pp + 1, ii * 2 + bb) ? 2.4 : 1; },
+          straightFirst: false, straightLast: false, highlight: false, fixed: true});
+      })(p, i, b);
+    }
+  }
+}
+for (var p = 0; p <= 4; p++){
+  for (var i = 0; i < Math.pow(2, p); i++){
+    (function(pp, ii){
+      b1.create('point', [px7(pp, ii), py7(pp)], {
+        name: '', size: 8, face: 'o', fixed: true, highlight: false, strokeWidth: 2,
+        strokeColor: function(){
+          var n = noeudVu(pp, ii);
+          if (!n) { return PAL.axis(); }
+          if (n.conflit) { return cssv('--viz-bad', '#dc2626'); }
+          if (n.succes) { return cssv('--viz-ok', '#16a34a'); }
+          return cssv('--primary', '#026573');
+        },
+        fillColor: function(){
+          var n = noeudVu(pp, ii);
+          if (!n) { return PAL.bg(); }
+          if (n.conflit) { return cssv('--viz-bad', '#dc2626'); }
+          if (n.succes) { return cssv('--viz-ok', '#16a34a'); }
+          return cssv('--primary', '#026573');
+        }, fillOpacity: 1});
+      b1.create('text', [px7(pp, ii), py7(pp) - 0.48, function(){
+        var n = noeudVu(pp, ii);
+        if (!n) { return ''; }
+        if (n.conflit) { return 'conflit'; }
+        if (n.succes) { return 'modele'; }
+        var s = [];
+        for (var v = 1; v <= NVAR; v++){ if (v in n.aff) { s.push(NOMS7[v-1] + (n.aff[v] ? '=V' : '=F')); } }
+        return s.join(' ');
+      }], {fontSize: 10, anchorX: 'middle', fixed: true, highlight: false,
+           strokeColor: function(){
+             var n = noeudVu(pp, ii);
+             return (n && n.conflit) ? cssv('--viz-bad','#dc2626') : PAL.muted(); }});
+    })(p, i);
+  }
+}
+b1.create('text', [-0.8, 6.1, function(){
+  var t = trace7();
+  return (prop() ? 'DPLL مع الانتشار الأحادي' : 'تعداد بالتراجع، بلا انتشار')
+       + '   |   العقد المزارة في هذه الخطوة: ' + pas7()
+       + ' من ' + t.noeuds.length + ' في المجموع';
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-0.8, 5.65, function(){
+  var t = trace7(), n = pas7();
+  if (n === 0) { return 'لا متغير مسند. صيغة من 7 فقرات على 5 متغيرات.'; }
+  var e = t.noeuds[n-1];
+  if (e.conflit) { return 'تعارض: فقرة واحدة على الاقل خاطئة، والفرع مقطوع.'; }
+  if (e.succes) { return 'كل الفقرات مرضاة: وُجد نموذج.'; }
+  if (e.forcees.length){
+    var f = e.forcees.map(litNom).join(', ');
+    return 'فقرات أحادية: ' + f + ' مفروضة بلا أي اختيار.';
+  }
+  return 'اختيار حر للمتغير التالي.';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-0.8, -2.6, function(){
+  var t = trace7();
+  if (pas7() < t.noeuds.length) { return 'البحث جار...'; }
+  if (!t.solution) { return 'الصيغة غير قابلة للإرضاء: كل الفروع قادت الى تعارض.'; }
+  var s = [];
+  for (var v = 1; v <= NVAR; v++){ s.push(NOMS7[v-1] + ' = ' + (t.solution[v] ? 'صحيح' : 'خطأ')); }
+  return 'وُجد نموذج: ' + s.join(', ') + '   |   ' + t.noeuds.length + ' عقدة مزارة';
+}], {fontSize: 14, strokeColor: function(){ return cssv('--primary','#026573'); },
+     fixed: true, highlight: false});
+b1.create('text', [-0.8, -3.1, function(){
+  return 'بلا انتشار: ' + TRACE7[0].noeuds.length + ' عقدة. ومعه: '
+       + TRACE7[1].noeuds.length + ' عقدة. الجواب نفسه، والنموذج نفسه.';
+}], {fontSize: 12.5, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+/* ============ Figure : cout selon le rapport clauses / variables ========= */
+function aleaSAT(graine){
+  var s = graine;
+  return function(){ s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648; };
+}
+function formuleAleatoire(n, m, rnd){
+  var f = [];
+  for (var i = 0; i < m; i++){
+    var vus = {}, cl = [];
+    while (cl.length < 3){
+      var v = 1 + Math.floor(rnd() * n);
+      if (vus[v]) { continue; }
+      vus[v] = true;
+      cl.push(rnd() < 0.5 ? v : -v);
+    }
+    f.push(cl);
+  }
+  return f;
+}
+/* DPLL generique, compte les noeuds. */
+function dpllCompte(f, n){
+  var compteur = 0, sat = false;
+  function propage(aff){
+    var a = {}, k;
+    for (k in aff){ a[k] = aff[k]; }
+    var change = true;
+    while (change){
+      change = false;
+      for (var i = 0; i < f.length; i++){
+        var cl = f[i], libre = null, nl = 0, ok = false;
+        for (var j = 0; j < cl.length; j++){
+          var v = Math.abs(cl[j]), s = cl[j] > 0;
+          if (!(v in a)) { nl++; libre = cl[j]; }
+          else if (a[v] === s) { ok = true; }
+        }
+        if (ok) { continue; }
+        if (nl === 0) { return null; }
+        if (nl === 1){ a[Math.abs(libre)] = libre > 0; change = true; }
+      }
+    }
+    return a;
+  }
+  function rec(aff){
+    compteur++;
+    var a = propage(aff);
+    if (a === null) { return false; }
+    var choisie = 0;
+    for (var v = 1; v <= n; v++){ if (!(v in a)) { choisie = v; break; } }
+    if (choisie === 0) { sat = true; return true; }
+    for (var b = 0; b < 2; b++){
+      var suiv = {}; for (var k in a){ suiv[k] = a[k]; }
+      suiv[choisie] = (b === 0);
+      if (rec(suiv)) { return true; }
+    }
+    return false;
+  }
+  rec({});
+  return {n: compteur, sat: sat};
+}
+var CACHE7 = {};
+function mesure(ratio){
+  var k = ratio.toFixed(1);
+  if (k in CACHE7) { return CACHE7[k]; }
+  var n = 18, essais = 25, total = 0, sats = 0, max = 0;
+  for (var e = 1; e <= essais; e++){
+    var rnd = aleaSAT(9000 + e * 131 + Math.round(ratio * 10));
+    var f = formuleAleatoire(n, Math.round(ratio * n), rnd);
+    var r = dpllCompte(f, n);
+    total += r.n; if (r.sat) { sats++; }
+    if (r.n > max) { max = r.n; }
+  }
+  CACHE7[k] = {moy: total / essais, sat: sats / essais, max: max};
+  return CACHE7[k];
+}
+var RATIOS = [];
+for (var r = 10; r <= 80; r += 5){ RATIOS.push(r / 10); }
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [0.2, 1.24, 8.9, -0.36], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sRat = b2.create('slider', [[1.2, -0.20], [7.8, -0.20], [1, 4.3, 8]], {
+  name: 'نسبة الفقرات الى المتغيرات', snapWidth: 0.5, precision: 1,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function ratio(){ return Math.round(sRat.Value() * 2) / 2; }
+b2.create('segment', [[1, 0], [8, 0]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b2.create('segment', [[1, 0], [1, 1.05]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+function maxMoy(){
+  var m = 1;
+  for (var i = 0; i < RATIOS.length; i++){ var v = mesure(RATIOS[i]).moy; if (v > m) { m = v; } }
+  return m;
+}
+var cCout = b2.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }, strokeWidth: 3,
+  highlight: false, fixed: true});
+cCout.updateDataArray = function(){
+  var m = maxMoy(), X = [], Y = [];
+  for (var i = 0; i < RATIOS.length; i++){ X.push(RATIOS[i]); Y.push(mesure(RATIOS[i]).moy / m); }
+  this.dataX = X; this.dataY = Y;
+};
+var cSat = b2.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--primary', '#026573'); }, strokeWidth: 3,
+  highlight: false, fixed: true});
+cSat.updateDataArray = function(){
+  var X = [], Y = [];
+  for (var i = 0; i < RATIOS.length; i++){ X.push(RATIOS[i]); Y.push(mesure(RATIOS[i]).sat); }
+  this.dataX = X; this.dataY = Y;
+};
+b2.create('segment', [function(){ return [ratio(), 0]; }, function(){ return [ratio(), 1.02]; }], {
+  strokeColor: function(){ return cssv('--accent', '#f59e0b'); }, strokeWidth: 1.8, dash: 2,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+for (var v = 1; v <= 8; v++){
+  (function(k){ b2.create('text', [k, -0.06, String(k)], {fontSize: 11, anchorX: 'middle',
+    strokeColor: PAL.muted, fixed: true, highlight: false}); })(v);
+}
+b2.create('text', [4.5, 1.21, function(){
+  var m = mesure(ratio());
+  return 'Rapport ' + ratio().toFixed(1) + '   |   القابلة للإرضاء: '
+       + Math.round(100 * m.sat) + ' %   |   العقد المزارة وسطيا: '
+       + Math.round(m.moy) + '   |   اسوأ حالة مرصودة: ' + m.max;
+}], {fontSize: 13.5, anchorX: 'middle', strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [8.8, 0.92, 'احتمال القابلية للإرضاء'], {fontSize: 12, anchorX: 'right',
+  strokeColor: function(){ return cssv('--primary', '#026573'); }, fixed: true, highlight: false});
+b2.create('text', [8.8, 0.82, 'كلفة الحل (سلم نسبي)'], {fontSize: 12,
+  anchorX: 'right', strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); },
+  fixed: true, highlight: false});
+b2.create('text', [1.0, -0.32, '18 متغيرا، 25 صيغة عشوائية لكل نقطة، فقرات من 3 اعداد اولية منطقية.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

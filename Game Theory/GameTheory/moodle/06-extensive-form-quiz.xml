@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 06 - Extensive-Form Games, Backward Induction and Subgame Perfection (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 06.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C06 Q1 - Backward induction</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In the entry game (entrant chooses In or Out; if In, the incumbent chooses Fight giving \((-2, -2)\) or Accommodate giving \((2, 5)\); Out gives \((0, 10)\)), what does backward induction predict?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Start at the incumbent's node: \(5 \gt  -2\), so Accommodate. Folding back, the entrant compares 2 from entering with 0 from staying out and enters. The prediction is (In, Accommodate) with payoffs (2, 5).</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[In, then Accommodate: payoffs (2, 5)]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Out, then Fight: payoffs (0, 10)]]></text><feedback format="html"><text><![CDATA[<p>That is a Nash equilibrium but relies on a non-credible threat.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[In, then Fight: payoffs \((-2, -2)\)]]></text><feedback format="html"><text><![CDATA[<p>The incumbent would never choose \(-2\) over \(5\).</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The game has no solution by backward induction]]></text><feedback format="html"><text><![CDATA[<p>It is finite with perfect information, so Zermelo applies.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C06 Q2 - Nash versus SPNE</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Every subgame perfect Nash equilibrium is a Nash equilibrium, but not every Nash equilibrium is subgame perfect.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True. SPNE requires Nash behaviour in the whole game <em>and</em> in every subgame, so it is a strictly stronger requirement. The entry game's (Out, Fight) is Nash but not subgame perfect.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C06 Q3 - Non-credible threat</text></name>
+  <questiontext format="html"><text><![CDATA[<p>What makes the incumbent's threat to fight non-credible?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Credibility is about incentives at the moment of action, not about what was announced. If entry occurs, fighting yields \(-2\) and accommodating yields \(5\), so the incumbent would not carry out the threat. This is exactly what subgame perfection checks.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[If entry actually happened, fighting would give the incumbent a strictly lower payoff than accommodating]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The incumbent has no way to communicate the threat]]></text><feedback format="html"><text><![CDATA[<p>Communication is not the issue; incentives are.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Fighting is a strictly dominated strategy in the strategic form]]></text><feedback format="html"><text><![CDATA[<p>It is not strictly dominated there, which is why the Nash concept misses the problem.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The entrant cannot observe the incumbent's move]]></text><feedback format="html"><text><![CDATA[<p>The entrant moves first and needs no observation.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C06 Q4 - Counting strategies</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Player 1 moves first with 2 possible actions. Player 2 then moves, observing player 1's choice, and has 3 actions available at each of player 1's two nodes. How many distinct <strong>strategies</strong> does player 2 have?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>A strategy for player 2 assigns an action to each of the two information sets, so there are 3 x 3 = 9 strategies. This blow-up is why the strategic form of even a small tree can be large.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>9</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C06 Q5 - Stackelberg leader</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Inverse demand \(P = 100 - Q\), unit cost \(c = 10\), firm 1 moves first. What quantity does the <strong>leader</strong> produce?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The leader anticipates \(q_2 = (a - c - q_1)/2\) and maximises, giving \(q_1^{*} = \dfrac{a - c}{2} = 45\). The follower then produces \(\dfrac{a - c}{4} = 22.5\). Both Cournot firms would have produced 30 each.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>45</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C06 Q6 - Stackelberg follower</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Same setting (\(P = 100 - Q\), \(c = 10\), sequential choice). What quantity does the <strong>follower</strong> produce?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>\(q_2^{*} = \dfrac{a - c}{4} = 22.5\). The follower is squeezed below its Cournot output of 30 because the leader's commitment to 45 leaves less residual demand.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>22.5</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="truefalse">
+  <name><text>C06 Q7 - Commitment</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Deliberately restricting your own future options can raise your payoff.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True, and this is one of the most useful ideas in the subject. Removing an option changes what others expect you to do at future nodes. Burning bridges, signing penalty clauses, and delegating to a hard-line negotiator all work by making a threat credible that would otherwise not be.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C06 Q8 - Centipede</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Backward induction in the centipede game predicts the first player takes immediately, yet experimental subjects usually pass for several rounds. The best reading of this gap is:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Backward induction needs common knowledge of rationality to survive at nodes that would only be reached if someone had already deviated from it. Once a player passes, the assumption that generated the prediction is in doubt. Experimental evidence also shows limited depth of reasoning and genuine other-regarding preferences.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Backward induction relies on common knowledge of rationality holding even at nodes that would only be reached after a deviation from it]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The game has no subgame perfect equilibrium]]></text><feedback format="html"><text><![CDATA[<p>It has one, computed by backward induction.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Subjects cannot compute the equilibrium because it is PPAD-complete]]></text><feedback format="html"><text><![CDATA[<p>The tree is small and the computation is easy.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Backward induction is mathematically invalid in finite trees]]></text><feedback format="html"><text><![CDATA[<p>It is valid; the question is whether its assumptions describe people.</p>]]></text></feedback></answer>
+</question>
+</quiz>

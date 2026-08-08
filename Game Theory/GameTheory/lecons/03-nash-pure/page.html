@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 3 &mdash; Nash Equilibrium in Pure Strategies</title>
+<meta name="description" content="The central solution concept: mutual best responses, and what it does and does not promise.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; justify-content: space-between; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz { margin: 26px 0; }
+.viz-title { font-weight: 700; color: var(--primary); font-size: 0.98rem; margin-bottom: 10px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 12px 0 0; border-top: 1px solid var(--color-rule); padding-top: 10px; }
+.viz svg { max-width: 100%; height: auto; }
+.payoff { display: inline-block !important; border-collapse: collapse; margin: 0 auto; }
+.payoff th, .payoff td { border: 1px solid var(--color-rule); padding: 9px 18px; text-align: center; }
+.payoff thead th { background: var(--primary-soft); color: var(--color-text); }
+.payoff th.corner { background: var(--primary); color: #fff; font-size: 0.82rem; font-weight: 600; }
+.payoff tbody th { background: var(--primary-soft); text-align: left; }
+.payoff td { font-family: var(--font-mono); font-size: 0.98rem; }
+.glossary th:first-child, .glossary td:first-child { white-space: nowrap; font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Game Theory</a> &middot; Chapter 03</div><span class="course-code">Part II &middot; Equilibrium</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Part II &middot; Equilibrium &middot; Chapter 3</div>
+<h1>Chapter 3 &mdash; Nash Equilibrium in Pure Strategies</h1>
+<div class="lesson-sub">The central solution concept: mutual best responses, and what it does and does not promise.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">What you will be able to do</div><ul><li>State the definition of Nash equilibrium and verify a candidate profile from the definition.</li><li>Find all pure Nash equilibria of a matrix game with the underline method.</li><li>Explain why a Nash equilibrium can be Pareto dominated, using the Prisoner's Dilemma.</li><li>Derive best-response functions and solve the Cournot duopoly for its equilibrium quantities.</li><li>Discuss multiplicity, focal points, and the correctness-of-beliefs assumption.</li></ul></div>
+
+<h2>1. The idea: no regrets, given what the others did</h2>
+<p>Dominance solves few games. We need a concept that applies everywhere. John Nash's answer (1950) is disarmingly simple: look for a strategy profile at which <strong>no single player, acting alone, would want to change their strategy</strong>, taking everyone else's strategy as given.</p>
+<div class="box def"><div class="box-title">Definition - Nash equilibrium</div><p style='margin:0;'>A profile \(s^{*} = (s_1^{*}, \dots, s_n^{*})\) is a <strong>Nash equilibrium</strong> if for every player \(i\) and every alternative \(s_i\):</p><div class="eq">\[ u_i(s_i^{*},\, s_{-i}^{*}) \;\ge\; u_i(s_i,\, s_{-i}^{*}). \]</div><p style='margin:0;'>Equivalently: \(s_i^{*} \in BR_i(s_{-i}^{*})\) for every \(i\) - every player's strategy is a best response to the others' strategies.</p></div>
+<p>Three readings help. As a <em>stability</em> condition: if the profile were somehow reached, nobody has a private reason to move away. As a <em>consistency of beliefs</em> condition: each player is optimising against a correct forecast of the others. As a <em>self-enforcing agreement</em>: if the players could talk before playing but could not sign a binding contract, only a Nash profile could survive the conversation - any other suggestion contains at least one player with a private incentive to break the deal.</p>
+
+<h2>2. Finding pure equilibria in a matrix: the underline method</h2>
+<p>For each column, underline the row player's largest payoff; for each row, underline the column player's largest. A cell with both numbers underlined is a Nash equilibrium in pure strategies. The procedure is nothing more than the definition applied cell by cell, but doing it mechanically prevents mistakes.</p>
+<figure class="viz"><div class="viz-title">Battle of the Sexes</div><div style="text-align:center;overflow-x:auto;"><table class="payoff"><thead><tr><th class="corner">Alex \ Bailey</th><th>Opera</th><th>Football</th></tr></thead><tbody><tr><th>Opera</th><td>2, 1</td><td>0, 0</td></tr><tr><th>Football</th><td>0, 0</td><td>1, 2</td></tr></tbody></table></div><p class="viz-caption">Two pure equilibria: (Opera, Opera) and (Football, Football).</p></figure>
+<p>Check (Opera, Opera): Alex switching to Football drops from 2 to 0; Bailey switching drops from 1 to 0. Neither deviates, so it is an equilibrium. The same argument works at (Football, Football). The off-diagonal cells are not equilibria: at (Opera, Football) both get 0 and either could improve alone.</p>
+<div class="box warn"><div class="box-title">Careful</div><p><strong>Multiplicity is the norm, not the exception.</strong> Battle of the Sexes has two pure equilibria (and a third in mixed strategies, Chapter 4). Nash equilibrium tells you which profiles are stable; it does not tell you which one gets played. That gap is filled by conventions, communication, focal points (Schelling), or refinements such as subgame perfection.</p></div>
+
+<h2>3. Equilibrium need not be efficient</h2>
+<p>The Prisoner's Dilemma has the unique Nash equilibrium (Defect, Defect) with payoffs (1, 1), while (3, 3) is available. So a Nash equilibrium can be <strong>Pareto dominated</strong> - there can be another outcome that every player strictly prefers. Nash equilibrium is a positive concept (what will happen), not a normative one (what should happen). Much of applied economics is the study of institutions that change the game so that its equilibrium becomes efficient.</p>
+
+<h2>4. Continuous strategies: the Cournot duopoly</h2>
+<p>Strategies need not be finite. Two firms simultaneously choose quantities \(q_1\) and \(q_2\) of an identical good. The market price falls with total output: \(P = a - (q_1 + q_2)\). Each firm has constant unit cost \(c\). Firm 1's profit is</p>
+<div class="eq">\[ \pi_1(q_1, q_2) = \bigl[\, a - q_1 - q_2 - c \,\bigr] \, q_1. \]</div>
+<p>Differentiate with respect to \(q_1\), holding \(q_2\) fixed - this is exactly the 'best response' operation - and set the derivative to zero: \(\partial \pi_1 / \partial q_1 = a - 2q_1 - q_2 - c = 0\), giving the <strong>best-response function</strong></p>
+<div class="eq">\[ q_1 = \frac{a - c - q_2}{2} \qquad \text{and symmetrically} \qquad q_2 = \frac{a - c - q_1}{2}. \]</div>
+<p>A Nash equilibrium is a point where the two best-response lines cross - each firm is optimising against what the other is actually doing. Solving the pair by symmetry gives</p>
+<div class="box prop"><div class="box-title">Cournot-Nash equilibrium</div><div class="eq">\[ q_1^{*} = q_2^{*} = \frac{a - c}{3}. \]</div></div>
+<p>Take \(a = 100\) and \(c = 10\). Each firm produces 30, total output is 60, the price is 40 and each firm earns \((40 - 10) \times 30 = \mathbf{900}\). Now compare with collusion: a monopolist would produce \((a - c)/2 = 45\) in total, sell at 55, and earn 2025, i.e. 1012.5 per firm if the cartel split output. Competition destroys 112.5 of profit per firm - and the cartel is not a Nash equilibrium, because at a total of 45 each firm's best response is to expand. Cournot is a Prisoner's Dilemma with continuous strategies.</p>
+<figure class="viz"><div class="viz-title">Best responses in the Cournot duopoly</div><div style="text-align:center;"><svg viewBox='0 0 700 300' style='width:100%;max-width:700px;height:auto;font-family:var(--font-sans);' xmlns='http://www.w3.org/2000/svg'><line x1='70' y1='250' x2='620' y2='250' stroke='var(--viz-axis)' stroke-width='2'/><line x1='70' y1='250' x2='70' y2='30' stroke='var(--viz-axis)' stroke-width='2'/><text x='615' y='274' font-size='14' text-anchor='end' fill='var(--color-muted)'>q&#8322;</text><text x='44' y='42' font-size='14' fill='var(--color-muted)'>q&#8321;</text><line x1='70' y1='150' x2='550' y2='250' stroke='var(--primary)' stroke-width='3'/><text x='470' y='205' font-size='13' fill='var(--primary)' text-anchor='middle'>BR&#8321;: q&#8321; = (a-c-q&#8322;)/2</text><line x1='70' y1='50' x2='310' y2='250' stroke='var(--accent)' stroke-width='3'/><text x='300' y='58' font-size='13' fill='var(--accent)'>BR&#8322;: q&#8322; = (a-c-q&#8321;)/2</text><line x1='230' y1='183' x2='230' y2='250' stroke='var(--viz-bad)' stroke-width='1' stroke-dasharray='4 3'/><line x1='70' y1='183' x2='230' y2='183' stroke='var(--viz-bad)' stroke-width='1' stroke-dasharray='4 3'/><circle cx='230' cy='183' r='7' fill='var(--viz-bad)'/><text x='246' y='170' font-size='13' fill='var(--viz-bad)'>Nash: q&#8321; = q&#8322; = (a-c)/3</text></svg></div><p class="viz-caption">The two best-response lines. Their intersection is the Cournot-Nash equilibrium.</p></figure>
+
+<h2>5. What Nash equilibrium assumes, and what it does not</h2>
+<p>The concept assumes each player's belief about the others is <em>correct</em>. That is a strong assumption. It is plausible when the game has been played many times and behaviour has settled down, when there is a public convention, or when the game is dominance solvable so that beliefs are pinned by reasoning alone. It is far less plausible in a novel one-shot interaction, and this is why rationalizability (Chapter 2) is sometimes the more honest prediction.</p>
+<p>Nash equilibrium also does not assume players cooperate, communicate or randomise jointly. It only requires unilateral stability. Profiles that are stable against <em>group</em> deviations - the strong equilibrium and the core - are studied in Chapter 10.</p>
+
+<h2>Glossary</h2>
+<table class="glossary"><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Nash equilibrium</td><td>A strategy profile in which each player's strategy is a best response to the others'.</td></tr><tr><td>Best-response function</td><td>The map from opponents' strategies to the set of strategies maximising a player's payoff.</td></tr><tr><td>Pareto dominance</td><td>Outcome A Pareto dominates B if every player weakly prefers A and at least one strictly prefers it.</td></tr><tr><td>Focal point</td><td>An equilibrium selected by shared cultural or contextual salience rather than by payoffs (Schelling).</td></tr><tr><td>Cournot competition</td><td>Simultaneous quantity choice by firms facing a downward-sloping inverse demand curve.</td></tr><tr><td>Coordination game</td><td>A game with several Nash equilibria in which players gain from matching each other's choice.</td></tr></tbody></table>
+<div class="keypoints"><h3>Check your understanding</h3><ol><li>Is (Opera, Football) in Battle of the Sexes an equilibrium? <span style='color:var(--color-muted);'>(Answer: No - both get 0 and either alone can improve)</span></li><li>In the Prisoner's Dilemma, is the unique Nash equilibrium Pareto efficient? <span style='color:var(--color-muted);'>(Answer: No - (3,3) is better for both)</span></li><li>With \(a = 100\) and \(c = 10\), what is each Cournot firm's equilibrium output? <span style='color:var(--color-muted);'>(Answer: \(\tfrac{100-10}{3} = 30\))</span></li><li>Why is the joint-monopoly output split not a Nash equilibrium in Cournot? <span style='color:var(--color-muted);'>(Answer: Each firm's best response to the low total is to expand)</span></li></ol></div>
+<div class="box tip"><div class="box-title">Practice</div><p>The chapter quiz has you verify the definition on specific cells, count pure equilibria in a matrix, compute a Cournot equilibrium numerically, and separate the claim 'is an equilibrium' from the claim 'is a good outcome'.</p></div>
+</main>
+<nav class="lesson-nav"><a href="../02-dominance/page.html">&larr; Chapter 02 &middot; Dominance and Iterated Elimination</a><a href="../04-mixed-strategies/page.html">Chapter 04 &middot; Mixed Strategies and Nash's Existence Theorem &rarr;</a></nav>
+<footer class="site-footer"><strong>Game Theory &mdash; complete handbook</strong> &middot; Strategy, equilibrium, information and design<span class="footer-meta">Edition 2025-2026</span></footer>
+</body></html>

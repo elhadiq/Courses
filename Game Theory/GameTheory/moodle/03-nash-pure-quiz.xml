@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 03 - Nash Equilibrium in Pure Strategies (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 03.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C03 Q1 - Definition</text></name>
+  <questiontext format="html"><text><![CDATA[<p>A strategy profile is a Nash equilibrium exactly when:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The definition is unilateral: hold everyone else fixed and check that the remaining player cannot gain by deviating alone. Nothing is required about joint deviations, efficiency, or uniqueness.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[No player can increase their payoff by changing strategy alone, holding the others fixed]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The sum of all players' payoffs is maximised]]></text><feedback format="html"><text><![CDATA[<p>That is social efficiency, a different criterion.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[No group of players can gain by deviating together]]></text><feedback format="html"><text><![CDATA[<p>That is a strong equilibrium, a much more demanding notion.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Every player uses a strictly dominant strategy]]></text><feedback format="html"><text><![CDATA[<p>Dominant strategies rarely exist; equilibria still can.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C03 Q2 - Counting pure equilibria</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Consider this game (row payoff, column payoff):</p><table border='1' cellpadding='8' style='border-collapse:collapse;'><tr><th></th><th>L</th><th>R</th></tr><tr><th>U</th><td>2, 1</td><td>0, 0</td></tr><tr><th>D</th><td>0, 0</td><td>1, 2</td></tr></table><p>How many Nash equilibria in <strong>pure</strong> strategies does it have?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Two: (U, L) and (D, R). At (U, L) the row player would drop from 2 to 0 by moving and the column player from 1 to 0. The same check works at (D, R). The off-diagonal cells give 0 to both, and either player alone can improve. There is also a mixed equilibrium, but the question asks only about pure ones.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>2</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="truefalse">
+  <name><text>C03 Q3 - Efficiency</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Every Nash equilibrium is Pareto efficient.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>False, and the Prisoner's Dilemma is the standard counterexample: the unique equilibrium (Defect, Defect) gives (1, 1) while (3, 3) is feasible and preferred by both. Nash equilibrium predicts behaviour; it makes no welfare promise.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C03 Q4 - Cournot output</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Two firms face inverse demand \(P = 120 - Q\) where \(Q = q_1 + q_2\), and each has constant unit cost \(c = 30\). In the Cournot-Nash equilibrium, how much does <strong>each</strong> firm produce?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The symmetric Cournot equilibrium is \(q^{*} = \dfrac{a - c}{3} = \dfrac{120 - 30}{3} = 30\) for each firm. Total output is 60 and the price is \(120 - 60 = 60\), so each firm earns \((60 - 30)\times 30 = 900\).</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>30</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C03 Q5 - Cournot price</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Same setting: \(P = 120 - Q\), \(c = 30\), two Cournot firms. What is the <strong>equilibrium market price</strong>?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Each firm produces 30 so \(Q = 60\) and \(P = 120 - 60 = 60\). Compare the collusive outcome: total 45, price 75. Competition lowers the price - good for consumers, bad for the firms, and the firms cannot sustain the higher price without a binding agreement.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>60</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C03 Q6 - Multiplicity</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Battle of the Sexes has two pure Nash equilibria. What does game theory say about which one occurs?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Nash equilibrium is silent on selection. Schelling's notion of a focal point - a shared salience such as tradition, precedent, or a small asymmetry in the story - is the usual explanation for how players coordinate. Refinements like subgame perfection help in sequential games but not in a symmetric simultaneous one.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[The concept does not select between them; salience, convention or communication may]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The Pareto-dominant one always occurs]]></text><feedback format="html"><text><![CDATA[<p>Neither equilibrium here Pareto dominates the other.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The one with the larger payoff sum always occurs]]></text><feedback format="html"><text><![CDATA[<p>Both sum to 3 here, and in general the concept makes no such claim.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Neither occurs; players must mix]]></text><feedback format="html"><text><![CDATA[<p>A mixed equilibrium also exists, but the pure ones are equally valid predictions.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C03 Q7 - Beliefs</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Nash equilibrium requires that each player's belief about the opponents' play be correct, whereas rationalizability requires only that beliefs be consistent with common knowledge of rationality.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True. This is the precise sense in which Nash equilibrium is stronger than rationalizability. Correct beliefs are plausible after repeated play or with an established convention, less so in a genuinely novel one-shot encounter.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C03 Q8 - Verifying a candidate</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Someone claims (U, L) is a Nash equilibrium of a 3x3 game. What is the minimum you must check?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>You check unilateral deviations only: the row player's other two rows against column L, and the column player's other two columns against row U - four comparisons. You do not need to evaluate the other cells or any joint deviation.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[That the row player gains nothing from the other 2 rows given L, and the column player gains nothing from the other 2 columns given U]]></text><feedback format="html"><text><![CDATA[<p>Correct - four comparisons.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[That the payoffs at (U, L) are the largest in the whole matrix]]></text><feedback format="html"><text><![CDATA[<p>Equilibrium payoffs are often far from the largest.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[That no pair of simultaneous deviations improves both players]]></text><feedback format="html"><text><![CDATA[<p>That is a stronger, different condition.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[That U and L are dominant strategies]]></text><feedback format="html"><text><![CDATA[<p>Sufficient but not necessary.</p>]]></text></feedback></answer>
+</question>
+</quiz>

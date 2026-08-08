@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الفصل 8 &mdash; الاستدلال الاحتمالي</title>
+<meta name="description" content="بايز، الاستقلال الشرطي، الشبكات البايزية، المصنّف الساذج، ماركوف.">
+<link href="../../assets/style.css" rel="stylesheet">
+<link href="../../assets/rtl.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+
+.src-ar { margin: 26px 0 8px; border-top: 2px solid var(--color-rule); padding-top: 16px; }
+.src-ar h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--primary); }
+.src-ar .src-note { color: var(--color-muted); font-size: 0.9rem; margin: 0 0 12px; }
+.src-ar ul { list-style: none; padding: 0; margin: 0; }
+.src-ar li { margin: 0 0 14px; padding-right: 14px; border-right: 3px solid var(--primary-soft-2);
+             line-height: 1.7; font-size: 0.95rem; }
+.src-ar li .pourquoi { display: block; color: var(--color-muted); font-size: 0.9em;
+                       margin-top: 3px; }
+.src-ar li a.lien { word-break: break-all; font-size: 0.88em; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><a class="lang-switch" href="../../../IA/lecons/08-probabiliste/page.html" hreflang="fr" title="Version fran&ccedil;aise">FR</a><div class="breadcrumb"><a href="../../index.html">الذكاء الاصطناعي</a> &middot; مُقرَّر</div><span class="course-code">برنامج MP/PSI &middot; الفترة الثانية</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">القسم الثالث &middot; الفصل 8</div>
+<h1>الفصل 8 &mdash; الاستدلال حين تكون المعلومة غير مؤكّدة</h1>
+<div class="lesson-sub">الاحتمالات، وقاعدة بايز، والاستقلال الشرطي، والمصنّف الساذج، والشبكات البايزية، وسلاسل ماركوف.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">المُلحَق المرافق</div><p>قاعدة بايز، والاستنباط بالتعداد، والمصنّف الساذج، والترشيح في سلسلة ماركوف، مفصَّلة <strong><a href="../../../IA/lecons/08-probabiliste/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">خطوة بخطوة في المُلحَق</a></strong>.</p></div>
+
+<h2>8.1 لماذا لا يكفي المنطق</h2>
+
+<p>كان الفصل السابق يعامل العالم مجموعةَ قضايا صحيحة أو خاطئة. والوكيل الحقيقي لا يحظى بذلك أبداً تقريباً. إذ سيلزم كتابة «إن كان بالمريض ألم أسنان، فعنده تسوّس، أو التهاب، أو كسر، أو…»: واللائحة مفتوحة، ولم يُتمّها أيّ طبيبٍ قطّ.</p>
+
+<div class="box def"><div class="box-title">ثلاثة أسباب للتخلّي عن اليقين</div>
+<ul>
+<li><strong>الكسل.</strong> تعداد كلّ الاستثناءات يتطلّب عملاً لا نهائياً.</li>
+<li><strong>الجهل النظري.</strong> لا علم يملك نظريةً تامّة لمجاله.</li>
+<li><strong>الجهل العملي.</strong> حتّى مع نظريةٍ تامّة، لم نُجرِ قطّ كلّ الفحوص.</li>
+</ul></div>
+
+<div class="box thm"><div class="box-title">مبرهنة &mdash; حجّة الرهان الهولندي</div>
+<p>إذا أعلن وكيلٌ درجات اعتقادٍ تنتهك مسلّمات كولموغوروف، فيوجد تركيبُ رهاناتٍ يقبلها كلّها فرادى ويخرج منه خاسراً مهما كانت النتيجة <a class="cite" href="#ref-definetti1937">[1]</a>.</p>
+<p>بعبارةٍ أخرى، الاحتمالات ليست اختياراً في النمذجة من بين اختيارات: بل هي الطريقة المتّسقة الوحيدة لتكميم اعتقاد، تماماً كما جعلت مبرهنةُ فون نيومان أملَ المنفعة الطريقةَ المتّسقة الوحيدة للترجيح بين المخاطر.</p></div>
+
+<h2>8.2 قاعدة بايز</h2>
+
+<div class="box def"><div class="box-title">التعريف وقاعدة بايز</div>
+<p>الاحتمال الشرطي مُعرَّف بـM0 من أجل \(P(b) \gt 0\). وبكتابة \(P(a \land b)\) بالطريقتين الممكنتين، نحصل على</p>
+<div class="eq">\[P(h \mid e) = \frac{P(e \mid h)\,P(h)}{P(e)}\]</div>
+<p>حيث \(h\) فرضيّة وM5 ملاحظة. وM6 هو الاعتقاد <em>قبل</em> الملاحظة، وM7 الاحتمالية، وM8 الاعتقاد <em>بعدها</em> <a class="cite" href="#ref-bayes1763">[2]</a>.</p>
+<p>وفائدة هذه الكتابة عملية: ففي الطبّ، تُقاس \(P(\text{sympt&ocirc;me} \mid \text{maladie})\) على فوجٍ من المرضى، بينما تتوقّف \(P(\text{maladie} \mid \text{sympt&ocirc;me})\) على الساكنة التي سنُجري فيها الكشف. والقاعدة تتيح الانتقال من الأولى، وهي مستقرّة، إلى الثانية، وهي متغيّرة.</p></div>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">المربّع يمثّل ساكنةً بأكملها. وعرضه نسبة المرضى، وارتفاعه جواب الاختبار. والمؤشّرات تضبط الانتشار والحسّاسية والنوعية.</p>
+<div id="jxg1" class="viz-board" style="height:520px;"></div>
+<p class="viz-caption"><strong>الشكل 8.1.</strong> اختبارٌ بحسّاسية 99 % ونوعية 95 % يبدو ممتازاً. غير أنّه في مرضٍ يصيب شخصاً من كلّ ألف، لا يعني اختبارٌ إيجابي إلّا <strong>1,9 %</strong> من حظوظ كون المرء مريضاً: فالمساحة الحمراء للإيجابيات الكاذبة تسحق الخضراء للصادقة. ارفع الانتشار إلى 1 %: نصير إلى 16,7 %. ثمّ ارفع النوعية إلى 99 %: 50 % بالضبط. فالنوعية هي الوسيط الحرج في الكشف الجماعي، وذلك مخالف للبداهة.</p></div>
+
+<div class="box warn"><div class="box-title">إهمال التواتر القاعدي</div>
+الخلط بين \(P(e \mid h)\) وM12 هو خطأ الاستدلال الأحسن توثيقاً في علم النفس التجريبي <a class="cite" href="#ref-tversky1974">[3]</a>. وله عواقب حقيقية: ففي محاكماتٍ مشهورة عديدة، قُدّم إلى هيئة المحلّفين احتمالُ أن يحمل بريءٌ أثراً معيّناً على أنّه احتمال براءة المتّهم. والعلاج هو علاج الشكل أعلاه: الاستدلال على أعدادٍ فعلية، لا على نسبٍ مئوية معزولة أبداً.</div>
+
+<h2>8.3 الاستقلال الشرطي، الطريقة الوحيدة لجعل الحساب ممكناً</h2>
+
+<p>قانون احتمالٍ على \(n\) متغيّراً بوليانياً يتطلّب \(2^{n}-1\) عدداً. ثلاثون متغيّراً: أكثر من مليار. ومئة متغيّر: أكثر من ذرّات المجرّة. فلا خبير سيوفّر هذه الأعداد، ولا ذاكرة ستخزّنها، ولا حساب سيجوبها.</p>
+
+<div class="box def"><div class="box-title">تعريف &mdash; الاستقلال الشرطي</div>
+<p>\(X\) وM16 مستقلّتان شرطياً بالنسبة إلى \(Z\) إذا كان \(P(X, Y \mid Z) = P(X \mid Z)\,P(Y \mid Z)\)، أو بصورةٍ مكافئة \(P(X \mid Y, Z) = P(X \mid Z)\): فمتى عُرِفت \(Z\)، لم تعد \(Y\) تضيف شيئاً عن \(X\).</p>
+<p>وهي خاصّية أكثر تواتراً وأكثر فائدةً بكثير من الاستقلال البسيط. فعَرَضان لمرضٍ واحد مترابطان في الساكنة العامّة، لكنّهما يصيران مستقلَّين متى عُلِم أنّ المريض مريض.</p></div>
+
+<figure class="viz"><div class="viz-title">كلفة قانون احتمال</div>
+<svg viewBox="0 0 760 340" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">ما يكلّفه قانون احتمالٍ على \(n\) متغيّراً بوليانياً</text><text x="300" y="76" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">n = 2</text><text x="418" y="76" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">n = 5</text><text x="536" y="76" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">n = 10</text><text x="654" y="76" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">n = 100</text><rect x="20" y="116" width="712" height="62" rx="8" style="fill:var(--viz-bad);fill-opacity:0.08;stroke:var(--viz-bad);stroke-width:2;"/><text x="44" y="142" style="fill:var(--color-text);font-size:13px;font-family:inherit;">الجدول المشترك الكامل</text><text x="44" y="164" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">2 أُسّ n ناقص 1 وسيطاً</text><text x="300" y="154" text-anchor="middle" style="fill:var(--viz-bad);font-size:14px;font-weight:700;font-family:inherit;">3</text><text x="418" y="154" text-anchor="middle" style="fill:var(--viz-bad);font-size:14px;font-weight:700;font-family:inherit;">31</text><text x="536" y="154" text-anchor="middle" style="fill:var(--viz-bad);font-size:14px;font-weight:700;font-family:inherit;">1023</text><text x="654" y="154" text-anchor="middle" style="fill:var(--viz-bad);font-size:14px;font-weight:700;font-family:inherit;">نحو 10 أُسّ 30</text><rect x="20" y="198" width="712" height="62" rx="8" style="fill:var(--primary);fill-opacity:0.08;stroke:var(--primary);stroke-width:2;"/><text x="44" y="224" style="fill:var(--color-text);font-size:13px;font-family:inherit;">شبكة، بأبوين على الأكثر</text><text x="44" y="246" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">على الأكثر 4 n وسيطاً</text><text x="300" y="236" text-anchor="middle" style="fill:var(--primary);font-size:14px;font-weight:700;font-family:inherit;">8</text><text x="418" y="236" text-anchor="middle" style="fill:var(--primary);font-size:14px;font-weight:700;font-family:inherit;">20</text><text x="536" y="236" text-anchor="middle" style="fill:var(--primary);font-size:14px;font-weight:700;font-family:inherit;">40</text><text x="654" y="236" text-anchor="middle" style="fill:var(--primary);font-size:14px;font-weight:700;font-family:inherit;">400</text><text x="380" y="300" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">الاستقلال الشرطي ليس تقريباً مريحاً: بل هو ما يجعل الحساب ممكناً.</text><text x="380" y="324" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">مئة متغيّرٍ بولياني: نماذج ممكنة أكثر من ذرّات المجرّة، أو أربعمئة عدد.</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 8.2.</strong> ينمو الجدول المشترك نموّاً أُسّياً، والتحليل إلى عوامل نموّاً خطّياً. وهذا السبب الوحيد في كون الاستدلال الاحتمالي قابلاً للممارسة، وهو أيضاً ما يفسّر أنّ النمذجة هي الجزء الصعب: إذ يجب تحديد الاستقلالات الصحيحة.</figcaption></figure>
+
+<h2>8.4 الشبكات البايزية</h2>
+
+<div class="box def"><div class="box-title">تعريف &mdash; الشبكة البايزية</div>
+<p>الشبكة البايزية مبيانٌ موجّه <em>بلا دورات</em> رؤوسه متغيّرات عشوائية، مزوَّدٌ لكلّ متغيّرٍ بجدولٍ يعطي \(P(X_i \mid \text{Parents}(X_i))\). وهو يمثّل القانون المشترك</p>
+<div class="eq">\[P(x_1, \dots, x_n) = \prod_{i=1}^{n} P\big(x_i \mid \text{parents}(x_i)\big)\]</div>
+<p>والقوس من \(A\) نحو \(B\) يُقرأ «\(A\) تؤثّر مباشرةً في \(B\)». وغياب القوس يحمل أثمن معلومة: فهو يؤكّد استقلالاً شرطياً <a class="cite" href="#ref-pearl1988">[4]</a>.</p></div>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">شبكة جهاز الإنذار. والمؤشّران يحدّدان ما نلاحظه: فكلّ جارٍ قد يكون اتّصل، أو لم يتّصل، أو مجهولاً.</p>
+<div id="jxg2" class="viz-board" style="height:520px;"></div>
+<p class="viz-caption"><strong>الشكل 8.3.</strong> بلا ملاحظة، احتمال السطو هو الاحتمال القَبْلي: 0,1 %. وإن اتّصل جان وحده، ارتفع إلى 1,6 %؛ وإن اتّصلت ماري وحدها، إلى 5,6 % &mdash; فماري تتّصل خطأً أقلّ، ومن ثمّ فاتّصالها يساوي أكثر. وإن اتّصل الاثنان، بلغ <strong>28,4 %</strong>، أي أكثر بكثير من مجموع الأثرين المعزولين. فالاتّصالان ليسا مستقلَّين: إنّهما يمرّان بالسبب نفسه، وهو جهاز الإنذار، الذي يرتفع احتماله إلى 76 %.</p></div>
+
+<div class="box warn"><div class="box-title">التفسير المنافس</div>
+في هذه الشبكة نفسها، السطو والزلزال مستقلّان <em>قَبْلياً</em>. لاحِظ جهاز الإنذار: فيكفّان عن ذلك. ثمّ اعلم أنّ زلزالاً وقع، فيعود احتمال السطو إلى <em>الانخفاض</em>: فالزلزال يفسّر جهاز الإنذار سلفاً. وهذه الظاهرة، حيث تجعل ملاحظةُ ابنٍ مشترك أبوين متعلّقَين، هي الوحيدة من بين تشكيلات التعلّق الثلاث التي تقاوم البداهة. وتُسمّى التفسير المنافس.</div>
+
+<div class="box thm"><div class="box-title">تعقيد الاستنباط</div>
+<p>الاستنباط الدقيق في شبكةٍ بايزية صعبٌ بمعنى NP في الحالة العامّة <a class="cite" href="#ref-cooper1990">[5]</a>، والاستنباط التقريبي بخطأ محدود كذلك <a class="cite" href="#ref-dagum1993">[6]</a>. وفي المقابل، في الشبكات التي يكون مبيانها غير الموجّه الكامن شجرةً، يحلّ انتشارُ الرسائل المسألةَ في زمنٍ خطّي.</p></div>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 8.1 &mdash; الاستنباط الدقيق بالتعداد</div><div class="algo-io"><b>المُدخل:</b> شبكة بايزية على \(X_1, \dots, X_n\)، ومتغيّر \(Q\)، وملاحظات \(e\)<br><b>المُخرج:</b> القانون \(P(Q \mid e)\)</div><ol class="algo-corps"><li><b class="kw">لكلّ</b> \(q \in \mathrm{Val}(Q)\) <b class="kw">نفّذ</b></li><li class="n1">\(\displaystyle \alpha_q \leftarrow \sum_{\text{mondes } w \,\models\, e \wedge (Q=q)} \ \prod_{i=1}^{n} P\big(w_i \mid \mathrm{par}(X_i)\big)\)</li><li>\(\displaystyle P(Q = q \mid e) \leftarrow \frac{\alpha_q}{\sum_{q'} \alpha_{q'}}\)          <span class="cm">// تنظيم</span></li><li><b class="kw">أرجِع</b> \(P(Q \mid e)\)</li></ol><p class="algo-note">يجب تعداد المتغيّرات بترتيبٍ طوبولوجي، تسبق فيه الآباء أبناءَها. <strong>الكلفة.</strong> \(O(d^{\,h})\) حيث \(h\) عدد المتغيّرات الخفيّة: فالمسألة صعبة بمعنى NP عموماً، وخطّية على الشبكات الشجرية.</p></div>
+
+<h2>8.5 مصنّف بايز الساذج</h2>
+
+<p>الحالة الخاصّة الأكثر استعمالاً عملياً هي أيضاً الأشدّ خشونة: إذ نفترض أنّ كلّ الملاحظات مستقلّة شرطياً بمعلومية الصنف.</p>
+
+<div class="eq">\[\hat{c} = \operatorname*{argmax}_{c}\ P(c)\prod_{i=1}^{n} P(e_i \mid c)\]</div>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 8.2 &mdash; مصنّف بايز الساذج</div><div class="algo-io"><b>المُدخل:</b> وثائق موسومة، ومعجم \(V\)، وتنعيم \(\lambda \gt 0\)<br><b>المُخرج:</b> الصنف المتنبَّأ به لوثيقةٍ جديدة</div><ol class="algo-corps"><li><b class="kw">لكلّ</b> صنف \(c\) <b class="kw">نفّذ</b></li><li class="n1">\(\displaystyle \hat{P}(c) \leftarrow \frac{|\{\text{documents de classe } c\}|}{N}\)</li><li class="n1"><b class="kw">لكلّ</b> \(w \in V\) <b class="kw">نفّذ</b></li><li class="n2">\(\displaystyle \hat{P}(w \mid c) \leftarrow \frac{n_{c,w} + \lambda}{n_c + \lambda\,|V|}\)          <span class="cm">// بلا تنعيم، كلمة مجهولة تلغي كل شيء</span></li><li>&nbsp;</li><li><b class="kw">دالّة</b> <span class="fn">صنِّف</span>\((d)\)</li><li class="n1"><b class="kw">أرجِع</b> \(\displaystyle \operatorname*{argmax}_{c}\ \Big[\ln \hat{P}(c) + \sum_{w \in d} \ln \hat{P}(w \mid c)\Big]\)</li></ol><p class="algo-note">نجمع لوغاريتمات بدل ضرب احتمالات: فجداء آلاف الأعداد الأصغر من 1 يصير منعدماً عددياً. وفرضيّة الاستقلال خاطئة، ويبقى التصنيف صحيحاً غالباً: فلا يُحسَب إلّا \(\operatorname{argmax}\)، لا القيمة.</p></div>
+
+<figure class="viz"><div class="viz-title">فرضيّة خاطئة تعمل</div>
+<svg viewBox="0 0 760 330" role="img" style="width:100%;height:auto;display:block;"><text x="200" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">البنية المفترَضة</text><ellipse cx="200" cy="76" rx="62" ry="26" style="fill:var(--primary);"/><text x="200" y="81" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">الصنف</text><path d="M 200 102 L 80 154" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 75 146 L 80 158 L 86 148 Z" style="fill:var(--viz-axis);"/><circle cx="80" cy="176" r="21" style="fill:var(--accent);"/><text x="80" y="181" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">الكلمة 1</text><path d="M 200 102 L 160 154" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 155 146 L 160 158 L 166 148 Z" style="fill:var(--viz-axis);"/><circle cx="160" cy="176" r="21" style="fill:var(--accent);"/><text x="160" y="181" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">الكلمة 2</text><path d="M 200 102 L 240 154" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 235 146 L 240 158 L 246 148 Z" style="fill:var(--viz-axis);"/><circle cx="240" cy="176" r="21" style="fill:var(--accent);"/><text x="240" y="181" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">الكلمة 3</text><path d="M 200 102 L 320 154" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 315 146 L 320 158 L 326 148 Z" style="fill:var(--viz-axis);"/><circle cx="320" cy="176" r="21" style="fill:var(--accent);"/><text x="320" y="181" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">الكلمة 4</text><text x="200" y="228" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">الكلمات مفترَضٌ استقلالها متى عُرِف الصنف</text><text x="570" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">ما تتجاهله هذه الفرضيّة</text><text x="440" y="76" style="fill:var(--color-text);font-size:13px;font-family:inherit;">«New» و«York»</text><text x="440" y="96" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">لا تكادان تظهران منفصلتين</text><text x="440" y="128" style="fill:var(--color-text);font-size:13px;font-family:inherit;">«لم» و«أبداً»</text><text x="440" y="148" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تقلبان المعنى معاً</text><text x="440" y="180" style="fill:var(--color-text);font-size:13px;font-family:inherit;">«جدّ» و«جيّد»</text><text x="440" y="200" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعزّز إحداهما الأخرى</text><text x="570" y="252" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;"><tspan x="570" dy="0">الفرضيّة خاطئة، والمصنّف يعمل</tspan><tspan x="570" dy="16">مع ذلك.</tspan></text><text x="380" y="298" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">السبب: من أجل <tspan style="font-weight:700;">التصنيف</tspan>، لا يهمّ إلّا أيّ جداءٍ أكبر، لا قيمته.</text><text x="380" y="320" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">أمّا الاحتمالات المُنتَجة فسيّئة المعايرة جدّاً: فلا يجوز أبداً قراءتها درجاتِ ثقة.</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 8.4.</strong> فرضيّة الاستقلال خاطئة بجلاء على النصوص، ومع ذلك يعمل المصنّف جيّداً جدّاً. والسبب يسع في جملة: من أجل <em>التصنيف</em>، لا يُحسَب إلّا معرفة أيّ جداءٍ أكبر، لا قيمته. وفي المقابل فالاحتمالات المُنتَجة سيّئة المعايرة جدّاً &mdash; إذ تتشبّع عند 0 أو 1 &mdash; ولا يجوز أبداً تقديمها درجاتِ ثقة <a class="cite" href="#ref-domingos1997">[7]</a>.</figcaption></figure>
+
+<h2>8.6 الزمن: سلاسل ماركوف</h2>
+
+<p>كان العالم إلى هنا جامداً. والوكيل الحقيقي يلاحظ متتاليةَ حالاتٍ تتطوّر. ونمذجة ذلك بلا فرضيّةٍ ستقود إلى اشتراط كلّ لحظةٍ بالتاريخ الماضي كلّه.</p>
+
+<div class="box def"><div class="box-title">تعريف &mdash; فرضيّة ماركوف والنموذج ذو الحالة الخفيّة</div>
+<p><strong>فرضيّة ماركوف من الرتبة 1</strong> تضع \(P(X_t \mid X_{0:t-1}) = P(X_t \mid X_{t-1})\): فالحالة الحاضرة تلخّص الماضي كلّه. ونضيف فرضيّة المَحسّ، \(P(E_t \mid X_{0:t}, E_{0:t-1}) = P(E_t \mid X_t)\): فالملاحظة لا تتوقّف إلّا على الحالة الراهنة.</p>
+<p>ويكون النموذج عندئذٍ موصوفاً بتمامه بثلاثة عناصر: قانون ابتدائي، ومصفوفة انتقال، ومصفوفة انبعاث.</p></div>
+
+<p>وتُطرح أربعة أسئلة، ولكلٍّ منها خوارزميته: <strong>الترشيح</strong> يقدّر الحالة الراهنة من كلّ ما لوحِظ؛ و<strong>التنبّؤ</strong> يمدّه إلى المستقبل؛ و<strong>التنعيم</strong> يصحّح تقديراً ماضياً على ضوء ما تلاه؛ و<strong>التفسير الأرجح</strong> يبحث عن متتالية الحالات الأكثر احتمالية، ويُحسَب بالبرمجة الديناميكية بفضل خوارزمية فيتربي <a class="cite" href="#ref-viterbi1967">[8]</a>. وهذا بالضبط تحديث الحالة الداخلية في الفصل 2، مُحوَّلاً إلى كمّ.</p>
+
+<div class="box tip"><div class="box-title">الصلة بالفصل 2</div>
+يُحسَب الترشيح في مرحلتين تُعيدان حرفياً الإجراءَ الموصوف في الفصل 2: <em>التنبّؤ</em> بنشر الاعتقاد عبر مصفوفة الانتقال، ثمّ <em>التصحيح</em> بوزنه باحتمالية الملاحظة، وأخيراً التنظيم. والصيغة الاحتمالية لا تفعل إلّا أن تُسنِد وزناً عددياً للترجيح بين التنبّؤ والمَحسّ.</div>
+
+<h2>الخلاصة</h2>
+<ul>
+<li>لا يكفي المنطق بمجرّد أن تكون لائحة الاستثناءات مفتوحة؛ والاحتمالات هي التكميم المتّسق الوحيد للاعتقاد <a class="cite" href="#ref-definetti1937">[1]</a>.</li>
+<li>تحوّل قاعدة بايز احتماليةً قابلة للقياس إلى الاعتقاد المطلوب؛ وإهمال التواتر القاعدي أشيع الأخطاء <a class="cite" href="#ref-tversky1974">[3]</a>.</li>
+<li>ينقل الاستقلال الشرطي عدد الوسائط من \(2^{n}\) إلى مقدارٍ خطّي: فبدونه لا شيء قابل للحساب.</li>
+<li>تُشفّر الشبكة البايزية هذه الاستقلالات في مبيان؛ وأقواسها <em>الغائبة</em> تحمل جُلّ المعلومة <a class="cite" href="#ref-pearl1988">[4]</a>.</li>
+<li>الاستنباط الدقيق صعبٌ بمعنى NP عموماً، وخطّي على الأشجار <a class="cite" href="#ref-cooper1990">[5]</a>.</li>
+<li>يقوم المصنّف الساذج على فرضيّةٍ خاطئة ومع ذلك يصنّف جيّداً جدّاً &mdash; لكنّ احتمالاته لا تعني شيئاً <a class="cite" href="#ref-domingos1997">[7]</a>.</li>
+</ul>
+
+<h2>المراجع</h2>
+<ol class="reflist">
+<li id="ref-definetti1937">de Finetti, B. (1937). La pr&eacute;vision : ses lois logiques, ses sources subjectives. <em>Annales de l'Institut Henri Poincar&eacute;</em>, 7(1), 1&ndash;68. <a href="http://www.numdam.org/item/AIHP_1937__7_1_1_0/">http://www.numdam.org/item/AIHP_1937__7_1_1_0/</a></li>
+<li id="ref-bayes1763">Bayes, T. (1763). An essay towards solving a problem in the doctrine of chances. <em>Philosophical Transactions of the Royal Society of London</em>, 53, 370&ndash;418. DOI: 10.1098/rstl.1763.0053. <a href="https://doi.org/10.1098/rstl.1763.0053">https://doi.org/10.1098/rstl.1763.0053</a></li>
+<li id="ref-tversky1974">Tversky, A. &amp; Kahneman, D. (1974). Judgment under uncertainty: heuristics and biases. <em>Science</em>, 185(4157), 1124&ndash;1131. DOI: 10.1126/science.185.4157.1124. <a href="https://doi.org/10.1126/science.185.4157.1124">https://doi.org/10.1126/science.185.4157.1124</a></li>
+<li id="ref-pearl1988">Pearl, J. (1988). <em>Probabilistic Reasoning in Intelligent Systems: Networks of Plausible Inference</em>. Morgan Kaufmann. DOI: 10.1016/C2009-0-27609-4. <a href="https://doi.org/10.1016/C2009-0-27609-4">https://doi.org/10.1016/C2009-0-27609-4</a></li>
+<li id="ref-cooper1990">Cooper, G. F. (1990). The computational complexity of probabilistic inference using Bayesian belief networks. <em>Artificial Intelligence</em>, 42(2&ndash;3), 393&ndash;405. DOI: 10.1016/0004-3702(90)90060-D. <a href="https://doi.org/10.1016/0004-3702(90)90060-D">https://doi.org/10.1016/0004-3702(90)90060-D</a></li>
+<li id="ref-dagum1993">Dagum, P. &amp; Luby, M. (1993). Approximating probabilistic inference in Bayesian belief networks is NP-hard. <em>Artificial Intelligence</em>, 60(1), 141&ndash;153. DOI: 10.1016/0004-3702(93)90036-B. <a href="https://doi.org/10.1016/0004-3702(93)90036-B">https://doi.org/10.1016/0004-3702(93)90036-B</a></li>
+<li id="ref-domingos1997">Domingos, P. &amp; Pazzani, M. (1997). On the optimality of the simple Bayesian classifier under zero-one loss. <em>Machine Learning</em>, 29, 103&ndash;130. DOI: 10.1023/A:1007413511361. <a href="https://doi.org/10.1023/A:1007413511361">https://doi.org/10.1023/A:1007413511361</a></li>
+<li id="ref-viterbi1967">Viterbi, A. (1967). Error bounds for convolutional codes and an asymptotically optimum decoding algorithm. <em>IEEE Transactions on Information Theory</em>, 13(2), 260&ndash;269. DOI: 10.1109/TIT.1967.1054010. <a href="https://doi.org/10.1109/TIT.1967.1054010">https://doi.org/10.1109/TIT.1967.1054010</a></li>
+<li id="ref-kalman1960">Kalman, R. E. (1960). A new approach to linear filtering and prediction problems. <em>Journal of Basic Engineering</em>, 82(1), 35&ndash;45. DOI: 10.1115/1.3662552. <a href="https://doi.org/10.1115/1.3662552">https://doi.org/10.1115/1.3662552</a></li>
+</ol>
+
+<section class="src-ar">
+<h3>مصادر بالعربية</h3>
+<p class="src-note">مصادر للاستزادة، لا مراجع لما ورد أعلاه: المراجع الأصلية للفصل مذكورةٌ في القائمة السابقة بلغتها. وقد عُوينت كلّ صفحةٍ من صفحات الناشرين للتحقّق من العنوان والمترجم ورخصة الإتاحة.</p>
+<ul>
+<li>هاند، ديفيد جيه. <em>علم الإحصاء: مقدّمة قصيرة جدًّا</em>. ترجمة أحمد شكل، مراجعة محمد فتحي خضر. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/42848630/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/42848630/</a><span class="pourquoi">موجَّه إلى قارئٍ بلا خلفية رياضية مسبقة، ويشرح بالعربية الاستدلال الإحصائي الذي يقوم عليه هذا الفصل.</span></li>
+<li>فلوريدي، لوتشانو. <em>المعلومات: مقدّمة قصيرة جدًّا</em>. ترجمة محمد سعد طنطاوي، مراجعة علا عبد الفتاح يس. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/29257536/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/29257536/</a><span class="pourquoi">يقدّم بالعربية مفهوم المعلومة والإنتروبيا، وهو الأساس الذي تستند إليه مقاييس هذا الفصل.</span></li>
+</ul>
+</section>
+<p>حين تكون الحالة متّصلة والقوانين غاوسية، يقبل الترشيح حلّاً مغلقاً تراجعياً، هو مرشِّح كالمان <a class="cite" href="#ref-kalman1960">[9]</a>، الذي يجهّز اليوم أنظمة الملاحة كلّها تقريباً.</p>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../07-logique/page.html">\(\leftarrow\) الفصل 7 &mdash; المنطق والبرهنة</a>
+<a href="../../../IA/lecons/08-probabiliste/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">المُلحَق الخوارزمي</a>
+<a href="../../index.html">فهرس المُقرَّر</a>
+<a href="../09-apprentissage/page.html">الفصل 9 &mdash; التعلّم المُراقَب \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>الذكاء الاصطناعي &mdash; الأقسام التحضيرية MP/PSI</strong> &middot; البحث والألعاب والقيود والتعلّم<span class="footer-meta">طبعة 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">تعذّر تحميل الشكل التفاعلي. تحقّق من اتصالك بالشبكة.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ========== Figure : le paradoxe du depistage, vu comme des surfaces ====== */
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-0.30, 1.42, 1.34, -0.52], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sPrev = b1.create('slider', [[0.00, -0.20], [0.44, -0.20], [0.001, 0.010, 0.300]], {
+  name: 'prevalence', snapWidth: 0.001, precision: 3,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }}
+});
+var sSens = b1.create('slider', [[0.52, -0.20], [0.86, -0.20], [0.50, 0.99, 1.00]], {
+  name: 'sensibilite', snapWidth: 0.01, precision: 2,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sSpec = b1.create('slider', [[0.00, -0.40], [0.44, -0.40], [0.50, 0.95, 1.00]], {
+  name: 'specificite', snapWidth: 0.01, precision: 2,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function prev(){ return Math.round(sPrev.Value() * 1000) / 1000; }
+function sens(){ return Math.round(sSens.Value() * 100) / 100; }
+function spec(){ return Math.round(sSpec.Value() * 100) / 100; }
+function chiffres(){
+  var p = prev(), se = sens(), sp = spec();
+  var vp = p * se, fn = p * (1 - se), fp = (1 - p) * (1 - sp), vn = (1 - p) * sp;
+  var post = (vp + fp) > 0 ? vp / (vp + fp) : 0;
+  return {vp: vp, fn: fn, fp: fp, vn: vn, post: post};
+}
+/* Le carre unite : largeur = malade ou non, hauteur = test positif ou non. */
+function rect(x0, x1, y0, y1){
+  return [[x0, x1, x1, x0, x0], [y0, y0, y1, y1, y0]];
+}
+function zone(nom, couleur, opac, calc){
+  var c = b1.create('curve', [[0],[0]], {strokeWidth: 0.5,
+    strokeColor: function(){ return PAL.bg(); },
+    fillColor: function(){ return cssv(couleur, '#026573'); },
+    fillOpacity: opac, highlight: false, fixed: true});
+  c.updateDataArray = function(){ var d = calc(); this.dataX = d[0]; this.dataY = d[1]; };
+  return c;
+}
+zone('vp', '--viz-ok',   0.85, function(){ var c = chiffres(); return rect(0, prev(), 0, sens()); });
+zone('fn', '--viz-ref',  0.45, function(){ return rect(0, prev(), sens(), 1); });
+zone('fp', '--viz-bad',  0.75, function(){ return rect(prev(), 1, 0, 1 - spec()); });
+zone('vn', '--viz-ref',  0.20, function(){ return rect(prev(), 1, 1 - spec(), 1); });
+b1.create('curve', [[0, 1, 1, 0, 0], [0, 0, 1, 1, 0]], {strokeColor: PAL.axis,
+  strokeWidth: 1.6, highlight: false, fixed: true});
+b1.create('text', [function(){ return prev() / 2; }, function(){ return sens() / 2; }, function(){
+  var c = chiffres();
+  return prev() < 0.06 ? '' : 'ايجابيات صادقة\n' + (100 * c.vp).toFixed(1) + ' %';
+}], {fontSize: 12, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+     strokeColor: function(){ return PAL.bg(); }});
+b1.create('text', [function(){ return (prev() + 1) / 2; }, function(){ return (1 - spec()) / 2; },
+  function(){
+    var c = chiffres();
+    return (1 - spec()) < 0.05 ? '' : 'ايجابيات كاذبة ' + (100 * c.fp).toFixed(1) + ' %';
+  }], {fontSize: 12, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+       strokeColor: function(){ return PAL.bg(); }});
+b1.create('text', [-0.28, 1.36, function(){
+  var c = chiffres();
+  return 'على 100 000 شخص: ' + Math.round(100000 * (c.vp + c.fn)) + ' malades, '
+       + Math.round(100000 * c.vp) + ' ايجابية صادقة، ' + Math.round(100000 * c.fp)
+       + ' ايجابية كاذبة.';
+}], {fontSize: 14, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-0.28, 1.24, function(){
+  var c = chiffres();
+  return 'اختبار ايجابي: احتمال ان يكون المرء مريضا فعلا = '
+       + (100 * c.post).toFixed(1) + ' %';
+}], {fontSize: 17, strokeColor: function(){ return cssv('--primary', '#026573'); },
+     fixed: true, highlight: false});
+b1.create('text', [-0.28, 1.12, function(){
+  var c = chiffres();
+  if (c.post < 0.5) {
+    return 'اقل من حظ من اثنين: اغلب الاختبارات الايجابية ايجابيات كاذبة.';
+  }
+  return 'اكثر من حظ من اثنين: الاختبار مفيد في هذه الساكنة.';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-0.28, -0.48,
+  'عرض المربع: نسبة المرضى. الارتفاع: جواب الاختبار. والمساحة الخضراء مقارنة بالحمراء تعطي الجواب.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+/* ========= Figure : reseau bayesien de l'alarme, inference exacte ========= */
+/* Reseau classique : Cambriolage -> Alarme <- Seisme ; Alarme -> Jean, Marie. */
+var PC = 0.001, PS = 0.002;
+var PA = {'11': 0.95, '10': 0.94, '01': 0.29, '00': 0.001};   /* P(A | C, S) */
+var PJ = {'1': 0.90, '0': 0.05};                               /* P(J | A) */
+var PM = {'1': 0.70, '0': 0.01};                               /* P(M | A) */
+function pTout(c, s, a, j, m){
+  var p = (c ? PC : 1 - PC) * (s ? PS : 1 - PS);
+  var pa = PA[(c ? '1' : '0') + (s ? '1' : '0')];
+  p *= a ? pa : 1 - pa;
+  p *= a ? (j ? PJ['1'] : 1 - PJ['1']) : (j ? PJ['0'] : 1 - PJ['0']);
+  p *= a ? (m ? PM['1'] : 1 - PM['1']) : (m ? PM['0'] : 1 - PM['0']);
+  return p;
+}
+/* obsJ, obsM : -1 inconnu, 0 faux, 1 vrai */
+function posterieur(obsJ, obsM){
+  var num = {c: 0, s: 0, a: 0}, den = 0;
+  for (var c = 0; c < 2; c++) for (var s = 0; s < 2; s++) for (var a = 0; a < 2; a++)
+  for (var j = 0; j < 2; j++) for (var m = 0; m < 2; m++){
+    if (obsJ >= 0 && j !== obsJ) { continue; }
+    if (obsM >= 0 && m !== obsM) { continue; }
+    var p = pTout(c, s, a, j, m);
+    den += p;
+    if (c) { num.c += p; }
+    if (s) { num.s += p; }
+    if (a) { num.a += p; }
+  }
+  return {c: num.c / den, s: num.s / den, a: num.a / den};
+}
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-1.6, 6.6, 9.6, -2.8], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sJ = b2.create('slider', [[-1.2, -1.4], [2.4, -1.4], [-1, -1, 1]], {
+  name: 'جان يتصل', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--viz-blue', '#2563eb'); }}
+});
+var sM = b2.create('slider', [[4.6, -1.4], [8.2, -1.4], [-1, -1, 1]], {
+  name: 'ماري تتصل', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function obsJ(){ return Math.round(sJ.Value()); }
+function obsM(){ return Math.round(sM.Value()); }
+function libelle(v){ return v < 0 ? 'inconnu' : (v === 1 ? 'نعم' : 'ليس'); }
+var NOEUDS8 = [
+  {id:'c', nom:'Cambriolage', x:1.6, y:5.0, prior:PC},
+  {id:'s', nom:'Seisme',      x:6.4, y:5.0, prior:PS},
+  {id:'a', nom:'Alarme',      x:4.0, y:3.0, prior:null},
+  {id:'j', nom:'جان يتصل', x:2.0, y:1.0, prior:null},
+  {id:'m', nom:'ماري تتصل', x:6.2, y:1.0, prior:null}
+];
+var ARCS8 = [['c','a'], ['s','a'], ['a','j'], ['a','m']];
+function fiche8(id){
+  for (var i = 0; i < NOEUDS8.length; i++){ if (NOEUDS8[i].id === id) { return NOEUDS8[i]; } }
+  return null;
+}
+for (var i = 0; i < ARCS8.length; i++){
+  (function(arc){
+    var u = fiche8(arc[0]), v = fiche8(arc[1]);
+    b2.create('arrow', [[u.x, u.y - 0.34], [v.x, v.y + 0.34]], {
+      strokeColor: PAL.axis, strokeWidth: 2, highlight: false, fixed: true});
+  })(ARCS8[i]);
+}
+for (var i = 0; i < NOEUDS8.length; i++){
+  (function(n){
+    b2.create('curve', [[n.x - 1.0, n.x + 1.0, n.x + 1.0, n.x - 1.0, n.x - 1.0],
+                        [n.y - 0.34, n.y - 0.34, n.y + 0.34, n.y + 0.34, n.y - 0.34]], {
+      strokeColor: function(){
+        if (n.id === 'j' && obsJ() >= 0) { return cssv('--viz-blue', '#2563eb'); }
+        if (n.id === 'm' && obsM() >= 0) { return cssv('--accent', '#f59e0b'); }
+        return PAL.axis(); },
+      strokeWidth: function(){
+        if (n.id === 'j' && obsJ() >= 0) { return 3; }
+        if (n.id === 'm' && obsM() >= 0) { return 3; }
+        return 1.6; },
+      fillColor: function(){ return cssv('--primary', '#026573'); },
+      fillOpacity: function(){
+        if (n.id === 'j') { return obsJ() >= 0 ? 0.22 : 0.06; }
+        if (n.id === 'm') { return obsM() >= 0 ? 0.22 : 0.06; }
+        var p = posterieur(obsJ(), obsM())[n.id];
+        return 0.06 + 0.7 * Math.min(1, p * 3);
+      },
+      highlight: false, fixed: true});
+    b2.create('text', [n.x, n.y + 0.12, n.nom], {fontSize: 13, anchorX: 'middle',
+      anchorY: 'middle', strokeColor: PAL.text, fixed: true, highlight: false});
+    b2.create('text', [n.x, n.y - 0.16, function(){
+      if (n.id === 'j') { return 'ملاحَظ: ' + libelle(obsJ()); }
+      if (n.id === 'm') { return 'ملاحَظ: ' + libelle(obsM()); }
+      var p = posterieur(obsJ(), obsM())[n.id];
+      return 'P = ' + (100 * p).toFixed(2) + ' %';
+    }], {fontSize: 12, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+         strokeColor: function(){ return cssv('--primary-dark', '#014a55'); }});
+  })(NOEUDS8[i]);
+}
+b2.create('text', [-1.5, 6.3, function(){
+  var p = posterieur(obsJ(), obsM());
+  return 'السطو: ' + (100 * p.c).toFixed(2) + ' %   |   زلزال: '
+       + (100 * p.s).toFixed(2) + ' %   |   جهاز الانذار: ' + (100 * p.a).toFixed(2) + ' %';
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-1.5, 5.85, function(){
+  var base = posterieur(-1, -1), p = posterieur(obsJ(), obsM());
+  if (obsJ() < 0 && obsM() < 0) { return 'لا ملاحظة: الاحتمالات هي الاحتمالات القبلية.'; }
+  return 'السطو ينتقل من ' + (100 * base.c).toFixed(2) + ' % a '
+       + (100 * p.c).toFixed(2) + ' %، اي بمعامل '
+       + (p.c / base.c).toFixed(0) + '.';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-1.5, -2.2, function(){
+  var seulJ = posterieur(1, -1), seulM = posterieur(-1, 1), deux = posterieur(1, 1);
+  return 'جان وحده: ' + (100 * seulJ.c).toFixed(1) + ' %   |   ماري وحدها: '
+       + (100 * seulM.c).toFixed(1) + ' %   |   الاثنان: ' + (100 * deux.c).toFixed(1)
+       + ' %  -  الاتصالان ليسا مستقلين، فهما يمران بجهاز الانذار.';
+}], {fontSize: 12.5, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-1.5, -2.65,
+  'الشبكة تطلب 10 اعداد بدل 31 للقانون المشترك للمتغيرات الخمسة.'],
+  {fontSize: 12.5, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

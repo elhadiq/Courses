@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الفصل 6 &mdash; إرضاء القيود</title>
+<meta name="description" content="مسائل القيود، التراجع، المُرشِدات، اتّساق القوس AC-3، البنية، الإصلاح المحلّي.">
+<link href="../../assets/style.css" rel="stylesheet">
+<link href="../../assets/rtl.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+
+.src-ar { margin: 26px 0 8px; border-top: 2px solid var(--color-rule); padding-top: 16px; }
+.src-ar h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--primary); }
+.src-ar .src-note { color: var(--color-muted); font-size: 0.9rem; margin: 0 0 12px; }
+.src-ar ul { list-style: none; padding: 0; margin: 0; }
+.src-ar li { margin: 0 0 14px; padding-right: 14px; border-right: 3px solid var(--primary-soft-2);
+             line-height: 1.7; font-size: 0.95rem; }
+.src-ar li .pourquoi { display: block; color: var(--color-muted); font-size: 0.9em;
+                       margin-top: 3px; }
+.src-ar li a.lien { word-break: break-all; font-size: 0.88em; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><a class="lang-switch" href="../../../IA/lecons/06-contraintes/page.html" hreflang="fr" title="Version fran&ccedil;aise">FR</a><div class="breadcrumb"><a href="../../index.html">الذكاء الاصطناعي</a> &middot; مُقرَّر</div><span class="course-code">برنامج MP/PSI &middot; الفترة الثانية</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">القسم الثاني &middot; الفصل 6</div>
+<h1>الفصل 6 &mdash; مسائل إرضاء القيود</h1>
+<div class="lesson-sub">المتغيّرات والمجالات والقيود، والبحث بالتراجع، واتّساق القوس، ومُرشِدات الترتيب، وبنية مبيان القيود، والإصلاح المحلّي.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">المُلحَق المرافق</div><p>التراجع، والتحقّق الاستباقي، واتّساق القوس، والإصلاح المحلّي، مفصَّلة <strong><a href="../../../IA/lecons/06-contraintes/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">خطوة بخطوة في المُلحَق</a></strong>، بأمثلةٍ رقمية قابلة للتحقّق يدوياً.</p></div>
+
+<h2>3.1 النموذج</h2>
+
+<p>كانت الحالة في الفصل 3 صندوقاً أسود: لا نعلم عنها شيئاً سوى أنّ لها خُلَفاء. غير أنّ لمسائل حقيقية كثيرة <em>بنيةً</em> ظاهرة &mdash; فالحالة تجميعُ قراراتٍ مستقلّة خاضعة لقيودٍ محلّية. واستثمار هذه البنية يغيّر كلّ شيء: فبدل الاستكشاف نستطيع <strong>الاستنتاج</strong>.</p>
+
+<div class="box def"><div class="box-title">تعريف &mdash; مسألة إرضاء القيود</div>
+<p>مسألة القيود ثلاثيّةٌ \((X, D, C)\) حيث \(X = \{x_1,\dots,x_n\}\) مجموعة <strong>متغيّرات</strong>، وM2 مجموعة <strong>مجالاتها</strong> (القيم المسموح بها)، وM3 مجموعة <strong>قيود</strong>. وكلّ قيدٍ يتناول جزءاً من المتغيّرات، هو <em>مداه</em>، ويحدّد تركيبات القيم المقبولة. و<strong>الحلّ</strong> إسنادٌ تامّ يُرضي كلّ القيود.</p>
+<p>القيد ذو المدى 2 يُسمّى <strong>ثنائياً</strong>؛ ومسألة قيودٍ ثنائية تُمثَّل بـ<strong>مبيان قيود</strong> رؤوسه المتغيّرات وأضلاعه القيود.</p></div>
+
+<table>
+<thead><tr><th>المسألة</th><th>المتغيّرات</th><th>المجالات</th><th>القيود</th></tr></thead>
+<tbody>
+<tr><td>تلوين خريطة</td><td>الجهات</td><td>الألوان</td><td>جهتان متجاورتان تختلفان</td></tr>
+<tr><td>\(n\) وزيرة</td><td>واحدة لكلّ عمود</td><td>الأسطر \(1..n\)</td><td>لا السطر نفسه ولا القطر نفسه</td></tr>
+<tr><td>سودوكو</td><td>الخانات الـ81</td><td>\(\{1,\dots,9\}\)</td><td>27 قيد «كلّها مختلفة»</td></tr>
+<tr><td>جدول حصص</td><td>الدروس</td><td>الحصص الزمنية</td><td>قاعات وأساتذة ومجموعات منفصلة</td></tr>
+<tr><td>لغز حسابي بالحروف</td><td>الحروف</td><td>\(\{0,\dots,9\}\)</td><td>كلّها مختلفة، والجمع صحيح</td></tr>
+</tbody></table>
+
+<p>مسألة القرار المرافقة &mdash; هل لمسألة القيود هذه حلّ؟ &mdash; صعبةٌ تامّة بمعنى NP بمجرّد أن يكون للمجالات ثلاث قيمٍ على الأقلّ: فالتلوين بثلاثة ألوان، وهو حالة خاصّة منها، وارد أصلاً في اللائحة المؤسِّسة لكارب <a class="cite" href="#ref-karp1972">[1]</a>. فلن نبحث إذن عن خوارزميةٍ كثيرة الحدود، بل عن طرائق تتجنّب عملياً فضاء البحث كلّه تقريباً.</p>
+
+<h2>3.2 البحث بالتراجع</h2>
+
+<p>مسألة قيودٍ بـM8 متغيّراً وM9 قيمة لكلّ مجال تقبل \(d^{n}\) إسناداً تامّاً. وملاحظتان تُنقِصان هذا العدد فوراً. أوّلاً، الترتيب الذي نُسنِد به المتغيّرات لا يهمّ: فيمكن ألّا نستكشف إلّا شجرةً يُثبِّت كلّ مستوىً فيها متغيّراً، وهذا يردّ \(n!\,d^{n}\) إلى \(d^{n}\). ثانياً وقبل كلّ شيء، إسنادٌ جزئي ينتهك قيداً سلفاً لا يمكن إتمامه: فنقطع الفرع فوراً. وهذا هو <strong>التراجع</strong>.</p>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 6.1 &mdash; البحث بالتراجع</div><div class="algo-io"><b>المُدخل:</b> مسألة قيود \((X, D, C)\)<br><b>المُخرج:</b> إسنادٌ كلّي \(\mathcal{A}\) يُرضي \(C\)، أو الإخفاق</div><ol class="algo-corps"><li><b class="kw">دالّة</b> <span class="fn">استكشف</span>\((\mathcal{A})\)</li><li class="n1"><b class="kw">إذا</b> \(|\mathcal{A}| = |X|\) <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> \(\mathcal{A}\)</li><li class="n1">\(x \leftarrow\) متغيّر من \(X \setminus \operatorname{dom}\mathcal{A}\)</li><li class="n1"><b class="kw">لكلّ</b> \(v \in D_x\) <b class="kw">نفّذ</b></li><li class="n2"><b class="kw">إذا</b> \(\mathcal{A} \cup \{x = v\}\) يُرضي كلّ قيدٍ مُسنَدٍ بتمامه <b class="kw">فإنّ</b></li><li class="n3">\(r \leftarrow\) <span class="fn">استكشف</span>\((\mathcal{A} \cup \{x = v\})\)</li><li class="n3"><b class="kw">إذا</b> \(r \neq\) إخفاق <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> <i class="va">r</i></li><li class="n1"><b class="kw">أرجِع</b> إخفاق          <span class="cm">// تراجع</span></li></ol><p class="algo-note"><strong>الثابت الحلقي.</strong> \(\mathcal{A}\) يُرضي كلّ قيدٍ مداه محتوىً في \(\operatorname{dom}\mathcal{A}\). <strong>المتناقص.</strong> \(|X| - |\mathcal{A}|\). <strong>الكلفة.</strong> \(O(d^{n})\) في أسوأ الحالات، وفضاء \(O(n)\).</p></div>
+
+<div class="box method"><div class="box-title">التحليل &mdash; الصحّة والانتهاء والتعقيد</div>
+<p><strong>الثابت الحلقي.</strong> عند كلّ استدعاءٍ لـ<em>استكشف</em>، يُرضي الإسناد الجزئي الراهن كلّ القيود التي أُسنِد مداها بتمامه. وهو مُثبَتٌ عند الدخول (إسناد فارغ) ومحفوظٌ باختبار التوافق قبل كلّ توسيع.</p>
+<p><strong>الصحّة.</strong> التمام: كلّ إسنادٍ تامّ متّسق قابل للبلوغ، لأنّنا لا نُقصي قيمةً إلّا إن انتهكت قيداً سلفاً، وهو ما كان سيُبطِل أيّ توسيع. الصلاحية: الإسناد المُرجَع تامّ ويحقّق الثابت الحلقي، فيُرضي إذن كلّ القيود.</p>
+<p><strong>الانتهاء.</strong> المقياس: عدد المتغيّرات غير المُسنَدة، وهو عدد صحيح موجب يتناقص قطعاً عند كلّ استدعاءٍ تراجعي. وكلّ حلقةٍ منتهية لأنّ المجالات منتهية.</p>
+<p><strong>التعقيد.</strong> \(O(d^{n})\) في أسوأ الحالات &mdash; ولا سبيل إلى أفضل، لأنّ المسألة صعبة تامّة بمعنى NP. والفضاء \(O(n)\): فلا يُحفَظ إلّا الإسناد الراهن.</p></div>
+
+<h2>3.3 ثلاث مُرشِدات تغيّر كلّ شيء</h2>
+
+<p>يترك الهيكل السابق اختيارين حرَّين: أيّ متغيّرٍ نُسنِد بعد ذلك، وبأيّ ترتيبٍ نجرّب قيمه. وهذان الاختياران لا يغيّران الصحّة ولا التعقيد في أسوأ الحالات، لكنّهما يُغيّران الزمن الفعلي بعدّة رتبٍ من القدر <a class="cite" href="#ref-haralick1980">[2]</a>.</p>
+
+<div class="box prop"><div class="box-title">المُرشِدات المعيارية الثلاث</div>
+<ul>
+<li><strong>المتغيّر الأشدّ تقييداً</strong> (أصغر مجالٍ متبقٍّ): إسناد المتغيّر ذي أقلّ القيم الممكنة أوّلاً. والدافع: إن كان لا بدّ أن يُخفِق، فليكن ذلك فوراً، في أعلى الشجرة، لا بعد تطوير شجرةٍ جزئية بأكملها.</li>
+<li><strong>المتغيّر الأعلى درجةً</strong>، لفصل التعادل في السابقة: وهو الذي يظهر في أكبر عددٍ من القيود مع متغيّرات غير مُسنَدة. فهو يقيّد بقيّة المسألة أكثر من غيره.</li>
+<li><strong>القيمة الأقلّ تقييداً</strong>: من بين قيم متغيّر، نجرّب أوّلاً التي تُقصي أقلّ الخيارات عند جيرانه. وهنا نسعى إلى <em>النجاح</em>، أي إلى إبقاء أكبر عددٍ من الأبواب مفتوحة &mdash; وهو منطقٌ معاكس لمنطق اختيار المتغيّر، وذلك طبيعي: فقيمةٌ واحدة تكفي، بينما كلّ المتغيّرات ستُسنَد.</li>
+</ul></div>
+
+<p>وتنضاف إلى هذه المُرشِدات <strong>التحقّق الاستباقي</strong>: فبمجرّد أن يتلقّى متغيّرٌ قيمةً، نحذف هذه القيمة من مجالات جيرانه غير المُسنَدين. فإن صار مجالٌ فارغاً، رجعنا فوراً، دون انتظار بلوغ المتغيّر المعني. وهو أيضاً الذي يُغذّي مُرشِدة أصغر مجالٍ بمعلوماتٍ طازجة.</p>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">المؤشّر الأوّل يختار الاستراتيجية، والثاني يبسط الحلّ. وتحت كلّ جهةٍ غير ملوّنة ترد أوائل حروف الألوان الممكنة بعد.</p>
+<div id="jxg1" class="viz-board" style="height:500px;"></div>
+<p class="viz-caption"><strong>الشكل 6.1.</strong> تلوين بثلاثة ألوان لخريطةٍ ذات سبع جهات. وبترتيبٍ ثابت متوسّطٍ عن قصد، يتطلّب الحلّ <strong>47 محاولة و9 تراجعات</strong>. ومُرشِدة أصغر مجالٍ تردّهما إلى <strong>15 محاولة بلا أيّ تراجع</strong>؛ وبإضافة التحقّق الاستباقي، لا تبقى إلّا <strong>7 محاولات</strong>، أي واحدة لكلّ جهة: فتُحلّ المسألة دون خطأٍ واحد. والاستراتيجيات الثلاث تنتهي إلى تلوينٍ صحيح، لكن ليس إلى التلوين نفسه.</p></div>
+
+<h2>3.4 انتشار القيود: اتّساق القوس</h2>
+
+<p>لا يَنشُر التحقّق الاستباقي إلّا خطوةً واحدة. ويمكن الذهاب أبعد وجعل الشبكة <em>متّسقة</em> قبل بدء البحث أصلاً.</p>
+
+<div class="box def"><div class="box-title">تعريف &mdash; اتّساق القوس</div>
+<p>القوس \((x_i, x_j)\) <strong>متّسق</strong> إذا وُجِدت لكلّ قيمة \(a \in D_i\) قيمةٌ واحدة على الأقلّ \(b \in D_j\) بحيث يُرضي الزوج \((a,b)\) القيدَ بين \(x_i\) وM38. والشبكة متّسقة القوس إذا كانت كلّ أقواسها كذلك، في الاتّجاهين.</p>
+<p>جعل قوسٍ متّسقاً هو حذف كلّ قيمةٍ بلا سندٍ في \(D_j\) من \(D_i\). وهذا الحذف قد يجعل أقواساً أخرى متّجهة نحو \(x_i\) غير متّسقة: فيجب إعادتها إلى الطابور. وهذه خوارزمية <strong>AC-3</strong> لماكوورث <a class="cite" href="#ref-mackworth1977">[3]</a>.</p></div>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 6.2 &mdash; اتّساق القوس (AC-3)</div><div class="algo-io"><b>المُدخل:</b> شبكة ثنائية \((X, D, C)\)<br><b>المُخرج:</b> المجالات المُختزَلة؛ وخطأ إذا صار مجالٌ فارغاً</div><ol class="algo-corps"><li>\(Q \leftarrow \{(x_i, x_j) : (x_i, x_j) \text{ port&eacute;e d'une contrainte}\}\)          <span class="cm">// الاتجاهان معا</span></li><li><b class="kw">طالما</b> \(Q \neq \varnothing\) <b class="kw">نفّذ</b></li><li class="n1">\((x_i, x_j) \leftarrow\) <span class="fn">انزع من الطابور</span>\((Q)\)</li><li class="n1"><b class="kw">إذا</b> <span class="fn">راجِع</span>\((D, x_i, x_j)\) <b class="kw">فإنّ</b></li><li class="n2"><b class="kw">إذا</b> \(D_i = \varnothing\) <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> خطأ          <span class="cm">// عدم الاتساق مبرهن</span></li><li class="n2">\(Q \leftarrow Q \cup \{(x_k, x_i) : k \neq j,\ (x_k, x_i) \in C\}\)</li><li><b class="kw">أرجِع</b> صحيح</li><li>&nbsp;</li><li><b class="kw">دالّة</b> <span class="fn">راجِع</span>\((D, x_i, x_j)\)</li><li class="n1">\(D_i' \leftarrow \{a \in D_i\ :\ \exists\, b \in D_j,\ (a,b) \text{ autoris&eacute;}\}\)</li><li class="n1">\(\mathrm{modifi\acute{e}} \leftarrow (D_i' \neq D_i)\) ؛ \(D_i \leftarrow D_i'\)</li><li class="n1"><b class="kw">أرجِع</b> \(\mathrm{modifi\acute{e}}\)</li></ol><p class="algo-note"><strong>المتناقص.</strong> \(\sum_i |D_i|\)، عدد صحيح موجب: مراجعةٌ فعّالة تُنقِصه، ولا يُعاد قوسٌ إلى الطابور إلّا بعد نقصانٍ كهذا. <strong>الكلفة.</strong> \(O(e\,d^{3})\). واتّساق القوس ضروري، لا كافٍ أبداً.</p></div>
+
+<figure class="viz"><div class="viz-title">الانتشار على سلسلة قيود</div>
+<svg viewBox="0 0 760 330" role="img" style="width:100%;height:auto;display:block;"><text x="20" y="24" style="fill:var(--color-text);font-size:13px;font-family:inherit;">قبل</text><circle cx="42" cy="70" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="42" y="75" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">X</text><text x="72" y="75" style="fill:var(--color-text);font-size:14px;font-family:inherit;">{1,2,3}</text><path d="M 42 91 L 42 129" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><text x="34" y="114" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">X &lt; Y</text><circle cx="42" cy="150" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="42" y="155" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">Y</text><text x="72" y="155" style="fill:var(--color-text);font-size:14px;font-family:inherit;">{1,2,3}</text><path d="M 42 171 L 42 209" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><text x="34" y="194" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">Y &lt; Z</text><circle cx="42" cy="230" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="42" y="235" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">Z</text><text x="72" y="235" style="fill:var(--color-text);font-size:14px;font-family:inherit;">{1,2,3}</text><path d="M 170 160 L 230 160" style="fill:none;stroke:var(--primary);stroke-width:2.5;" marker-end=""/><path d="M 225 154 L 236 160 L 225 166 Z" style="fill:var(--primary);"/><text x="270" y="24" style="fill:var(--color-text);font-size:13px;font-family:inherit;">بعد X &lt; Y</text><circle cx="292" cy="70" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="292" y="75" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">X</text><text x="322" y="75" style="fill:var(--viz-bad);font-size:14px;font-family:inherit;">{1,2}</text><path d="M 292 91 L 292 129" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><text x="284" y="114" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">X &lt; Y</text><circle cx="292" cy="150" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="292" y="155" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">Y</text><text x="322" y="155" style="fill:var(--viz-bad);font-size:14px;font-family:inherit;">{2,3}</text><path d="M 292 171 L 292 209" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><text x="284" y="194" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">Y &lt; Z</text><circle cx="292" cy="230" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="292" y="235" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">Z</text><text x="322" y="235" style="fill:var(--color-text);font-size:14px;font-family:inherit;">{1,2,3}</text><path d="M 420 160 L 480 160" style="fill:none;stroke:var(--primary);stroke-width:2.5;" marker-end=""/><path d="M 475 154 L 486 160 L 475 166 Z" style="fill:var(--primary);"/><text x="520" y="24" style="fill:var(--color-text);font-size:13px;font-family:inherit;">بعد Y &lt; Z</text><circle cx="542" cy="70" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="542" y="75" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">X</text><text x="572" y="75" style="fill:var(--viz-bad);font-size:14px;font-family:inherit;">{1}</text><path d="M 542 91 L 542 129" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><text x="534" y="114" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">X &lt; Y</text><circle cx="542" cy="150" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="542" y="155" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">Y</text><text x="572" y="155" style="fill:var(--viz-bad);font-size:14px;font-family:inherit;">{2}</text><path d="M 542 171 L 542 209" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><text x="534" y="194" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">Y &lt; Z</text><circle cx="542" cy="230" r="20" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><text x="542" y="235" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">Z</text><text x="572" y="235" style="fill:var(--viz-bad);font-size:14px;font-family:inherit;">{3}</text><text x="380" y="316" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">مجالٌ مُختزَل ينشر الاختزال إلى جيرانه: فيظهر الحلّ بلا أيّ تعداد</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 6.2.</strong> ثلاثة متغيّرات مجالها \(\{1,2,3\}\) مرتبطة بـM58 وM59. مراجعة القوس الأوّل تحذف 3 من \(D_X\) و1 من \(D_Y\)؛ ومراجعة الثاني تحذف 3 من \(D_Y\)، وهذا يُعيد النظر في القوس السابق فيُحذَف 2 من \(D_X\). والحلّ الوحيد \((1,2,3)\) مبلوغٌ <em>بالاستنتاج</em>، دون أدنى محاولة.</figcaption></figure>
+
+<div class="box thm"><div class="box-title">مبرهنة &mdash; كلفة AC-3 ومداها</div>
+<p>على شبكةٍ ثنائية بـM65 قيداً ومجالاتٍ حجمها \(d\) على الأكثر، يُنفَّذ AC-3 في \(O(e\,d^{3})\) وبفضاء \(O(e)\) <a class="cite" href="#ref-mackworth1985">[4]</a>.</p>
+<p><strong>الانتهاء.</strong> المتناقص: مجموع أحجام المجالات، وهو عدد صحيح موجب. كلّ مراجعةٍ فعّالة تُنقِصه بواحدٍ على الأقلّ، ولا يُعاد قوسٌ إلى الطابور إلّا بعد نقصانٍ كهذا؛ فمجموع الإدراجات محدود إذن بـM69.</p>
+<p><strong>المدى.</strong> اتّساق القوس شرطٌ <em>ضروري</em> لا كافٍ: فشبكة متّسقة القوس قد لا يكون لها أيّ حلّ. والمثلّث ذو المتغيّرات الثلاثة واللونين، مع قيد الاختلاف على كلّ ضلع، متّسق القوس ومع ذلك لا يقبل حلّاً.</p></div>
+
+<div class="box tip"><div class="box-title">MAC: التركيب الرابح</div>
+عملياً نُنفّذ AC-3 مرّةً قبل البحث، ثمّ بعد كلّ إسناد، ولا نُعيد إلى الطابور إلّا الأقواس المتأثّرة. وهذا التركيب، المسمّى <em>صيانة اتّساق القوس</em>، يهيمن بانتظامٍ على التحقّق الاستباقي وحده. وهو ما يفعله كلّ حلّال سودوكو جدير باسمه: فشبكات الصعوبة المتوسّطة تُحلّ بالانتشار الخالص، بلا محاولةٍ واحدة.</div>
+
+<h2>3.5 ما تقدّمه البنية</h2>
+
+<p>يتوقّف التعقيد في أسوأ الحالات على <em>شكل</em> مبيان القيود، لا على حجمه فحسب.</p>
+
+<div class="box thm"><div class="box-title">مبرهنة &mdash; مسألة قيودٍ بمبيانٍ بلا دورات</div>
+<p>إذا كان مبيان القيود شجرةً، تُحلّ مسألة القيود في \(O(n\,d^{2})\)، أي في زمنٍ كثير الحدود. والإجراء: تجذير الشجرة، وترتيب المتغيّرات من الأب نحو الأبناء، وجعل كلّ قوسٍ متّسقاً صعوداً من الأوراق إلى الجذر، ثمّ الإسناد نزولاً. ولا يحدث أيّ تراجع <a class="cite" href="#ref-freuder1982">[5]</a>.</p>
+<p>وعلى نحوٍ أعمّ، مسألة قيودٍ مبيانها ذو <strong>عرض شجريّ</strong> \(w\) تُحلّ في \(O(n\,d^{w+1})\) <a class="cite" href="#ref-dechter1989">[6]</a>. وتستثمر هذه النتيجةَ تقنيّتان: <em>قطع الدورات</em>، التي تُعدّد قيم مجموعةٍ صغيرة من المتغيّرات يجعل حذفُها المبيانَ بلا دورات، و<em>التفكيك الشجري</em>.</p></div>
+
+<p>وثمّة انتظامٌ لافت آخر يخصّ الصعوبة <em>الوسطى</em>. فمن أجل عائلةٍ من الأمثلة العشوائية، ينتقل احتمال وجود حلٍّ فجأةً من 1 إلى 0 حين تتجاوز نسبةُ عدد القيود إلى عدد المتغيّرات عتبةً معيّنة، و<em>هناك بالضبط</em> تبلغ كلفةُ الحلّ ذروتها <a class="cite" href="#ref-cheeseman1991">[7]</a>. وبعيداً عن العتبة تكون الأمثلة سهلة: فإمّا قليلة التقييد جدّاً فنجد حلّاً بلا جهد، وإمّا شديدة التقييد فيُثبِت الانتشارُ الإخفاقَ فوراً.</p>
+
+<figure class="viz"><div class="viz-title">الانتقال الطوري</div>
+<svg viewBox="0 0 720 330" role="img" style="width:100%;height:auto;display:block;"><path d="M 80 40 L 80 285 L 680 285" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 80 40.007 L 85 40.0087 L 90 40.0107 L 95 40.0133 L 100 40.0164 L 105 40.0203 L 110 40.0252 L 115 40.0311 L 120 40.0385 L 125 40.0477 L 130 40.059 L 135 40.0731 L 140 40.0904 L 145 40.1119 L 150 40.1385 L 155 40.1715 L 160 40.2122 L 165 40.2626 L 170 40.325 L 175 40.4021 L 180 40.4975 L 185 40.6155 L 190 40.7615 L 195 40.9418 L 200 41.1647 L 205 41.4401 L 210 41.78 L 215 42.1995 L 220 42.7168 L 225 43.354 L 230 44.138 L 235 45.1016 L 240 46.2836 L 245 47.7307 L 250 49.4977 L 255 51.6489 L 260 54.2578 L 265 57.4073 L 270 61.1887 L 275 65.6988 L 280 71.0358 L 285 77.2927 L 290 84.5483 L 295 92.8563 L 300 102.233 L 305 112.644 L 310 123.996 L 315 136.132 L 320 148.837 L 325 161.847 L 330 174.871 L 335 187.619 L 340 199.823 L 345 211.262 L 350 221.772 L 355 231.254 L 360 239.669 L 365 247.028 L 370 253.381 L 375 258.806 L 380 263.395 L 385 267.245 L 390 270.453 L 395 273.112 L 400 275.306 L 405 277.108 L 410 278.584 L 415 279.791 L 420 280.774 L 425 281.575 L 430 282.225 L 435 282.753 L 440 283.182 L 445 283.529 L 450 283.81 L 455 284.038 L 460 284.222 L 465 284.371 L 470 284.492 L 475 284.589 L 480 284.668 L 485 284.732 L 490 284.783 L 495 284.825 L 500 284.858 L 505 284.886 L 510 284.908 L 515 284.925 L 520 284.94 L 525 284.951 L 530 284.961 L 535 284.968 L 540 284.974 L 545 284.979 L 550 284.983 L 555 284.986 L 560 284.989 L 565 284.991 L 570 284.993 L 575 284.994 L 580 284.995 L 585 284.996 L 590 284.997 L 595 284.998 L 600 284.998 L 605 284.998 L 610 284.999 L 615 284.999 L 620 284.999 L 625 284.999 L 630 284.999 L 635 285 L 640 285 L 645 285 L 650 285 L 655 285 L 660 285 L 665 285 L 670 285 L 675 285 L 680 285" style="fill:none;stroke:var(--primary);stroke-width:3;"/><path d="M 80 284.998 L 85 284.997 L 90 284.996 L 95 284.994 L 100 284.99 L 105 284.984 L 110 284.976 L 115 284.963 L 120 284.945 L 125 284.917 L 130 284.878 L 135 284.821 L 140 284.741 L 145 284.628 L 150 284.472 L 155 284.257 L 160 283.965 L 165 283.572 L 170 283.05 L 175 282.364 L 180 281.47 L 185 280.32 L 190 278.857 L 195 277.015 L 200 274.723 L 205 271.903 L 210 268.473 L 215 264.351 L 220 259.453 L 225 253.704 L 230 247.038 L 235 239.406 L 240 230.776 L 245 221.147 L 250 210.548 L 255 199.042 L 260 186.733 L 265 173.766 L 270 160.325 L 275 146.633 L 280 132.947 L 285 119.549 L 290 106.74 L 295 94.827 L 300 84.1117 L 305 74.8782 L 310 67.3803 L 315 61.8299 L 320 58.3871 L 325 57.1528 L 330 58.1632 L 335 61.3886 L 340 66.7345 L 345 74.0464 L 350 83.1172 L 355 93.6967 L 360 105.503 L 365 118.237 L 370 131.589 L 375 145.26 L 380 158.963 L 385 172.44 L 390 185.463 L 395 197.845 L 400 209.437 L 405 220.13 L 410 229.858 L 415 238.588 L 420 246.319 L 425 253.08 L 430 258.917 L 435 263.897 L 440 268.094 L 445 271.589 L 450 274.466 L 455 276.807 L 460 278.691 L 465 280.189 L 470 281.368 L 475 282.284 L 480 282.99 L 485 283.526 L 490 283.93 L 495 284.231 L 500 284.453 L 505 284.615 L 510 284.731 L 515 284.814 L 520 284.873 L 525 284.914 L 530 284.942 L 535 284.962 L 540 284.975 L 545 284.984 L 550 284.989 L 555 284.993 L 560 284.996 L 565 284.997 L 570 284.998 L 575 284.999 L 580 284.999 L 585 285 L 590 285 L 595 285 L 600 285 L 605 285 L 610 285 L 615 285 L 620 285 L 625 285 L 630 285 L 635 285 L 640 285 L 645 285 L 650 285 L 655 285 L 660 285 L 665 285 L 670 285 L 675 285 L 680 285" style="fill:none;stroke:var(--viz-bad);stroke-width:3;stroke-dasharray:7 5;"/><path d="M 325.25 285 L 325.25 40" style="fill:none;stroke:var(--accent);stroke-width:2;stroke-dasharray:4 4;"/><text x="325.25" y="32" text-anchor="middle" style="fill:var(--accent);font-size:12.5px;font-weight:700;font-family:inherit;">العتبة</text><text x="80" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">1</text><text x="155" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">2</text><text x="230" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">3</text><text x="305" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">4</text><text x="380" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">5</text><text x="455" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">6</text><text x="530" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">7</text><text x="605" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">8</text><text x="680" y="305" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">9</text><text x="380" y="327" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">نسبة عدد القيود إلى عدد المتغيّرات</text><text x="94" y="64" style="fill:var(--primary);font-size:13px;font-weight:700;font-family:inherit;">احتمال وجود حلّ</text><text x="674" y="64" text-anchor="end" style="fill:var(--viz-bad);font-size:13px;font-weight:700;font-family:inherit;">كلفة الحلّ</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 6.3.</strong> الشكل النمطي للظاهرة في صيغٍ عشوائية ذات ثلاثة أعداد أوّلية منطقية: ينقلب احتمال القابلية للإرضاء حول نسبةٍ تجاور 4,27 وتُظهِر كلفة الحلّ عندها ذروةً واضحة <a class="cite" href="#ref-mitchell1992">[8]</a>. والمنحنيان المرسومان نموذجان أملسان لهذا الشكل، لا قياسات: فموضع العتبة الدقيق وارتفاع الذروة يتوقّفان على الحلّال وعلى حجم الأمثلة.</figcaption></figure>
+
+<h2>3.6 الإصلاح المحلّي</h2>
+
+<p>يبني التراجع حلّاً انطلاقاً من لا شيء. أمّا المقاربة المعاكسة فتنطلق من إسنادٍ تامّ، خاطئ على الأرجح، و<em>تُصلِحه</em>: فما دامت هناك تعارضات، نختار متغيّراً في تعارض ونعطيه القيمة التي تُنشئ أقلّها. وهذه مُرشِدة <strong>أدنى التعارضات</strong> <a class="cite" href="#ref-minton1992">[9]</a>.</p>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 6.3 &mdash; الإصلاح بأدنى التعارضات</div><div class="algo-io"><b>المُدخل:</b> مسألة قيود، وإسنادٌ كلّي ابتدائي \(\mathcal{A}_0\)، وميزانية \(t_{\max}\)<br><b>المُخرج:</b> إسنادٌ بلا تعارض، أو الإخفاق &mdash; وهو لا يُثبِت شيئاً</div><ol class="algo-corps"><li>\(\mathcal{A} \leftarrow \mathcal{A}_0\)          <span class="cm">// تام، لكنه خاطئ</span></li><li><b class="kw">لكلّ</b> \(t = 1\) <b class="kw">إلى أن</b> \(t_{\max}\) <b class="kw">نفّذ</b></li><li class="n1">\(K \leftarrow \{x \in X\ :\ x \text{ viole au moins une contrainte}\}\)</li><li class="n1"><b class="kw">إذا</b> \(K = \varnothing\) <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> \(\mathcal{A}\)</li><li class="n1">\(x \sim \mathcal{U}(K)\)          <span class="cm">// سحب انتظامي: لا غنى عنه</span></li><li class="n1">\(m \leftarrow \displaystyle\min_{v \in D_x} \mathrm{conf}(\mathcal{A}, x, v)\)</li><li class="n1">\(\mathcal{A}[x] \sim \mathcal{U}\big(\{v \in D_x : \mathrm{conf}(\mathcal{A},x,v) = m\}\big)\)</li><li><b class="kw">أرجِع</b> إخفاق</li></ol><p class="algo-note">السحبان الانتظاميّان ليسا تجميلاً: فبدون الأوّل يتذبذب البحث بين تشكيلتين؛ وبدون الثاني ينحصر عند أوّل هضبة. <strong>لا متناقص:</strong> فعدد التعارضات قد يرتفع، والانتهاء مفروضٌ بـM84.</p></div>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">المؤشّر الأوّل يحدّد حجم الرقعة، والثاني يتقدّم في متتالية الإصلاحات. والوزيرات بالأحمر تشارك في تعارضٍ واحد على الأقلّ؛ والخطوط المنقّطة تُظهِر الأزواج المتهاجمة.</p>
+<div id="jxg2" class="viz-board" style="height:540px;"></div>
+<p class="viz-caption"><strong>الشكل 6.4.</strong> الخطوط الحمراء تربط صراحةً أزواج الوزيرات المتهاجمة: فنرى ما تسعى الخوارزمية إلى إزالته. والشريط العمودي البرتقالي يعلّم العمود المُحرَّك في الخطوة الراهنة، والمدرّج التكراري على اليمين يعطي عدد التعارضات عبر الإصلاحات &mdash; وهو لا يتناقص تناقصاً رتيباً، وذلك طبيعي: فالطريقة تقبل المرور بتشكيلاتٍ أسوأ. وعدد الإصلاحات اللازمة لا يتزايد عملياً مع \(n\): وهذه هي الخاصّية اللافتة لهذه العائلة من الأمثلة، فهي قليلة التقييد جدّاً ومن ثمّ بعيدة عن عتبة الشكل السابق. والسحب مثبَّت لجعل الشكل قابلاً للاستنساخ؛ وسحوبٌ أخرى تعطي مساراتٍ مقارنة الطول.</p></div>
+
+<div class="box warn"><div class="box-title">ما لا يُحسِنه الإصلاح المحلّي</div>
+إنّه لا يُثبِت <em>أبداً</em> انعدام الحلّ: فالإخفاق قد يعني أنّه لا يوجد حلّ، أو ببساطة أنّ الاستكشاف غاص في أصغريّةٍ محلّية. فهو إذن غير قابل للاستعمال كما هو في المسائل التي نسعى فيها إلى برهنة عدم الاتّساق، ويجب تزويده بآليّات إفلات &mdash; إعادات انطلاق عشوائية، وتنقّلات جانبية، وذاكرة للتشكيلات المزارة حديثاً.</div>
+
+<h2>الخلاصة</h2>
+<ul>
+<li>تُظهِر مسألة القيود البنية الداخلية للحالات: فيمكن عندئذٍ الاستنتاج بدل الاستكشاف.</li>
+<li>يردّ التراجع \(d^{n}\) إسناداً إلى شجرةٍ مقلَّمة منذ أوّل انتهاك؛ ويبقى أُسّياً في أسوأ الحالات، لأنّ المسألة صعبة تامّة بمعنى NP <a class="cite" href="#ref-karp1972">[1]</a>.</li>
+<li>أصغر مجال، والأعلى درجةً، والقيمة الأقلّ تقييداً، والتحقّق الاستباقي، تقسم العمل الفعلي على عدّة رتبٍ من القدر <a class="cite" href="#ref-haralick1980">[2]</a>.</li>
+<li>يُقصي اتّساق القوس بالاستنتاج، في \(O(e\,d^{3})\)؛ وهو ضروري لكن غير كافٍ <a class="cite" href="#ref-mackworth1977">[3]</a>.</li>
+<li>مبيان قيودٍ بلا دورات يجعل المسألة كثيرة الحدود؛ والعرض الشجري يعمّم هذه النتيجة <a class="cite" href="#ref-dechter1989">[6]</a>.</li>
+<li>يحلّ الإصلاح المحلّي الأمثلة القليلة التقييد بسرعةٍ كبيرة، لكنّه لا يُثبِت انعدام الحلّ أبداً <a class="cite" href="#ref-minton1992">[9]</a>.</li>
+</ul>
+
+<h2>المراجع</h2>
+<ol class="reflist">
+<li id="ref-karp1972">Karp, R. M. (1972). Reducibility among combinatorial problems. In <em>Complexity of Computer Computations</em>, Plenum Press, 85&ndash;103. DOI: 10.1007/978-1-4684-2001-2_9. <a href="https://doi.org/10.1007/978-1-4684-2001-2_9">https://doi.org/10.1007/978-1-4684-2001-2_9</a></li>
+<li id="ref-haralick1980">Haralick, R. M. &amp; Elliott, G. L. (1980). Increasing tree search efficiency for constraint satisfaction problems. <em>Artificial Intelligence</em>, 14(3), 263&ndash;313. DOI: 10.1016/0004-3702(80)90051-X. <a href="https://doi.org/10.1016/0004-3702(80)90051-X">https://doi.org/10.1016/0004-3702(80)90051-X</a></li>
+<li id="ref-mackworth1977">Mackworth, A. K. (1977). Consistency in networks of relations. <em>Artificial Intelligence</em>, 8(1), 99&ndash;118. DOI: 10.1016/0004-3702(77)90007-8. <a href="https://doi.org/10.1016/0004-3702(77)90007-8">https://doi.org/10.1016/0004-3702(77)90007-8</a></li>
+<li id="ref-mackworth1985">Mackworth, A. K. &amp; Freuder, E. C. (1985). The complexity of some polynomial network consistency algorithms for constraint satisfaction problems. <em>Artificial Intelligence</em>, 25(1), 65&ndash;74. DOI: 10.1016/0004-3702(85)90041-4. <a href="https://doi.org/10.1016/0004-3702(85)90041-4">https://doi.org/10.1016/0004-3702(85)90041-4</a></li>
+<li id="ref-freuder1982">Freuder, E. C. (1982). A sufficient condition for backtrack-free search. <em>Journal of the ACM</em>, 29(1), 24&ndash;32. DOI: 10.1145/322290.322292. <a href="https://doi.org/10.1145/322290.322292">https://doi.org/10.1145/322290.322292</a></li>
+<li id="ref-dechter1989">Dechter, R. &amp; Pearl, J. (1989). Tree clustering for constraint networks. <em>Artificial Intelligence</em>, 38(3), 353&ndash;366. DOI: 10.1016/0004-3702(89)90037-4. <a href="https://doi.org/10.1016/0004-3702(89)90037-4">https://doi.org/10.1016/0004-3702(89)90037-4</a></li>
+<li id="ref-cheeseman1991">Cheeseman, P., Kanefsky, B. &amp; Taylor, W. M. (1991). Where the really hard problems are. <em>Proceedings of IJCAI-91</em>, 331&ndash;337. <a href="https://www.ijcai.org/Proceedings/91-1/Papers/052.pdf">https://www.ijcai.org/Proceedings/91-1/Papers/052.pdf</a></li>
+<li id="ref-mitchell1992">Mitchell, D., Selman, B. &amp; Levesque, H. (1992). Hard and easy distributions of SAT problems. <em>Proceedings of AAAI-92</em>, 459&ndash;465. <a href="https://cdn.aaai.org/AAAI/1992/AAAI92-071.pdf">https://cdn.aaai.org/AAAI/1992/AAAI92-071.pdf</a></li>
+<li id="ref-minton1992">Minton, S., Johnston, M. D., Philips, A. B. &amp; Laird, P. (1992). Minimizing conflicts: a heuristic repair method for constraint satisfaction and scheduling problems. <em>Artificial Intelligence</em>, 58(1&ndash;3), 161&ndash;205. DOI: 10.1016/0004-3702(92)90007-K. <a href="https://doi.org/10.1016/0004-3702(92)90007-K">https://doi.org/10.1016/0004-3702(92)90007-K</a></li>
+</ol>
+
+<section class="src-ar">
+<h3>مصادر بالعربية</h3>
+<p class="src-note">مصادر للاستزادة، لا مراجع لما ورد أعلاه: المراجع الأصلية للفصل مذكورةٌ في القائمة السابقة بلغتها. وقد عُوينت كلّ صفحةٍ من صفحات الناشرين للتحقّق من العنوان والمترجم ورخصة الإتاحة.</p>
+<ul>
+<li>داسجوبتا، سوبراتا. <em>علم الكمبيوتر: مقدّمة قصيرة جدًّا</em>. ترجمة إبراهيم سند أحمد، مراجعة عبد الفتاح عبد الله أحمد. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/13726364/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/13726364/</a><span class="pourquoi">فصلُ «التفكير الخوارزمي» فيه يقدّم بالعربية مفهوم الخوارزمية وتكلفتها، وهو ما يفترضه هذا الفصل مكتسَباً.</span></li>
+</ul>
+</section>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../05-jeux/page.html">\(\leftarrow\) الفصل 5 &mdash; الألعاب</a>
+<a href="../../../IA/lecons/06-contraintes/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">المُلحَق الخوارزمي</a>
+<a href="../../index.html">فهرس المُقرَّر</a>
+<a href="../07-logique/page.html">الفصل 7 &mdash; المنطق \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>الذكاء الاصطناعي &mdash; الأقسام التحضيرية MP/PSI</strong> &middot; البحث والألعاب والقيود والتعلّم<span class="footer-meta">طبعة 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">تعذّر تحميل الشكل التفاعلي. تحقّق من اتصالك بالشبكة.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ============ Figure 3.x : coloration d'un graphe par retour sur trace ==== */
+var REGIONS = ['T','WA','NSW','NT','Q','V','SA'];   /* ordre fixe volontairement mediocre */
+var RPOS = {WA:[1.0,3.2], NT:[2.7,4.3], SA:[2.9,2.4], Q:[4.6,4.2],
+            NSW:[5.2,2.6], V:[4.6,1.2], T:[5.0,-0.4]};
+var RARETES = [['WA','NT'],['WA','SA'],['NT','SA'],['NT','Q'],['SA','Q'],
+               ['SA','NSW'],['SA','V'],['Q','NSW'],['NSW','V']];
+var COUL = ['rouge','vert','bleu'];
+var COULHEX = ['#dc2626', '#16a34a', '#2563eb'];
+var VOISINS = {};
+for (var i=0;i<REGIONS.length;i++){ VOISINS[REGIONS[i]] = []; }
+for (var i=0;i<RARETES.length;i++){
+  VOISINS[RARETES[i][0]].push(RARETES[i][1]);
+  VOISINS[RARETES[i][1]].push(RARETES[i][0]);
+}
+
+/* strategie : 0 = ordre fixe, 1 = + variable la plus contrainte,
+   2 = + verification en avant (et variable la plus contrainte) */
+function resoudre(strategie){
+  var evts = [], retours = 0, aff = {};
+  var dom = {};
+  for (var i=0;i<REGIONS.length;i++){ dom[REGIONS[i]] = [0,1,2]; }
+
+  function libre(){
+    var r = [];
+    for (var i=0;i<REGIONS.length;i++){ if (!(REGIONS[i] in aff)) { r.push(REGIONS[i]); } }
+    return r;
+  }
+  function choisir(){
+    var l = libre();
+    if (!l.length) { return null; }
+    if (strategie === 0) { return l[0]; }
+    var best = l[0];
+    for (var i=1;i<l.length;i++){
+      if (dom[l[i]].length < dom[best].length) { best = l[i]; }
+      else if (dom[l[i]].length === dom[best].length &&
+               VOISINS[l[i]].length > VOISINS[best].length) { best = l[i]; }
+    }
+    return best;
+  }
+  function compatible(v, c){
+    for (var i=0;i<VOISINS[v].length;i++){
+      var u = VOISINS[v][i];
+      if (u in aff && aff[u] === c) { return false; }
+    }
+    return true;
+  }
+  function retirer(v, c){
+    /* verification en avant : renvoie la liste des retraits effectues */
+    var retraits = [];
+    for (var i=0;i<VOISINS[v].length;i++){
+      var u = VOISINS[v][i];
+      if (u in aff) { continue; }
+      var j = dom[u].indexOf(c);
+      if (j >= 0){ dom[u].splice(j,1); retraits.push(u); }
+    }
+    return retraits;
+  }
+  function remettre(retraits, c){
+    for (var i=0;i<retraits.length;i++){ dom[retraits[i]].push(c); dom[retraits[i]].sort(); }
+  }
+  function bt(){
+    if (libre().length === 0) { return true; }
+    var v = choisir();
+    var valeurs = dom[v].slice();
+    for (var k=0;k<valeurs.length;k++){
+      var c = valeurs[k];
+      if (!compatible(v, c)) {
+        evts.push({v:v, c:c, ok:false, aff:copie(aff), dom:copieDom(dom)});
+        continue;
+      }
+      aff[v] = c;
+      var retraits = [];
+      var echec = false;
+      if (strategie === 2){
+        retraits = retirer(v, c);
+        for (var i=0;i<REGIONS.length;i++){
+          var u = REGIONS[i];
+          if (!(u in aff) && dom[u].length === 0) { echec = true; }
+        }
+      }
+      evts.push({v:v, c:c, ok:!echec, aff:copie(aff), dom:copieDom(dom)});
+      if (!echec && bt()) { return true; }
+      if (strategie === 2) { remettre(retraits, c); }
+      delete aff[v];
+      retours++;
+      evts.push({v:v, c:null, ok:false, retour:true, aff:copie(aff), dom:copieDom(dom)});
+    }
+    return false;
+  }
+  function copie(o){ var r = {}; for (var k in o){ r[k] = o[k]; } return r; }
+  function copieDom(o){ var r = {}; for (var k in o){ r[k] = o[k].slice(); } return r; }
+  var succes = bt();
+  return {evts: evts, retours: retours, succes: succes, final: copie(aff)};
+}
+var SOLS = [resoudre(0), resoudre(1), resoudre(2)];
+var STRAT = ['ترتيب ثابت', 'المتغير الاشد تقييدا', 'الاشد تقييدا + تحقق استباقي'];
+
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-0.6, 6.4, 9.4, -2.2], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sStrat = b1.create('slider', [[0.0, -1.2], [3.4, -1.2], [0, 0, 2]], {
+  name: 'strategie', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sEt = b1.create('slider', [[4.6, -1.2], [9.0, -1.2], [0, 30, 30]], {
+  name: 'خطوة', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function strat(){ return Math.round(sStrat.Value()); }
+function sol(){ return SOLS[strat()]; }
+function etape(){ return Math.min(Math.round(sEt.Value()), sol().evts.length); }
+function affCourante(){
+  var e = etape(), s = sol();
+  if (e === 0) { return {}; }
+  return s.evts[e-1].aff;
+}
+function domCourant(){
+  var e = etape(), s = sol();
+  if (e === 0) { var d = {}; for (var i=0;i<REGIONS.length;i++){ d[REGIONS[i]] = [0,1,2]; } return d; }
+  return s.evts[e-1].dom;
+}
+for (var i=0;i<RARETES.length;i++){
+  (function(a){
+    b1.create('segment', [RPOS[a[0]], RPOS[a[1]]], {
+      strokeColor: PAL.ref, strokeWidth: 2, highlight: false, fixed: true,
+      straightFirst: false, straightLast: false});
+  })(RARETES[i]);
+}
+for (var i=0;i<REGIONS.length;i++){
+  (function(r){
+    b1.create('point', RPOS[r], {
+      name: '', size: 17, face: 'o', fixed: true, highlight: false, strokeWidth: 2,
+      strokeColor: function(){
+        var a = affCourante();
+        return (r in a) ? COULHEX[a[r]] : PAL.axis();
+      },
+      fillColor: function(){
+        var a = affCourante();
+        return (r in a) ? COULHEX[a[r]] : PAL.bg();
+      }, fillOpacity: 1
+    });
+    b1.create('text', [RPOS[r][0], RPOS[r][1], r], {
+      fontSize: 13, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+      strokeColor: function(){ var a = affCourante(); return (r in a) ? '#ffffff' : PAL.text(); }});
+    b1.create('text', [RPOS[r][0], RPOS[r][1] + 0.55, function(){
+      var a = affCourante(), d = domCourant();
+      if (r in a) { return ''; }
+      var n = d[r].map(function(c){ return COUL[c].charAt(0); }).join('');
+      return n.length ? n : 'vide';
+    }], {fontSize: 12, anchorX: 'middle', fixed: true, highlight: false,
+         strokeColor: function(){
+           var d = domCourant(), a = affCourante();
+           return (!(r in a) && d[r].length === 0) ? cssv('--viz-bad','#dc2626') : PAL.muted();
+         }});
+  })(REGIONS[i]);
+}
+b1.create('text', [-0.5, 6.1, function(){
+  var s = sol(), e = etape();
+  var rt = 0;
+  for (var i=0;i<e;i++){ if (s.evts[i].retour) { rt++; } }
+  return 'الاستراتيجية: ' + STRAT[strat()] + '   |   خطوة ' + e + ' من ' + s.evts.length
+       + '   |   التراجعات المنجزة: ' + rt;
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-0.5, 5.7, function(){
+  var s = sol(), e = etape();
+  if (e === 0) { return 'لا جهة ملونة. والحروف تشير الى الالوان الممكنة بعد.'; }
+  var ev = s.evts[e-1];
+  if (ev.retour) { return 'تراجع: ' + ev.v + ' يُلغى اسنادها.'; }
+  if (!ev.ok) { return ev.v + ' = ' + COUL[ev.c] + ' مرفوض.'; }
+  return ev.v + ' تتلقى اللون ' + COUL[ev.c] + '.';
+}], {fontSize: 14, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-0.5, -1.9, function(){
+  var s = sol();
+  if (etape() < s.evts.length) { return 'الحل جار...'; }
+  return 'انتهى: ' + (s.succes ? 'وُجد تلوين' : 'لا حل')
+       + '   |   ' + s.evts.length + ' essais, ' + s.retours + ' تراجعا';
+}], {fontSize: 15, strokeColor: function(){ return cssv('--primary','#026573'); },
+     fixed: true, highlight: false});
+
+/* ====== Figure 6.4 : n reines par reparation locale, avec les conflits ==== */
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-2.2, 14.6, 15.8, -3.6], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: true
+});
+var sN = b2.create('slider', [[-1.8, -1.6], [3.6, -1.6], [4, 8, 12]], {
+  name: 'n', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sIt = b2.create('slider', [[5.2, -1.6], [15.4, -1.6], [0, 0, 40]], {
+  name: 'reparations', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function alea(graine){
+  var s = graine;
+  return function(){ s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648; };
+}
+function conflits(pos, col){
+  var n = pos.length, c = 0;
+  for (var j = 0; j < n; j++){
+    if (j === col) { continue; }
+    if (pos[j] === pos[col]) { c++; }
+    else if (Math.abs(pos[j] - pos[col]) === Math.abs(j - col)) { c++; }
+  }
+  return c;
+}
+function total(pos){
+  var t = 0;
+  for (var j = 0; j < pos.length; j++){ t += conflits(pos, j); }
+  return t / 2;
+}
+/* Les paires en conflit, pour les tracer explicitement. */
+function paires(pos){
+  var res = [], n = pos.length;
+  for (var i = 0; i < n; i++){
+    for (var j = i + 1; j < n; j++){
+      if (pos[i] === pos[j] || Math.abs(pos[i] - pos[j]) === Math.abs(i - j)){
+        res.push([i, j]);
+      }
+    }
+  }
+  return res;
+}
+function trajectoire(n, graine){
+  var rnd = alea(graine * 977 + n), pos = [], j;
+  for (j = 0; j < n; j++){ pos.push(Math.floor(rnd() * n)); }
+  var etats = [{pos: pos.slice(), col: -1, avant: -1}];
+  for (var it = 0; it < 400 && total(pos) > 0; it++){
+    var candidats = [];
+    for (j = 0; j < n; j++){ if (conflits(pos, j) > 0) { candidats.push(j); } }
+    if (!candidats.length) { break; }
+    var col = candidats[Math.floor(rnd() * candidats.length)];
+    var meilleures = [], bestc = Infinity, ancien = pos[col];
+    for (var l = 0; l < n; l++){
+      pos[col] = l;
+      var c = conflits(pos, col);
+      if (c < bestc){ bestc = c; meilleures = [l]; }
+      else if (c === bestc){ meilleures.push(l); }
+    }
+    pos[col] = meilleures[Math.floor(rnd() * meilleures.length)];
+    etats.push({pos: pos.slice(), col: col, avant: ancien});
+  }
+  return etats;
+}
+var CACHE_N = {};
+function reines(n){
+  if (n in CACHE_N) { return CACHE_N[n]; }
+  var etats = null;
+  for (var graine = 1; graine <= 60 && etats === null; graine++){
+    var essai = trajectoire(n, graine);
+    if (essai.length - 1 <= 40 && total(essai[essai.length - 1].pos) === 0) { etats = essai; }
+  }
+  if (etats === null) { etats = trajectoire(n, 1); }
+  CACHE_N[n] = etats;
+  return etats;
+}
+function nCourant(){ return Math.round(sN.Value()); }
+function etatReines(){
+  var e = reines(nCourant());
+  var i = Math.min(Math.round(sIt.Value()), e.length - 1);
+  return {e: e[i], i: i, max: e.length - 1};
+}
+/* damier a cases alternees */
+var cCasesSombres = b2.create('curve', [[0],[0]], {
+  strokeWidth: 0, fillColor: PAL.ref, fillOpacity: 0.5, highlight: false, fixed: true});
+cCasesSombres.updateDataArray = function(){
+  var n = nCourant(), X = [], Y = [];
+  for (var i = 0; i < n; i++){
+    for (var j = 0; j < n; j++){
+      if ((i + j) % 2 === 0) { continue; }
+      X.push(i, i + 1, i + 1, i, i, NaN);
+      Y.push(j, j, j + 1, j + 1, j, NaN);
+    }
+  }
+  this.dataX = X; this.dataY = Y;
+};
+b2.create('curve', [[0],[0]], {strokeColor: PAL.axis, strokeWidth: 1.4,
+  highlight: false, fixed: true}).updateDataArray = function(){
+  var n = nCourant(), X = [], Y = [];
+  for (var i = 0; i <= n; i++){ X.push(i, i, NaN); Y.push(0, n, NaN); }
+  for (var j = 0; j <= n; j++){ X.push(0, n, NaN); Y.push(j, j, NaN); }
+  this.dataX = X; this.dataY = Y;
+};
+/* segments reliant les paires en conflit : on VOIT pourquoi c est faux */
+var cConflitsLignes = b2.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); },
+  strokeWidth: 2, dash: 2, highlight: false, fixed: true});
+cConflitsLignes.updateDataArray = function(){
+  var pos = etatReines().e.pos, P = paires(pos), X = [], Y = [];
+  for (var k = 0; k < P.length; k++){
+    X.push(P[k][0] + 0.5, P[k][1] + 0.5, NaN);
+    Y.push(pos[P[k][0]] + 0.5, pos[P[k][1]] + 0.5, NaN);
+  }
+  this.dataX = X; this.dataY = Y;
+};
+/* colonne deplacee a cette etape */
+var cColonne = b2.create('curve', [[0],[0]], {
+  strokeWidth: 0, fillColor: function(){ return cssv('--accent', '#f59e0b'); },
+  fillOpacity: 0.20, highlight: false, fixed: true});
+cColonne.updateDataArray = function(){
+  var e = etatReines().e, n = nCourant();
+  if (e.col < 0) { this.dataX = []; this.dataY = []; return; }
+  this.dataX = [e.col, e.col + 1, e.col + 1, e.col, e.col];
+  this.dataY = [0, 0, n, n, 0];
+};
+function disques(enConflit){
+  var c = b2.create('curve', [[0],[0]], {
+    strokeWidth: 0, highlight: false, fixed: true,
+    fillColor: function(){
+      return enConflit ? cssv('--viz-bad', '#dc2626') : cssv('--primary', '#026573'); },
+    fillOpacity: 0.92});
+  c.updateDataArray = function(){
+    var pos = etatReines().e.pos, X = [], Y = [];
+    for (var j = 0; j < pos.length; j++){
+      if ((conflits(pos, j) > 0) !== enConflit) { continue; }
+      var cx = j + 0.5, cy = pos[j] + 0.5;
+      for (var t = 0; t <= 18; t++){
+        X.push(cx + 0.34 * Math.cos(t / 18 * 2 * Math.PI));
+        Y.push(cy + 0.34 * Math.sin(t / 18 * 2 * Math.PI));
+      }
+      X.push(NaN); Y.push(NaN);
+    }
+    this.dataX = X; this.dataY = Y;
+  };
+}
+disques(false); disques(true);
+/* jauge du nombre de conflits */
+b2.create('curve', [[0],[0]], {strokeWidth: 0,
+  fillColor: function(){ return cssv('--viz-bad', '#dc2626'); }, fillOpacity: 0.25,
+  highlight: false, fixed: true}).updateDataArray = function(){
+  var e = reines(nCourant()), n = nCourant();
+  var X = [], Y = [];
+  for (var i = 0; i < e.length; i++){
+    var t = total(e[i].pos);
+    var x = n + 0.8 + i * (5.4 / Math.max(1, e.length - 1));
+    var h = t * 0.5;
+    X.push(x, x + 0.16, x + 0.16, x, x, NaN);
+    Y.push(0, 0, h, h, 0, NaN);
+  }
+  this.dataX = X; this.dataY = Y;
+};
+b2.create('text', [function(){ return nCourant() + 0.8; }, -0.7,
+  'التعارضات عبر الاصلاحات'], {fontSize: 11, anchorX: 'left',
+  strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('segment', [
+  function(){ var e = etatReines(), n = nCourant();
+    return [n + 0.8 + e.i * (5.4 / Math.max(1, e.max)), 0]; },
+  function(){ var e = etatReines(), n = nCourant();
+    return [n + 0.8 + e.i * (5.4 / Math.max(1, e.max)), 5.6]; }], {
+  strokeColor: function(){ return cssv('--accent', '#f59e0b'); }, strokeWidth: 1.8,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+
+b2.create('text', [-2.1, 14.2, function(){
+  var e = etatReines();
+  return 'n = ' + nCourant() + '   |   اصلاح ' + e.i + ' من ' + e.max
+       + '   |   الازواج المتعارضة: ' + total(e.e.pos);
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-2.1, 13.4, function(){
+  var e = etatReines();
+  if (e.e.col < 0) { return 'وضع ابتدائي مسحوب عشوائيا، قبل اي اصلاح.'; }
+  return 'العمود ' + (e.e.col + 1) + ' انتقل من السطر ' + (e.e.avant + 1)
+       + ' الى السطر ' + (e.e.pos[e.e.col] + 1) + ' : وهو الذي يصغّر تعارضاته.';
+}], {fontSize: 13, strokeColor: function(){ return cssv('--accent','#f59e0b'); },
+     fixed: true, highlight: false});
+b2.create('text', [-2.1, 12.6, function(){
+  var e = etatReines();
+  if (total(e.e.pos) === 0) { return 'لا وزيرة تهاجم اخرى: بُلغ الحل.'; }
+  return 'الخطوط الحمراء تربط الازواج المتهاجمة؛ وعمود واحد يتحرك في كل خطوة.';
+}], {fontSize: 12.5, fixed: true, highlight: false,
+     strokeColor: function(){
+       return total(etatReines().e.pos) === 0 ? cssv('--viz-ok','#16a34a') : PAL.muted(); }});
+b2.create('text', [-2.1, -2.9, function(){
+  var r = [];
+  for (var n = 4; n <= 12; n += 2){ r.push(n + ' : ' + (reines(n).length - 1)); }
+  return 'الاصلاحات اللازمة بدلالة n  -  ' + r.join('   ')
+       + '   -  العدد لا يتزايد عمليا مع حجم الرقعة.';
+}], {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

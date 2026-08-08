@@ -1,0 +1,106 @@
+<style>
+.gt{--primary:#026573;--primary-dark:#014a55;--primary-light:#2a8c9a;--primary-soft:#e6f1f3;
+ --primary-soft-2:#d0e4e8;--accent:#f59e0b;--color-text:#1f2937;--color-muted:#6b7280;
+ --color-rule:#e2e8eb;--box-bg:#fff;--def-bg:#e6f1f3;--def-br:#026573;--def-fg:#014a55;
+ --thm-bg:#f5f1ff;--thm-br:#7c3aed;--thm-fg:#6d28d9;--prop-bg:#eff6ff;--prop-br:#2563eb;
+ --prop-fg:#1d4ed8;--method-bg:#ecfdf5;--method-br:#059669;--method-fg:#047857;
+ --warn-bg:#fef2f2;--warn-br:#dc2626;--warn-fg:#b91c1c;--tip-bg:#fffbeb;--tip-br:#f59e0b;
+ --tip-fg:#b45309;--example-bg:#f8fafc;--example-br:#64748b;--example-fg:#475569;
+ --viz-axis:#94a3b8;--viz-bad:#dc2626;--radius:10px;
+ --font-serif:"Source Serif Pro","Iowan Old Style",Georgia,serif;
+ --font-sans:"Inter",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+ --font-mono:"JetBrains Mono","SF Mono",Consolas,monospace;
+ font-family:var(--font-serif);color:var(--color-text);line-height:1.75;font-size:1.02rem;
+ max-width:900px;margin:0 auto;}
+.gt h1,.gt h2,.gt h3{font-family:var(--font-sans);color:var(--primary-dark);line-height:1.3;}
+.gt h2{font-size:1.42rem;margin:1.9em 0 .7em;padding-bottom:.3em;
+ border-bottom:2px solid var(--primary-soft-2);}
+.gt h3{font-size:1.14rem;margin:1.5em 0 .5em;}
+.gt p{margin:0 0 1em;}
+.gt ul,.gt ol{margin:0 0 1em;padding-left:1.4em;}
+.gt li{margin-bottom:.4em;}
+.gt a{color:var(--primary);}
+.gt .lead{border-left:4px solid var(--primary);background:var(--primary-soft);
+ padding:14px 20px;border-radius:0 var(--radius) var(--radius) 0;margin:0 0 1.6em;}
+.gt .lead .lead-label{font-family:var(--font-sans);font-size:.74rem;letter-spacing:.09em;
+ text-transform:uppercase;font-weight:700;color:var(--primary-dark);display:block;margin-bottom:4px;}
+.gt .lead h1{font-size:1.6rem;margin:0 0 6px;}
+.gt .lead .lead-sub{color:var(--color-muted);font-size:.97rem;margin:0;}
+.gt .box{background:var(--box-bg);border:1px solid var(--color-rule);border-left-width:4px;
+ border-radius:var(--radius);padding:14px 20px;margin:1.4em 0;}
+.gt .box>.box-title{font-family:var(--font-sans);font-weight:700;font-size:.95rem;margin-bottom:6px;}
+.gt .box>*:last-child{margin-bottom:0;}
+.gt .box.def{background:var(--def-bg);border-left-color:var(--def-br);}
+.gt .box.def>.box-title{color:var(--def-fg);}
+.gt .box.thm{background:var(--thm-bg);border-left-color:var(--thm-br);}
+.gt .box.thm>.box-title{color:var(--thm-fg);}
+.gt .box.prop{background:var(--prop-bg);border-left-color:var(--prop-br);}
+.gt .box.prop>.box-title{color:var(--prop-fg);}
+.gt .box.method{background:var(--method-bg);border-left-color:var(--method-br);}
+.gt .box.method>.box-title{color:var(--method-fg);}
+.gt .box.warn{background:var(--warn-bg);border-left-color:var(--warn-br);}
+.gt .box.warn>.box-title{color:var(--warn-fg);}
+.gt .box.tip{background:var(--tip-bg);border-left-color:var(--tip-br);}
+.gt .box.tip>.box-title{color:var(--tip-fg);}
+.gt .box.example{background:var(--example-bg);border-left-color:var(--example-br);}
+.gt .box.example>.box-title{color:var(--example-fg);}
+.gt .eq{margin:1.1em 0;overflow-x:auto;text-align:center;}
+.gt .keypoints{background:var(--primary-soft);border:1px solid var(--primary-soft-2);
+ border-radius:var(--radius);padding:16px 22px;margin:2em 0;}
+.gt .keypoints h3{margin-top:0;}
+.gt .viz{margin:1.6em 0;}
+.gt .viz-title{font-family:var(--font-sans);font-weight:700;color:var(--primary);
+ font-size:.95rem;margin-bottom:8px;}
+.gt .viz-caption{color:var(--color-muted);font-size:.9rem;margin:10px 0 0;
+ border-top:1px solid var(--color-rule);padding-top:9px;}
+.gt table{border-collapse:collapse;width:100%;font-size:.96rem;margin:0;}
+.gt th,.gt td{border:1px solid var(--color-rule);padding:8px 14px;text-align:left;
+ vertical-align:top;}
+.gt thead th{background:var(--primary-soft);}
+.gt .payoff{width:auto;margin:0 auto;}
+.gt .payoff th,.gt .payoff td{text-align:center;}
+.gt .payoff th.corner{background:var(--primary);color:#fff;font-size:.8rem;}
+.gt .payoff tbody th{background:var(--primary-soft);text-align:left;}
+.gt .payoff td{font-family:var(--font-mono);}
+.gt .glossary td:first-child{white-space:nowrap;font-weight:600;}
+.gt svg{max-width:100%;height:auto;}
+</style>
+<div class="gt">
+<div class="lead"><span class="lead-label">Part I &middot; Foundations &middot; Chapter 2</span><h1>Dominance and Iterated Elimination</h1><p class="lead-sub">Predict behaviour using rationality alone, before any equilibrium concept.</p></div>
+<div class="box method"><div class="box-title">What you will be able to do</div><ul><li>Distinguish strict from weak dominance and check the 'for every opponent action' clause.</li><li>Run iterated elimination of strictly dominated strategies to solve a 3x3 game.</li><li>Explain why each round of elimination consumes one more level of common knowledge of rationality.</li><li>State why strict elimination is order-independent but weak elimination is not.</li><li>Detect a strategy dominated by a mixture rather than by any pure strategy.</li></ul></div>
+
+<h2>1. When one strategy is simply worse</h2>
+<p>Before asking what a player <em>will</em> do, ask what a player will never do. Sometimes a strategy is worse than another <strong>no matter what the opponents do</strong>. Such a strategy can be deleted with a clear conscience, and deleting it often collapses a big game to a small one.</p>
+<div class="box def"><div class="box-title">Definitions - dominance</div><p style='margin:0 0 6px;'>\(s_i'\) is <strong>strictly dominated</strong> by \(s_i\) if</p><div class="eq">\[ u_i(s_i,\, s_{-i}) \;\gt \; u_i(s_i',\, s_{-i}) \qquad \text{for every } s_{-i}. \]</div><p style='margin:6px 0 0;'>\(s_i'\) is <strong>weakly dominated</strong> by \(s_i\) if the inequality holds with \(\ge\) for every \(s_{-i}\) and with \(\gt \) for at least one \(s_{-i}\).</p></div>
+<p>The word <em>every</em> is the whole content of the definition. A strategy that is worse in three columns out of four is not dominated; the fourth column may be exactly the situation you find yourself in.</p>
+
+<h2>2. Solving the Prisoner's Dilemma by dominance</h2>
+<figure class="viz"><div class="viz-title">Prisoner's Dilemma</div><div style="text-align:center;overflow-x:auto;"><table class="payoff"><thead><tr><th class="corner">Player 1 \ Player 2</th><th>Cooperate</th><th>Defect</th></tr></thead><tbody><tr><th>Cooperate</th><td>3, 3</td><td>0, 5</td></tr><tr><th>Defect</th><td>5, 0</td><td>1, 1</td></tr></tbody></table></div></figure>
+<p>For player 1: against Cooperate, Defect gives 5 versus 3; against Defect, Defect gives 1 versus 0. Defect wins in every column, so Cooperate is strictly dominated. By symmetry the same holds for player 2. A rational player never plays a strictly dominated strategy, so the outcome is (Defect, Defect) with payoffs (1, 1). Note how little we needed: no beliefs about the opponent, no equilibrium concept, no fixed point. Dominance arguments are the cheapest predictions in game theory, which is why they are the most persuasive when they are available.</p>
+
+<h2>3. Iterated elimination</h2>
+<p>Deleting a dominated strategy shrinks the game. In the smaller game, another strategy may now be dominated even though it was not before - because the column that protected it has disappeared. Repeat until nothing more can be deleted. This is <strong>iterated elimination of strictly dominated strategies</strong> (IESDS).</p>
+<figure class="viz"><div class="viz-title">A 3x3 game to reduce</div><div style="text-align:center;overflow-x:auto;"><table class="payoff"><thead><tr><th class="corner">Player 1 \ Player 2</th><th>Left</th><th>Centre</th><th>Right</th></tr></thead><tbody><tr><th>Top</th><td>4, 3</td><td>5, 1</td><td>6, 2</td></tr><tr><th>Middle</th><td>2, 1</td><td>8, 4</td><td>3, 6</td></tr><tr><th>Bottom</th><td>3, 0</td><td>9, 6</td><td>2, 8</td></tr></tbody></table></div></figure>
+<p>Step 1. Compare player 2's columns. Against Top, 2 gets 3 / 1 / 2; against Middle, 1 / 4 / 6; against Bottom, 0 / 6 / 8. Is Centre dominated by Right? Compare 1 vs 2, 4 vs 6, 6 vs 8: Right is strictly better in all three rows, so <strong>Centre is strictly dominated and is deleted</strong>.</p>
+<p>Step 2. In the remaining 3x2 game (columns Left and Right), look at player 1: Top gives (4, 6), Middle gives (2, 3), Bottom gives (3, 2). Top strictly beats Middle (4 &gt; 2 and 6 &gt; 3) and strictly beats Bottom (4 &gt; 3 and 6 &gt; 2). Delete <strong>Middle and Bottom</strong>.</p>
+<p>Step 3. Only row Top remains. Player 2 now compares 3 (Left) with 2 (Right) and keeps <strong>Left</strong>. The unique surviving profile is (Top, Left) with payoffs (4, 3). A game solvable this way is called <strong>dominance solvable</strong>.</p>
+<div class="box tip"><div class="box-title">Why iteration needs common knowledge</div><p>Each round of elimination uses one more layer of reasoning about reasoning. Round 1 needs 'player 2 is rational'. Round 2 needs 'player 1 knows player 2 is rational'. Round 3 needs 'player 2 knows that player 1 knows that player 2 is rational'. IESDS therefore consumes common knowledge of rationality one level at a time.</p></div>
+
+<h2>4. Strict versus weak: an important asymmetry</h2>
+<p>The order in which you delete strictly dominated strategies does not matter - the final set is the same whichever path you take. This is a genuine theorem, and it makes IESDS a well-defined procedure.</p>
+<div class="box warn"><div class="box-title">Careful</div><p><strong>Weak dominance is order-dependent.</strong> Deleting weakly dominated strategies in different orders can leave different survivors, and can destroy legitimate equilibria. Use weak elimination with care and report the order you used.</p></div>
+<figure class="viz"><div class="viz-title">Order matters under weak dominance</div><div style="text-align:center;overflow-x:auto;"><table class="payoff"><thead><tr><th class="corner">Player 1 \ Player 2</th><th>Left</th><th>Right</th></tr></thead><tbody><tr><th>Up</th><td>1, 1</td><td>0, 0</td></tr><tr><th>Down</th><td>0, 0</td><td>0, 0</td></tr></tbody></table></div><p class="viz-caption">Down is weakly dominated by Up, and Right is weakly dominated by Left. Delete Down first and then Right and you keep (Up, Left). But (Down, Right) is also a legitimate profile where neither player can improve - weak elimination has thrown it away.</p></figure>
+
+<h2>5. Dominance by a mixed strategy</h2>
+<p>A strategy can fail to be dominated by any single strategy yet be dominated by a <em>randomisation</em> over two others. Consider player 1 facing two columns:</p>
+<figure class="viz"><div class="viz-title">Domination by a mixture</div><div style="text-align:center;overflow-x:auto;"><table class="payoff"><thead><tr><th class="corner">Player 1 \ Player 2</th><th>Left</th><th>Right</th></tr></thead><tbody><tr><th>A</th><td>6, 0</td><td>0, 0</td></tr><tr><th>B</th><td>0, 0</td><td>6, 0</td></tr><tr><th>C</th><td>2, 0</td><td>2, 0</td></tr></tbody></table></div></figure>
+<p>Strategy C gives 2 in both columns. Neither A (6 then 0) nor B (0 then 6) dominates it. But the mixed strategy \(\sigma = \tfrac{1}{2} A + \tfrac{1}{2} B\) yields an expected \(\tfrac{1}{2}(6) + \tfrac{1}{2}(0) = 3\) in both columns, and \(3 \gt  2\). So <strong>C is strictly dominated by a mixed strategy</strong> and a rational expected-payoff maximiser never plays it. When you check for dominance, you must therefore consider mixtures, not only pure strategies. Chapter 4 develops mixed strategies properly.</p>
+
+<h2>6. Rationalizability, in one paragraph</h2>
+<p>A strategy is <strong>rationalizable</strong> if it is a best response to some belief about the opponents that is itself consistent with their rationality, and so on up the hierarchy. In two-player games the set of rationalizable strategies coincides exactly with the set surviving iterated elimination of strictly dominated strategies (Bernheim 1984, Pearce 1984). Rationalizability is thus the largest prediction you can make from common knowledge of rationality alone. Nash equilibrium, in Chapter 3, is a strictly stronger requirement: it additionally demands that beliefs be <em>correct</em>.</p>
+
+<h2>Glossary</h2>
+<table class="glossary"><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Strict dominance</td><td>s' is strictly dominated by s if s gives a strictly higher payoff against every opponent profile.</td></tr><tr><td>Weak dominance</td><td>s' is weakly dominated by s if s is never worse and is strictly better against at least one opponent profile.</td></tr><tr><td>IESDS</td><td>Iterated elimination of strictly dominated strategies; the result does not depend on the order of deletion.</td></tr><tr><td>Dominance solvable</td><td>A game in which IESDS leaves exactly one strategy profile.</td></tr><tr><td>Rationalizable strategy</td><td>A strategy that is a best response to some belief consistent with common knowledge of rationality.</td></tr><tr><td>Mixed strategy</td><td>A probability distribution over a player's pure strategies; payoffs are computed as expectations.</td></tr></tbody></table>
+<div class="keypoints"><h3>Check your understanding</h3><ol><li>A strategy is worse in 4 of a rival's 5 columns and better in the 5th. Is it dominated? <span style='color:#6b7280;'>(Answer: No - dominance requires every column)</span></li><li>Why is it safe to delete strictly dominated strategies in any order? <span style='color:#6b7280;'>(Answer: The surviving set is provably the same for every order)</span></li><li>Which mixture over A and B in section 5 dominates C? <span style='color:#6b7280;'>(Answer: \(\tfrac{1}{2}A + \tfrac{1}{2}B\), giving expected \(3 \gt  2\) in both columns)</span></li><li>What extra assumption does IESDS need beyond each player being rational? <span style='color:#6b7280;'>(Answer: Common knowledge of rationality, one extra level per round)</span></li></ol></div>
+<div class="box tip"><div class="box-title">Practice</div><p>The chapter quiz asks you to verify dominance against every opponent action, carry out two rounds of elimination by hand, spot the order-dependence trap in weak dominance, and identify a strategy dominated only by a mixture.</p></div>
+</div>

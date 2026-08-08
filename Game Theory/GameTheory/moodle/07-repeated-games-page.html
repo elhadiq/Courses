@@ -1,0 +1,106 @@
+<style>
+.gt{--primary:#026573;--primary-dark:#014a55;--primary-light:#2a8c9a;--primary-soft:#e6f1f3;
+ --primary-soft-2:#d0e4e8;--accent:#f59e0b;--color-text:#1f2937;--color-muted:#6b7280;
+ --color-rule:#e2e8eb;--box-bg:#fff;--def-bg:#e6f1f3;--def-br:#026573;--def-fg:#014a55;
+ --thm-bg:#f5f1ff;--thm-br:#7c3aed;--thm-fg:#6d28d9;--prop-bg:#eff6ff;--prop-br:#2563eb;
+ --prop-fg:#1d4ed8;--method-bg:#ecfdf5;--method-br:#059669;--method-fg:#047857;
+ --warn-bg:#fef2f2;--warn-br:#dc2626;--warn-fg:#b91c1c;--tip-bg:#fffbeb;--tip-br:#f59e0b;
+ --tip-fg:#b45309;--example-bg:#f8fafc;--example-br:#64748b;--example-fg:#475569;
+ --viz-axis:#94a3b8;--viz-bad:#dc2626;--radius:10px;
+ --font-serif:"Source Serif Pro","Iowan Old Style",Georgia,serif;
+ --font-sans:"Inter",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+ --font-mono:"JetBrains Mono","SF Mono",Consolas,monospace;
+ font-family:var(--font-serif);color:var(--color-text);line-height:1.75;font-size:1.02rem;
+ max-width:900px;margin:0 auto;}
+.gt h1,.gt h2,.gt h3{font-family:var(--font-sans);color:var(--primary-dark);line-height:1.3;}
+.gt h2{font-size:1.42rem;margin:1.9em 0 .7em;padding-bottom:.3em;
+ border-bottom:2px solid var(--primary-soft-2);}
+.gt h3{font-size:1.14rem;margin:1.5em 0 .5em;}
+.gt p{margin:0 0 1em;}
+.gt ul,.gt ol{margin:0 0 1em;padding-left:1.4em;}
+.gt li{margin-bottom:.4em;}
+.gt a{color:var(--primary);}
+.gt .lead{border-left:4px solid var(--primary);background:var(--primary-soft);
+ padding:14px 20px;border-radius:0 var(--radius) var(--radius) 0;margin:0 0 1.6em;}
+.gt .lead .lead-label{font-family:var(--font-sans);font-size:.74rem;letter-spacing:.09em;
+ text-transform:uppercase;font-weight:700;color:var(--primary-dark);display:block;margin-bottom:4px;}
+.gt .lead h1{font-size:1.6rem;margin:0 0 6px;}
+.gt .lead .lead-sub{color:var(--color-muted);font-size:.97rem;margin:0;}
+.gt .box{background:var(--box-bg);border:1px solid var(--color-rule);border-left-width:4px;
+ border-radius:var(--radius);padding:14px 20px;margin:1.4em 0;}
+.gt .box>.box-title{font-family:var(--font-sans);font-weight:700;font-size:.95rem;margin-bottom:6px;}
+.gt .box>*:last-child{margin-bottom:0;}
+.gt .box.def{background:var(--def-bg);border-left-color:var(--def-br);}
+.gt .box.def>.box-title{color:var(--def-fg);}
+.gt .box.thm{background:var(--thm-bg);border-left-color:var(--thm-br);}
+.gt .box.thm>.box-title{color:var(--thm-fg);}
+.gt .box.prop{background:var(--prop-bg);border-left-color:var(--prop-br);}
+.gt .box.prop>.box-title{color:var(--prop-fg);}
+.gt .box.method{background:var(--method-bg);border-left-color:var(--method-br);}
+.gt .box.method>.box-title{color:var(--method-fg);}
+.gt .box.warn{background:var(--warn-bg);border-left-color:var(--warn-br);}
+.gt .box.warn>.box-title{color:var(--warn-fg);}
+.gt .box.tip{background:var(--tip-bg);border-left-color:var(--tip-br);}
+.gt .box.tip>.box-title{color:var(--tip-fg);}
+.gt .box.example{background:var(--example-bg);border-left-color:var(--example-br);}
+.gt .box.example>.box-title{color:var(--example-fg);}
+.gt .eq{margin:1.1em 0;overflow-x:auto;text-align:center;}
+.gt .keypoints{background:var(--primary-soft);border:1px solid var(--primary-soft-2);
+ border-radius:var(--radius);padding:16px 22px;margin:2em 0;}
+.gt .keypoints h3{margin-top:0;}
+.gt .viz{margin:1.6em 0;}
+.gt .viz-title{font-family:var(--font-sans);font-weight:700;color:var(--primary);
+ font-size:.95rem;margin-bottom:8px;}
+.gt .viz-caption{color:var(--color-muted);font-size:.9rem;margin:10px 0 0;
+ border-top:1px solid var(--color-rule);padding-top:9px;}
+.gt table{border-collapse:collapse;width:100%;font-size:.96rem;margin:0;}
+.gt th,.gt td{border:1px solid var(--color-rule);padding:8px 14px;text-align:left;
+ vertical-align:top;}
+.gt thead th{background:var(--primary-soft);}
+.gt .payoff{width:auto;margin:0 auto;}
+.gt .payoff th,.gt .payoff td{text-align:center;}
+.gt .payoff th.corner{background:var(--primary);color:#fff;font-size:.8rem;}
+.gt .payoff tbody th{background:var(--primary-soft);text-align:left;}
+.gt .payoff td{font-family:var(--font-mono);}
+.gt .glossary td:first-child{white-space:nowrap;font-weight:600;}
+.gt svg{max-width:100%;height:auto;}
+</style>
+<div class="gt">
+<div class="lead"><span class="lead-label">Part III &middot; Time and information &middot; Chapter 7</span><h1>Repeated Games, Reciprocity and the Folk Theorem</h1><p class="lead-sub">How self-interested players sustain cooperation when they expect to meet again.</p></div>
+<div class="box method"><div class="box-title">What you will be able to do</div><ul><li>Explain why finite repetition of a game with a unique equilibrium unravels by backward induction.</li><li>Compute the present value of an infinite payoff stream with discount factor delta.</li><li>Derive the critical discount factor that makes grim trigger an equilibrium.</li><li>Describe tit-for-tat and the four properties Axelrod credited for its success.</li><li>State the folk theorem and explain why its generality is a mixed blessing.</li></ul></div>
+
+<h2>1. The shadow of the future</h2>
+<p>The Prisoner's Dilemma predicts that self-interested players never cooperate. Yet firms sustain tacit collusion, neighbours maintain quiet streets, and traders honour deals without contracts. The missing ingredient is <strong>repetition</strong>: if we meet again, today's defection can be punished tomorrow. Robert Axelrod called the resulting discipline the shadow of the future.</p>
+
+<h2>2. Finite repetition: the unravelling problem</h2>
+<p>Suppose the Prisoner's Dilemma is played exactly 10 times, with both players knowing this. Apply backward induction. In round 10 there is no future, so both defect. Since round 10's outcome is fixed regardless of what happens in round 9, round 9 is effectively the last round too - so both defect there. The argument marches back to round 1.</p>
+<div class="box thm"><div class="box-title">Result &mdash; finite repetition unravels</div><p>If a stage game has a unique Nash equilibrium and is repeated a known finite number of times, the unique subgame perfect equilibrium is that stage equilibrium in every round.</p></div>
+<p>The prediction is famously at odds with behaviour: in finitely repeated experiments people cooperate until the last few rounds. Kreps, Milgrom, Roberts and Wilson (1982) showed that a small probability that the opponent is a committed cooperator - a Chapter 8 idea - is enough to restore long cooperation in a finite game. What breaks cooperation is not finiteness as such; it is the certainty of a known last round.</p>
+
+<h2>3. Infinite (or indefinite) repetition and discounting</h2>
+<p>Suppose instead that after each round the game continues with probability \(\delta\), or equivalently that future payoffs are discounted by \(\delta \in (0, 1)\) per period. A constant payoff \(u\) every round is worth</p>
+<div class="eq">\[ u + \delta u + \delta^{2} u + \dots \;=\; \sum_{t=0}^{\infty} \delta^{t} u \;=\; \frac{u}{1 - \delta}. \]</div>
+<p>Now there is never a known last round, so backward induction has nothing to bite on, and strategies that condition on history become viable.</p>
+
+<h2>4. Grim trigger, with the algebra</h2>
+<p><strong>Grim trigger:</strong> cooperate in round 1; keep cooperating as long as nobody has ever defected; if anyone ever defects, defect in every subsequent round forever. Use the Prisoner's Dilemma payoffs \(T = 5\) (defect against a cooperator), \(R = 3\) (mutual cooperation), \(P = 1\) (mutual defection), \(S = 0\) (cooperate against a defector).</p>
+<p>If a player follows the strategy, they earn \(R\) every period; if instead they defect once, they get \(T\) today and then \(P\) forever. Cooperation is sustainable when</p>
+<div class="box prop"><div class="box-title">The critical discount factor</div><div class="eq">\[ \underbrace{\frac{R}{1 - \delta}}_{\text{cooperate forever}} \;\ge\; \underbrace{T + \frac{\delta P}{1 - \delta}}_{\text{defect once, then punished}} \]</div><div class="eq">\[ \Longleftrightarrow\; R \ge T(1-\delta) + \delta P \;\Longleftrightarrow\; \delta \;\ge\; \delta^{*} = \frac{T - R}{T - P}. \]</div><p style='margin:6px 0 0;'>With \(T=5, R=3, P=1\) this gives \(\delta^{*} = \dfrac{5-3}{5-1} = \dfrac{1}{2}\).</p></div>
+<p>Read this as a statement about patience or about the frequency of interaction: cooperation survives if the future matters at least half as much as the present. Raise the temptation \(T\) and the threshold \(\delta^{*}\) rises; make punishment harsher (lower \(P\)) and it falls. Every prescription for sustaining cooperation - meet often, make relationships long, publicise cheating, keep the gain from cheating small - is a way of moving one of these terms.</p>
+
+<h2>5. Tit-for-tat and Axelrod's tournaments</h2>
+<p><strong>Tit-for-tat</strong> cooperates in round 1 and then copies the opponent's previous move. In Axelrod's computer tournaments (1980) it won against far more elaborate programs. Axelrod attributed its success to four properties: it is <em>nice</em> (never defects first), <em>retaliatory</em> (punishes immediately), <em>forgiving</em> (returns to cooperation as soon as the opponent does), and <em>clear</em> (easy for an opponent to understand and therefore to reciprocate).</p>
+<figure class="viz"><table><thead><tr><th>Strategy</th><th>Behaviour</th><th>Weakness</th></tr></thead><tbody><tr><td>Always Defect</td><td>Defect every round</td><td>Cannot exploit a cooperative environment</td></tr><tr><td>Always Cooperate</td><td>Cooperate every round</td><td>Exploited by any defector</td></tr><tr><td>Grim trigger</td><td>Cooperate until any defection, then defect forever</td><td>Unforgiving: a single mistake destroys the relationship permanently</td></tr><tr><td>Tit-for-tat</td><td>Copy the opponent's last move</td><td>With noise, a mistaken defection triggers alternating retaliation</td></tr><tr><td>Tit-for-two-tats</td><td>Defect only after two consecutive defections</td><td>More robust to noise; slightly more exploitable</td></tr></tbody></table></figure>
+<div class="box warn"><div class="box-title">Careful</div><p>Tit-for-tat is <em>not</em> a dominant strategy and it does not win in all environments. Against Always Defect it loses the first round and merely ties thereafter. Its strength is in a population of reciprocators - which is why evolutionary and population framings matter for interpreting the result.</p></div>
+
+<h2>6. The folk theorem</h2>
+<p>Grim trigger is one of many strategies that work. The general statement is startling in its generality.</p>
+<div class="box thm"><div class="box-title">Theorem &mdash; the folk theorem (informal)</div><p>In an infinitely repeated game with sufficiently patient players, <em>every</em> feasible payoff vector that gives each player strictly more than their minmax payoff can be sustained as a subgame perfect equilibrium.</p></div>
+<p>Feasible means achievable as an average of stage-game outcomes; the minmax payoff is the worst the others can hold a player to. In the repeated Prisoner's Dilemma the minmax is 1, so any pair of average payoffs above (1, 1) inside the feasible set - including (3, 3), \((4, 2)\) and \((2.5, 3.5)\) - is an equilibrium for \(\delta\) near 1.</p>
+<p>The folk theorem is both liberating and deflating. Liberating, because it explains how cooperation, norms and reputation can be self-enforcing without any external enforcer. Deflating, because a theory that permits almost every outcome predicts almost nothing. Applied work therefore adds structure - renegotiation-proofness, bounded memory, imperfect monitoring, or evolutionary selection - to cut the equilibrium set back down.</p>
+
+<h2>Glossary</h2>
+<table class="glossary"><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Stage game</td><td>The one-shot game that is repeated in each period.</td></tr><tr><td>Discount factor</td><td>\(\delta \in (0,1)\): the weight on next period's payoff, or the probability the game continues.</td></tr><tr><td>Grim trigger</td><td>Cooperate until any defection occurs, then defect forever.</td></tr><tr><td>Tit-for-tat</td><td>Cooperate first, then copy the opponent's previous action.</td></tr><tr><td>Minmax payoff</td><td>The lowest payoff the other players can force on a player who best-responds.</td></tr><tr><td>Folk theorem</td><td>For \(\delta\) close enough to 1, any feasible payoff vector strictly above the minmax is a subgame perfect equilibrium of the repeated game.</td></tr><tr><td>Unravelling</td><td>The backward-induction collapse of cooperation in a game with a known final round.</td></tr></tbody></table>
+<div class="keypoints"><h3>Check your understanding</h3><ol><li>Why does cooperation collapse in a Prisoner's Dilemma repeated exactly 10 times? <span style='color:#6b7280;'>(Answer: Round 10 is a one-shot game, so defection unravels back to round 1)</span></li><li>What is the present value of 4 per period with \(\delta = 0.8\)? <span style='color:#6b7280;'>(Answer: \(\tfrac{4}{1 - 0.8} = 20\))</span></li><li>With \(T=5, R=3, P=1\), what discount factor sustains grim trigger? <span style='color:#6b7280;'>(Answer: \(\delta \ge \tfrac{1}{2}\))</span></li><li>Which of Axelrod's four properties does grim trigger lack? <span style='color:#6b7280;'>(Answer: Forgiveness)</span></li></ol></div>
+<div class="box tip"><div class="box-title">Practice</div><p>The chapter quiz asks you to compute present values and critical discount factors, reason about the unravelling argument, and state the folk theorem's condition precisely.</p></div>
+</div>

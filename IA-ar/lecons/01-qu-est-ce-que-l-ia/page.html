@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الفصل 1 &mdash; ما الذكاء الاصطناعي؟</title>
+<meta name="description" content="تعريفات الذكاء الاصطناعي، اختبار تورينغ، الغرفة الصينية، التاريخ، النماذج الإرشادية.">
+<link href="../../assets/style.css" rel="stylesheet">
+<link href="../../assets/rtl.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+
+.src-ar { margin: 26px 0 8px; border-top: 2px solid var(--color-rule); padding-top: 16px; }
+.src-ar h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--primary); }
+.src-ar .src-note { color: var(--color-muted); font-size: 0.9rem; margin: 0 0 12px; }
+.src-ar ul { list-style: none; padding: 0; margin: 0; }
+.src-ar li { margin: 0 0 14px; padding-right: 14px; border-right: 3px solid var(--primary-soft-2);
+             line-height: 1.7; font-size: 0.95rem; }
+.src-ar li .pourquoi { display: block; color: var(--color-muted); font-size: 0.9em;
+                       margin-top: 3px; }
+.src-ar li a.lien { word-break: break-all; font-size: 0.88em; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><a class="lang-switch" href="../../../IA/lecons/01-qu-est-ce-que-l-ia/page.html" hreflang="fr" title="Version fran&ccedil;aise">FR</a><div class="breadcrumb"><a href="../../index.html">الذكاء الاصطناعي</a> &middot; مُقرَّر</div><span class="course-code">برنامج MP/PSI &middot; الفترة الثانية</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">القسم الأول &middot; الفصل 1</div>
+<h1>الفصل 1 &mdash; ما الذكاء الاصطناعي؟</h1>
+<div class="lesson-sub">أربعة تعريفات متنافسة، ولعبة المحاكاة ونقدها، وسبعون سنة من التناوب بين الربيع والشتاء، والمقاربة الرمزية في مواجهة الاتصالية.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">المُلحَق المرافق</div><p>الإجراءات التاريخية الأربعة المذكورة في هذا الفصل &mdash; لعبة المحاكاة، والبحث بتحليل الوسائل والغايات، ومحرّك القواعد في نظامٍ خبير، وتقييم مرجعٍ معياري &mdash; مفصَّلة <strong><a href="../../../IA/lecons/01-qu-est-ce-que-l-ia/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">خطوة بخطوة في المُلحَق</a></strong>.</p></div>
+
+<h2>1.1 عبارةٌ تدلّ على أربعة أشياء مختلفة</h2>
+
+<p>صاغ المصطلح جون مكارثي سنة 1955 في طلب تمويلٍ لورشةٍ صيفية في دارتموث، حول حَدْسٍ صريح: <em>كلّ جانب من جوانب التعلّم، أو أيّ خاصيّة أخرى من خصائص الذكاء، يمكن مبدئياً وصفه بدقّةٍ كافية بحيث تستطيع آلةٌ محاكاته</em> <a class="cite" href="#ref-dartmouth1955">[1]</a>. وكان اختيار كلمة «ذكاء» طموحاً عن قصد: كان المراد التمايز عن السيبرنطيقا ونظرية الآلات المتحرّكة، وكانتا حينئذٍ مهيمنتين <a class="cite" href="#ref-nilsson2009">[2]</a>.</p>
+
+<p>وبعد سبعين سنة، ما تزال العبارة تغطّي أربعة برامج بحثٍ متمايزة، نحصل عليها بتقاطع سؤالين: هل نسعى إلى إعادة إنتاج <em>سيرورة</em> التفكير أم <em>سلوكه</em> فحسب؟ وهل نتّخذ الإنسان معياراً، أم معياراً مثالياً للعقلانية؟</p>
+
+<table>
+<thead><tr><th></th><th>المعيار: الإنسان</th><th>المعيار: العقلانية</th></tr></thead>
+<tbody>
+<tr><td><strong>التفكير</strong> (السيرورة)</td><td>النمذجة المعرفية: على البرنامج أن يستدلّ كما يستدلّ الإنسان، ويُتحقَّق من ذلك تجريبياً</td><td>قوانين الفكر: يطبّق البرنامج قواعد استدلالٍ سليمة</td></tr>
+<tr><td><strong>الفعل</strong> (السلوك)</td><td>لعبة المحاكاة: على البرنامج ألّا يُميَّز عن إنسانٍ في محادثة</td><td>الوكيل العقلاني: يختار البرنامج الفعل الذي يُعظّم مقياس أدائه</td></tr>
+</tbody></table>
+
+<p>هذه الخانات الأربع ليست فروقاً دقيقة: إنّها تُنتج انتقاداتٍ ومناهج تجريبية ومعايير نجاحٍ غير متوافقة. فبرنامجٌ ممتاز بحسب إحداها قد يكون تافهاً بحسب أخرى. وهذا ما يتيح الشكل التالي التحقّق منه على أنظمة حقيقية.</p>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">يختار المؤشّر نظاماً مشهوراً. وتستقرّ النقطة في الربع المطابق للهدف الذي سعى إليه مصمّموه فعلاً، لا للانطباع الذي يُحدثه.</p>
+<div id="jxg2" class="viz-board" style="height:520px;"></div>
+<p class="viz-caption"><strong>الشكل 1.1.</strong> درسان. أوّلاً، لا يشغل أيّ نظامٍ مشهور خانة «التفكير على نحوٍ إنساني»، عدا أنظمة الخمسينيات والستّينيات، التي كانت صراحةً نماذج علم نفسٍ تجريبي. ثانياً، الخانة المهيمنة اليوم هي «الفعل على نحوٍ عقلاني»: وهي التي تقبل تعريفاً رياضياً وقياساً. وهي أيضاً التي يتبنّاها هذا المُقرَّر، ويعطي الفصل 2 صياغتها الدقيقة.</p></div>
+
+<div class="box def"><div class="box-title">التعريف الإجرائي المعتمَد في هذا المُقرَّر</div>
+<p>الذكاء الاصطناعي هو دراسة وبناء <strong>وكلاء عقلانيين</strong>: أنظمةٍ تختار، انطلاقاً من متتالية إدراكات، الفعلَ الذي يُعظّم أمل مقياس أداءٍ مُعطى.</p>
+<p>لهذا التعريف ثلاث فضائل: إنّه <em>إجرائي</em> (يمكن القياس)، ولا يفترض <em>شيئاً</em> عن الآلية الداخلية، ولا يشترط تعريف الذكاء &mdash; وهي مسألة فلسفية لم يُخرِج منها سبعون سنة من الجدل معياراً قابلاً للاستعمال.</p></div>
+
+<h2>1.2 لعبة المحاكاة ونقدها</h2>
+
+<p>سنة 1950، يفتتح تورينغ مقاله بـ«أقترح النظر في السؤال: هل تستطيع الآلات التفكير؟»، ثمّ يعلن على الفور أنّ السؤال أعرى من المعنى من أن يستحقّ نقاشاً، ويستبدل به جهازاً قابلاً للملاحظة <a class="cite" href="#ref-turing1950">[3]</a>.</p>
+
+<div class="box def"><div class="box-title">لعبة المحاكاة</div>
+<p>يحاور مستجوِبٌ بشري كتابةً محاورَين غير مرئيَّين، أحدهما إنسان والآخر آلة، وعليه أن يقول أيّهما أيّ. فإن لم يُحسِن المستجوِب أكثر من الصدفة، تكون الآلة قد اجتازت الاختبار. وقد تنبّأ تورينغ بأنّ آلةً ذات \(10^{9}\) بت من الذاكرة ستخدع مستجوِباً متوسّطاً أكثر من 30 % من الوقت بعد خمس دقائق من الحوار، وذلك بحلول سنة 2000.</p></div>
+
+<p>الإزاحة التي أجراها تورينغ أشدّ جذريةً ممّا تبدو: فهو يستبدل ببروتوكولٍ تجريبي سؤالاً ميتافيزيقياً. وهذا أيضاً ما تقوم عليه الانتقادات الثلاثة الرئيسة.</p>
+
+<div class="box warn"><div class="box-title">ثلاثة اعتراضات، مختلفة الطبيعة</div>
+<p><strong>الاختبار يقيس الخداع لا التفكير.</strong> فـELIZA، الذي كتبه فايتسنباوم سنة 1966، كان يسع بضع مئات من الأسطر ويكتفي بإعادة صوغ جُمَل محاوره أسئلةً. ومع ذلك نسب إليه مستعملون واعون فهماً وتعاطفاً، حتّى نشأ لدى فايتسنباوم قلقٌ دائم <a class="cite" href="#ref-weizenbaum1966">[4]</a>. فاجتياز الاختبار قد يكافئ محاكاةً سطحية.</p>
+<p><strong>الغرفة الصينية.</strong> يتخيّل سيرل رجلاً محبوساً في غرفة، يعالج رموزاً صينية بمعونة دليل قواعد مكتوبٍ بلغته. من الخارج، لا تُميَّز أجوبته عن أجوبة ناطقٍ أصلي؛ ومن الداخل، لا يفهم كلمةً واحدة من الصينية. ويستنتج سيرل أنّ المعالجة الصورية للرموز لا تكفي أبداً للفهم <a class="cite" href="#ref-searle1980">[5]</a>. والردّ الأشيع، المسمّى «ردّ النظام»، يعترض بأنّ الفاهم ليس الرجل بل المجموع المؤلَّف من الرجل والدليل والغرفة &mdash; وهو ما لم يقنع سيرل ولم يُحسَم قطّ.</p>
+<p><strong>الاختبار ضيّق جدّاً وواسع جدّاً.</strong> ضيّق جدّاً: فهو يُهمل الإدراك والفعل الجسدي والإبداع الرياضي. وواسع جدّاً: فهو يطالب الآلة بمحاكاة نقائص إنسانية &mdash; الخطأ في الحساب، والتباطؤ في الجواب &mdash; لا صلة لها بالذكاء. ولهذا لم يعد البحث المعاصر يسعى إلى اجتيازه.</p></div>
+
+<h2>1.3 سبعون سنة من التناوب</h2>
+
+<p>تاريخ الحقل ليس تقدّماً مطّرداً: إنّه تعاقب موجاتٍ من الحماس تتبعها انهياراتٌ في التمويل، تسمّيها الأدبيات <em>شتاءات</em>. وتتكرّر آليتان في كلّ دورة: وعودٌ تُعلَن علناً بما يتجاوز النتائج كثيراً، واستهانةٌ منهجية بصعوبة المهامّ التي ينجزها البشر بلا تفكير.</p>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">حرّك مؤشّر السنة على طول الشريط الزمني. يظهر أقرب معلمٍ تاريخي، وكذلك الحقبة التي كان فيها الحقل آنذاك.</p>
+<div id="jxg1" class="viz-board" style="height:480px;"></div>
+<p class="viz-caption"><strong>الشكل 1.2.</strong> واحد وعشرون معلماً مؤرَّخاً، وسبع حقب. وارتفاع الأشرطة يترجم الشدّة النوعية للاهتمام والتمويل كما يصفها مؤرّخو الحقل <a class="cite" href="#ref-nilsson2009">[2]</a><a class="cite" href="#ref-crevier1993">[6]</a>: فهذا ليس قياساً، ولا ينبغي أن يُقرأ على أنّه كذلك. والأمر الجدير بالملاحظة هو النمط، لا القيم.</p></div>
+
+<p>تاريخان يستحقّان الإفراد، لأنّهما في كلّ مرّة أُطلِقا بنتيجةٍ سلبية صارمة، لا بخيبةٍ مبهمة.</p>
+
+<p><strong>1969.</strong> يبرهن مينسكي وبابرت أنّ مُدرِكاً حسّياً ذا طبقةٍ واحدة لا يستطيع تمثيل دالّة «أو الحصري»، ولا أيّ دالّة غير قابلة للفصل خطّياً <a class="cite" href="#ref-minsky1969">[7]</a>. والنتيجة صحيحة ويبرهنها الفصل 11. غير أنّ مداها أُسيء تأويله على نطاقٍ واسع: فهو لا يقول شيئاً عن الشبكات متعدّدة الطبقات، التي لم يكن يُعرَف بعد كيف تُضبَط أوزانها فحسب. وتعيّن انتظار 1986 <a class="cite" href="#ref-rumelhart1986">[8]</a>.</p>
+
+<p><strong>1973.</strong> خلص التقرير الذي كلّفت به الحكومة البريطانية جيمس لايتهيل إلى أنّ أيّ نتيجةٍ في الحقل لم تفِ بوعودها خارج المسائل اللعبيّة، وأشار إلى <em>الانفجار التوافقي</em>: فالطرائق التي تنجح على عشرة أشياء تصير غير قابلة للاستعمال على ألف <a class="cite" href="#ref-lighthill1973">[9]</a>. وكان التشخيص صائباً، وهو بالضبط المشكل الذي تعالجه الفصول 3 إلى 6 من هذا المُقرَّر.</p>
+
+<div class="box example"><div class="box-title">مفارقة مورافيك</div>
+ما يجده البشر صعباً &mdash; برهنة مبرهنة، لعب الشطرنج &mdash; تبيّن أنّه سهل الأتمتة نسبياً؛ وما يفعله طفلٌ في الثانية بلا جهد &mdash; التعرّف على وجه، الإمساك بشيء، فهم جملةٍ في سياقها &mdash; قاوم خمسين سنة. ويقترح مورافيك تفسيراً تطوّرياً: الإدراك والحركة نتاج مئات ملايين السنين من الانتقاء وهما مُحسَّنان على نحوٍ هائل، بينما الاستدلال المجرّد مكسبٌ حديث وهشّ <a class="cite" href="#ref-moravec1988">[10]</a>. وهذه المفارقة وحدها تفسّر جزءاً كبيراً من أخطاء التنبّؤ في هذا الحقل.</div>
+
+<h2>1.4 نموذجان إرشاديّان</h2>
+
+<p>تحت الدورات التاريخية يجري تعارضٌ جوهري حول السؤال: <em>أين توجد المعرفة في الآلة؟</em></p>
+
+<figure class="viz"><div class="viz-title">الرمزية والاتصالية</div>
+<svg viewBox="0 0 760 350" role="img" style="width:100%;height:auto;display:block;"><rect x="20" y="46" width="340" height="270" rx="10" style="fill:var(--primary);fill-opacity:0.08;stroke:var(--primary);stroke-width:2.2;"/><text x="190" y="76" text-anchor="middle" style="fill:var(--primary);font-size:15px;font-weight:700;font-family:inherit;">المقاربة الرمزية</text><circle cx="46" cy="102" r="3.5" style="fill:var(--primary);"/><text x="60" y="106" style="fill:var(--color-text);font-size:13px;font-family:inherit;">المعرفة صريحة</text><circle cx="46" cy="136" r="3.5" style="fill:var(--primary);"/><text x="60" y="140" style="fill:var(--color-text);font-size:13px;font-family:inherit;">رموز وقواعد</text><circle cx="46" cy="170" r="3.5" style="fill:var(--primary);"/><text x="60" y="174" style="fill:var(--color-text);font-size:13px;font-family:inherit;">نبرمج ما نعرفه</text><circle cx="46" cy="204" r="3.5" style="fill:var(--primary);"/><text x="60" y="208" style="fill:var(--color-text);font-size:13px;font-family:inherit;">الأثر تفسير</text><circle cx="46" cy="238" r="3.5" style="fill:var(--primary);"/><text x="60" y="242" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">الإخفاق: الحسّ المشترك، الإدراك</text><circle cx="46" cy="272" r="3.5" style="fill:var(--primary);"/><text x="60" y="276" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">1956 &ndash; 1990</text><rect x="400" y="46" width="340" height="270" rx="10" style="fill:var(--accent);fill-opacity:0.08;stroke:var(--accent);stroke-width:2.2;"/><text x="570" y="76" text-anchor="middle" style="fill:var(--accent);font-size:15px;font-weight:700;font-family:inherit;">المقاربة الاتصالية</text><circle cx="426" cy="102" r="3.5" style="fill:var(--accent);"/><text x="440" y="106" style="fill:var(--color-text);font-size:13px;font-family:inherit;">المعرفة ضمنية</text><circle cx="426" cy="136" r="3.5" style="fill:var(--accent);"/><text x="440" y="140" style="fill:var(--color-text);font-size:13px;font-family:inherit;">أوزان عددية مضبوطة</text><circle cx="426" cy="170" r="3.5" style="fill:var(--accent);"/><text x="440" y="174" style="fill:var(--color-text);font-size:13px;font-family:inherit;">نتعلّم من الأمثلة</text><circle cx="426" cy="204" r="3.5" style="fill:var(--accent);"/><text x="440" y="208" style="fill:var(--color-text);font-size:13px;font-family:inherit;">الأثر لا يفسّر شيئاً</text><circle cx="426" cy="238" r="3.5" style="fill:var(--accent);"/><text x="440" y="242" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">الإخفاق: الاستدلال الموثوق، الضمان</text><circle cx="426" cy="272" r="3.5" style="fill:var(--accent);"/><text x="440" y="276" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">1943، 1986، 2012 &ndash; ...</text><text x="380" y="28" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">طريقتان متعارضتان لوضع المعرفة في آلة</text><text x="380" y="340" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">أنجع الأنظمة الحالية تجمع بينهما: وحدةٌ متعلَّمة داخل بحثٍ رمزي.</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 1.3.</strong> تضع المقاربة الرمزية المعرفة في قضايا يمكن قراءتها ومناقشتها وتصحيحها واحدةً واحدة؛ أمّا الاتصالية فتُذيبها في ملايين المعاملات العددية التي لا يستطيع أيّ إنسان تأويلها منفردة. وليست المسألة مسألة ذوق: فللمقاربتين مجالا كفاءةٍ منفصلان، وتُخفق كلٌّ منهما حيث تنجح الأخرى.</figcaption></figure>
+
+<div class="box thm"><div class="box-title">فرضيّة نظام الرموز الفيزيائية</div>
+<p>يصوغ نيويل وسايمون، في خطاب تسلّمهما جائزة تورينغ، الأطروحة المركزية للمقاربة الرمزية: <em>نظام الرموز الفيزيائية يمتلك الوسائل الضرورية والكافية للفعل الذكيّ العامّ</em> <a class="cite" href="#ref-newell1976">[11]</a>. وهما يقدّمانها صراحةً بوصفها <strong>فرضيّة تجريبية</strong> قابلة للدحض، لا مبرهنة. وبعد نصف قرن، لم تُبرهَن ولم تُدحَض: فأنجع الأنظمة تعالج رموزاً بالفعل، لكنّ هذه الرموز تنبثق من معاملاتٍ متعلَّمة بدل أن يضعها مبرمج.</p></div>
+
+<p>لم يكن انقلاب 2012 متّصلاً بحجّةٍ فلسفية بل بتراكم ثلاثة عوامل قابلة للقياس: مجموعات بيانات موسومة تضمّ ملايين الأمثلة، وعتادٌ رسومي يوفّر رتبتَي قدرٍ إضافيّتين من الحساب، وبعض التحسينات التقنية في التدريب. وليس أيٌّ من هذه العوامل الثلاثة فكرةً جديدة عن الذكاء.</p>
+
+<h2>1.5 الذكاء الاصطناعي الضعيف والقويّ، وما تعنيه كلمة «عامّ»</h2>
+
+<div class="box def"><div class="box-title">ثلاثة تمييزات لا ينبغي الخلط بينها</div>
+<ul>
+<li><strong>الذكاء الضعيف والذكاء القويّ</strong> (سيرل). يؤكّد الذكاء الضعيف أنّ الآلة تستطيع <em>أن تسلك</em> كما لو كانت ذكيّة. ويؤكّد الذكاء القويّ أنّ آلةً مبرمجة على النحو المناسب <em>تملك</em> عقلاً بالمعنى التامّ. الأولى مسألة تقنية؛ والثانية أطروحة فلسفية، وهي وحدها ما تستهدفه الغرفة الصينية.</li>
+<li><strong>الذكاء المتخصّص والذكاء العامّ</strong>. يتفوّق الذكاء المتخصّص في مهمّةٍ محدّدة؛ أمّا الذكاء العامّ فينقل كفاءاته إلى مهامّ جديدة، كما يفعل الإنسان. وكلّ الأنظمة القائمة متخصّصة، حتّى حين يكون مجالها واسعاً جدّاً.</li>
+<li><strong>الأداء والفهم</strong>. قد يبلغ نظامٌ نتيجةً تفوق البشر على مرجعٍ معياري بينما يُخفق في صيغةٍ تافهة من المسألة نفسها. وهذا أوثق عَرَضٍ على كفاءةٍ حُصِّلت بارتباطٍ سطحي لا بنمذجة.</li>
+</ul></div>
+
+<figure class="viz"><div class="viz-title">أثر الذكاء الاصطناعي</div>
+<svg viewBox="0 0 760 340" role="img" style="width:100%;height:auto;display:block;"><path d="M 40 268 L 720 268" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><rect x="14" y="210" width="96" height="58" rx="5" style="fill:var(--primary);fill-opacity:0.10;stroke:var(--primary);stroke-width:1.6;"/><text x="62" y="200" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">1958</text><text x="62" y="288" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">لعب الداما</text><text x="62" y="304" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">التعلّم</text><rect x="132" y="180" width="96" height="88" rx="5" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.6;"/><text x="180" y="170" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">1997</text><text x="180" y="288" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">لعب الشطرنج</text><text x="180" y="304" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">شجرة بحث</text><rect x="250" y="150" width="96" height="118" rx="5" style="fill:var(--primary);fill-opacity:0.18;stroke:var(--primary);stroke-width:1.6;"/><text x="298" y="140" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">2011</text><text x="298" y="288" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">الثقافة العامّة</text><text x="298" y="304" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">البحث في النصوص</text><rect x="368" y="120" width="96" height="148" rx="5" style="fill:var(--primary);fill-opacity:0.22;stroke:var(--primary);stroke-width:1.6;"/><text x="416" y="110" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">2016</text><text x="416" y="288" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">لعب غو</text><text x="416" y="304" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">المعاينة العشوائية</text><rect x="486" y="90" width="96" height="178" rx="5" style="fill:var(--primary);fill-opacity:0.26;stroke:var(--primary);stroke-width:1.6;"/><text x="534" y="80" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">2020</text><text x="534" y="288" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">طيّ بروتين</text><text x="534" y="304" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">شبكة عميقة</text><rect x="604" y="60" width="96" height="208" rx="5" style="fill:var(--primary);fill-opacity:0.30;stroke:var(--primary);stroke-width:1.6;"/><text x="652" y="50" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">2022</text><text x="652" y="288" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">كتابة نصّ</text><text x="652" y="304" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">نموذج لغوي</text><path d="M 40 44 L 720 44" style="fill:none;stroke:var(--viz-bad);stroke-width:2.2;stroke-dasharray:8 6;"/><text x="46" y="36" style="fill:var(--viz-bad);font-size:12.5px;font-weight:700;font-family:inherit;">«ذاك سيكون ذكاءً حقيقياً» &mdash; الحدّ، دائماً أبعد قليلاً</text><text x="380" y="330" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تحت كلّ شريط: المهمّة الساقطة، ثمّ الطريقة التي أسقطتها.</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 1.4.</strong> في كلّ مرّة تسقط فيها مهمّة، تكفّ عن أن تُعدّ من الذكاء: تصير «مجرّد بحثٍ شجري»، «مجرّد إحصاء». وقد سمّت مكوردك هذه الظاهرة <em>أثر الذكاء الاصطناعي</em> <a class="cite" href="#ref-mccorduck2004">[12]</a>. وفيه جانبٌ مُجحِف، لكن فيه أيضاً قدراً من الحقيقة: فهم كيفية حلّ مهمّةٍ يكشف دائماً تقريباً أنّها لم تكن تتطلّب ما كنّا نظنّ.</figcaption></figure>
+
+<h2>1.6 أربع أفكار خاطئة شائعة</h2>
+
+<div class="box warn"><div class="box-title">«الذكاء الاصطناعي هو التعلّم الآلي»</div>
+التعلّم الآلي حقلٌ فرعي من الذكاء الاصطناعي، مهيمنٌ اليوم، لكنّ الفصول 3 إلى 8 من هذا المُقرَّر لا تنتمي إليه. فحلّال قيودٍ يبني جدول حصص، وبرهانٌ آلي يتحقّق من دارةٍ إلكترونية، ومخطّط مسار: كلّها أنظمة ذكاءٍ اصطناعي بلا ذرّة تعلّم.</div>
+
+<div class="box warn"><div class="box-title">«الشبكة تتعلّم وحدها»</div>
+لا يتعلّم النظام المتعلِّم إلّا ما تكافئه عليه دالّته الهدف، على البيانات التي نزوّده بها، ضمن صنف الدوالّ الذي نفرضه عليه. وهذه الاختيارات الثلاثة يقوم بها بشر وتحدّد بالكامل ما يُتعلَّم. ويُظهر الفصل 9 ذلك صورياً: بلا فرضيّةٍ مسبقة، لا تعلّم ممكن.</div>
+
+<div class="box warn"><div class="box-title">«يكفي مزيدٌ من البيانات ومزيدٌ من الحساب»</div>
+هذا صحيح إلى حدٍّ ما، وخاطئ بعده. فتقدّم العقد الأخير مدينٌ كثيراً للحجم، لكنّ نموذجاً مدرَّباً على بياناتٍ متحيّزة يبقى متحيّزاً مهما بلغت كمّيتها؛ وبعض أصناف المسائل صعبة بمعنى NP، وذلك حاجزٌ رياضي لا نقص وسائل.</div>
+
+<div class="box warn"><div class="box-title">«الآلة لا تفعل إلّا ما قيل لها أن تفعله»</div>
+هذا اعتراض الليدي لوفلايس، وقد ردّ عليه تورينغ منذ 1950 <a class="cite" href="#ref-turing1950">[3]</a>. وهو صحيح حرفياً وخاطئ عملياً: فبرنامج تعلّم يُنتج بانتظامٍ سلوكاتٍ لم يتوقّعها مؤلّفه ولم يرغب فيها. وهذا بالضبط ما يجعل الفصل 14 ضرورياً.</div>
+
+<h2>الخلاصة</h2>
+<ul>
+<li>المصطلح يغطّي أربعة برامج بحثٍ متمايزة؛ ويتبنّى هذا المُقرَّر برنامج <strong>الوكيل العقلاني</strong>، لأنّه الوحيد القابل للقياس <a class="cite" href="#ref-russell2020">[13]</a>.</li>
+<li>غيّرت لعبة المحاكاة السؤال لكنّها تقيس التشابه لا التفكير؛ وانتقاداتها تبقى مفتوحة <a class="cite" href="#ref-turing1950">[3]</a><a class="cite" href="#ref-searle1980">[5]</a>.</li>
+<li>يتناوب التاريخ بين ربيعٍ وشتاء، وهذه الأخيرة أطلقتها نتائج سلبية صارمة بقدر ما أطلقتها وعودٌ مفرطة <a class="cite" href="#ref-lighthill1973">[9]</a>.</li>
+<li>الرمزية والاتصالية لا تتنافيان: لهما مجالا كفاءةٍ منفصلان، وأفضل الأنظمة تجمع بينهما.</li>
+<li>ما يجده البشر سهلاً هو ما تجده الآلات صعباً <a class="cite" href="#ref-moravec1988">[10]</a>، وكلّ مهمّةٍ تُحلّ تكفّ فوراً عن أن تُسمّى ذكاءً <a class="cite" href="#ref-mccorduck2004">[12]</a>.</li>
+</ul>
+
+<h2>المراجع</h2>
+<ol class="reflist">
+<li id="ref-dartmouth1955">McCarthy, J., Minsky, M. L., Rochester, N. &amp; Shannon, C. E. (1955). A proposal for the Dartmouth summer research project on artificial intelligence. أُعيد نشره في <em>AI Magazine</em>, 27(4), 12&ndash;14 (2006). DOI: 10.1609/aimag.v27i4.1904. <a href="https://doi.org/10.1609/aimag.v27i4.1904">https://doi.org/10.1609/aimag.v27i4.1904</a></li>
+<li id="ref-nilsson2009">Nilsson, N. J. (2009). <em>The Quest for Artificial Intelligence</em>. Cambridge University Press. DOI: 10.1017/CBO9780511819346. <a href="https://doi.org/10.1017/CBO9780511819346">https://doi.org/10.1017/CBO9780511819346</a></li>
+<li id="ref-turing1950">Turing, A. M. (1950). Computing machinery and intelligence. <em>Mind</em>, LIX(236), 433&ndash;460. DOI: 10.1093/mind/LIX.236.433. <a href="https://doi.org/10.1093/mind/LIX.236.433">https://doi.org/10.1093/mind/LIX.236.433</a></li>
+<li id="ref-weizenbaum1966">Weizenbaum, J. (1966). ELIZA &mdash; a computer program for the study of natural language communication between man and machine. <em>Communications of the ACM</em>, 9(1), 36&ndash;45. DOI: 10.1145/365153.365168. <a href="https://doi.org/10.1145/365153.365168">https://doi.org/10.1145/365153.365168</a></li>
+<li id="ref-searle1980">Searle, J. R. (1980). Minds, brains, and programs. <em>Behavioral and Brain Sciences</em>, 3(3), 417&ndash;457. DOI: 10.1017/S0140525X00005756. <a href="https://doi.org/10.1017/S0140525X00005756">https://doi.org/10.1017/S0140525X00005756</a></li>
+<li id="ref-crevier1993">Crevier, D. (1993). <em>AI: The Tumultuous History of the Search for Artificial Intelligence</em>. Basic Books. ISBN 978-0-465-02997-6. <a href="https://archive.org/details/aitumultuoushist0000crev">https://archive.org/details/aitumultuoushist0000crev</a></li>
+<li id="ref-minsky1969">Minsky, M. &amp; Papert, S. (1969). <em>Perceptrons: An Introduction to Computational Geometry</em>. MIT Press. DOI: 10.7551/mitpress/11301.001.0001. <a href="https://doi.org/10.7551/mitpress/11301.001.0001">https://doi.org/10.7551/mitpress/11301.001.0001</a></li>
+<li id="ref-rumelhart1986">Rumelhart, D. E., Hinton, G. E. &amp; Williams, R. J. (1986). Learning representations by back-propagating errors. <em>Nature</em>, 323, 533&ndash;536. DOI: 10.1038/323533a0. <a href="https://doi.org/10.1038/323533a0">https://doi.org/10.1038/323533a0</a></li>
+<li id="ref-lighthill1973">Lighthill, J. (1973). Artificial intelligence: a general survey. In <em>Artificial Intelligence: A Paper Symposium</em>, Science Research Council, London. <a href="http://www.chilton-computing.org.uk/inf/literature/reports/lighthill_report/contents.htm">http://www.chilton-computing.org.uk/inf/literature/reports/lighthill_report/contents.htm</a></li>
+<li id="ref-moravec1988">Moravec, H. (1988). <em>Mind Children: The Future of Robot and Human Intelligence</em>. Harvard University Press. ISBN 978-0-674-57616-2. <a href="https://archive.org/details/mindchildrenfutu0000mora">https://archive.org/details/mindchildrenfutu0000mora</a></li>
+<li id="ref-newell1976">Newell, A. &amp; Simon, H. A. (1976). Computer science as empirical inquiry: symbols and search. <em>Communications of the ACM</em>, 19(3), 113&ndash;126. DOI: 10.1145/360018.360022. <a href="https://doi.org/10.1145/360018.360022">https://doi.org/10.1145/360018.360022</a></li>
+<li id="ref-mccorduck2004">McCorduck, P. (2004). <em>Machines Who Think</em> (الطبعة 2). A K Peters. DOI: 10.1201/9780429258985. <a href="https://doi.org/10.1201/9780429258985">https://doi.org/10.1201/9780429258985</a></li>
+<li id="ref-russell2020">Russell, S. &amp; Norvig, P. (2020). <em>Artificial Intelligence: A Modern Approach</em> (الطبعة 4). Pearson. ISBN 978-0-13-461099-3. <a href="https://aima.cs.berkeley.edu/">https://aima.cs.berkeley.edu/</a></li>
+</ol>
+
+<section class="src-ar">
+<h3>مصادر بالعربية</h3>
+<p class="src-note">مصادر للاستزادة، لا مراجع لما ورد أعلاه: المراجع الأصلية للفصل مذكورةٌ في القائمة السابقة بلغتها. وقد عُوينت كلّ صفحةٍ من صفحات الناشرين للتحقّق من العنوان والمترجم ورخصة الإتاحة.</p>
+<ul>
+<li>بودن، مارجريت إيه. <em>الذكاء الاصطناعي: مقدّمة قصيرة جدًّا</em>. ترجمة إبراهيم سند أحمد، مراجعة هاني فتحي سليمان. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). نحو 43 ألف كلمة، متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/48149074/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/48149074/</a><span class="pourquoi">أقرب كتابٍ عربيٍّ مجّاني إلى روح الفصل الأوّل: التعريفات، والتاريخ، والحدود، والنقاش الفلسفي.</span></li>
+<li>المنظمة العربية للتربية والثقافة والعلوم، مكتب تنسيق التعريب. <em>المعجم الموحّد لمصطلحات تقانة المعلومات</em> (عربي &ndash; إنجليزي &ndash; فرنسي). مطبعة النجاح الجديدة، الرباط، 2011. ISBN 978-9954-00-742-6.<br><a class="lien" href="https://archive.org/details/ALECSO2011AREN" hreflang="ar" target="_blank" rel="noopener">https://archive.org/details/ALECSO2011AREN</a><span class="pourquoi">المرجع المعتمَد في تعريب المصطلحات؛ ثلاثيّ اللغة، وهو ما يجعله مفيداً للانتقال بين هذا المُقرَّر ونسخته الفرنسية.</span></li>
+</ul>
+</section>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../00-introduction/page.html">\(\leftarrow\) مقدّمة عامّة</a>
+<a href="../../../IA/lecons/01-qu-est-ce-que-l-ia/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">المُلحَق الخوارزمي</a>
+<a href="../../index.html">فهرس المُقرَّر</a>
+<a href="../02-agents/page.html">الفصل 2 &mdash; الوكلاء والبيئات \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>الذكاء الاصطناعي &mdash; الأقسام التحضيرية MP/PSI</strong> &middot; البحث والألعاب والقيود والتعلّم<span class="footer-meta">طبعة 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">تعذّر تحميل الشكل التفاعلي. تحقّق من اتصالك بالشبكة.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* =============== Figure : frise chronologique de l'IA ==================== */
+var JALONS = [
+ {a:1943, t:'العصبون الصوري لمكولوك وبيتس', d:'نموذج رياضي للعصبون، قبل أيّ حاسوب.'},
+ {a:1950, t:'تورينغ: لعبة المحاكاة', d:'سؤال هل تستطيع آلة أن تفكّر يُستبدل باختبار قابل للملاحظة.'},
+ {a:1956, t:'مؤتمر دارتموث', d:'يُصاغ مصطلح الذكاء الاصطناعي؛ ويولد الحقل رسمياً.'},
+ {a:1957, t:'مُدرِك روزنبلات الحسّي', d:'أوّل آلة متعلّمة، بقاعدة تقارب مبرهنة.'},
+ {a:1958, t:'مكارثي يُنشئ Lisp', d:'لغة الأنظمة الرمزية طوال ثلاثين سنة.'},
+ {a:1965, t:'قاعدة الحلّ عند روبنسون', d:'قاعدة استدلال وحيدة وتامّة لمنطق المحمولات.'},
+ {a:1966, t:'ELIZA', d:'برنامج من 200 سطر يحسبه مستعملون معالجاً نفسياً.'},
+ {a:1969, t:'مينسكي وبابرت: Perceptrons', d:'المُدرِك الحسّي لا يستطيع تعلّم أو الحصري. وينهار تمويل الشبكات.'},
+ {a:1973, t:'تقرير لايتهيل', d:'المملكة المتّحدة تقطع الاعتمادات: بداية الشتاء الأوّل.'},
+ {a:1980, t:'الأنظمة الخبيرة', d:'MYCIN وXCON: قواعد مكتوبة يدوياً تجعل الذكاء الاصطناعي مربحاً.'},
+ {a:1986, t:'الانتشار العكسي', d:'روملهارت وهنتون وويليامز يُعيدون إطلاق الشبكات متعدّدة الطبقات.'},
+ {a:1987, t:'انهيار آلات Lisp', d:'الشتاء الثاني: سوق العتاد المتخصّص يختفي.'},
+ {a:1995, t:'آلات أشعة الدعم', d:'التعلّم الإحصائي ذو الأساس النظري يهيمن على العقد.'},
+ {a:1997, t:'ديب بلو يهزم كاسباروف', d:'بحث شجري وعتاد مخصّص، بلا تعلّم.'},
+ {a:2006, t:'نهضة الشبكات العميقة', d:'تدريب مسبق طبقةً طبقة؛ ويفرض مصطلح التعلّم العميق نفسه.'},
+ {a:2011, t:'واطسون يفوز في Jeopardy', d:'معالجة اللغة على نطاق واسع، على نصوص غير مهيكلة.'},
+ {a:2012, t:'AlexNet', d:'الرؤية الحاسوبية تنتقل كلّياً إلى الشبكات الالتفافية.'},
+ {a:2016, t:'ألفاغو يهزم لي سيدول', d:'بحث بالمعاينة العشوائية موجَّه بشبكات متعلَّمة.'},
+ {a:2017, t:'المحوّل', d:'الانتباه يحلّ محلّ التكرار؛ وهي بنية النماذج الحالية.'},
+ {a:2020, t:'ألفافولد 2', d:'التنبّؤ بطيّ البروتينات يبلغ الدقّة التجريبية.'},
+ {a:2022, t:'نماذج لغوية كبرى للعموم', d:'الحقل يصير واقعة مجتمعية.'}
+];
+/* Periodes qualifiees par les historiens du domaine. */
+var PERIODES = [
+ {d:1943, f:1956, n:'prehistoire',        h:0.45},
+ {d:1956, f:1974, n:'الربيع الأوّل',  h:0.80},
+ {d:1974, f:1980, n:'الشتاء الأوّل',      h:0.20},
+ {d:1980, f:1987, n:'الربيع الثاني',   h:0.70},
+ {d:1987, f:1993, n:'الشتاء الثاني',       h:0.18},
+ {d:1993, f:2012, n:'النهضة الإحصائية', h:0.50},
+ {d:2012, f:2026, n:'العصر العميق',        h:0.95}
+];
+var A0 = 1940, A1 = 2026;
+
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-0.06, 1.42, 1.06, -0.62], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+function ax(an){ return (an - A0) / (A1 - A0); }
+var sAn = b1.create('slider', [[0.02, -0.30], [0.98, -0.30], [A0, 1956, A1]], {
+  name: 'annee', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+function annee(){ return Math.round(sAn.Value()); }
+function periode(an){
+  for (var i = 0; i < PERIODES.length; i++){
+    if (an >= PERIODES[i].d && an < PERIODES[i].f) { return PERIODES[i]; }
+  }
+  return PERIODES[PERIODES.length - 1];
+}
+function jalonProche(an){
+  var best = JALONS[0];
+  for (var i = 0; i < JALONS.length; i++){
+    if (Math.abs(JALONS[i].a - an) < Math.abs(best.a - an)) { best = JALONS[i]; }
+  }
+  return best;
+}
+/* bandes de periode */
+for (var i = 0; i < PERIODES.length; i++){
+  (function(p){
+    b1.create('curve', [[ax(p.d), ax(p.f), ax(p.f), ax(p.d), ax(p.d)],
+                        [0, 0, p.h, p.h, 0]], {
+      strokeWidth: 0, highlight: false, fixed: true,
+      fillColor: function(){
+        return p.n.indexOf('hiver') >= 0 ? cssv('--viz-blue', '#2563eb')
+                                         : cssv('--primary', '#026573'); },
+      fillOpacity: function(){ return periode(annee()) === p ? 0.34 : 0.12; }});
+    b1.create('text', [(ax(p.d) + ax(p.f)) / 2, p.h + 0.045, p.n], {
+      fontSize: 10.5, anchorX: 'middle', fixed: true, highlight: false,
+      strokeColor: function(){ return periode(annee()) === p ? PAL.text() : PAL.muted(); }});
+  })(PERIODES[i]);
+}
+b1.create('segment', [[0, 0], [1, 0]], {strokeColor: PAL.axis, strokeWidth: 1.8,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+for (var an = 1950; an <= 2020; an += 10){
+  (function(v){
+    b1.create('text', [ax(v), -0.075, String(v)], {fontSize: 11, anchorX: 'middle',
+      strokeColor: PAL.muted, fixed: true, highlight: false});
+  })(an);
+}
+/* jalons */
+for (var i = 0; i < JALONS.length; i++){
+  (function(j){
+    b1.create('point', [ax(j.a), 0], {
+      name: '', size: 4, face: 'o', fixed: true, highlight: false, strokeWidth: 1.5,
+      strokeColor: function(){
+        return jalonProche(annee()) === j ? cssv('--accent', '#f59e0b') : PAL.axis(); },
+      fillColor: function(){
+        return jalonProche(annee()) === j ? cssv('--accent', '#f59e0b') : PAL.bg(); },
+      fillOpacity: 1});
+  })(JALONS[i]);
+}
+b1.create('segment', [function(){ return [ax(annee()), -0.02]; },
+                      function(){ return [ax(annee()), 1.05]; }], {
+  strokeColor: function(){ return cssv('--accent', '#f59e0b'); }, strokeWidth: 2,
+  dash: 2, straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b1.create('text', [-0.05, 1.36, function(){
+  var j = jalonProche(annee());
+  return String(j.a) + '  -  ' + j.t;
+}], {fontSize: 16, strokeColor: function(){ return cssv('--primary', '#026573'); },
+     fixed: true, highlight: false});
+b1.create('text', [-0.05, 1.26, function(){ return jalonProche(annee()).d; }],
+  {fontSize: 13, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-0.05, 1.16, function(){
+  var p = periode(annee());
+  return 'الحقبة: ' + p.n + ' (' + p.d + '-' + p.f + ')';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-0.05, -0.52,
+  'ارتفاع الأشرطة: شدّة نوعية للاهتمام والتمويل، لا قياس.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+/* =============== Figure : les quatre definitions ========================= */
+var SYSTEMES = [
+ {n:'ELIZA (1966)', x:0.72, y:-0.68,
+  d:'يحاكي محادثة معالج نفسي بإعادة صوغ بسيطة. لا ينمذج أيّ استدلال ولا يسعى إلى أيّ غاية: إنّما يسعى فقط إلى أن يُحسَب إنساناً.'},
+ {n:'الحلّال العامّ للمسائل (1959)', x:-0.70, y:0.62,
+  d:'كان نيويل وسايمون يقارنان آثار البرنامج ببروتوكولات لفظية لأشخاص حقيقيين: كان الهدف الصريح إعادة إنتاج طريقة التفكير، لا الأداء.'},
+ {n:'برهان آلي', x:0.66, y:0.74,
+  d:'يطبّق قواعد استدلال سليمة: ما ينتجه يلزم منطقياً عن مقدّماته. وهي تقليد قوانين الفكر.'},
+ {n:'ديب بلو (1997)', x:-0.62, y:-0.72,
+  d:'لا يلعب البتّة كما يلعب الإنسان — 200 مليون وضعية في الثانية — لكنّه يختار النقلة التي تُعظّم مقياس أدائه.'},
+ {n:'روبوت مكنسة', x:-0.80, y:-0.44,
+  d:'لا ادّعاء بالذكاء: يفعل بعقلانية بالنظر إلى هدف ضيّق، في بيئة قابلة للملاحظة جزئياً.'},
+ {n:'نموذج لغوي كبير', x:0.58, y:-0.34,
+  d:'مُحسَّن لإنتاج أرجح تتمّة للنصّ: معيار التدريب هو التشابه بالكلام البشري، لا الحقيقة ولا غاية.'}
+];
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-1.55, 1.55, 1.55, -1.75], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sSys = b2.create('slider', [[-1.4, -1.42], [0.6, -1.42], [0, 0, SYSTEMES.length - 1]], {
+  name: 'systeme', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+function sys(){ return SYSTEMES[Math.round(sSys.Value())]; }
+b2.create('curve', [[-1.1, 1.1, 1.1, -1.1, -1.1], [-1.1, -1.1, 1.1, 1.1, -1.1]], {
+  strokeColor: PAL.axis, strokeWidth: 1.6, highlight: false, fixed: true});
+b2.create('segment', [[0, -1.1], [0, 1.1]], {strokeColor: PAL.axis, strokeWidth: 1.4,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b2.create('segment', [[-1.1, 0], [1.1, 0]], {strokeColor: PAL.axis, strokeWidth: 1.4,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+var QUADRANTS = [
+ {x:-0.55, y: 0.55, t:'التفكير بعقلانية', s:'قوانين الفكر'},
+ {x: 0.55, y: 0.55, t:'التفكير على نحو إنساني',     s:'نموذج معرفي'},
+ {x:-0.55, y:-0.55, t:'الفعل بعقلانية',   s:'وكيل يُعظّم'},
+ {x: 0.55, y:-0.55, t:'الفعل على نحو إنساني',       s:'لعبة المحاكاة'}
+];
+/* Les axes : gauche/droite = rationnel/humain ; haut/bas = penser/agir. */
+for (var i = 0; i < 4; i++){
+  (function(q){
+    b2.create('text', [q.x, q.y + 0.14, q.t], {fontSize: 13.5, anchorX: 'middle',
+      fixed: true, highlight: false,
+      strokeColor: function(){
+        var s = sys();
+        var meme = (s.x > 0) === (q.x > 0) && (s.y > 0) === (q.y > 0);
+        return meme ? cssv('--primary', '#026573') : PAL.text(); }});
+    b2.create('text', [q.x, q.y - 0.02, q.s], {fontSize: 11.5, anchorX: 'middle',
+      strokeColor: PAL.muted, fixed: true, highlight: false});
+  })(QUADRANTS[i]);
+}
+b2.create('text', [0, 1.22, 'التفكير  -  إعادة إنتاج السيرورة'], {fontSize: 12,
+  anchorX: 'middle', strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [0, -1.22, 'الفعل  -  إعادة إنتاج السلوك فقط'], {fontSize: 12,
+  anchorX: 'middle', strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-1.5, 0, 'المعيار: النموذج المثالي'], {fontSize: 11.5, anchorX: 'left',
+  strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [1.5, 0, 'المعيار: الإنسان'], {fontSize: 11.5, anchorX: 'right',
+  strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('point', [function(){ return sys().x; }, function(){ return sys().y; }], {
+  name: '', size: 8, face: 'o', fixed: true, highlight: false, strokeWidth: 2.5,
+  strokeColor: function(){ return cssv('--primary-dark', '#014a55'); },
+  fillColor: function(){ return cssv('--accent', '#f59e0b'); }, fillOpacity: 1});
+b2.create('text', [-1.5, 1.42, function(){ return sys().n; }], {fontSize: 16,
+  strokeColor: function(){ return cssv('--primary', '#026573'); }, fixed: true, highlight: false});
+b2.create('text', [-1.5, -1.62, function(){ return sys().d; }], {fontSize: 12.5,
+  strokeColor: PAL.text, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 01 - What Is a Game? Players, Strategies and Payoffs (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 01.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C01 Q1 - Ingredients of a game</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Which triple constitutes the <strong>normal form</strong> of a game?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The normal (strategic) form is exactly (N, S, u): the set of players, each player's strategy set, and each player's payoff function over strategy profiles. Beliefs and timing are not part of the normal form.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Players, strategy sets, payoff functions]]></text><feedback format="html"><text><![CDATA[<p>Right - (N, S, u).</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Players, beliefs, information sets]]></text><feedback format="html"><text><![CDATA[<p>Information sets belong to the extensive form (Chapter 6).</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Actions, timing, probabilities]]></text><feedback format="html"><text><![CDATA[<p>Timing is absent from the normal form by construction.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Players, outcomes, prices]]></text><feedback format="html"><text><![CDATA[<p>Prices are specific to market models, not part of the general definition.</p>]]></text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C01 Q2 - Reading a payoff cell</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In the matrix below, entries are (row player, column player).</p><table border='1' cellpadding='8' style='border-collapse:collapse;'><tr><th></th><th>Left</th><th>Right</th></tr><tr><th>Up</th><td>2, 7</td><td>6, 1</td></tr><tr><th>Down</th><td>4, 4</td><td>0, 9</td></tr></table><p>What does the <strong>column</strong> player earn at (Up, Right)?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>(Up, Right) holds 6, 1. The first number is the row player's payoff and the second is the column player's, so the column player earns 1.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[1]]></text><feedback format="html"><text><![CDATA[<p>Correct - second number of the pair.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[6]]></text><feedback format="html"><text><![CDATA[<p>That is the row player's payoff.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[9]]></text><feedback format="html"><text><![CDATA[<p>That is the column player's payoff at (Down, Right).</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[7]]></text><feedback format="html"><text><![CDATA[<p>That is the column player's payoff at (Up, Left).</p>]]></text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C01 Q3 - Best response</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Using the same matrix (Up/Down against Left/Right, payoffs 2,7 / 6,1 / 4,4 / 0,9), what is the <strong>row player's best response</strong> to Right?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Fix the column at Right. The row player gets 6 from Up and 0 from Down. Since 6 &gt; 0, Up is the best response. Note that against Left the answer is Down (4 &gt; 2), so this player has no single strategy that is best against everything.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Up, because 6 &gt; 0]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Down, because 4 &gt; 2]]></text><feedback format="html"><text><![CDATA[<p>That comparison is the response to Left, not Right.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Down, because 9 &gt; 1]]></text><feedback format="html"><text><![CDATA[<p>Those are the column player's payoffs.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Either, the payoffs are equal]]></text><feedback format="html"><text><![CDATA[<p>They are 6 and 0.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C01 Q4 - Rationality and selfishness</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Assuming players are rational is the same as assuming players are selfish.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>False. Rationality says a player maximises their own payoff function. That function can place high value on other people's wellbeing, on fairness, or on keeping a promise. Selfishness is a claim about what is inside the payoff function; rationality is a claim about how it is used.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C01 Q5 - Identify the game</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In a two-player game, each player prefers to do the opposite of the other; the worst outcome by far for both is when both act aggressively, and each would rather yield than crash. Which classic game is this?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>This is Chicken (also called Hawk-Dove). Its signature is a mutually catastrophic cell and two asymmetric outcomes in which one player yields. Contrast the Stag Hunt, where the danger is being the only cooperator, not mutual aggression.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Chicken (Hawk-Dove)]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Prisoner's Dilemma]]></text><feedback format="html"><text><![CDATA[<p>There the aggressive action is best regardless of the opponent.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Stag Hunt]]></text><feedback format="html"><text><![CDATA[<p>There the best outcome is mutual cooperation, and the risk is being alone.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Matching Pennies]]></text><feedback format="html"><text><![CDATA[<p>That game is zero-sum with no catastrophic joint cell.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C01 Q6 - Strategy versus action</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In a game where players move one after another, a strategy must specify an action at every point where the player might be called on to move, including points that will not be reached if the strategy is followed.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True. A strategy is a complete contingent plan. This is not pedantry: the plans specified off the equilibrium path are exactly what make threats credible or not, which is the whole content of subgame perfection in Chapter 6.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C01 Q7 - Counting strategy profiles</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Three players play simultaneously. Player 1 has 2 strategies, player 2 has 3, player 3 has 4. How many distinct strategy profiles does the game have?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>A profile picks one strategy per player independently, so the count is the product 2 x 3 x 4 = 24. Equivalently, the payoff function of each player must specify 24 numbers.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>24</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C01 Q8 - The dilemma in the Prisoner's Dilemma</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In the Prisoner's Dilemma with payoffs (C,C) = 3,3; (C,D) = 0,5; (D,C) = 5,0; (D,D) = 1,1, what exactly is paradoxical?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The paradox is a clash between individual and collective rationality. Defect strictly beats Cooperate for each player against each opponent action, so rational play gives (1, 1); yet (3, 3) is available and better for both. Nothing about the reasoning is wrong - the structure of the payoffs is what produces the bad outcome.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Each player's individually optimal choice leads to an outcome both players like less than an available alternative]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The players cannot compute their best responses]]></text><feedback format="html"><text><![CDATA[<p>The computation is trivial; that is not the difficulty.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The game has no best responses at all]]></text><feedback format="html"><text><![CDATA[<p>Best responses exist and are unique.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Payoffs sum to zero, so cooperation is impossible]]></text><feedback format="html"><text><![CDATA[<p>The game is not zero-sum: 3 + 3 differs from 1 + 1.</p>]]></text></feedback></answer>
+</question>
+</quiz>

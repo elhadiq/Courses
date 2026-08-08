@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الفصل 4 &mdash; الميتاهيوريستيّات</title>
+<meta name="description" content="البحث المحلّي، إعادات الانطلاق، التلدين المحاكى، البحث المحظور، الخوارزميات الجينية.">
+<link href="../../assets/style.css" rel="stylesheet">
+<link href="../../assets/rtl.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+
+.src-ar { margin: 26px 0 8px; border-top: 2px solid var(--color-rule); padding-top: 16px; }
+.src-ar h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--primary); }
+.src-ar .src-note { color: var(--color-muted); font-size: 0.9rem; margin: 0 0 12px; }
+.src-ar ul { list-style: none; padding: 0; margin: 0; }
+.src-ar li { margin: 0 0 14px; padding-right: 14px; border-right: 3px solid var(--primary-soft-2);
+             line-height: 1.7; font-size: 0.95rem; }
+.src-ar li .pourquoi { display: block; color: var(--color-muted); font-size: 0.9em;
+                       margin-top: 3px; }
+.src-ar li a.lien { word-break: break-all; font-size: 0.88em; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><a class="lang-switch" href="../../../IA/lecons/04-metaheuristiques/page.html" hreflang="fr" title="Version fran&ccedil;aise">FR</a><div class="breadcrumb"><a href="../../index.html">الذكاء الاصطناعي</a> &middot; مُقرَّر</div><span class="course-code">برنامج MP/PSI &middot; الفترة الثانية</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">القسم الثاني &middot; الفصل 4</div>
+<h1>الفصل 4 &mdash; البحث المحلّي والميتاهيوريستيّات</h1>
+<div class="lesson-sub">الصعود التدرّجي، والتلدين المحاكى، والبحث المحظور، والخوارزميات التطوّرية: ماذا نفعل حين يكون فضاء الحلول أكبر من أن يُجاب.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">المُلحَق المرافق</div><p>الصعود الصارم، وإعادات الانطلاق العشوائية، والتلدين المحاكى، والخوارزمية الجينية، مفصَّلة <strong><a href="../../../IA/lecons/04-metaheuristiques/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">خطوة بخطوة في المُلحَق</a></strong>، مع مثالٍ رقميّ قابل للتحقّق لكلٍّ منها.</p></div>
+
+<h2>4.1 تغيير السؤال</h2>
+
+<p>كان الفصل 3 يبحث عن <em>مسار</em>: فمتتالية الأفعال كانت تُحسَب بقدر حالة الوصول. أمّا في مسائل كثيرة فلا تُحسَب البتّة. ولا يهمّ بأيّ ترتيبٍ وُضِعت الوزيرات الثماني: فالتشكيلة النهائية وحدها هي المحكوم عليها. والأمر نفسه في جدول حصص، أو خطّة جولة، أو توزيع مكوّنات على لوحة.</p>
+
+<div class="box def"><div class="box-title">تعريف &mdash; مسألة الأمثلة التوافقية</div>
+<p>مسألة الأمثلة التوافقية هي معطى مجموعةٍ منتهية \(S\) من <strong>الحلول المرشَّحة</strong> ودالّة هدف \(v : S \to \mathbb{R}\). ونبحث عن \(x^{*} \in S\) بحيث \(v(x^{*}) \ge v(x)\) لكلّ \(x \in S\).</p>
+<p><strong>بنية الجوار</strong> تطبيقٌ \(N : S \to \mathcal{P}(S)\) يُرفِق بكلّ حلٍّ مجموعةَ الحلول التي يمكن بلوغها بتعديلٍ أوّلي. وM6 <strong>أمثلٌ محلّي</strong> إذا كان \(v(x) \ge v(y)\) لكلّ \(y \in N(x)\).</p></div>
+
+<p>المكسب فوري: تهبط الذاكرة إلى حلٍّ راهن واحد، مقابل حاشيةٍ أُسّية في الفصل 3. والثمن كذلك: نفقد كلّ ضمانٍ للأمثلية.</p>
+
+<figure class="viz"><div class="viz-title">تشريح منظرٍ للبحث</div>
+<svg viewBox="0 0 760 330" role="img" style="width:100%;height:auto;display:block;"><path d="M 60 270 L 700 270" style="fill:none;stroke:var(--viz-axis);stroke-width:1.6;"/><path d="M 60 268.457 L 60.64 267.751 L 61.28 267.042 L 61.92 266.331 L 62.56 265.619 L 63.2 264.907 L 63.84 264.195 L 64.48 263.486 L 65.12 262.778 L 65.76 262.075 L 66.4 261.375 L 67.04 260.68 L 67.68 259.992 L 68.32 259.31 L 68.96 258.635 L 69.6 257.968 L 70.24 257.31 L 70.88 256.662 L 71.52 256.023 L 72.16 255.396 L 72.8 254.779 L 73.44 254.174 L 74.08 253.581 L 74.72 253.001 L 75.36 252.434 L 76 251.88 L 76.64 251.341 L 77.28 250.815 L 77.92 250.303 L 78.56 249.806 L 79.2 249.323 L 79.84 248.855 L 80.48 248.402 L 81.12 247.964 L 81.76 247.54 L 82.4 247.131 L 83.04 246.737 L 83.68 246.357 L 84.32 245.991 L 84.96 245.64 L 85.6 245.302 L 86.24 244.977 L 86.88 244.665 L 87.52 244.366 L 88.16 244.078 L 88.8 243.803 L 89.44 243.538 L 90.08 243.284 L 90.72 243.039 L 91.36 242.804 L 92 242.577 L 92.64 242.358 L 93.28 242.146 L 93.92 241.94 L 94.56 241.739 L 95.2 241.543 L 95.84 241.351 L 96.48 241.162 L 97.12 240.974 L 97.76 240.787 L 98.4 240.601 L 99.04 240.413 L 99.68 240.224 L 100.32 240.031 L 100.96 239.835 L 101.6 239.634 L 102.24 239.426 L 102.88 239.212 L 103.52 238.99 L 104.16 238.759 L 104.8 238.519 L 105.44 238.267 L 106.08 238.003 L 106.72 237.727 L 107.36 237.436 L 108 237.131 L 108.64 236.81 L 109.28 236.472 L 109.92 236.117 L 110.56 235.744 L 111.2 235.352 L 111.84 234.939 L 112.48 234.506 L 113.12 234.051 L 113.76 233.574 L 114.4 233.075 L 115.04 232.552 L 115.68 232.005 L 116.32 231.433 L 116.96 230.837 L 117.6 230.215 L 118.24 229.567 L 118.88 228.893 L 119.52 228.193 L 120.16 227.466 L 120.8 226.712 L 121.44 225.931 L 122.08 225.123 L 122.72 224.288 L 123.36 223.426 L 124 222.537 L 124.64 221.621 L 125.28 220.678 L 125.92 219.71 L 126.56 218.715 L 127.2 217.695 L 127.84 216.649 L 128.48 215.579 L 129.12 214.485 L 129.76 213.368 L 130.4 212.228 L 131.04 211.066 L 131.68 209.883 L 132.32 208.679 L 132.96 207.456 L 133.6 206.214 L 134.24 204.956 L 134.88 203.68 L 135.52 202.39 L 136.16 201.085 L 136.8 199.768 L 137.44 198.439 L 138.08 197.099 L 138.72 195.751 L 139.36 194.395 L 140 193.032 L 140.64 191.665 L 141.28 190.295 L 141.92 188.923 L 142.56 187.551 L 143.2 186.18 L 143.84 184.812 L 144.48 183.449 L 145.12 182.091 L 145.76 180.742 L 146.4 179.402 L 147.04 178.073 L 147.68 176.757 L 148.32 175.456 L 148.96 174.17 L 149.6 172.902 L 150.24 171.654 L 150.88 170.427 L 151.52 169.223 L 152.16 168.043 L 152.8 166.889 L 153.44 165.763 L 154.08 164.666 L 154.72 163.6 L 155.36 162.566 L 156 161.566 L 156.64 160.601 L 157.28 159.673 L 157.92 158.783 L 158.56 157.933 L 159.2 157.123 L 159.84 156.355 L 160.48 155.631 L 161.12 154.951 L 161.76 154.317 L 162.4 153.729 L 163.04 153.189 L 163.68 152.698 L 164.32 152.256 L 164.96 151.865 L 165.6 151.524 L 166.24 151.236 L 166.88 151.001 L 167.52 150.818 L 168.16 150.689 L 168.8 150.614 L 169.44 150.594 L 170.08 150.629 L 170.72 150.719 L 171.36 150.864 L 172 151.065 L 172.64 151.321 L 173.28 151.632 L 173.92 151.999 L 174.56 152.421 L 175.2 152.898 L 175.84 153.43 L 176.48 154.016 L 177.12 154.655 L 177.76 155.348 L 178.4 156.094 L 179.04 156.892 L 179.68 157.741 L 180.32 158.641 L 180.96 159.59 L 181.6 160.588 L 182.24 161.634 L 182.88 162.727 L 183.52 163.866 L 184.16 165.049 L 184.8 166.276 L 185.44 167.545 L 186.08 168.854 L 186.72 170.203 L 187.36 171.591 L 188 173.015 L 188.64 174.474 L 189.28 175.966 L 189.92 177.491 L 190.56 179.047 L 191.2 180.631 L 191.84 182.242 L 192.48 183.879 L 193.12 185.54 L 193.76 187.223 L 194.4 188.926 L 195.04 190.647 L 195.68 192.385 L 196.32 194.138 L 196.96 195.904 L 197.6 197.681 L 198.24 199.468 L 198.88 201.262 L 199.52 203.062 L 200.16 204.866 L 200.8 206.671 L 201.44 208.477 L 202.08 210.281 L 202.72 212.082 L 203.36 213.877 L 204 215.665 L 204.64 217.444 L 205.28 219.213 L 205.92 220.97 L 206.56 222.712 L 207.2 224.439 L 207.84 226.148 L 208.48 227.839 L 209.12 229.509 L 209.76 231.157 L 210.4 232.782 L 211.04 234.381 L 211.68 235.954 L 212.32 237.5 L 212.96 239.016 L 213.6 240.502 L 214.24 241.956 L 214.88 243.377 L 215.52 244.764 L 216.16 246.117 L 216.8 247.433 L 217.44 248.712 L 218.08 249.953 L 218.72 251.155 L 219.36 252.317 L 220 253.439 L 220.64 254.519 L 221.28 255.558 L 221.92 256.554 L 222.56 257.507 L 223.2 258.417 L 223.84 259.283 L 224.48 260.104 L 225.12 260.881 L 225.76 261.613 L 226.4 262.3 L 227.04 262.942 L 227.68 263.538 L 228.32 264.09 L 228.96 264.596 L 229.6 265.057 L 230.24 265.473 L 230.88 265.844 L 231.52 266.171 L 232.16 266.453 L 232.8 266.692 L 233.44 266.887 L 234.08 267.039 L 234.72 267.149 L 235.36 267.216 L 236 267.243 L 236.64 267.229 L 237.28 267.174 L 237.92 267.081 L 238.56 266.948 L 239.2 266.779 L 239.84 266.572 L 240.48 266.329 L 241.12 266.051 L 241.76 265.739 L 242.4 265.393 L 243.04 265.016 L 243.68 264.607 L 244.32 264.167 L 244.96 263.699 L 245.6 263.203 L 246.24 262.679 L 246.88 262.13 L 247.52 261.556 L 248.16 260.958 L 248.8 260.338 L 249.44 259.697 L 250.08 259.035 L 250.72 258.354 L 251.36 257.656 L 252 256.94 L 252.64 256.21 L 253.28 255.464 L 253.92 254.706 L 254.56 253.935 L 255.2 253.153 L 255.84 252.361 L 256.48 251.56 L 257.12 250.752 L 257.76 249.937 L 258.4 249.116 L 259.04 248.291 L 259.68 247.462 L 260.32 246.63 L 260.96 245.796 L 261.6 244.962 L 262.24 244.128 L 262.88 243.294 L 263.52 242.463 L 264.16 241.633 L 264.8 240.808 L 265.44 239.986 L 266.08 239.168 L 266.72 238.357 L 267.36 237.551 L 268 236.751 L 268.64 235.959 L 269.28 235.174 L 269.92 234.397 L 270.56 233.629 L 271.2 232.869 L 271.84 232.118 L 272.48 231.377 L 273.12 230.645 L 273.76 229.923 L 274.4 229.212 L 275.04 228.51 L 275.68 227.818 L 276.32 227.137 L 276.96 226.465 L 277.6 225.804 L 278.24 225.153 L 278.88 224.512 L 279.52 223.88 L 280.16 223.258 L 280.8 222.646 L 281.44 222.042 L 282.08 221.447 L 282.72 220.86 L 283.36 220.281 L 284 219.71 L 284.64 219.145 L 285.28 218.588 L 285.92 218.036 L 286.56 217.49 L 287.2 216.948 L 287.84 216.411 L 288.48 215.878 L 289.12 215.347 L 289.76 214.82 L 290.4 214.294 L 291.04 213.768 L 291.68 213.244 L 292.32 212.719 L 292.96 212.192 L 293.6 211.664 L 294.24 211.134 L 294.88 210.6 L 295.52 210.062 L 296.16 209.519 L 296.8 208.97 L 297.44 208.416 L 298.08 207.854 L 298.72 207.284 L 299.36 206.705 L 300 206.118 L 300.64 205.52 L 301.28 204.912 L 301.92 204.292 L 302.56 203.66 L 303.2 203.016 L 303.84 202.358 L 304.48 201.686 L 305.12 201 L 305.76 200.299 L 306.4 199.582 L 307.04 198.849 L 307.68 198.1 L 308.32 197.333 L 308.96 196.55 L 309.6 195.748 L 310.24 194.929 L 310.88 194.091 L 311.52 193.235 L 312.16 192.361 L 312.8 191.467 L 313.44 190.554 L 314.08 189.622 L 314.72 188.671 L 315.36 187.701 L 316 186.712 L 316.64 185.704 L 317.28 184.678 L 317.92 183.632 L 318.56 182.569 L 319.2 181.487 L 319.84 180.387 L 320.48 179.27 L 321.12 178.137 L 321.76 176.986 L 322.4 175.82 L 323.04 174.639 L 323.68 173.443 L 324.32 172.233 L 324.96 171.009 L 325.6 169.773 L 326.24 168.525 L 326.88 167.266 L 327.52 165.997 L 328.16 164.719 L 328.8 163.433 L 329.44 162.139 L 330.08 160.84 L 330.72 159.535 L 331.36 158.226 L 332 156.915 L 332.64 155.601 L 333.28 154.288 L 333.92 152.975 L 334.56 151.664 L 335.2 150.356 L 335.84 149.053 L 336.48 147.756 L 337.12 146.466 L 337.76 145.185 L 338.4 143.913 L 339.04 142.653 L 339.68 141.406 L 340.32 140.173 L 340.96 138.956 L 341.6 137.755 L 342.24 136.573 L 342.88 135.411 L 343.52 134.27 L 344.16 133.152 L 344.8 132.058 L 345.44 130.989 L 346.08 129.947 L 346.72 128.934 L 347.36 127.95 L 348 126.997 L 348.64 126.076 L 349.28 125.188 L 349.92 124.336 L 350.56 123.519 L 351.2 122.74 L 351.84 121.999 L 352.48 121.297 L 353.12 120.637 L 353.76 120.018 L 354.4 119.442 L 355.04 118.909 L 355.68 118.422 L 356.32 117.98 L 356.96 117.585 L 357.6 117.237 L 358.24 116.937 L 358.88 116.686 L 359.52 116.484 L 360.16 116.333 L 360.8 116.232 L 361.44 116.183 L 362.08 116.185 L 362.72 116.24 L 363.36 116.346 L 364 116.506 L 364.64 116.718 L 365.28 116.983 L 365.92 117.302 L 366.56 117.673 L 367.2 118.098 L 367.84 118.576 L 368.48 119.107 L 369.12 119.691 L 369.76 120.327 L 370.4 121.015 L 371.04 121.755 L 371.68 122.547 L 372.32 123.389 L 372.96 124.281 L 373.6 125.223 L 374.24 126.214 L 374.88 127.253 L 375.52 128.34 L 376.16 129.473 L 376.8 130.651 L 377.44 131.875 L 378.08 133.142 L 378.72 134.451 L 379.36 135.802 L 380 137.193 L 380.64 138.624 L 381.28 140.092 L 381.92 141.597 L 382.56 143.137 L 383.2 144.71 L 383.84 146.317 L 384.48 147.954 L 385.12 149.62 L 385.76 151.315 L 386.4 153.036 L 387.04 154.782 L 387.68 156.552 L 388.32 158.343 L 388.96 160.154 L 389.6 161.983 L 390.24 163.829 L 390.88 165.69 L 391.52 167.565 L 392.16 169.451 L 392.8 171.347 L 393.44 173.251 L 394.08 175.162 L 394.72 177.077 L 395.36 178.996 L 396 180.916 L 396.64 182.836 L 397.28 184.753 L 397.92 186.667 L 398.56 188.576 L 399.2 190.478 L 399.84 192.371 L 400.48 194.254 L 401.12 196.125 L 401.76 197.983 L 402.4 199.826 L 403.04 201.652 L 403.68 203.461 L 404.32 205.251 L 404.96 207.02 L 405.6 208.767 L 406.24 210.491 L 406.88 212.191 L 407.52 213.864 L 408.16 215.511 L 408.8 217.13 L 409.44 218.719 L 410.08 220.279 L 410.72 221.807 L 411.36 223.303 L 412 224.766 L 412.64 226.196 L 413.28 227.59 L 413.92 228.95 L 414.56 230.273 L 415.2 231.56 L 415.84 232.81 L 416.48 234.022 L 417.12 235.196 L 417.76 236.332 L 418.4 237.429 L 419.04 238.487 L 419.68 239.506 L 420.32 240.485 L 420.96 241.425 L 421.6 242.325 L 422.24 243.186 L 422.88 244.008 L 423.52 244.79 L 424.16 245.533 L 424.8 246.238 L 425.44 246.904 L 426.08 247.532 L 426.72 248.122 L 427.36 248.675 L 428 249.191 L 428.64 249.671 L 429.28 250.116 L 429.92 250.526 L 430.56 250.901 L 431.2 251.243 L 431.84 251.553 L 432.48 251.83 L 433.12 252.077 L 433.76 252.293 L 434.4 252.481 L 435.04 252.64 L 435.68 252.772 L 436.32 252.878 L 436.96 252.959 L 437.6 253.016 L 438.24 253.05 L 438.88 253.062 L 439.52 253.053 L 440.16 253.025 L 440.8 252.979 L 441.44 252.916 L 442.08 252.836 L 442.72 252.742 L 443.36 252.635 L 444 252.515 L 444.64 252.384 L 445.28 252.243 L 445.92 252.093 L 446.56 251.936 L 447.2 251.773 L 447.84 251.604 L 448.48 251.432 L 449.12 251.256 L 449.76 251.079 L 450.4 250.902 L 451.04 250.725 L 451.68 250.55 L 452.32 250.377 L 452.96 250.208 L 453.6 250.044 L 454.24 249.885 L 454.88 249.733 L 455.52 249.589 L 456.16 249.452 L 456.8 249.325 L 457.44 249.208 L 458.08 249.102 L 458.72 249.007 L 459.36 248.924 L 460 248.853 L 460.64 248.796 L 461.28 248.753 L 461.92 248.724 L 462.56 248.709 L 463.2 248.71 L 463.84 248.726 L 464.48 248.758 L 465.12 248.805 L 465.76 248.869 L 466.4 248.949 L 467.04 249.045 L 467.68 249.157 L 468.32 249.285 L 468.96 249.43 L 469.6 249.591 L 470.24 249.767 L 470.88 249.959 L 471.52 250.167 L 472.16 250.389 L 472.8 250.626 L 473.44 250.876 L 474.08 251.141 L 474.72 251.418 L 475.36 251.708 L 476 252.009 L 476.64 252.322 L 477.28 252.645 L 477.92 252.977 L 478.56 253.318 L 479.2 253.667 L 479.84 254.022 L 480.48 254.384 L 481.12 254.75 L 481.76 255.121 L 482.4 255.494 L 483.04 255.869 L 483.68 256.245 L 484.32 256.62 L 484.96 256.993 L 485.6 257.363 L 486.24 257.729 L 486.88 258.089 L 487.52 258.443 L 488.16 258.789 L 488.8 259.125 L 489.44 259.451 L 490.08 259.764 L 490.72 260.064 L 491.36 260.35 L 492 260.619 L 492.64 260.87 L 493.28 261.103 L 493.92 261.315 L 494.56 261.506 L 495.2 261.674 L 495.84 261.817 L 496.48 261.935 L 497.12 262.026 L 497.76 262.088 L 498.4 262.121 L 499.04 262.123 L 499.68 262.092 L 500.32 262.028 L 500.96 261.93 L 501.6 261.796 L 502.24 261.625 L 502.88 261.415 L 503.52 261.167 L 504.16 260.879 L 504.8 260.549 L 505.44 260.177 L 506.08 259.762 L 506.72 259.303 L 507.36 258.8 L 508 258.25 L 508.64 257.655 L 509.28 257.012 L 509.92 256.322 L 510.56 255.583 L 511.2 254.796 L 511.84 253.959 L 512.48 253.073 L 513.12 252.137 L 513.76 251.15 L 514.4 250.113 L 515.04 249.025 L 515.68 247.886 L 516.32 246.696 L 516.96 245.455 L 517.6 244.164 L 518.24 242.821 L 518.88 241.429 L 519.52 239.985 L 520.16 238.492 L 520.8 236.95 L 521.44 235.358 L 522.08 233.718 L 522.72 232.029 L 523.36 230.294 L 524 228.511 L 524.64 226.683 L 525.28 224.81 L 525.92 222.893 L 526.56 220.933 L 527.2 218.93 L 527.84 216.887 L 528.48 214.803 L 529.12 212.681 L 529.76 210.521 L 530.4 208.326 L 531.04 206.095 L 531.68 203.832 L 532.32 201.536 L 532.96 199.21 L 533.6 196.855 L 534.24 194.473 L 534.88 192.066 L 535.52 189.635 L 536.16 187.181 L 536.8 184.708 L 537.44 182.216 L 538.08 179.707 L 538.72 177.184 L 539.36 174.648 L 540 172.101 L 540.64 169.545 L 541.28 166.982 L 541.92 164.414 L 542.56 161.844 L 543.2 159.272 L 543.84 156.702 L 544.48 154.135 L 545.12 151.574 L 545.76 149.02 L 546.4 146.476 L 547.04 143.943 L 547.68 141.424 L 548.32 138.92 L 548.96 136.435 L 549.6 133.969 L 550.24 131.526 L 550.88 129.106 L 551.52 126.713 L 552.16 124.348 L 552.8 122.012 L 553.44 119.709 L 554.08 117.439 L 554.72 115.205 L 555.36 113.009 L 556 110.852 L 556.64 108.736 L 557.28 106.664 L 557.92 104.636 L 558.56 102.654 L 559.2 100.72 L 559.84 98.8357 L 560.48 97.0022 L 561.12 95.2212 L 561.76 93.494 L 562.4 91.822 L 563.04 90.2064 L 563.68 88.6485 L 564.32 87.1494 L 564.96 85.7102 L 565.6 84.332 L 566.24 83.0158 L 566.88 81.7624 L 567.52 80.5728 L 568.16 79.4475 L 568.8 78.3875 L 569.44 77.3932 L 570.08 76.4653 L 570.72 75.6042 L 571.36 74.8103 L 572 74.0841 L 572.64 73.4257 L 573.28 72.8354 L 573.92 72.3133 L 574.56 71.8594 L 575.2 71.4738 L 575.84 71.1563 L 576.48 70.9067 L 577.12 70.7249 L 577.76 70.6106 L 578.4 70.5633 L 579.04 70.5826 L 579.68 70.668 L 580.32 70.8189 L 580.96 71.0347 L 581.6 71.3147 L 582.24 71.6582 L 582.88 72.0641 L 583.52 72.5318 L 584.16 73.0602 L 584.8 73.6483 L 585.44 74.2951 L 586.08 74.9995 L 586.72 75.7602 L 587.36 76.5761 L 588 77.4459 L 588.64 78.3682 L 589.28 79.3418 L 589.92 80.3653 L 590.56 81.4372 L 591.2 82.5561 L 591.84 83.7204 L 592.48 84.9287 L 593.12 86.1793 L 593.76 87.4708 L 594.4 88.8014 L 595.04 90.1697 L 595.68 91.5738 L 596.32 93.0123 L 596.96 94.4833 L 597.6 95.9853 L 598.24 97.5165 L 598.88 99.0752 L 599.52 100.66 L 600.16 102.269 L 600.8 103.9 L 601.44 105.552 L 602.08 107.223 L 602.72 108.912 L 603.36 110.616 L 604 112.335 L 604.64 114.066 L 605.28 115.808 L 605.92 117.56 L 606.56 119.319 L 607.2 121.085 L 607.84 122.856 L 608.48 124.63 L 609.12 126.405 L 609.76 128.182 L 610.4 129.958 L 611.04 131.731 L 611.68 133.502 L 612.32 135.267 L 612.96 137.027 L 613.6 138.78 L 614.24 140.525 L 614.88 142.261 L 615.52 143.986 L 616.16 145.701 L 616.8 147.403 L 617.44 149.093 L 618.08 150.769 L 618.72 152.431 L 619.36 154.078 L 620 155.709 L 620.64 157.324 L 621.28 158.922 L 621.92 160.502 L 622.56 162.065 L 623.2 163.609 L 623.84 165.135 L 624.48 166.642 L 625.12 168.13 L 625.76 169.599 L 626.4 171.048 L 627.04 172.478 L 627.68 173.888 L 628.32 175.279 L 628.96 176.65 L 629.6 178.002 L 630.24 179.335 L 630.88 180.649 L 631.52 181.944 L 632.16 183.22 L 632.8 184.478 L 633.44 185.718 L 634.08 186.94 L 634.72 188.146 L 635.36 189.334 L 636 190.506 L 636.64 191.663 L 637.28 192.804 L 637.92 193.93 L 638.56 195.042 L 639.2 196.14 L 639.84 197.225 L 640.48 198.298 L 641.12 199.359 L 641.76 200.408 L 642.4 201.447 L 643.04 202.476 L 643.68 203.496 L 644.32 204.507 L 644.96 205.51 L 645.6 206.505 L 646.24 207.494 L 646.88 208.477 L 647.52 209.454 L 648.16 210.426 L 648.8 211.394 L 649.44 212.359 L 650.08 213.32 L 650.72 214.279 L 651.36 215.236 L 652 216.192 L 652.64 217.147 L 653.28 218.101 L 653.92 219.055 L 654.56 220.01 L 655.2 220.966 L 655.84 221.923 L 656.48 222.881 L 657.12 223.842 L 657.76 224.805 L 658.4 225.77 L 659.04 226.739 L 659.68 227.71 L 660.32 228.684 L 660.96 229.662 L 661.6 230.642 L 662.24 231.627 L 662.88 232.614 L 663.52 233.606 L 664.16 234.6 L 664.8 235.598 L 665.44 236.599 L 666.08 237.603 L 666.72 238.61 L 667.36 239.619 L 668 240.631 L 668.64 241.645 L 669.28 242.661 L 669.92 243.678 L 670.56 244.696 L 671.2 245.714 L 671.84 246.733 L 672.48 247.751 L 673.12 248.769 L 673.76 249.785 L 674.4 250.799 L 675.04 251.81 L 675.68 252.819 L 676.32 253.823 L 676.96 254.823 L 677.6 255.818 L 678.24 256.807 L 678.88 257.79 L 679.52 258.765 L 680.16 259.732 L 680.8 260.691 L 681.44 261.64 L 682.08 262.579 L 682.72 263.506 L 683.36 264.422 L 684 265.326 L 684.64 266.216 L 685.28 267.091 L 685.92 267.952 L 686.56 268.797 L 687.2 269.626 L 687.84 270.437 L 688.48 271.23 L 689.12 272.005 L 689.76 272.76 L 690.4 273.495 L 691.04 274.209 L 691.68 274.901 L 692.32 275.571 L 692.96 276.219 L 693.6 276.842 L 694.24 277.442 L 694.88 278.017 L 695.52 278.567 L 696.16 279.091 L 696.8 279.589 L 697.44 280.06 L 698.08 280.504 L 698.72 280.921 L 699.36 281.31 L 700 281.67" style="fill:none;stroke:var(--primary);stroke-width:3;"/><circle cx="164.32" cy="152.256" r="5.5" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><text x="164.32" y="138.256" text-anchor="middle" style="fill:var(--viz-bad);font-size:12px;font-weight:700;font-family:inherit;">أعظمية محلّية</text><circle cx="356.32" cy="117.98" r="5.5" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><text x="356.32" y="103.98" text-anchor="middle" style="fill:var(--viz-bad);font-size:12px;font-weight:700;font-family:inherit;">أعظمية محلّية</text><circle cx="578.4" cy="70.5633" r="5.5" style="fill:var(--viz-ok);stroke:var(--color-bg);stroke-width:2;"/><text x="578.4" y="56.5633" text-anchor="middle" style="fill:var(--viz-ok);font-size:12px;font-weight:700;font-family:inherit;">أعظمية شاملة</text><circle cx="261.6" cy="244.962" r="5.5" style="fill:var(--color-muted);stroke:var(--color-bg);stroke-width:2;"/><text x="261.6" y="266.962" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-weight:700;font-family:inherit;">وادٍ: يجب النزول للصعود أعلى</text><text x="380" y="24" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">منظرٌ للبحث: الصعود الصارم يتوقّف عند أوّل قمّة يلقاها</text><text x="380" y="308" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">حوض جذب الأعظمية الشاملة لا يشغل إلّا جزءاً صغيراً من المحور: فالانطلاق عشوائياً نادراً ما يكفي.</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 4.1.</strong> ترسم دالّة الهدف منظراً على فضاء الحلول. وخوارزمية البحث المحلّي تتنقّل من مكانٍ إلى مجاوره في هذا المنظر. والمعجم معجم المشي في الجبال: قمم، وأودية، وهضاب، وأعراف. وكلّ الصعوبة تسع في جملة: <em>لبلوغ قمّةٍ أعلى، يجب غالباً البدء بالنزول</em>.</figcaption></figure>
+
+<div class="box warn"><div class="box-title">ثلاثة عوائق، وثلاثة علاجات مختلفة</div>
+<p><strong>الأمثليّات المحلّية</strong> توقف الصعود الصارم فوراً. العلاج: قبول النزول أحياناً، أو الانطلاق من مكانٍ آخر.</p>
+<p><strong>الهضاب</strong> &mdash; مناطق يتساوى فيها كلّ الجيران قيمةً &mdash; لا تعطي أيّ اتّجاه. العلاج: الإذن بالتنقّلات الجانبية، لكن بعددٍ محدود، وإلّا درنا فيها بلا انتهاء.</p>
+<p><strong>الأعراف</strong> متتاليات قممٍ محلّية لا يُحسّنها أيّ جارٍ منفرد، بينما كان تركيب حركتين ليفعل. العلاج: توسيع الجوار، أو تغييره.</p></div>
+
+<h2>4.2 الصعود الصارم وإعادات الانطلاق</h2>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 4.1 &mdash; الصعود الصارم وإعادات الانطلاق العشوائية</div><div class="algo-io"><b>المُدخل:</b> فضاء \(S\)، وجوار \(N : S \to \mathcal{P}(S)\)، وتنقيط \(v : S \to \mathbb{R}\)<br><b>المُخرج:</b> أمثلٌ محلّي لـM12؛ ومع إعادات الانطلاق، أفضل \(k\) محاولة</div><ol class="algo-corps"><li><b class="kw">دالّة</b> <span class="fn">صعود</span>\((x_0)\)</li><li class="n1">\(x \leftarrow x_0\)</li><li class="n1"><b class="kw">كرّر</b></li><li class="n2">\(y \leftarrow \operatorname*{argmax}_{z \in N(x)} v(z)\)</li><li class="n2"><b class="kw">إذا</b> \(v(y) \le v(x)\) <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> <i class="va">x</i>          <span class="cm">// امثل محلي</span></li><li class="n2">\(x \leftarrow y\)</li><li>&nbsp;</li><li><b class="kw">دالّة</b> <span class="fn">صعود‌بإعادات</span>\((k)\)</li><li class="n1">\(x^{*} \leftarrow \mathrm{nil}\)</li><li class="n1"><b class="kw">لكلّ</b> \(i = 1\) <b class="kw">إلى أن</b> \(k\) <b class="kw">نفّذ</b></li><li class="n2">\(x \leftarrow\) <span class="fn">صعود</span>\((\xi_i)\) <b class="kw">مع</b> \(\xi_i \sim \mathcal{U}(S)\)</li><li class="n2"><b class="kw">إذا</b> \(x^{*} = \mathrm{nil}\) <b class="kw">أو</b> \(v(x) \gt v(x^{*})\) <b class="kw">فإنّ</b> \(x^{*} \leftarrow x\)</li><li class="n1"><b class="kw">أرجِع</b> \(x^{*}\)</li></ol><p class="algo-note"><strong>متناقص الصعود:</strong> \(v(x)\)، متزايدة قطعاً على مجموعةٍ منتهية. <strong>تمام إعادات الانطلاق:</strong> إذا نجحت كلّ محاولةٍ باحتمال \(p \gt 0\)، فإنّ الإخفاق بعد \(k\) محاولة يساوي \((1-p)^{k} \to 0\)، وأمل عدد المحاولات يساوي \(1/p\).</p></div>
+
+<p>الصعود الصارم بسيطٌ إلى حدّ الإرباك، ويُخفِق بالضبط حيث نتوقّع: فهو يتوقّف عند أوّل قمّة يلقاها. وفي مسألة الوزيرات الثماني، انطلاقاً من تشكيلةٍ عشوائية، لا يبلغ حلّاً إلّا في نحو 14 % من الحالات؛ والـ86 % الباقية تنتهي عند أمثلٍ محلّي <a class="cite" href="#ref-russell2020">[1]</a>.</p>
+
+<div class="box thm"><div class="box-title">مبرهنة &mdash; إعادات الانطلاق العشوائية تامّة</div>
+<p>إذا بلغت كلّ محاولةٍ حلّاً أمثل باحتمال \(p \gt 0\) مستقلٍّ عن المحاولات السابقة، فإنّ عدد المحاولات اللازمة يتبع قانوناً هندسياً أمله \(1/p\)، ويؤول احتمال النجاح إلى 1 حين يؤول عدد المحاولات إلى اللانهاية.</p>
+<p>مع \(p = 0{,}14\)، تلزم نحو 7 محاولات وسطياً: فحيث كانت محاولةٌ واحدة تُخفِق ستّ مرّات من سبع، تنجح سبع محاولات نجاحاً شبه أكيد. وهذه أفضل نسبةٍ بين المكسب وتعقيد التنفيذ في هذا الفصل كلّه.</p></div>
+
+<h2>4.3 التلدين المحاكى</h2>
+
+<p>الفكرة آتيةٌ من علم المعادن: للحصول على بلّورةٍ منتظمة، نُسخّن المعدن ثمّ نُبرّده ببطء؛ فإن بُرِّد فجأةً تجمّد في حالةٍ مضطربة عالية الطاقة. وكان ميتروبوليس وشركاؤه قد اقترحوا سنة 1953 طريقةً لمعاينة حالات نظامٍ فيزيائي عند حرارةٍ معطاة <a class="cite" href="#ref-metropolis1953">[2]</a>؛ ثمّ خطرت لكيركباتريك وجيلات وفيكي سنة 1983 فكرة تحويلها إلى طريقة أمثلة، بجعل الحرارة تتناقص <a class="cite" href="#ref-kirkpatrick1983">[3]</a>.</p>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 4.2 &mdash; التلدين المحاكى</div><div class="algo-io"><b>المُدخل:</b> نقطة انطلاق \(x_0\)، وجارٌ عشوائي \(\nu\)، وحرارة ابتدائية \(T_0\)، ومعامل \(\rho \in\ ]0,1[\)، وعدد خطوات \(K\)<br><b>المُخرج:</b> أفضل نقطةٍ لُقِيت</div><ol class="algo-corps"><li>\(x \leftarrow x_0\) ؛ \(x^{*} \leftarrow x_0\)</li><li><b class="kw">لكلّ</b> \(k = 0\) <b class="kw">إلى أن</b> \(K-1\) <b class="kw">نفّذ</b></li><li class="n1">\(T_k \leftarrow T_0\,\rho^{\,k}\)          <span class="cm">// تبريد هندسي</span></li><li class="n1">\(y \leftarrow \nu(x)\) ؛ \(\Delta \leftarrow v(y) - v(x)\)</li><li class="n1"><b class="kw">إذا</b> \(\Delta \gt 0\) <b class="kw">فإنّ</b></li><li class="n2">\(x \leftarrow y\)          <span class="cm">// تحسن: مقبول دائما</span></li><li class="n1"><b class="kw">وإلّا</b></li><li class="n2">\(u \sim \mathcal{U}([0,1[)\)</li><li class="n2"><b class="kw">إذا</b> \(u \lt \exp(\Delta / T_k)\) <b class="kw">فإنّ</b> \(x \leftarrow y\)          <span class="cm">// معيار ميتروبوليس</span></li><li class="n1"><b class="kw">إذا</b> \(v(x) \gt v(x^{*})\) <b class="kw">فإنّ</b> \(x^{*} \leftarrow x\)</li><li><b class="kw">أرجِع</b> \(x^{*}\)</li></ol><p class="algo-note">بما أنّ \(\Delta \lt 0\) في فرع «وإلّا»، فلدينا \(\exp(\Delta/T) \in\ ]0,1[\): فتدهورٌ صغير يمرّ بسهولة، وكبيرٌ لا يمرّ تقريباً أبداً. والتقارب مبرهَن من أجل \(T_k \ge c/\ln(1+k)\)، وهو شرطٌ غير قابل للتطبيق عملياً.</p></div>
+
+<div class="box def"><div class="box-title">معيار ميتروبوليس</div>
+<p>تعديلٌ يُدهوِر الهدف بمقدار \(|\Delta|\) يُقبَل باحتمال</p>
+<div class="eq">\[\mathbb{P}(\text{accepter}) = \exp\!\left(\frac{\Delta}{T}\right), \qquad \Delta \lt 0\]</div>
+<p>قراءتان. عند حرارةٍ مرتفعة، يقترب هذا الاحتمال من 1: فيُقبَل كلّ شيء تقريباً ويهيم البحث عشوائياً. وعند حرارةٍ منعدمة، يكون منعدماً: فنجد الصعود الصارم بالضبط. وبينهما، يُقبَل تدهورٌ صغير أسهل بكثير من كبير &mdash; وهذا ما يميّز التلدين عن قبولٍ عشوائي أعمى.</p></div>
+
+<div class="box thm"><div class="box-title">مبرهنة &mdash; تقارب التلدين المحاكى</div>
+<p>إذا تناقصت الحرارة ببطءٍ كافٍ، على شكل \(T_k \ge c / \ln(1+k)\) من أجل ثابتٍ \(c\) مرتبطٍ بعمق أعمق أمثلٍ محلّي، فإنّ احتمال أن يكون الحلّ الراهن أمثلَ يؤول إلى 1 <a class="cite" href="#ref-geman1984">[4]</a><a class="cite" href="#ref-hajek1988">[5]</a>.</p>
+<p><strong>هذه النتيجة غير قابلة للاستعمال عملياً</strong>، ولا بدّ من قولها. فتبريدٌ لوغاريتمي يتطلّب عدد تكراراتٍ يقارن بالتعداد الشامل للفضاء: فالضمان صحيح وبلا قيمةٍ إجرائية. وكلّ عمليات التلدين الحقيقية تستعمل تبريداً هندسياً \(T_{k+1} = \alpha T_k\) بـM66 بين 0,90 و0,99، وهو لا يضمن شيئاً لكنّه يعمل.</p></div>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">المؤشّر الأوّل يغيّر السحب العشوائي، والثاني الحرارة الابتدائية للتلدين، والثالث يبسط التكرارات. وللاستراتيجيات الثلاث ميزانية واحدة قدرها 300 تقييم.</p>
+<div id="jxg1" class="viz-board" style="height:560px;"></div>
+<p class="viz-caption"><strong>الشكل 4.2.</strong> أكثر النتائج إفادةً في أسفل الشكل، على متوسّط 40 سحباً مستقلّاً. الصعود الصارم لا يبلغ <em>أبداً</em> الأعظمية الشاملة. والتلدين يتحسّن حين ترتفع الحرارة الابتدائية &mdash; من 0 مرّة من 40 إلى 18 من 40 &mdash; ثمّ <em>يتدهور</em> بعد ذلك: فإن اشتدّ الحرّ لم يعد يستثمر شيئاً. أمّا الصعود بإعادات الانطلاق، وهو أبسط الثلاثة، فيفوز بفارقٍ واسع بـ38 نجاحاً من 40. والدرس ليس أنّ التلدين رديء: بل أنّ إعادة الانطلاق في الأبعاد الصغيرة لا تكلّف شيئاً تقريباً وتكفي. ويتقدّم التلدين حين يكون الفضاء من الضخامة بحيث لا يقع سحبٌ عشوائي في الحوض الصحيح أبداً.</p></div>
+
+<h2>4.4 البحث المحظور</h2>
+
+<p>يفلت التلدين من الأمثليّات المحلّية بثمن الصدفة. وقد اقترح غلوفر سنة 1986 مقاربةً حتميّة: قبول <em>أفضل جارٍ </em>دائماً، ولو دهوَر الهدف، ومنع العودة إلى الوراء بفضل ذاكرةٍ قصيرة <a class="cite" href="#ref-glover1986">[6]</a>.</p>
+
+<div class="box def"><div class="box-title">اللائحة المحظورة ومعيار الطموح</div>
+<p>نحتفظ بطابورٍ لآخر \(t\) <em>حركة</em> مُنجَزة &mdash; لا للحلول المزارة، فتخزينها مكلفٌ جدّاً. وهذه الحركات ممنوعة. والطول \(t\) هو الوسيط الوحيد: فإن قَصُر دارت الخوارزمية؛ وإن طال منعت نفسها من مناطق مثيرة للاهتمام.</p>
+<p>غير أنّ منع حركةٍ قد يحول دون بلوغ حلٍّ ممتاز. و<strong>معيار الطموح</strong> يرفع الحظر حين تقود الحركة إلى حلٍّ أفضل من كلّ ما لُقِي حتّى ذلك الحين.</p></div>
+
+<h2>4.5 الخوارزميات التطوّرية</h2>
+
+<p>كلّ الطرائق السابقة لا تعالج إلّا حلّاً واحداً في المرّة. أمّا الخوارزميات التطوّرية فتحتفظ بـ<em>ساكنة</em> منها، وتستعير من البيولوجيا ثلاث آليّات: الانتقاء، وإعادة التركيب، والطفرة <a class="cite" href="#ref-holland1975">[7]</a>.</p>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 4.3 &mdash; خوارزمية تطوّرية</div><div class="algo-io"><b>المُدخل:</b> حجم \(\mu\)، ولياقة \(\varphi\)، ومعدّل طفرة \(p_m\)، وM72 جيلاً<br><b>المُخرج:</b> أفضل فردٍ لُقِي</div><ol class="algo-corps"><li>\(\Pi_0 \leftarrow\) \(\mu\) فرداً مسحوبين انتظامياً</li><li><b class="kw">لكلّ</b> \(g = 0\) <b class="kw">إلى أن</b> \(G-1\) <b class="kw">نفّذ</b></li><li class="n1">\(\Pi' \leftarrow \big\{\operatorname*{argmax}_{x \in \Pi_g} \varphi(x)\big\}\)          <span class="cm">// نخبوية</span></li><li class="n1"><b class="kw">طالما</b> \(|\Pi'| \lt \mu\) <b class="kw">نفّذ</b></li><li class="n2">\(p_1 \leftarrow\) <span class="fn">مباراة</span>\((\Pi_g)\) ؛ \(p_2 \leftarrow\) <span class="fn">مباراة</span>\((\Pi_g)\)</li><li class="n2">\(c \sim \mathcal{U}(\{1, \dots, \ell-1\})\)          <span class="cm">// نقطة القطع</span></li><li class="n2">\(z \leftarrow p_1[1..c] \,\Vert\, p_2[c+1..\ell]\)          <span class="cm">// تصالب</span></li><li class="n2"><b class="kw">لكلّ</b> \(i = 1\) <b class="kw">إلى أن</b> \(\ell\) <b class="kw">نفّذ</b> <b class="kw">باحتمال</b> \(p_m\): \(z_i \leftarrow 1 - z_i\)</li><li class="n2">\(\Pi' \leftarrow \Pi' \cup \{z\}\)</li><li class="n1">\(\Pi_{g+1} \leftarrow \Pi'\)</li><li><b class="kw">أرجِع</b> \(\operatorname*{argmax}_{x \in \Pi_G} \varphi(x)\)</li></ol><p class="algo-note">لا يُنتج التصالب إلّا قيماً موجودة سلفاً في الساكنة؛ والطفرة وحدها تستطيع إعادة إدخال قيمةٍ ضائعة. وبدون السطر الأوّل من جسم الحلقة، تكفّ \(\max_{\Pi_g} \varphi\) عن التزايد بدلالة \(g\).</p></div>
+
+<figure class="viz"><div class="viz-title">التصالب والطفرة</div>
+<svg viewBox="0 0 760 380" role="img" style="width:100%;height:auto;display:block;"><text x="200" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">تصالب في نقطةٍ واحدة</text><text x="146" y="57" text-anchor="end" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">الأب 1</text><rect x="160" y="44" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="173" y="62" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="188" y="44" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="201" y="62" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">0</text><rect x="216" y="44" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="229" y="62" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="244" y="44" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="257" y="62" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="272" y="44" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="285" y="62" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">0</text><rect x="300" y="44" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="313" y="62" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">0</text><rect x="328" y="44" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="341" y="62" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="356" y="44" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="369" y="62" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">0</text><text x="146" y="97" text-anchor="end" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">الأب 2</text><rect x="160" y="84" width="26" height="26" rx="4" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:1.5;"/><text x="173" y="102" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">0</text><rect x="188" y="84" width="26" height="26" rx="4" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:1.5;"/><text x="201" y="102" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="216" y="84" width="26" height="26" rx="4" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:1.5;"/><text x="229" y="102" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="244" y="84" width="26" height="26" rx="4" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:1.5;"/><text x="257" y="102" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">0</text><rect x="272" y="84" width="26" height="26" rx="4" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:1.5;"/><text x="285" y="102" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="300" y="84" width="26" height="26" rx="4" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:1.5;"/><text x="313" y="102" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="328" y="84" width="26" height="26" rx="4" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:1.5;"/><text x="341" y="102" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">0</text><rect x="356" y="84" width="26" height="26" rx="4" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:1.5;"/><text x="369" y="102" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><path d="M 243 38 L 243 116" style="fill:none;stroke:var(--viz-bad);stroke-width:2;stroke-dasharray:4 4;"/><text x="243" y="132" text-anchor="middle" style="fill:var(--viz-bad);font-size:11px;font-family:inherit;">نقطة القطع</text><text x="146" y="165" text-anchor="end" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">الابن</text><rect x="160" y="152" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="173" y="170" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="188" y="152" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="201" y="170" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">0</text><rect x="216" y="152" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="229" y="170" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="244" y="152" width="26" height="26" rx="4" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:1.5;"/><text x="257" y="170" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">0</text><rect x="272" y="152" width="26" height="26" rx="4" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:1.5;"/><text x="285" y="170" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="300" y="152" width="26" height="26" rx="4" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:1.5;"/><text x="313" y="170" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="328" y="152" width="26" height="26" rx="4" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:1.5;"/><text x="341" y="170" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">0</text><rect x="356" y="152" width="26" height="26" rx="4" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:1.5;"/><text x="369" y="170" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><text x="200" y="212" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">يرث الابن بادئةً ولاحقة</text><text x="570" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">الطفرة</text><text x="476" y="57" text-anchor="end" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">قبل</text><rect x="490" y="44" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="503" y="62" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="518" y="44" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="531" y="62" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">0</text><rect x="546" y="44" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="559" y="62" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="574" y="44" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="587" y="62" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">0</text><rect x="602" y="44" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="615" y="62" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="630" y="44" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="643" y="62" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="658" y="44" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="671" y="62" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">0</text><rect x="686" y="44" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="699" y="62" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><text x="476" y="165" text-anchor="end" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">بعد</text><rect x="490" y="152" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="503" y="170" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="518" y="152" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="531" y="170" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">0</text><rect x="546" y="152" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="559" y="170" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="574" y="152" width="26" height="26" rx="4" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:1.5;"/><text x="587" y="170" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="602" y="152" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="615" y="170" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="630" y="152" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="643" y="170" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">1</text><rect x="658" y="152" width="26" height="26" rx="4" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:1.5;"/><text x="671" y="170" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">0</text><rect x="686" y="152" width="26" height="26" rx="4" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:1.5;"/><text x="699" y="170" text-anchor="middle" style="fill:var(--color-bg);font-size:12px;font-weight:700;font-family:inherit;">0</text><path d="M 587 76 L 587 146" style="fill:none;stroke:var(--viz-bad);stroke-width:2;"/><path d="M 582 140 L 587 150 L 592 140 Z" style="fill:var(--viz-bad);"/><path d="M 671 76 L 671 146" style="fill:none;stroke:var(--viz-bad);stroke-width:2;"/><path d="M 666 140 L 671 150 L 676 140 Z" style="fill:var(--viz-bad);"/><text x="570" y="212" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">كلّ بت يتغيّر باحتمالٍ صغير</text><text x="380" y="268" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">يُعيد التصالب تركيب ما هو موجود سلفاً في الساكنة؛ والطفرة وحدها تستطيع إدخال قيمةٍ ضائعة.</text><text x="380" y="312" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;"><tspan x="380" dy="0">بلا طفرة، ساكنةٌ فقدت القيمة 1 في الموضع 4 لا تستطيع أن تجدها من جديد أبداً، مهما بلغ عدد</tspan><tspan x="380" dy="16">التصالبات.</tspan></text><text x="380" y="356" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">وفي المقابل، الإفراط في الطفرة يحوّل البحث إلى سحبٍ عشوائي.</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 4.3.</strong> للمُؤثّرَين دوران متكاملان لا متبادلان. فالتصالب <em>يُعيد التركيب</em>: ولا يستطيع أن يُنتج إلّا قيماً موجودة سلفاً في مكانٍ ما من الساكنة. والطفرة <em>تُبدِع</em>: وهي وحدها تستطيع إعادة إدخال قيمةٍ فقدتها الساكنة. وساكنةٌ يحمل كلّ أفرادها 0 في الموضع 4 لن تجد 1 بالتصالب أبداً، مهما بلغ عدد الأجيال.</figcaption></figure>
+
+<div class="box warn"><div class="box-title">ما لا تضمنه الخوارزميات الجينية</div>
+<p><em>مبرهنة المخطّطات</em>، التي كثيراً ما يُستشهَد بها أساساً نظرياً، لا تُثبت إلّا أنّ الأنماط القصيرة، المنخفضة الرتبة، ذات اللياقة الأعلى من المتوسّط، يتزايد عددها أُسّياً من جيلٍ إلى الذي يليه <a class="cite" href="#ref-holland1975">[7]</a>. وهذه النتيجة لا تقول شيئاً عن التقارب نحو الأمثل، وقد بولغ في تقدير مداها كثيراً.</p>
+<p>وعملياً، كثيراً ما تهزم خوارزميةَ جينية حسنة الضبط عمليةُ تلدينٍ محاكى حسنة الضبط، وهذه بدورها يهزمها أحياناً صعودٌ بإعادات انطلاق. والسؤال الصادق ليس «أيّ ميتاهيوريستيّة أفضل؟» &mdash; فمبرهنة انعدام الوجبة المجّانية تمنع وجود جواب <a class="cite" href="#ref-wolpert1997">[8]</a> &mdash; بل «أيّ بنية جوارٍ تلتقط بنية <em>هذه</em> المسألة؟».</p></div>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">مسألة حقيبةٍ بـ24 غرضاً، أمثلها الدقيق معروف بالبرمجة الديناميكية. والمؤشّران يضبطان معدّل الطفرة وحجم الساكنة.</p>
+<div id="jxg2" class="viz-board" style="height:460px;"></div>
+<p class="viz-caption"><strong>الشكل 4.4.</strong> ثلاثة دروس. مع النخبوية، يكون منحنى أفضل فردٍ متزايداً بالبناء ويقترب إلى أقلّ من 1 % من الأمثل الدقيق. وبدونها يتذبذب: فأفضل فردٍ يختفي بانتظام، والنتيجة النهائية أسوأ بوضوح. وأخيراً، معدّل طفرةٍ مرتفع جدّاً يُدهوِر كلّ شيء: فمتوسّط الساكنة يكفّ عن التقدّم، لأنّ كلّ حلٍّ جيّد يُدمَّر بمجرّد إيجاده.</p></div>
+
+<h2>4.6 كيف نختار</h2>
+
+<table>
+<thead><tr><th>الطريقة</th><th>الذاكرة</th><th>الوسائط الواجب ضبطها</th><th>متى تكون الاختيار الصحيح</th></tr></thead>
+<tbody>
+<tr><td>الصعود الصارم</td><td>حلّ واحد</td><td>لا شيء</td><td>منظر أحادي النمط، أو لَبِنة أساس لشيءٍ آخر</td></tr>
+<tr><td>إعادات الانطلاق العشوائية</td><td>حلّ واحد</td><td>عدد المحاولات</td><td>أبعاد قليلة، وأحواض جذبٍ ليست بالغة الصغر</td></tr>
+<tr><td>التلدين المحاكى</td><td>حلّ واحد</td><td>الحرارة الابتدائية، التبريد</td><td>بُعد كبير، ومنظر شديد الوعورة</td></tr>
+<tr><td>البحث المحظور</td><td>حلّ واحد ولائحة قصيرة</td><td>طول اللائحة</td><td>جوار مهيكل تكون فيه الدورات هي المشكل الرئيس</td></tr>
+<tr><td>خوارزمية تطوّرية</td><td>ساكنة</td><td>الحجم، الطفرة، الانتقاء، التصالب</td><td>حلول قابلة للتحليل إلى كتلٍ مستقلّة إلى حدٍّ بعيد</td></tr>
+</tbody></table>
+
+<div class="box tip"><div class="box-title">المنعكس الواجب اكتسابه</div>
+قبل اختيار ميتاهيوريستيّة، جرّب دائماً صعوداً بإعادات انطلاق عشوائية. فهو يُبرمَج في عشر دقائق، ولا يطلب أيّ ضبط، ويشكّل المرجع الواجب هزمه. ومقالٌ يعرض ميتاهيوريستيّة معقّدة دون مقارنتها بهذا المرجع لم يُنجِز عمله.</div>
+
+<h2>الخلاصة</h2>
+<ul>
+<li>حين لا تُحسَب إلّا الحالة النهائية، نتخلّى عن المسار فتهبط الذاكرة إلى حلٍّ واحد: وهذا ما يجعل هذه الطرائق قابلة للتطبيق حيث يتشبّع الفصل 3.</li>
+<li>يوقف الصعودَ الصارم الأمثليّاتُ المحلّية والهضاب والأعراف؛ وإعادات الانطلاق العشوائية تكفي غالباً لمعالجتها.</li>
+<li>يقبل التلدين التدهورات باحتمال \(\exp(\Delta/T)\)؛ وتقاربه مبرهَن لكن تحت شرطٍ غير قابل للتطبيق <a class="cite" href="#ref-hajek1988">[5]</a>.</li>
+<li>يستبدل البحث المحظور بالصدفة ذاكرةً قصيرة للحركات الحديثة <a class="cite" href="#ref-glover1986">[6]</a>.</li>
+<li>تُعيد الخوارزميات التطوّرية تركيب ساكنة؛ فالتصالب يستثمر، والطفرة تُبدِع، والنخبوية تحمي.</li>
+<li>لا ميتاهيوريستيّة أفضل وسطياً على كلّ المسائل <a class="cite" href="#ref-wolpert1997">[8]</a>: فالمهمّ هو ملاءمة الجوار للمسألة.</li>
+</ul>
+
+<h2>المراجع</h2>
+<ol class="reflist">
+<li id="ref-russell2020">Russell, S. &amp; Norvig, P. (2020). <em>Artificial Intelligence: A Modern Approach</em> (الطبعة 4). Pearson. ISBN 978-0-13-461099-3. <a href="https://aima.cs.berkeley.edu/">https://aima.cs.berkeley.edu/</a></li>
+<li id="ref-metropolis1953">Metropolis, N., Rosenbluth, A. W., Rosenbluth, M. N., Teller, A. H. &amp; Teller, E. (1953). Equation of state calculations by fast computing machines. <em>The Journal of Chemical Physics</em>, 21(6), 1087&ndash;1092. DOI: 10.1063/1.1699114. <a href="https://doi.org/10.1063/1.1699114">https://doi.org/10.1063/1.1699114</a></li>
+<li id="ref-kirkpatrick1983">Kirkpatrick, S., Gelatt, C. D. &amp; Vecchi, M. P. (1983). Optimization by simulated annealing. <em>Science</em>, 220(4598), 671&ndash;680. DOI: 10.1126/science.220.4598.671. <a href="https://doi.org/10.1126/science.220.4598.671">https://doi.org/10.1126/science.220.4598.671</a></li>
+<li id="ref-geman1984">Geman, S. &amp; Geman, D. (1984). Stochastic relaxation, Gibbs distributions, and the Bayesian restoration of images. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em>, 6(6), 721&ndash;741. DOI: 10.1109/TPAMI.1984.4767596. <a href="https://doi.org/10.1109/TPAMI.1984.4767596">https://doi.org/10.1109/TPAMI.1984.4767596</a></li>
+<li id="ref-hajek1988">Hajek, B. (1988). Cooling schedules for optimal annealing. <em>Mathematics of Operations Research</em>, 13(2), 311&ndash;329. DOI: 10.1287/moor.13.2.311. <a href="https://doi.org/10.1287/moor.13.2.311">https://doi.org/10.1287/moor.13.2.311</a></li>
+<li id="ref-glover1986">Glover, F. (1986). Future paths for integer programming and links to artificial intelligence. <em>Computers &amp; Operations Research</em>, 13(5), 533&ndash;549. DOI: 10.1016/0305-0548(86)90048-1. <a href="https://doi.org/10.1016/0305-0548(86)90048-1">https://doi.org/10.1016/0305-0548(86)90048-1</a></li>
+<li id="ref-holland1975">Holland, J. H. (1975). <em>Adaptation in Natural and Artificial Systems</em>. University of Michigan Press. R&eacute;&eacute;dition MIT Press 1992, DOI: 10.7551/mitpress/1090.001.0001. <a href="https://doi.org/10.7551/mitpress/1090.001.0001">https://doi.org/10.7551/mitpress/1090.001.0001</a></li>
+<li id="ref-wolpert1997">Wolpert, D. H. &amp; Macready, W. G. (1997). No free lunch theorems for optimization. <em>IEEE Transactions on Evolutionary Computation</em>, 1(1), 67&ndash;82. DOI: 10.1109/4235.585893. <a href="https://doi.org/10.1109/4235.585893">https://doi.org/10.1109/4235.585893</a></li>
+<li id="ref-dorigo1996">Dorigo, M., Maniezzo, V. &amp; Colorni, A. (1996). Ant system: optimization by a colony of cooperating agents. <em>IEEE Transactions on Systems, Man, and Cybernetics, Part B</em>, 26(1), 29&ndash;41. DOI: 10.1109/3477.484436. <a href="https://doi.org/10.1109/3477.484436">https://doi.org/10.1109/3477.484436</a></li>
+</ol>
+
+<section class="src-ar">
+<h3>مصادر بالعربية</h3>
+<p class="src-note">مصادر للاستزادة، لا مراجع لما ورد أعلاه: المراجع الأصلية للفصل مذكورةٌ في القائمة السابقة بلغتها. وقد عُوينت كلّ صفحةٍ من صفحات الناشرين للتحقّق من العنوان والمترجم ورخصة الإتاحة.</p>
+<ul>
+<li>داسجوبتا، سوبراتا. <em>علم الكمبيوتر: مقدّمة قصيرة جدًّا</em>. ترجمة إبراهيم سند أحمد، مراجعة عبد الفتاح عبد الله أحمد. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/13726364/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/13726364/</a><span class="pourquoi">فصلُ «التفكير الخوارزمي» فيه يقدّم بالعربية مفهوم الخوارزمية وتكلفتها، وهو ما يفترضه هذا الفصل مكتسَباً.</span></li>
+</ul>
+</section>
+<p>عائلةٌ رابعة، لم تُعالَج هنا ضيقاً بالمكان، تستوحي ترسيب الفيرومونات عند النمل لتعزّز تدريجياً أجزاء الحلّ التي تتكرّر في الحلول الجيّدة <a class="cite" href="#ref-dorigo1996">[9]</a>.</p>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../03-recherche/page.html">\(\leftarrow\) الفصل 3 &mdash; البحث في فضاء الحالات</a>
+<a href="../../../IA/lecons/04-metaheuristiques/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">المُلحَق الخوارزمي</a>
+<a href="../../index.html">فهرس المُقرَّر</a>
+<a href="../05-jeux/page.html">الفصل 5 &mdash; ألعاب اللاعبَين \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>الذكاء الاصطناعي &mdash; الأقسام التحضيرية MP/PSI</strong> &middot; البحث والألعاب والقيود والتعلّم<span class="footer-meta">طبعة 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">تعذّر تحميل الشكل التفاعلي. تحقّق من اتصالك بالشبكة.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ======= Figure : paysage accidente, trois strategies de recherche locale === */
+function paysage(x){
+  /* fonction a maximiser sur [0, 10] : trois bosses de hauteurs inegales */
+  return 2.6 * Math.exp(-Math.pow(x - 1.6, 2) / 0.6)
+       + 3.4 * Math.exp(-Math.pow(x - 4.6, 2) / 0.9)
+       + 4.6 * Math.exp(-Math.pow(x - 8.2, 2) / 0.7)
+       + 0.35 * Math.sin(4.2 * x);
+}
+function alea(graine){
+  var s = graine;
+  return function(){ s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648; };
+}
+var NPAS = 300, REFROID = 0.99, AMPLI = 2.0;
+/* mode 0 : montee stricte ; 1 : recuit simule ; 2 : montee avec redemarrages */
+function trajectoire(mode, x0, t0, graine){
+  var rnd = alea(graine), x = x0, pts = [x], deg = 0, meilleur = x, redem = 0;
+  for (var k = 0; k < NPAS; k++){
+    if (mode === 2 && k > 0 && k % 30 === 0){
+      if (paysage(x) > paysage(meilleur)) { meilleur = x; }
+      x = rnd() * 10; redem++;                  /* redemarrage au hasard */
+      pts.push(x);
+      continue;
+    }
+    var T = t0 * Math.pow(REFROID, k);
+    var y = x + (rnd() - 0.5) * AMPLI;
+    if (y < 0) { y = 0; } if (y > 10) { y = 10; }
+    var d = paysage(y) - paysage(x);
+    var accepte;
+    if (d > 0) { accepte = true; }
+    else if (mode === 1) { accepte = (T > 1e-9) && (rnd() < Math.exp(d / T)); if (accepte) { deg++; } }
+    else { accepte = false; }
+    if (accepte) { x = y; }
+    pts.push(x);
+  }
+  if (paysage(x) > paysage(meilleur)) { meilleur = x; }
+  var fin = (mode === 2) ? meilleur : x;
+  return {pts: pts, deg: deg, fin: fin, val: paysage(fin), redem: redem};
+}
+var CACHE4 = {};
+function traj(mode, tirage, t0){
+  var k = mode + '|' + tirage + '|' + t0.toFixed(1);
+  if (!(k in CACHE4)){
+    var x0 = 0.4 + ((tirage * 7) % 12) * 0.5;
+    CACHE4[k] = trajectoire(mode, x0, t0, 1000 * tirage + 7);
+  }
+  return CACHE4[k];
+}
+var XOPT = (function(){
+  var best = 0;
+  for (var i = 0; i <= 10000; i++){ var x = i / 1000; if (paysage(x) > paysage(best)) { best = x; } }
+  return best;
+})();
+var CACHEM = {};
+function moyennes(t0){
+  var k = t0.toFixed(1);
+  if (k in CACHEM) { return CACHEM[k]; }
+  var r = [{s:0, g:0}, {s:0, g:0}, {s:0, g:0}];
+  for (var m = 0; m < 3; m++){
+    for (var s = 1; s <= 40; s++){
+      var x0 = 0.4 + ((s * 7) % 12) * 0.5;
+      var t = trajectoire(m, x0, m === 1 ? t0 : 0, 1000 * s + 7);
+      r[m].s += t.val;
+      if (Math.abs(t.fin - XOPT) < 0.6) { r[m].g++; }
+    }
+    r[m].s /= 40;
+  }
+  CACHEM[k] = r;
+  return r;
+}
+
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-1.1, 7.4, 10.9, -2.9], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sTir = b1.create('slider', [[0.1, -1.2], [4.4, -1.2], [1, 3, 12]], {
+  name: 'tirage', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--viz-blue', '#2563eb'); }}
+});
+var sT = b1.create('slider', [[5.4, -1.2], [10.6, -1.2], [0, 3.5, 5]], {
+  name: 'الحرارة الابتدائية', snapWidth: 0.5, precision: 1,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }}
+});
+var sIt = b1.create('slider', [[0.1, -2.1], [10.6, -2.1], [0, 300, 300]], {
+  name: 'iteration', snapWidth: 5, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function tirage(){ return Math.round(sTir.Value()); }
+function temp0(){ return Math.round(sT.Value() * 2) / 2; }
+function iter(){ return Math.round(sIt.Value()); }
+b1.create('functiongraph', [paysage, 0, 10], {
+  strokeColor: PAL.axis, strokeWidth: 2.4, highlight: false, fixed: true});
+b1.create('segment', [[0, 0], [10, 0]], {strokeColor: PAL.ref, strokeWidth: 1.2,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b1.create('point', [XOPT, paysage(XOPT)], {name: '', size: 5, face: '[]', fixed: true,
+  highlight: false, strokeColor: function(){ return cssv('--viz-ok', '#16a34a'); },
+  fillColor: function(){ return cssv('--viz-ok', '#16a34a'); }});
+b1.create('text', [XOPT, paysage(XOPT) + 0.34, 'الامثل الشامل'], {fontSize: 12,
+  anchorX: 'middle', strokeColor: function(){ return cssv('--viz-ok', '#16a34a'); },
+  fixed: true, highlight: false});
+var COUL4 = ['--viz-blue', '--viz-bad', '--primary'];
+var NOM4 = ['صعود صارم', 'تلدين محاكى', 'صعود بإعادات انطلاق'];
+for (var m = 0; m < 3; m++){
+  (function(mode){
+    var c = b1.create('curve', [[0],[0]], {
+      strokeColor: function(){ return cssv(COUL4[mode], '#026573'); },
+      strokeWidth: 2.2, highlight: false, fixed: true});
+    c.updateDataArray = function(){
+      var t = traj(mode, tirage(), temp0()), n = Math.min(iter(), t.pts.length - 1);
+      var X = [], Y = [];
+      for (var i = 0; i <= n; i++){ X.push(t.pts[i]); Y.push(paysage(t.pts[i])); }
+      this.dataX = X; this.dataY = Y;
+    };
+    b1.create('point', [
+      function(){ var t = traj(mode, tirage(), temp0()); return t.pts[Math.min(iter(), t.pts.length-1)]; },
+      function(){ var t = traj(mode, tirage(), temp0()); return paysage(t.pts[Math.min(iter(), t.pts.length-1)]); }
+    ], {name: '', size: 6, face: 'o', fixed: true, highlight: false, strokeWidth: 2,
+        strokeColor: function(){ return cssv(COUL4[mode], '#026573'); },
+        fillColor: function(){ return cssv(COUL4[mode], '#026573'); }, fillOpacity: 1});
+  })(m);
+}
+b1.create('text', [-1.0, 7.1, function(){
+  return 'Tirage ' + tirage() + '   |   حرارة ابتدائية ' + temp0().toFixed(1)
+       + '   |   تكرار ' + iter() + ' من ' + NPAS
+       + '   |   ميزانية واحدة قدرها ' + NPAS + ' تقييما للاستراتيجيات الثلاث';
+}], {fontSize: 14, strokeColor: PAL.text, fixed: true, highlight: false});
+for (var m = 0; m < 3; m++){
+  (function(mode){
+    b1.create('text', [-1.0, 6.6 - mode * 0.42, function(){
+      var t = traj(mode, tirage(), temp0());
+      var s = NOM4[mode] + ' : ' + t.val.toFixed(2)
+            + (Math.abs(t.fin - XOPT) < 0.6 ? '  (امثل شامل)' : '  (امثل محلي)');
+      if (mode === 1) { s += '   -   ' + t.deg + ' تدهورا مقبولا'; }
+      if (mode === 2) { s += '   -   ' + t.redem + ' redemarrages'; }
+      return s;
+    }], {fontSize: 13, fixed: true, highlight: false,
+         strokeColor: function(){ return cssv(COUL4[mode], '#026573'); }});
+  })(m);
+}
+b1.create('text', [-1.0, -2.6, function(){
+  var r = moyennes(temp0());
+  return 'على 40 سحبا مستقلا  -  ' + NOM4[0] + ' : ' + r[0].s.toFixed(2)
+       + ' وسطيا، الامثل الشامل ' + r[0].g + ' مرة   |   ' + NOM4[1] + ' : '
+       + r[1].s.toFixed(2) + ', ' + r[1].g + ' مرة   |   ' + NOM4[2] + ' : '
+       + r[2].s.toFixed(2) + ', ' + r[2].g + ' fois';
+}], {fontSize: 12.5, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+/* ============ Figure : algorithme genetique sur un probleme de sac ======= */
+var OBJETS = (function(){
+  var rnd = alea(4242), o = [];
+  for (var i = 0; i < 24; i++){
+    o.push({v: 10 + Math.floor(rnd() * 90), p: 5 + Math.floor(rnd() * 45)});
+  }
+  return o;
+})();
+var CAPACITE = 300;
+function valeurSac(gene){
+  var v = 0, p = 0;
+  for (var i = 0; i < gene.length; i++){ if (gene[i]) { v += OBJETS[i].v; p += OBJETS[i].p; } }
+  return p > CAPACITE ? 0 : v;   /* solution invalide : valeur nulle */
+}
+/* optimum exact par programmation dynamique, pour dire la verite dans la legende */
+var OPTSAC = (function(){
+  var t = new Array(CAPACITE + 1);
+  for (var c = 0; c <= CAPACITE; c++){ t[c] = 0; }
+  for (var i = 0; i < OBJETS.length; i++){
+    for (var c = CAPACITE; c >= OBJETS[i].p; c--){
+      var cand = t[c - OBJETS[i].p] + OBJETS[i].v;
+      if (cand > t[c]) { t[c] = cand; }
+    }
+  }
+  return t[CAPACITE];
+})();
+function evoluer(taille, mutation, elitisme, generations){
+  var rnd = alea(777), pop = [], i, k;
+  for (i = 0; i < taille; i++){
+    var g = [];
+    for (k = 0; k < OBJETS.length; k++){ g.push(rnd() < 0.35 ? 1 : 0); }
+    pop.push(g);
+  }
+  var hist = [];
+  function tournoi(){
+    var a = pop[Math.floor(rnd() * pop.length)], b = pop[Math.floor(rnd() * pop.length)];
+    return valeurSac(a) >= valeurSac(b) ? a : b;
+  }
+  for (var gen = 0; gen <= generations; gen++){
+    var vals = pop.map(valeurSac);
+    var meilleur = Math.max.apply(null, vals);
+    var moyenne = vals.reduce(function(a, b){ return a + b; }, 0) / vals.length;
+    hist.push({meilleur: meilleur, moyenne: moyenne});
+    if (gen === generations) { break; }
+    var nouvelle = [];
+    if (elitisme){
+      var idx = vals.indexOf(meilleur);
+      nouvelle.push(pop[idx].slice());
+    }
+    while (nouvelle.length < taille){
+      var p1 = tournoi(), p2 = tournoi();
+      var coupe = 1 + Math.floor(rnd() * (OBJETS.length - 1));
+      var enfant = p1.slice(0, coupe).concat(p2.slice(coupe));
+      for (k = 0; k < enfant.length; k++){
+        if (rnd() < mutation) { enfant[k] = 1 - enfant[k]; }
+      }
+      nouvelle.push(enfant);
+    }
+    pop = nouvelle;
+  }
+  return hist;
+}
+var CACHEG = {};
+function gen(taille, mutation, elitisme){
+  var k = taille + '|' + mutation.toFixed(3) + '|' + elitisme;
+  if (!(k in CACHEG)) { CACHEG[k] = evoluer(taille, mutation, elitisme, 60); }
+  return CACHEG[k];
+}
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-9, 1.19, 66, -0.30], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sMut = b2.create('slider', [[1, -0.13], [24, -0.13], [0, 0.03, 0.30]], {
+  name: 'معدل الطفرة', snapWidth: 0.01, precision: 2,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+var sPop = b2.create('slider', [[32, -0.13], [60, -0.13], [6, 40, 80]], {
+  name: 'حجم الساكنة', snapWidth: 2, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+function mut(){ return Math.round(sMut.Value() * 100) / 100; }
+function taillePop(){ return Math.round(sPop.Value() / 2) * 2; }
+b2.create('segment', [[0, 0], [60, 0]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b2.create('segment', [[0, 0], [0, 1.05]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b2.create('segment', [[0, 1], [60, 1]], {strokeColor: function(){ return cssv('--viz-ok', '#16a34a'); },
+  strokeWidth: 2, dash: 2, straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b2.create('text', [60, 1.04, 'الامثل الدقيق'], {fontSize: 12, anchorX: 'right',
+  strokeColor: function(){ return cssv('--viz-ok', '#16a34a'); }, fixed: true, highlight: false});
+var cBest = b2.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--primary', '#026573'); }, strokeWidth: 3,
+  highlight: false, fixed: true});
+cBest.updateDataArray = function(){
+  var h = gen(taillePop(), mut(), true), X = [], Y = [];
+  for (var i = 0; i < h.length; i++){ X.push(i); Y.push(h[i].meilleur / OPTSAC); }
+  this.dataX = X; this.dataY = Y;
+};
+var cMoy = b2.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--accent', '#f59e0b'); }, strokeWidth: 2.2,
+  highlight: false, fixed: true});
+cMoy.updateDataArray = function(){
+  var h = gen(taillePop(), mut(), true), X = [], Y = [];
+  for (var i = 0; i < h.length; i++){ X.push(i); Y.push(h[i].moyenne / OPTSAC); }
+  this.dataX = X; this.dataY = Y;
+};
+var cSansElite = b2.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }, strokeWidth: 2,
+  dash: 1, highlight: false, fixed: true});
+cSansElite.updateDataArray = function(){
+  var h = gen(taillePop(), mut(), false), X = [], Y = [];
+  for (var i = 0; i < h.length; i++){ X.push(i); Y.push(h[i].meilleur / OPTSAC); }
+  this.dataX = X; this.dataY = Y;
+};
+for (var g = 10; g <= 60; g += 10){
+  (function(k){ b2.create('text', [k, -0.045, String(k)], {fontSize: 11, anchorX: 'middle',
+    strokeColor: PAL.muted, fixed: true, highlight: false}); })(g);
+}
+b2.create('text', [30, -0.22, 'generations'], {fontSize: 12.5, anchorX: 'middle',
+  strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-8.5, 1.15, function(){
+  var h = gen(taillePop(), mut(), true), hs = gen(taillePop(), mut(), false);
+  var f = h[h.length - 1].meilleur, fs = hs[hs.length - 1].meilleur;
+  return 'حقيبة، 24 غرضا، سعة ' + CAPACITE + '   |   الامثل الدقيق ' + OPTSAC
+       + '   |   مع النخبوية: ' + f + ' (' + (100 * f / OPTSAC).toFixed(1) + ' %)'
+       + '   |   بدونها: ' + fs + ' (' + (100 * fs / OPTSAC).toFixed(1) + ' %)';
+}], {fontSize: 13, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [61, 0.60, 'الافضل، مع النخبوية'], {fontSize: 12, anchorX: 'right',
+  strokeColor: function(){ return cssv('--primary', '#026573'); }, fixed: true, highlight: false});
+b2.create('text', [61, 0.50, 'متوسط الساكنة'], {fontSize: 12, anchorX: 'right',
+  strokeColor: function(){ return cssv('--accent', '#f59e0b'); }, fixed: true, highlight: false});
+b2.create('text', [61, 0.40, 'الافضل، بدون النخبوية'], {fontSize: 12, anchorX: 'right',
+  strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 02 - Dominance and Iterated Elimination (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 02.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C02 Q1 - Definition of strict dominance</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Strategy X strictly dominates strategy Y for a player when:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Strict dominance requires X to beat Y against <em>every</em> possible profile of the opponents - not on average, not usually. That universal quantifier is what makes the deletion of Y safe without any assumption about beliefs.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[X gives a strictly higher payoff than Y against every possible opponent profile]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[X gives a higher expected payoff than Y under the player's beliefs]]></text><feedback format="html"><text><![CDATA[<p>That makes X a best response, not a dominant strategy.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[X gives a higher payoff than Y in most opponent profiles]]></text><feedback format="html"><text><![CDATA[<p>'Most' is not enough; the exception may be the realised one.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[X gives the highest payoff in the game]]></text><feedback format="html"><text><![CDATA[<p>Dominance compares two strategies, not all outcomes.</p>]]></text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C02 Q2 - One round of elimination</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Row player chooses U or D, column player chooses L or R.</p><table border='1' cellpadding='8' style='border-collapse:collapse;'><tr><th></th><th>L</th><th>R</th></tr><tr><th>U</th><td>3, 2</td><td>1, 5</td></tr><tr><th>D</th><td>2, 1</td><td>0, 4</td></tr></table><p>Which strategy is strictly dominated?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Compare the row player's payoffs: U gives 3 against L and 1 against R; D gives 2 and 0. U beats D in both columns, so D is strictly dominated. For the column player, R gives 5 and 4 against L's 2 and 1, so L is dominated too - the game reduces to (U, R).</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[D, for the row player]]></text><feedback format="html"><text><![CDATA[<p>Correct - 3 &gt; 2 and 1 &gt; 0.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[U, for the row player]]></text><feedback format="html"><text><![CDATA[<p>U is the dominating strategy, not the dominated one.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[R, for the column player]]></text><feedback format="html"><text><![CDATA[<p>R is better in both rows for the column player.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[No strategy is dominated]]></text><feedback format="html"><text><![CDATA[<p>Both players have a dominated strategy here.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C02 Q3 - Order independence</text></name>
+  <questiontext format="html"><text><![CDATA[<p>The set of strategies surviving iterated elimination of <em>strictly</em> dominated strategies does not depend on the order in which strategies are removed.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True, and this is a theorem rather than a convenience. It fails for weak dominance: eliminating weakly dominated strategies in different orders can leave different sets, so the procedure must be reported together with its order.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C02 Q4 - Weak dominance</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Eliminating weakly dominated strategies is order-independent in the same way as strict elimination.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>False. Weak elimination is order-dependent and can delete profiles in which no player would actually want to deviate. This is why textbook results are almost always stated for strict dominance.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C02 Q5 - Dominance by a mixture</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Player 1's payoffs against player 2's two columns are: A = (6, 0), B = (0, 6), C = (2, 2). Which statement is correct?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Neither A nor B dominates C, since each loses in one column. But the mixture \(\sigma = \tfrac{1}{2}A + \tfrac{1}{2}B\) gives an expected payoff of \(\tfrac{1}{2}(6) + \tfrac{1}{2}(0) = 3\) in both columns, and \(3 \gt  2\). So C is strictly dominated by a mixed strategy, and any check for dominance must include mixtures.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[C is strictly dominated by the mixture \(\tfrac{1}{2}A + \tfrac{1}{2}B\)]]></text><feedback format="html"><text><![CDATA[<p>Correct - expected 3 in both columns.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[C is not dominated, since no pure strategy dominates it]]></text><feedback format="html"><text><![CDATA[<p>Mixtures count as dominating strategies.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[C strictly dominates both A and B]]></text><feedback format="html"><text><![CDATA[<p>C loses 2 against 6 in one column each time.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A strictly dominates C]]></text><feedback format="html"><text><![CDATA[<p>A gives 0 against the second column, less than C's 2.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C02 Q6 - Levels of reasoning</text></name>
+  <questiontext format="html"><text><![CDATA[<p>A game is solved by exactly 4 rounds of iterated elimination of strictly dominated strategies. How many levels of 'rationality' must be common knowledge for the argument to go through - counting round 1 as level 1?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Each round consumes one further level of the hierarchy: round 1 uses rationality, round 2 uses knowledge of rationality, round 3 knowledge of that, and so on. Four rounds therefore need 4 levels. Experimental subjects in games like the beauty contest typically display only 1 to 3 levels.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>4</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C02 Q7 - Rationalizability</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In a two-player game, the set of rationalizable strategies coincides with:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Bernheim (1984) and Pearce (1984) showed that in two-player games rationalizability and survival of IESDS give the same set. Rationalizability is therefore the exact behavioural content of common knowledge of rationality, and it is generally a strictly larger set than the set of Nash equilibrium strategies.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[The set surviving iterated elimination of strictly dominated strategies]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The set of Nash equilibrium strategies]]></text><feedback format="html"><text><![CDATA[<p>Nash is strictly stronger: it also requires beliefs to be correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The set of weakly dominant strategies]]></text><feedback format="html"><text><![CDATA[<p>Those often do not exist at all.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The set of Pareto-efficient strategy profiles]]></text><feedback format="html"><text><![CDATA[<p>Efficiency is a welfare notion, unrelated to this procedure.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C02 Q8 - Existence of dominant strategies</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Every finite game has at least one player with a strictly dominant strategy.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>False. Matching Pennies is the standard counterexample: for each player, whether Heads or Tails is better depends entirely on what the opponent does. Dominance arguments are powerful when available but they are frequently unavailable, which is precisely why Nash equilibrium was needed.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+</quiz>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الذكاء الاصطناعي &mdash; مُقرَّر كامل</title>
+<meta name="description" content="مُقرَّر في الذكاء الاصطناعي في أربعة عشر فصلاً: التعريفات والتاريخ، والوكلاء، والبحث، والميتاهيوريستيّات، والألعاب، والقيود، والمنطق، والاحتمالات، والتعلّم المُراقَب وغير المُراقَب، والشبكات العصبية، والتعزيز، والنماذج التوليدية، والأخلاقيات.">
+<link href="assets/style.css" rel="stylesheet">
+<link href="assets/rtl.css" rel="stylesheet">
+<script src="assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+
+.src-ar { margin: 26px 0 8px; border-top: 2px solid var(--color-rule); padding-top: 16px; }
+.src-ar h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--primary); }
+.src-ar .src-note { color: var(--color-muted); font-size: 0.9rem; margin: 0 0 12px; }
+.src-ar ul { list-style: none; padding: 0; margin: 0; }
+.src-ar li { margin: 0 0 14px; padding-right: 14px; border-right: 3px solid var(--primary-soft-2);
+             line-height: 1.7; font-size: 0.95rem; }
+.src-ar li .pourquoi { display: block; color: var(--color-muted); font-size: 0.9em;
+                       margin-top: 3px; }
+.src-ar li a.lien { word-break: break-all; font-size: 0.88em; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><a class="lang-switch" href="../IA/index.html" hreflang="fr" title="Version fran&ccedil;aise">FR</a><div class="breadcrumb"><a href="index.html">الذكاء الاصطناعي</a> &middot; مُقرَّر</div><span class="course-code">14 فصلاً</span></div></header>
+<section class="hero"><div class="container"><h1>الذكاء الاصطناعي</h1><p class="subtitle">البحث &middot; الاستدلال &middot; التعلّم &mdash; من تعريف الكلمة إلى نماذج اليوم</p><a class="cta" href="lecons/00-introduction/page.html">ابدأ بالمقدّمة</a></div></section>
+<section class="section"><h2 class="section-title">وصولٌ سريع</h2><p class="section-subtitle">أربعة أبواب دخولٍ بحسب ما تبحث عنه</p><div class="quick-access"><a class="qa-card" href="lecons/00-introduction/page.html"><span class="qa-label">الانطلاق</span><span class="qa-title">مقدّمة عامّة</span><span class="qa-sub">كيف بُني المُقرَّر وكيف يُشتغَل عليه</span></a><a class="qa-card" href="lecons/01-qu-est-ce-que-l-ia/page.html"><span class="qa-label">عمّ نتكلّم؟</span><span class="qa-title">ما الذكاء الاصطناعي؟</span><span class="qa-sub">أربعة تعريفات، وسبعون سنة من التاريخ</span></a><a class="qa-card" href="lecons/09-apprentissage/page.html"><span class="qa-label">اللبّ الحالي</span><span class="qa-title">التعلّم بالمثال</span><span class="qa-sub">الخطر، وفرط التعلّم، والتقييم الصادق</span></a><a class="qa-card" href="lecons/14-ethique/page.html"><span class="qa-label">ما هو على المحكّ</span><span class="qa-title">التحيّز والمسؤولية</span><span class="qa-sub">مبرهنة استحالةٍ ينبغي معرفتها</span></a></div></section>
+<div id="sommaire"></div>
+<section class="section"><h2 class="section-title">افتتاحية</h2>
+<p class="section-subtitle">افتتاحية المُقرَّر</p><div class="sequences">
+<div class="seq-card"><div class="seq-meta">مقدّمة</div><h3>مقدّمة عامّة</h3><p class="seq-topics">ما الذي يغطّيه تعبير «الذكاء الاصطناعي»، وكيف نُظّم هذا المُقرَّر، ومن أين يُؤخذ.</p><p class="seq-topics">شكل تفاعلي واحد &middot; صورتان &middot; بلا مُلحَق</p><div class="seq-actions"><a class="btn primary" href="lecons/00-introduction/page.html">افتح</a>
+</div></div>
+</div></section>
+<section class="section"><h2 class="section-title">القسم الأول &middot; الأسس</h2>
+<p class="section-subtitle">فصول دراسية ومَلاحق بلا شيفرة وتمارين ذاتية التصحيح</p><div class="sequences">
+<div class="seq-card"><div class="seq-meta">الفصل 1</div><h3>ما الذكاء الاصطناعي؟</h3><p class="seq-topics">أربعة تعريفات متنافسة، ولعبة المحاكاة ونقدها، وسبعون سنة من التناوب بين الربيع والشتاء، والمقاربة الرمزية في مواجهة الاتصالية.</p><p class="seq-topics">شكلان تفاعليان &middot; صورتان &middot; 4 إجراءات في المُلحَق</p><div class="seq-actions"><a class="btn primary" href="lecons/01-qu-est-ce-que-l-ia/page.html">افتح</a>
+<a class="btn" href="../IA/lecons/01-qu-est-ce-que-l-ia/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">مُلحَق</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">الفصل 2</div><h3>الوكلاء العقلانيون والبيئات</h3><p class="seq-topics">الإدراكات والأفعال ومقياس الأداء وخصائص البيئة وخمس بُنى للوكيل، من المنعكس الخالص إلى الوكيل المتعلِّم.</p><p class="seq-topics">شكلان تفاعليان &middot; صورتان &middot; 4 إجراءات في المُلحَق</p><div class="seq-actions"><a class="btn primary" href="lecons/02-agents/page.html">افتح</a>
+<a class="btn" href="../IA/lecons/02-agents/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">مُلحَق</a>
+</div></div>
+</div></section>
+<section class="section"><h2 class="section-title">القسم الثاني &middot; الحلّ بالبحث</h2>
+<p class="section-subtitle">فصول دراسية ومَلاحق بلا شيفرة وتمارين ذاتية التصحيح</p><div class="sequences">
+<div class="seq-card"><div class="seq-meta">الفصل 3</div><h3>حلّ المسائل بالبحث في فضاء الحالات</h3><p class="seq-topics">العرض، والعمق، والكلفة المنتظمة، والمُرشِدات المقبولة والمتّسقة، وA* وIDA*.</p><p class="seq-topics">3 أشكال تفاعلية &middot; صورة واحدة &middot; 5 خوارزميات في المُلحَق</p><div class="seq-actions"><a class="btn primary" href="lecons/03-recherche/page.html">افتح</a>
+<a class="btn" href="../IA/lecons/03-recherche/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">مُلحَق</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">الفصل 4</div><h3>البحث المحلّي والميتاهيوريستيّات</h3><p class="seq-topics">الصعود التدرّجي، والتلدين المحاكى، والبحث المحظور، والخوارزميات التطوّرية: حين يكون الفضاء أكبر من أن يُجاب.</p><p class="seq-topics">شكلان تفاعليان &middot; صورتان &middot; 4 خوارزميات في المُلحَق</p><div class="seq-actions"><a class="btn primary" href="lecons/04-metaheuristiques/page.html">افتح</a>
+<a class="btn" href="../IA/lecons/04-metaheuristiques/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">مُلحَق</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">الفصل 5</div><h3>ألعاب اللاعبَين والخصم الأمثل</h3><p class="seq-topics">شجرة اللعبة، والأصغرى-الأعظمى، والتقليم ألفا-بيتا، ودالّة التقييم، وأثر الأفق، والبحث بالمعاينة العشوائية.</p><p class="seq-topics">شكلان تفاعليان &middot; صورتان &middot; 4 خوارزميات في المُلحَق</p><div class="seq-actions"><a class="btn primary" href="lecons/05-jeux/page.html">افتح</a>
+<a class="btn" href="../IA/lecons/05-jeux/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">مُلحَق</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">الفصل 6</div><h3>مسائل إرضاء القيود</h3><p class="seq-topics">المتغيّرات والمجالات والقيود، والتراجع، واتّساق القوس، وبنية المبيان، والإصلاح المحلّي.</p><p class="seq-topics">شكلان تفاعليان &middot; صورتان &middot; 4 خوارزميات في المُلحَق</p><div class="seq-actions"><a class="btn primary" href="lecons/06-contraintes/page.html">افتح</a>
+<a class="btn" href="../IA/lecons/06-contraintes/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">مُلحَق</a>
+</div></div>
+</div></section>
+<section class="section"><h2 class="section-title">القسم الثالث &middot; التمثيل والاستدلال</h2>
+<p class="section-subtitle">فصول دراسية ومَلاحق بلا شيفرة وتمارين ذاتية التصحيح</p><div class="sequences">
+<div class="seq-card"><div class="seq-meta">الفصل 7</div><h3>تمثيل المعارف والاستدلال</h3><p class="seq-topics">منطق القضايا، والنماذج واللزوم، وقاعدة الحلّ، وDPLL، ومنطق المحمولات، وحدود المقاربة الرمزية.</p><p class="seq-topics">شكلان تفاعليان &middot; صورتان &middot; 4 خوارزميات في المُلحَق</p><div class="seq-actions"><a class="btn primary" href="lecons/07-logique/page.html">افتح</a>
+<a class="btn" href="../IA/lecons/07-logique/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">مُلحَق</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">الفصل 8</div><h3>الاستدلال حين تكون المعلومة غير مؤكّدة</h3><p class="seq-topics">الاحتمالات، وقاعدة بايز، والاستقلال الشرطي، والمصنّف الساذج، والشبكات البايزية، وسلاسل ماركوف.</p><p class="seq-topics">شكلان تفاعليان &middot; صورتان &middot; 4 خوارزميات في المُلحَق</p><div class="seq-actions"><a class="btn primary" href="lecons/08-probabiliste/page.html">افتح</a>
+<a class="btn" href="../IA/lecons/08-probabiliste/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">مُلحَق</a>
+</div></div>
+</div></section>
+<section class="section"><h2 class="section-title">القسم الرابع &middot; التعلّم</h2>
+<p class="section-subtitle">فصول دراسية ومَلاحق بلا شيفرة وتمارين ذاتية التصحيح</p><div class="sequences">
+<div class="seq-card"><div class="seq-meta">الفصل 9</div><h3>التعلّم من الأمثلة</h3><p class="seq-topics">الخطر التجريبي، والجيران الأقرب، والانحدار، وأشجار القرار، وفرط التعلّم، والتقييم الصادق.</p><p class="seq-topics">شكلان تفاعليان &middot; صورتان &middot; 4 خوارزميات في المُلحَق</p><div class="seq-actions"><a class="btn primary" href="lecons/09-apprentissage/page.html">افتح</a>
+<a class="btn" href="../IA/lecons/09-apprentissage/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">مُلحَق</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">الفصل 10</div><h3>إيجاد بنيةٍ بلا وسوم</h3><p class="seq-topics">التقسيم بالمتوسّطات k، والتصنيف الهرمي، وتحليل المركّبات الرئيسة، وتقييم التقسيم.</p><p class="seq-topics">شكلان تفاعليان &middot; صورتان &middot; 4 خوارزميات في المُلحَق</p><div class="seq-actions"><a class="btn primary" href="lecons/10-non-supervise/page.html">افتح</a>
+<a class="btn" href="../IA/lecons/10-non-supervise/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">مُلحَق</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">الفصل 11</div><h3>من المُدرِك الحسّي إلى التعلّم العميق</h3><p class="seq-topics">العصبون الصوري، والمُدرِك الحسّي وحدوده، والشبكة متعدّدة الطبقات، والانتشار العكسي، ومبرهنة التقريب الكوني، والالتفافات.</p><p class="seq-topics">شكلان تفاعليان &middot; صورتان &middot; 4 خوارزميات في المُلحَق</p><div class="seq-actions"><a class="btn primary" href="lecons/11-reseaux-neurones/page.html">افتح</a>
+<a class="btn" href="../IA/lecons/11-reseaux-neurones/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">مُلحَق</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">الفصل 12</div><h3>التعلّم بالفعل</h3><p class="seq-topics">سيرورة القرار الماركوفية، ومعادلة بلمان، والتكرار على القيم، وتعلّم Q، والاستكشاف في مقابل الاستثمار.</p><p class="seq-topics">شكلان تفاعليان &middot; صورتان &middot; 4 خوارزميات في المُلحَق</p><div class="seq-actions"><a class="btn primary" href="lecons/12-renforcement/page.html">افتح</a>
+<a class="btn" href="../IA/lecons/12-renforcement/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">مُلحَق</a>
+</div></div>
+</div></section>
+<section class="section"><h2 class="section-title">القسم الخامس &middot; اليوم</h2>
+<p class="section-subtitle">فصول دراسية ومَلاحق بلا شيفرة وتمارين ذاتية التصحيح</p><div class="sequences">
+<div class="seq-card"><div class="seq-meta">الفصل 13</div><h3>النماذج التوليدية والنماذج اللغوية الكبرى</h3><p class="seq-topics">نمذجة توزيع، والمرمّزات الذاتية التغايرية، والنماذج التخاصمية، والانتشار، والانتباه، والمحوّلات.</p><p class="seq-topics">شكلان تفاعليان &middot; صورتان &middot; 4 خوارزميات في المُلحَق</p><div class="seq-actions"><a class="btn primary" href="lecons/13-generative/page.html">افتح</a>
+<a class="btn" href="../IA/lecons/13-generative/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">مُلحَق</a>
+</div></div>
+<div class="seq-card"><div class="seq-meta">الفصل 14</div><h3>التحيّز والقابلية للتفسير والمسؤولية</h3><p class="seq-topics">من أين يأتي التحيّز، وأيّ تعريفات الإنصاف متنافية، وكيف نفسّر قراراً، وأيّ كلفةٍ بيئية، وأيّ تنظيم.</p><p class="seq-topics">شكلان تفاعليان &middot; صورتان &middot; 4 إجراءات في المُلحَق</p><div class="seq-actions"><a class="btn primary" href="lecons/14-ethique/page.html">افتح</a>
+<a class="btn" href="../IA/lecons/14-ethique/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">مُلحَق</a>
+</div></div>
+</div></section>
+
+<section class="section"><h2 class="section-title">مصادر بالعربية</h2><p class="section-subtitle">تسعة مراجع مفتوحة، مُتحقَّق منها واحداً واحداً</p><div class="src-ar" style="border-top:none;padding-top:0"><p class="src-note">مراجعُ هذا المُقرَّر العلمية مذكورةٌ في آخر كلّ فصل بلغتها الأصلية، كما يقتضي العُرف الأكاديمي. أمّا ما يلي فمصادر للاستزادة بالعربية، أُدرِج كلٌّ منها في الفصل أو الفصول التي يخدمها. وثمانيةٌ منها متاحة مجّاناً وبترخيصٍ قانوني من ناشرها الأصلي.</p><ul><li>المنظمة العربية للتربية والثقافة والعلوم، مكتب تنسيق التعريب. <em>المعجم الموحّد لمصطلحات تقانة المعلومات</em> (عربي &ndash; إنجليزي &ndash; فرنسي). مطبعة النجاح الجديدة، الرباط، 2011. ISBN 978-9954-00-742-6.<br><a class="lien" href="https://archive.org/details/ALECSO2011AREN" hreflang="ar" target="_blank" rel="noopener">https://archive.org/details/ALECSO2011AREN</a><span class="pourquoi">المرجع المعتمَد في تعريب المصطلحات؛ ثلاثيّ اللغة، وهو ما يجعله مفيداً للانتقال بين هذا المُقرَّر ونسخته الفرنسية.</span></li>
+<li>بودن، مارجريت إيه. <em>الذكاء الاصطناعي: مقدّمة قصيرة جدًّا</em>. ترجمة إبراهيم سند أحمد، مراجعة هاني فتحي سليمان. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). نحو 43 ألف كلمة، متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/48149074/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/48149074/</a><span class="pourquoi">أقرب كتابٍ عربيٍّ مجّاني إلى روح الفصل الأوّل: التعريفات، والتاريخ، والحدود، والنقاش الفلسفي.</span></li>
+<li>راسل، ستيوارت. <em>ذكاء اصطناعي متوافق مع البشر: حتّى لا تفرض الآلات سيطرتها على العالم</em>. ترجمة مصطفى محمد فؤاد وأسامة إسماعيل عبد العليم. مؤسسة هنداوي (بترخيصٍ من المؤلّف). نحو 103 آلاف كلمة، متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/25350464/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/25350464/</a><span class="pourquoi">المؤلّف نفسه صاحب المرجع الأساسي لهذا المُقرَّر؛ والكتاب مبنيٌّ كلّه على فكرة الوكيل العقلاني ومقياس الأداء، وعلى ما يحدث حين يُساء وضعه.</span></li>
+<li>كوكلبيرج، مارك. <em>أخلاقيات الذكاء الاصطناعي</em>. ترجمة هبة عبد العزيز غانم، مراجعة هبة عبد المولى أحمد. مؤسسة هنداوي (بترخيصٍ من معهد ماساتشوستس للتقانة). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/57073919/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/57073919/</a><span class="pourquoi">يعالج بالعربية المسائل نفسها التي يعالجها الفصل 14: التحيّز، والمسؤولية، والشفافية، وتفويض القرار.</span></li>
+<li>اليونسكو. <em>التوصية الخاصّة بأخلاقيات الذكاء الاصطناعي</em>، المعتمَدة بالإجماع من الدول الأعضاء الـ193 في تشرين الثاني/نوفمبر 2021. النصّ الكامل بالعربية.<br><a class="lien" href="https://www.unesco.org/ar/artificial-intelligence/recommendation-ethics" hreflang="ar" target="_blank" rel="noopener">https://www.unesco.org/ar/artificial-intelligence/recommendation-ethics</a><span class="pourquoi">أوّل وثيقة تقنينية عالمية في الموضوع، وقيمها الأربع ومبادئها العشرة مصوغة بالعربية صياغةً رسمية — مفيدة لضبط المصطلح في هذا الفصل.</span></li>
+<li>داسجوبتا، سوبراتا. <em>علم الكمبيوتر: مقدّمة قصيرة جدًّا</em>. ترجمة إبراهيم سند أحمد، مراجعة عبد الفتاح عبد الله أحمد. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/13726364/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/13726364/</a><span class="pourquoi">فصلُ «التفكير الخوارزمي» فيه يقدّم بالعربية مفهوم الخوارزمية وتكلفتها، وهو ما يفترضه هذا الفصل مكتسَباً.</span></li>
+<li>هاند، ديفيد جيه. <em>علم الإحصاء: مقدّمة قصيرة جدًّا</em>. ترجمة أحمد شكل، مراجعة محمد فتحي خضر. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/42848630/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/42848630/</a><span class="pourquoi">موجَّه إلى قارئٍ بلا خلفية رياضية مسبقة، ويشرح بالعربية الاستدلال الإحصائي الذي يقوم عليه هذا الفصل.</span></li>
+<li>فلوريدي، لوتشانو. <em>المعلومات: مقدّمة قصيرة جدًّا</em>. ترجمة محمد سعد طنطاوي، مراجعة علا عبد الفتاح يس. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/29257536/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/29257536/</a><span class="pourquoi">يقدّم بالعربية مفهوم المعلومة والإنتروبيا، وهو الأساس الذي تستند إليه مقاييس هذا الفصل.</span></li>
+<li>هولمز، دون إي. <em>البيانات الضخمة: مقدّمة قصيرة جدًّا</em>. ترجمة أحمد عبد المنعم، مراجعة هبة عبد المولى أحمد. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/70929638/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/70929638/</a><span class="pourquoi">يضع البيانات التي تتغذّى عليها هذه الطرائق في سياقها، ويناقش حدودها الأخلاقية.</span></li></ul></div></section>
+<section class="section"><h2 class="section-title">كيف تشتغل على هذا المُقرَّر</h2><p class="section-subtitle">ثلاث مرّاتٍ متتالية على كلّ فصل</p><div class="quick-access"><a class="qa-card" href="lecons/00-introduction/page.html"><span class="qa-label">1</span><span class="qa-title">القراءة</span><span class="qa-sub">عالِج كلّ شكلٍ تفاعلي قبل الانتقال إلى ما بعده</span></a><a class="qa-card" href="../IA/lecons/03-recherche/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية"><span class="qa-label">2</span><span class="qa-title">البسط يدوياً</span><span class="qa-sub">أعِد جداول المُلحَق على الورق، دون نظر</span></a><a class="qa-card" href="lecons/09-apprentissage/page.html"><span class="qa-label">3</span><span class="qa-title">البرمجة</span><span class="qa-sub">عالِج تمارين الفصل ذاتية التصحيح</span></a></div><p class="section-subtitle">لا تحتوي فصول الدرس أيّ برنامج: فالخوارزميات معطاةٌ فيها بشيفرةٍ زائفة مستقلّة عن أيّ لغة. أمّا البرمجة الفعلية فتجري في التمارين.</p></section>
+<footer class="site-footer"><strong>الذكاء الاصطناعي &mdash; الأقسام التحضيرية MP/PSI</strong> &middot; البحث والألعاب والقيود والتعلّم<span class="footer-meta">طبعة 2025-2026</span></footer>
+</body></html>

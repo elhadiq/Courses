@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الفصل 2 &mdash; الوكلاء والبيئات</title>
+<meta name="description" content="الوكيل العقلاني، مقياس الأداء، البيئات، البُنى، الأمل في المنفعة.">
+<link href="../../assets/style.css" rel="stylesheet">
+<link href="../../assets/rtl.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+
+.src-ar { margin: 26px 0 8px; border-top: 2px solid var(--color-rule); padding-top: 16px; }
+.src-ar h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--primary); }
+.src-ar .src-note { color: var(--color-muted); font-size: 0.9rem; margin: 0 0 12px; }
+.src-ar ul { list-style: none; padding: 0; margin: 0; }
+.src-ar li { margin: 0 0 14px; padding-right: 14px; border-right: 3px solid var(--primary-soft-2);
+             line-height: 1.7; font-size: 0.95rem; }
+.src-ar li .pourquoi { display: block; color: var(--color-muted); font-size: 0.9em;
+                       margin-top: 3px; }
+.src-ar li a.lien { word-break: break-all; font-size: 0.88em; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><a class="lang-switch" href="../../../IA/lecons/02-agents/page.html" hreflang="fr" title="Version fran&ccedil;aise">FR</a><div class="breadcrumb"><a href="../../index.html">الذكاء الاصطناعي</a> &middot; مُقرَّر</div><span class="course-code">برنامج MP/PSI &middot; الفترة الثانية</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">القسم الأول &middot; الفصل 2</div>
+<h1>الفصل 2 &mdash; الوكلاء العقلانيون والبيئات</h1>
+<div class="lesson-sub">الإدراكات والأفعال ومقياس الأداء وخصائص البيئة وخمس بُنى للوكيل، من المنعكس الخالص إلى الوكيل المتعلِّم.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">المُلحَق المرافق</div><p>توصيف المهمّة، وتحديث الحالة الداخلية، واختيار الفعل بأمل المنفعة، وحلقة التعلّم، مفصَّلة <strong><a href="../../../IA/lecons/02-agents/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">خطوة بخطوة في المُلحَق</a></strong>.</p></div>
+
+<h2>2.1 الوكيل، معرَّفاً صورياً</h2>
+
+<p>اعتمد الفصل السابق، من بين أربعة تعريفات ممكنة للذكاء الاصطناعي، تعريف الوكيل العقلاني. ويبقى أن نعطيه مضموناً رياضياً، وإلّا لم يكن سوى عبارة.</p>
+
+<div class="box def"><div class="box-title">تعريف &mdash; الوكيل، دالّة الوكيل، برنامج الوكيل</div>
+<p>لتكن \(P\) مجموعة الإدراكات الممكنة وM1 مجموعة الأفعال الممكنة. <strong>متتالية الإدراكات</strong> عنصر من \(P^{*}\)، أي مجموعة المتتاليات المنتهية من عناصر \(P\).</p>
+<ul>
+<li><strong>دالّة الوكيل</strong> تطبيق \(f : P^{*} \to A\). وهو وصف <em>خارجي</em> وتامّ للسلوك: يقول ما يفعله الوكيل، لا كيف يفعله أبداً.</li>
+<li><strong>برنامج الوكيل</strong> تجسيد ملموس لـM5، يُنفَّذ على بنية فيزيائية ولا يملك إلّا ذاكرة منتهية.</li>
+</ul>
+<p>التمييز جوهري: دالّة الوكيل كائن رياضي، لا نهائي عموماً &mdash; فـM6 لا نهائية بمجرّد أن تحتوي \(P\) على عنصرين على الأقلّ. أمّا البرنامج فمنتهٍ. وصعوبة الهندسة كلّها تكمن في هذه الفجوة.</p></div>
+
+<div class="box example"><div class="box-title">وكيل ضئيل، قابل للجدولة بتمامه</div>
+<p>خانتان \(G\) وM9، كلٌّ منهما نظيفة أو متّسخة؛ يُدرك الوكيل موضعه وحالة خانته، ويستطيع أن يشفط، أو يذهب يساراً، أو يذهب يميناً. فالإدراكات الممكنة أربعة إذن. ودالّة الوكيل مقصورةً على المتتاليات ذات الطول 1 تسع في أربعة أسطر:</p>
+<table><thead><tr><th>الإدراك</th><th>الفعل</th></tr></thead>
+<tbody><tr><td>(يسار، متّسخة)</td><td>اشفط</td></tr><tr><td>(يسار، نظيفة)</td><td>اذهب يميناً</td></tr>
+<tr><td>(يمين، متّسخة)</td><td>اشفط</td></tr><tr><td>(يمين، نظيفة)</td><td>اذهب يساراً</td></tr></tbody></table>
+<p>أمّا في المتتاليات ذات الطول \(n\)، فللجدول \(4^{n}\) سطراً. ووكيلٌ يُدرك صورةً من \(1000 \times 1000\) بكسل بتدرّج الرمادي ستكون له \(256^{10^{6}}\) إدراكاً ممكناً: فالجدول قابل للتعريف، لا للبناء أبداً. ولهذا نبرمج <em>قواعد</em> بدل جداول.</p></div>
+
+<h2>2.2 العقلانية ليست علم الغيب</h2>
+
+<div class="box def"><div class="box-title">تعريف &mdash; الوكيل العقلاني</div>
+<p>لكلّ متتالية إدراكات ممكنة، يختار الوكيل العقلاني الفعل الذي يُنتظر منه أن يُعظّم <strong>مقياس الأداء</strong>، بالنظر إلى ما تكشفه متتالية الإدراكات وإلى المعرفة القَبْلية المتاحة للوكيل.</p></div>
+
+<p>تظهر في هذا التعريف أربعة عناصر، وكلٌّ منها مصدر خطأ إن أُسيء وضعه.</p>
+
+<div class="box warn"><div class="box-title">مقياس الأداء هو المَزلَق الأكبر</div>
+<p>يجب أن يُعرَّف على <em>حالات البيئة</em>، لا على الحالات الداخلية للوكيل. فمكنسةٌ تُنقَّط على كمّية الغبار المشفوط لها مصلحة في نثر الغبار لتعيد شفطه؛ وينبغي تنقيطها على نظافة الأرضية.</p>
+<p>وهذا هو مشكل التوصيف العامّ: الوكيل يُحسِّن <em>بالضبط</em> ما نطلبه منه، بما في ذلك حين لا يكون ذلك ما أردناه. وسيعود إليه الفصل 12 باسم تصميم المكافأة، والفصل 14 باسم المواءمة.</p></div>
+
+<div class="box tip"><div class="box-title">العقلاني ليس الكامل</div>
+العقلانية تُعظّم الأداء <em>المُنتظَر</em>؛ أمّا الكمال فيُعظّم الأداء <em>الفعلي</em>، وذلك يقتضي معرفة المستقبل. فعبور شارعٍ بعد النظر يمنةً ويسرةً يبقى عقلانياً حتّى لو سقط بابُ طائرة من السماء. في المقابل، تفرض العقلانية <em>جمع المعلومات</em> حين يستحقّ الأمر، و<em>التعلّم</em> ممّا يُدرَك: فوكيلٌ يتجاهل ما يلاحظه ليس عقلانياً، بل محدود النظر.</div>
+
+<h3>توصيف مهمّة قبل برمجتها</h3>
+
+<p>قبل أيّ شيفرة، نصف أربعة أشياء: مقياس الأداء، والبيئة، والمُشغّلات، والمَحسّات. يبدو التمرين صورياً؛ وهو يكشف عملياً نصف صعوبات المشروع.</p>
+
+<table>
+<thead><tr><th>المهمّة</th><th>مقياس الأداء</th><th>البيئة</th><th>المُشغّلات</th><th>المَحسّات</th></tr></thead>
+<tbody>
+<tr><td>سيّارة أجرة ذاتية القيادة</td><td>السلامة، الزمن، القانونية، الراحة، الوقود</td><td>الطرق، المركبات الأخرى، المشاة، الطقس</td><td>المِقود، دوّاسة السرعة، الفرامل، الإشارات</td><td>كاميرات، مقاييس مدى، تحديد موضع، عدّاد مسافة</td></tr>
+<tr><td>تشخيص طبّي</td><td>صحّة المريض، الكلفة، انعدام الفحوص غير المفيدة</td><td>المريض، الطاقم، الملفّ</td><td>أسئلة، فحوص مطلوبة، علاجات</td><td>الأجوبة، نتائج التحاليل</td></tr>
+<tr><td>مُدرِّس إنجليزية</td><td>نقطة التلميذ في اختبارٍ مستقلّ</td><td>التلميذ، البرنامج الرسمي</td><td>تمارين، تصحيحات، شروح</td><td>الأجوبة المُدخَلة، زمن الجواب</td></tr>
+</tbody></table>
+
+<p>لاحظ السطر الثالث: قياس أداء المُدرِّس على اختبارٍ صمّمه هو نفسه لا معنى له البتّة. فالمقياس الجيّد خارجيٌّ عن الوكيل دائماً.</p>
+
+<h2>2.3 الأبعاد الستّة للبيئة</h2>
+
+<p>لا تتوقّف صعوبة المهمّة على هدفها فحسب، بل على طبيعة العالم الذي تجري فيه. وستّ خصائص مستقلّة تكفي لتوصيفه، وهي تحدّد بنية الوكيل اللازمة.</p>
+
+<figure class="viz"><div class="viz-title">ثلاث بيئات على ستّة محاور</div>
+<svg viewBox="0 0 760 330" role="img" style="width:100%;height:auto;display:block;"><path d="M 250 60 L 610 60" style="fill:none;stroke:var(--viz-axis);stroke-width:1.6;"/><text x="238" y="64" text-anchor="end" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">قابلة للملاحظة كلّياً</text><text x="622" y="64" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">قابلة للملاحظة جزئياً</text><path d="M 250 98 L 610 98" style="fill:none;stroke:var(--viz-axis);stroke-width:1.6;"/><text x="238" y="102" text-anchor="end" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">حتميّة</text><text x="622" y="102" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">عشوائية</text><path d="M 250 136 L 610 136" style="fill:none;stroke:var(--viz-axis);stroke-width:1.6;"/><text x="238" y="140" text-anchor="end" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">حَلَقيّة</text><text x="622" y="140" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">تسلسلية</text><path d="M 250 174 L 610 174" style="fill:none;stroke:var(--viz-axis);stroke-width:1.6;"/><text x="238" y="178" text-anchor="end" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">ساكنة</text><text x="622" y="178" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">متحرّكة</text><path d="M 250 212 L 610 212" style="fill:none;stroke:var(--viz-axis);stroke-width:1.6;"/><text x="238" y="216" text-anchor="end" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">متقطّعة</text><text x="622" y="216" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">متّصلة</text><path d="M 250 250 L 610 250" style="fill:none;stroke:var(--viz-axis);stroke-width:1.6;"/><text x="238" y="254" text-anchor="end" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">أحادية الوكيل</text><text x="622" y="254" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">متعدّدة الوكلاء</text><circle cx="257.2" cy="60" r="6" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="257.2" cy="98" r="6" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="592" cy="136" r="6" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="257.2" cy="174" r="6" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="257.2" cy="212" r="6" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="257.2" cy="250" r="6" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><path d="M 257.2 60 L 257.2 98 L 592 136 L 257.2 174 L 257.2 212 L 257.2 250" style="fill:none;stroke:var(--primary);stroke-width:2;stroke-dasharray:5 4;opacity:0.75;"/><circle cx="150" cy="300" r="6" style="fill:var(--primary);"/><text x="162" y="304" style="fill:var(--color-text);font-size:13px;font-family:inherit;">الكلمات المتقاطعة</text><circle cx="592" cy="60" r="6" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><circle cx="592" cy="98" r="6" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><circle cx="592" cy="136" r="6" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><circle cx="592" cy="174" r="6" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><circle cx="592" cy="212" r="6" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><circle cx="592" cy="250" r="6" style="fill:var(--viz-bad);stroke:var(--color-bg);stroke-width:2;"/><path d="M 592 60 L 592 98 L 592 136 L 592 174 L 592 212 L 592 250" style="fill:none;stroke:var(--viz-bad);stroke-width:2;stroke-dasharray:5 4;opacity:0.75;"/><circle cx="360" cy="300" r="6" style="fill:var(--viz-bad);"/><text x="372" y="304" style="fill:var(--color-text);font-size:13px;font-family:inherit;">سيّارة ذاتية القيادة</text><circle cx="257.2" cy="60" r="6" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:2;"/><circle cx="257.2" cy="98" r="6" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:2;"/><circle cx="592" cy="136" r="6" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:2;"/><circle cx="466" cy="174" r="6" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:2;"/><circle cx="257.2" cy="212" r="6" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:2;"/><circle cx="592" cy="250" r="6" style="fill:var(--accent);stroke:var(--color-bg);stroke-width:2;"/><path d="M 257.2 60 L 257.2 98 L 592 136 L 466 174 L 257.2 212 L 592 250" style="fill:none;stroke:var(--accent);stroke-width:2;stroke-dasharray:5 4;opacity:0.75;"/><circle cx="570" cy="300" r="6" style="fill:var(--accent);"/><text x="582" y="304" style="fill:var(--color-text);font-size:13px;font-family:inherit;">شطرنج بساعة</text><text x="380" y="26" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">ستّة أبعاد مستقلّة: كلّما اتّجهنا يميناً وجب أن يكون الوكيل أكثر تعقيداً</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 2.1.</strong> الكلمات المتقاطعة في أقصى يسار كلّ المحاور تقريباً: ولهذا تُحلّ بالبحث الوارد في الفصل 3. والسيّارة في أقصى اليمين في كلّ مكان، ولهذا لا يكفي فصلٌ واحد لمعالجتها. والشطرنج بساعة حالة مختلطة مفيدة: قابل للملاحظة تماماً وحتميّ، لكن بوكيلَين وشبه متحرّك، لأنّ الساعة تدور أثناء التفكير.</figcaption></figure>
+
+<div class="box def"><div class="box-title">الخصائص الستّ</div>
+<ul>
+<li><strong>قابلة للملاحظة كلّياً أو جزئياً.</strong> هل تتيح المَحسّات الوصول إلى كلّ ما يهمّ القرار؟ وإلّا وجب على الوكيل أن يحتفظ بحالة داخلية.</li>
+<li><strong>حتميّة أو عشوائية.</strong> هل تتحدّد الحالة التالية بتمامها بالحالة الراهنة والفعل؟ وإلّا وجب الاستدلال بالاحتمالات (الفصل 8).</li>
+<li><strong>حَلَقيّة أو تسلسلية.</strong> هل تنقسم التجربة إلى حَلَقات مستقلّة، أم إنّ قراراً يُلزِم القرارات اللاحقة؟ تصنيف الصور حَلَقي؛ والقيادة تسلسلية.</li>
+<li><strong>ساكنة أو متحرّكة.</strong> هل يتغيّر العالم بينما يتداول الوكيل؟ فإن لم يتغيّر لكنّ النتيجة تتدهور مع الزمن، قيل إنّ البيئة <em>شبه متحرّكة</em>.</li>
+<li><strong>متقطّعة أو متّصلة.</strong> هل تأخذ الحالات والزمن والأفعال عدداً منتهياً من القيم؟</li>
+<li><strong>أحادية الوكيل أو متعدّدة الوكلاء.</strong> وإن كانت متعدّدة، فتعاونية أم تنافسية؟ والحالة التنافسية هي موضوع الفصل 5.</li>
+</ul></div>
+
+<div class="box warn"><div class="box-title">قابلية الملاحظة تتوقّف على الوكيل لا على العالم وحده</div>
+البيئة الواحدة قابلة للملاحظة كلّياً بالنسبة إلى وكيلٍ حسن التجهيز، وجزئياً بالنسبة إلى آخر. فإضافة مَحسٍّ قد تغيّر طبيعة المسألة &mdash; وهو غالباً أقلّ كلفةً من برمجة وكيلٍ قادرٍ على الاستغناء عنه. والسؤال «أنحتاج إلى خوارزمية أذكى أم إلى مَحسٍّ إضافي؟» سؤالٌ هندسي حقيقي.</div>
+
+<h2>2.4 خمس بُنى للوكيل</h2>
+
+<figure class="viz"><div class="viz-title">من القاعدة المنعكسة إلى الوكيل المتعلِّم</div>
+<svg viewBox="0 0 760 456" role="img" style="width:100%;height:auto;display:block;"><text x="12" y="24" style="fill:var(--color-text);font-size:13px;font-family:inherit;">خمس بُنى، من الأفقر إلى الأغنى</text><text x="12.0" y="57.0" style="fill:var(--color-text);font-size:13.0px;font-weight:700;font-family:inherit;">منعكس بسيط</text><rect x="142.9" y="36.0" width="82.0" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="183.9" y="56.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">إدراكات</text><path d="M 226.9 52.0 L 235.5 52.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 233.5 48.0 L 239.5 52.0 L 233.5 56.0 Z" style="fill:var(--viz-axis);"/><rect x="240.5" y="36.0" width="165.9" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="323.5" y="56.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">قواعد شرط-فعل</text><path d="M 408.4 52.0 L 417.0 52.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 415.0 48.0 L 421.0 52.0 L 415.0 56.0 Z" style="fill:var(--viz-axis);"/><rect x="422.0" y="36.0" width="112.7" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="478.4" y="56.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">فعل</text><text x="142.9" y="82.0" style="fill:var(--color-muted);font-size:11.0px;font-family:inherit;">لا ذاكرة: الإدراك نفسه يعطي الفعل نفسه دائماً</text><text x="12.0" y="131.0" style="fill:var(--color-text);font-size:13.0px;font-weight:700;font-family:inherit;">منعكس بحالة</text><rect x="142.9" y="110.0" width="82.0" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="183.9" y="130.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">إدراكات</text><path d="M 226.9 126.0 L 235.5 126.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 233.5 122.0 L 239.5 126.0 L 233.5 130.0 Z" style="fill:var(--viz-axis);"/><rect x="240.5" y="110.0" width="165.9" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="323.5" y="130.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">حالة داخلية للعالم</text><path d="M 408.4 126.0 L 417.0 126.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 415.0 122.0 L 421.0 126.0 L 415.0 130.0 Z" style="fill:var(--viz-axis);"/><rect x="422.0" y="110.0" width="112.7" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="478.4" y="130.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">قواعد</text><path d="M 536.7 126.0 L 545.3 126.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 543.3 122.0 L 549.3 126.0 L 543.3 130.0 Z" style="fill:var(--viz-axis);"/><rect x="550.3" y="110.0" width="116.2" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="608.4" y="130.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">فعل</text><text x="142.9" y="156.0" style="fill:var(--color-muted);font-size:11.0px;font-family:inherit;">نموذج للعالم مُحدَّث: للماضي وزن</text><text x="12.0" y="205.0" style="fill:var(--color-text);font-size:13.0px;font-weight:700;font-family:inherit;">وكيل بغاية</text><rect x="142.9" y="184.0" width="82.0" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="183.9" y="204.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">إدراكات</text><path d="M 226.9 200.0 L 235.5 200.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 233.5 196.0 L 239.5 200.0 L 233.5 204.0 Z" style="fill:var(--viz-axis);"/><rect x="240.5" y="184.0" width="165.9" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="323.5" y="204.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">حالة داخلية</text><path d="M 408.4 200.0 L 417.0 200.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 415.0 196.0 L 421.0 200.0 L 415.0 204.0 Z" style="fill:var(--viz-axis);"/><rect x="422.0" y="184.0" width="112.7" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="478.4" y="204.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">نتائج</text><path d="M 536.7 200.0 L 545.3 200.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 543.3 196.0 L 549.3 200.0 L 543.3 204.0 Z" style="fill:var(--viz-axis);"/><rect x="550.3" y="184.0" width="116.2" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="608.4" y="204.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">غاية</text><path d="M 668.6 200.0 L 677.2 200.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 675.2 196.0 L 681.2 200.0 L 675.2 204.0 Z" style="fill:var(--viz-axis);"/><rect x="682.2" y="184.0" width="65.8" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="715.1" y="204.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">فعل</text><text x="142.9" y="230.0" style="fill:var(--color-muted);font-size:11.0px;font-family:inherit;">يُختار الفعل لأنّه يقود إلى مكان ما</text><text x="12.0" y="279.0" style="fill:var(--color-text);font-size:13.0px;font-weight:700;font-family:inherit;">وكيل بمنفعة</text><rect x="142.9" y="258.0" width="82.0" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="183.9" y="278.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">إدراكات</text><path d="M 226.9 274.0 L 235.5 274.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 233.5 270.0 L 239.5 274.0 L 233.5 278.0 Z" style="fill:var(--viz-axis);"/><rect x="240.5" y="258.0" width="165.9" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="323.5" y="278.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">حالة داخلية</text><path d="M 408.4 274.0 L 417.0 274.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 415.0 270.0 L 421.0 274.0 L 415.0 278.0 Z" style="fill:var(--viz-axis);"/><rect x="422.0" y="258.0" width="112.7" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="478.4" y="278.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">نتائج</text><path d="M 536.7 274.0 L 545.3 274.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 543.3 270.0 L 549.3 274.0 L 543.3 278.0 Z" style="fill:var(--viz-axis);"/><rect x="550.3" y="258.0" width="116.2" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="608.4" y="278.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">منفعة مُنتظَرة</text><path d="M 668.6 274.0 L 677.2 274.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 675.2 270.0 L 681.2 274.0 L 675.2 278.0 Z" style="fill:var(--viz-axis);"/><rect x="682.2" y="258.0" width="65.8" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="715.1" y="278.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">فعل</text><text x="142.9" y="304.0" style="fill:var(--color-muted);font-size:11.0px;font-family:inherit;">الغايات مُدرَّجة: نقارن درجات الرضا</text><text x="12.0" y="353.0" style="fill:var(--color-text);font-size:13.0px;font-weight:700;font-family:inherit;">وكيل متعلِّم</text><rect x="142.9" y="332.0" width="82.0" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="183.9" y="352.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">إدراكات</text><path d="M 226.9 348.0 L 235.5 348.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 233.5 344.0 L 239.5 348.0 L 233.5 352.0 Z" style="fill:var(--viz-axis);"/><rect x="240.5" y="332.0" width="165.9" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="323.5" y="352.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">ناقد</text><path d="M 408.4 348.0 L 417.0 348.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 415.0 344.0 L 421.0 348.0 L 415.0 352.0 Z" style="fill:var(--viz-axis);"/><rect x="422.0" y="332.0" width="112.7" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="478.4" y="352.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">تعلّم</text><path d="M 536.7 348.0 L 545.3 348.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 543.3 344.0 L 549.3 348.0 L 543.3 352.0 Z" style="fill:var(--viz-axis);"/><rect x="550.3" y="332.0" width="116.2" height="32.0" rx="5" style="fill:var(--accent);fill-opacity:0.88;stroke:none;"/><text x="608.4" y="352.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">تنفيذ</text><path d="M 668.6 348.0 L 677.2 348.0" style="fill:none;stroke:var(--viz-axis);stroke-width:1.8;"/><path d="M 675.2 344.0 L 681.2 348.0 L 675.2 352.0 Z" style="fill:var(--viz-axis);"/><rect x="682.2" y="332.0" width="65.8" height="32.0" rx="5" style="fill:var(--primary);fill-opacity:0.88;stroke:none;"/><text x="715.1" y="352.0" text-anchor="middle" style="fill:var(--color-bg);font-size:11.5px;font-weight:700;font-family:inherit;">فعل</text><text x="142.9" y="378.0" style="fill:var(--color-muted);font-size:11.0px;font-family:inherit;">دالّة الوكيل نفسها تتغيّر بالتجربة</text><text x="12" y="444" style="fill:var(--color-muted);font-size:11px;font-family:inherit;">كلّ سطر يضيف صندوقاً إلى سابقه: الذاكرة، ثمّ الغاية، ثمّ التدرّج، ثمّ التعلّم.</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 2.2.</strong> كلّ بنية تضيف صندوقاً إلى سابقتها. وليست إحداها أفضل على الإطلاق: فالبنية الجيّدة هي أبسط ما يكفي للبيئة. فمِنظامٌ حراري منعكس عقلانيٌّ تماماً في بيئته، وإضافة نموذجٍ للعالم إليه لن تحسّنه.</figcaption></figure>
+
+<h3>وكيل منعكس بسيط</h3>
+<p>يطبّق قواعد شرط-فعل على الإدراك الراهن، بلا أيّ ذاكرة.</p>
+<div class="algo"><div class="algo-cap">الخوارزمية 2.1 &mdash; وكيل منعكس بسيط</div><div class="algo-io"><b>المُدخل:</b> إدراك \(p \in P\)، ولائحة قواعد شرط-فعل<br><b>المُخرج:</b> فعل \(a \in A\)</div><ol class="algo-corps"><li><b class="kw">دالّة</b> <span class="fn">وكيل‌منعكس</span>\((p)\)</li><li class="n1">\(e \leftarrow \mathrm{Interpreter}(p)\)          <span class="cm">// لا ذاكرة: e لا تتوقف الا على p</span></li><li class="n1">\(r \leftarrow\) أوّل قاعدة يتحقّق شرطها بـM19</li><li class="n1"><b class="kw">أرجِع</b> \(\mathrm{action}(r)\)</li></ol><p class="algo-note">لا يبقى أيّ متغيّر من استدعاءٍ إلى آخر: فدالّة الوكيل تتحلّل إلى \(f = \mathrm{action} \circ r \circ \mathrm{Interpreter}\)، ومن ثمّ فإدراكان متساويان يعطيان الفعل نفسه، مهما كان التاريخ السابق.</p></div>
+<p>وحدُّه بنيويّ لا تقنيّ: فإن كانت البيئة قابلة للملاحظة جزئياً، أمكن لحالتَي عالمٍ مختلفتين أن تُنتجا الإدراك نفسه، فيجيب عنهما الوكيل بالجواب نفسه. كما لا يستطيع الخروج من دورة، لأنّه لا يعلم أنّه مرّ منها من قبل.</p>
+
+<h3>وكيل منعكس بحالة داخلية</h3>
+<p>يحتفظ بتمثيلٍ للجزء الذي لا يُدركه من العالم مباشرةً.</p>
+<div class="algo"><div class="algo-cap">الخوارزمية 2.2 &mdash; وكيل منعكس بحالة داخلية</div><div class="algo-io"><b>المُدخل:</b> إدراك \(p_t\)، والحالة \(e_{t-1}\)، والفعل الأخير \(a_{t-1}\)، ونموذج انتقال \(\tau\)، ونموذج مَحسّ<br><b>المُخرج:</b> فعل \(a_t\)؛ وتُحفَظ الحالة \(e_t\) بين الاستدعاءات</div><ol class="algo-corps"><li><b class="kw">دالّة</b> <span class="fn">وكيل‌بحالة</span>\((p_t)\)</li><li class="n1">\(e_t \leftarrow\) <span class="fn">حدّث‌الحالة</span>\((e_{t-1},\ a_{t-1},\ p_t)\)</li><li class="n1">\(r \leftarrow\) أوّل قاعدة يتحقّق شرطها بـM32</li><li class="n1">\(a_t \leftarrow \mathrm{action}(r)\) ؛ <b class="kw">أرجِع</b> \(a_t\)</li><li>&nbsp;</li><li><b class="kw">دالّة</b> <span class="fn">حدّث‌الحالة</span>\((e,\ a,\ p)\)</li><li class="n1">\(\tilde{e} \leftarrow \tau(e,\ a)\)          <span class="cm">// تنبؤ: اثر الفعل والتطور الذاتي</span></li><li class="n1"><b class="kw">أرجِع</b> \(\tilde{e} \sqcap p\)          <span class="cm">// تصحيح بما يكشفه الادراك</span></li></ol><p class="algo-note">يلزم نموذجان متمايزان: كيف يتطوّر العالم وحده، وما الذي يفعله فعل الوكيل. والخلط بينهما يُنتج وكيلاً ينسب إلى نفسه تغيّراتٍ سبّبها غيره.</p></div>
+
+<h3>الوكيل بغاية والوكيل بمنفعة</h3>
+<p>يعرف الوكيل بغايةٍ زيادةً على ذلك مجموعةً من الحالات المرغوبة، ويختار أفعاله بحسب نتائجها: وهذا بالضبط مشكل الفصل 3. أمّا الوكيل بمنفعة فيذهب أبعد. فالغاية ثنائية &mdash; مُدرَكة أو لا &mdash; وهذا لا يتيح الترجيح بين غايتين متنافيتين، ولا مقارنة طريقتين لبلوغ الغاية نفسها، ولا الحسم حين يكون النجاح غير مؤكّد. ودالّة منفعةٍ \(U : S \to \mathbb{R}\) تحلّ الحالات الثلاث معاً.</p>
+<div class="algo"><div class="algo-cap">الخوارزمية 2.3 &mdash; وكيل بأمل المنفعة</div><div class="algo-io"><b>المُدخل:</b> إدراك \(p_t\)، ومنفعة \(U : S \to \mathbb{R}\)، ونموذج \(P(s' \mid s, a)\)<br><b>المُخرج:</b> الفعل الذي يُعظّم أمل المنفعة</div><ol class="algo-corps"><li>\(e_t \leftarrow\) <span class="fn">حدّث‌الحالة</span>\((e_{t-1},\ a_{t-1},\ p_t)\)</li><li><b class="kw">لكلّ</b> \(a \in A(e_t)\) <b class="kw">نفّذ</b></li><li class="n1">\(\displaystyle \mathrm{EU}(a) \leftarrow \sum_{s' \in S} P(s' \mid e_t, a)\ U(s')\)</li><li>\(a_t \leftarrow \operatorname*{argmax}_{a \in A(e_t)} \mathrm{EU}(a)\)</li><li><b class="kw">أرجِع</b> \(a_t\)</li></ol><p class="algo-note">هذا هو التعريف الإجرائي للعقلانية المعتمَد في هذا المُقرَّر. ومبرهنة فون نيومان ومورغنشتيرن تُثبت أنّه، تحت أربع مسلّمات اتّساق، تُكتَب كلّ أفضلية عقلانية على هذا النحو، مع \(U\) وحيدة إلى غاية تحويلٍ تآلفي متزايد.</p></div>
+
+<div class="box thm"><div class="box-title">مبرهنة &mdash; وجود دالّة منفعة</div>
+<p>إذا حقّقت أفضليّات وكيلٍ على اليانصيبات مسلّمات التمام والتعدّي والاتّصال والاستقلال، فتوجد دالّة \(U\) ذات قيمٍ حقيقية، وحيدة إلى غاية تحويلٍ تآلفي متزايد، بحيث يُفضّل الوكيل اليانصيب \(L_1\) على اليانصيب \(L_2\) إذا وفقط إذا كان \(\mathbb{E}_{L_1}[U] \gt \mathbb{E}_{L_2}[U]\) <a class="cite" href="#ref-vonneumann1944">[1]</a>.</p>
+<p>بعبارةٍ أخرى: الفعل بعقلانية هو تعظيم أمل منفعة &mdash; لا باختيارٍ في النمذجة، بل لزوماً عن أربعة مطالب اتّساق. والعكس النقيض مفيد بالقدر نفسه: فوكيلٌ تنتهك أفضليّاته هذه المسلّمات يمكن أن يُساق إلى قبول متتالية رهاناتٍ يخرج منها خاسراً حتماً.</p></div>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">المؤشّر الأوّل يختار البنية، والثاني يتقدّم في الزمن. الخانات الحمراء متّسخة، والأثر المنقّط هو المسار المقطوع.</p>
+<div id="jxg1" class="viz-board" style="height:520px;"></div>
+<p class="viz-caption"><strong>الشكل 2.3.</strong> عالمٌ من 10 في 4 خانات، عشرٌ منها متّسخة في البداية، وأربعون خطوة. الوكيل المنعكس البسيط لا يغادر سطره قطّ: فبلا ذاكرة، لا يستطيع أن يعلم أنّه استكشف شيئاً من قبل، فيُرجِّع مساره بلا نهاية بين الجدارين. والوكيل بحالة داخلية يمسح كلّ شيء على شكل أفعى، لكنّه يدفع ثمن كلّ خانة يعبرها. والوكيل بغاية يقصد أقرب اتّساخ مباشرةً.</p></div>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">سُمك الخطّ وعتامة الأشرطة يتبعان البنية المختارة في المؤشّر الأوّل من الشكل السابق؛ والنقطة المتحرّكة تتبع مؤشّر الخطوة.</p>
+<div id="jxg2" class="viz-board" style="height:440px;"></div>
+<p class="viz-caption"><strong>الشكل 2.4.</strong> ثلاث قراءات متراكبة. في الأعلى، النتيجة التراكمية: المنعكس البسيط يهوي إلى \(-44\)، لأنّه ينفق دون أن ينظّف. وفي الأسفل، تحليل كلّ نتيجة إلى مكاسب ونفقات، مع التفصيل الرقمي. وأكثر النتائج إفادةً هي الأخيرة: الوكيل بمنفعة لا يقوم إلّا بـ20 تنقّلاً مقابل 20 للوكيل بغاية، لكنّه يتخلّى عن اتّساخين بعيدين، فينتهي متأخّراً بنقطتين. ومع ذلك فهو يطبّق قاعدة مردوديّةٍ صحيحة &mdash; لكن <em>اتّساخاً اتّساخاً</em>: فهو لا يرى أنّه متى صار في المكان، فالثاني لا يكلّف شيئاً تقريباً. فالمنفعة قصيرة النظر ليست منفعةً مثلى؛ وكان ينبغي تقييم <em>خطط</em>، وهو ما يفعله الفصل 12.</p></div>
+
+<h2>2.5 الوكيل المتعلِّم</h2>
+
+<p>تفترض البُنى الأربع السابقة أنّ المصمّم يُحسِن كتابة القواعد أو نموذج العالم أو دالّة المنفعة. وقد لاحظ تورينغ ذلك منذ 1950: برمجة نظامٍ بمستوى إنساني يدوياً تتطلّب عملاً غير معقول، والأفضل بناء آلةٍ تتعلّم <a class="cite" href="#ref-turing1950">[2]</a>.</p>
+
+<div class="box def"><div class="box-title">المكوّنات الأربعة للوكيل المتعلِّم</div>
+<ul>
+<li><strong>عنصر التنفيذ</strong>: وهو ما كان يشكّل، حتّى الآن، الوكيل بأكمله.</li>
+<li><strong>الناقد</strong>: يلاحظ ويقول لعنصر التعلّم كيف يسلك الوكيل بالنظر إلى معيارٍ ثابت. ويجب أن يكون هذا المعيار <em>خارجياً</em> عن الوكيل، وإلّا لعدّله على أدائه هو.</li>
+<li><strong>عنصر التعلّم</strong>: يعدّل عنصر التنفيذ انطلاقاً من مُرتَجَعات الناقد.</li>
+<li><strong>مولّد المسائل</strong>: يقترح أفعالاً استكشافية، فائدتها ليست آنيّة بل إخبارية. وبدونه يبقى الوكيل حبيس ما يُحسِن فعله سلفاً.</li>
+</ul></div>
+
+<p>وهذا المكوّن الأخير أقلّها بداهةً وأهمّها. فوكيلٌ لا يلعب إلّا أفضل نقلاته المعروفة لن يعلم أبداً أنّ نقلةً أخرى كانت أفضل. وهذه المفاضلة بين الاستثمار والاستكشاف تعبر المُقرَّر كلّه: تظهر أصلاً في البحث بالمعاينة العشوائية في الفصل 5، وهي الموضوع المركزي للفصل 12.</p>
+
+<h2>2.6 مصارحة أخيرة: العقلانية الحسابية</h2>
+
+<p>يُهمل تعريف العقلانية المذكور أعلاه زمن الحساب. غير أنّ التداول يستغرق وقتاً، وفي بيئةٍ متحرّكة قد يكون الفعل الأمثل المحسوب متأخّراً أسوأ من فعلٍ متوسّط يُختار فوراً. وقد سمّى سايمون <em>العقلانية المحدودة</em> سلوك وكيلٍ يكتفي بحلٍّ مُرضٍ لعجزه عن حساب الأمثل <a class="cite" href="#ref-simon1955">[3]</a>.</p>
+
+<div class="box thm"><div class="box-title">العقلانية الحسابية</div>
+<p>المفهوم المناسب لوكيلٍ حقيقي ليس «أيّ فعلٍ هو الأمثل؟» بل «أيّ برنامجٍ، قابل للتنفيذ على هذه الآلة، يُنتج أفضل سلوكٍ وسطيّ؟». وصورياً، لم نعد نبحث عن دالّة الوكيل المثلى بل عن <strong>البرنامج</strong> الأمثل من بين ما تستطيع البنية تنفيذه <a class="cite" href="#ref-russell1995">[4]</a>. وهذه الإزاحة تبرّر بأثرٍ رجعي كلّ ما يفعله هذا المُقرَّر: البحث عن مُرشِدات، وبتر الأشجار، ومقاربة الحلول.</p></div>
+
+<h2>الخلاصة</h2>
+<ul>
+<li>يوصَف الوكيل من الخارج بدالّة \(P^{*} \to A\)، ومن الداخل ببرنامجٍ منتهٍ: وكلّ الفجوة بينهما هندسة.</li>
+<li>«عقلاني» يعني «يُعظّم الأداء <em>المُنتظَر</em>»، وهذا ليس علم الغيب ولا الكمال، وهو يفرض جمع المعلومات والتعلّم.</li>
+<li>مقياس الأداء يتناول البيئة، لا الوكيل أبداً؛ وسوء وضعه يعني الحصول بالضبط على ما طُلِب لا على ما أُريد.</li>
+<li>ستّ خصائص مستقلّة توصّف البيئة وتُملي البنية اللازمة.</li>
+<li>تحت أربع مسلّمات اتّساق، يكافئ الفعلُ بعقلانية تعظيمَ أمل منفعة <a class="cite" href="#ref-vonneumann1944">[1]</a>.</li>
+<li>زمن الحساب جزء من المسألة: والسؤال الصحيح هو سؤال أفضل برنامج، لا أفضل فعل <a class="cite" href="#ref-russell1995">[4]</a>.</li>
+</ul>
+
+<h2>المراجع</h2>
+<ol class="reflist">
+<li id="ref-vonneumann1944">von Neumann, J. &amp; Morgenstern, O. (1944). <em>Theory of Games and Economic Behavior</em>. Princeton University Press. DOI: 10.1515/9781400829460. <a href="https://doi.org/10.1515/9781400829460">https://doi.org/10.1515/9781400829460</a></li>
+<li id="ref-turing1950">Turing, A. M. (1950). Computing machinery and intelligence. <em>Mind</em>, LIX(236), 433&ndash;460. DOI: 10.1093/mind/LIX.236.433. <a href="https://doi.org/10.1093/mind/LIX.236.433">https://doi.org/10.1093/mind/LIX.236.433</a></li>
+<li id="ref-simon1955">Simon, H. A. (1955). A behavioral model of rational choice. <em>The Quarterly Journal of Economics</em>, 69(1), 99&ndash;118. DOI: 10.2307/1884852. <a href="https://doi.org/10.2307/1884852">https://doi.org/10.2307/1884852</a></li>
+<li id="ref-russell1995">Russell, S. J. &amp; Subramanian, D. (1995). Provably bounded-optimal agents. <em>Journal of Artificial Intelligence Research</em>, 2, 575&ndash;609. DOI: 10.1613/jair.133. <a href="https://doi.org/10.1613/jair.133">https://doi.org/10.1613/jair.133</a></li>
+<li id="ref-wooldridge2009">Wooldridge, M. (2009). <em>An Introduction to MultiAgent Systems</em> (الطبعة 2). Wiley. ISBN 978-0-470-51946-2. <a href="https://archive.org/details/introductiontomu0000wool">https://archive.org/details/introductiontomu0000wool</a></li>
+</ol>
+
+<section class="src-ar">
+<h3>مصادر بالعربية</h3>
+<p class="src-note">مصادر للاستزادة، لا مراجع لما ورد أعلاه: المراجع الأصلية للفصل مذكورةٌ في القائمة السابقة بلغتها. وقد عُوينت كلّ صفحةٍ من صفحات الناشرين للتحقّق من العنوان والمترجم ورخصة الإتاحة.</p>
+<ul>
+<li>راسل، ستيوارت. <em>ذكاء اصطناعي متوافق مع البشر: حتّى لا تفرض الآلات سيطرتها على العالم</em>. ترجمة مصطفى محمد فؤاد وأسامة إسماعيل عبد العليم. مؤسسة هنداوي (بترخيصٍ من المؤلّف). نحو 103 آلاف كلمة، متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/25350464/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/25350464/</a><span class="pourquoi">المؤلّف نفسه صاحب المرجع الأساسي لهذا المُقرَّر؛ والكتاب مبنيٌّ كلّه على فكرة الوكيل العقلاني ومقياس الأداء، وعلى ما يحدث حين يُساء وضعه.</span></li>
+<li>بودن، مارجريت إيه. <em>الذكاء الاصطناعي: مقدّمة قصيرة جدًّا</em>. ترجمة إبراهيم سند أحمد، مراجعة هاني فتحي سليمان. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). نحو 43 ألف كلمة، متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/48149074/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/48149074/</a><span class="pourquoi">أقرب كتابٍ عربيٍّ مجّاني إلى روح الفصل الأوّل: التعريفات، والتاريخ، والحدود، والنقاش الفلسفي.</span></li>
+</ul>
+</section>
+<p>توصيف البيئات بحسب تعدّد الوكلاء، تعاونيين أو تنافسيين، مبسوطٌ بالتفصيل عند وولدريدج <a class="cite" href="#ref-wooldridge2009">[5]</a>؛ ولا يحتفظ هذا المُقرَّر منه إلّا بالحالة التنافسية بلاعبَين، في الفصل 5.</p>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../01-qu-est-ce-que-l-ia/page.html">\(\leftarrow\) الفصل 1 &mdash; ما الذكاء الاصطناعي؟</a>
+<a href="../../../IA/lecons/02-agents/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">المُلحَق الخوارزمي</a>
+<a href="../../index.html">فهرس المُقرَّر</a>
+<a href="../03-recherche/page.html">الفصل 3 &mdash; البحث في فضاء الحالات \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>الذكاء الاصطناعي &mdash; الأقسام التحضيرية MP/PSI</strong> &middot; البحث والألعاب والقيود والتعلّم<span class="footer-meta">طبعة 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">تعذّر تحميل الشكل التفاعلي. تحقّق من اتصالك بالشبكة.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ============ Monde de l'المكنسة: اربع بنى'agent ======== */
+var LARG = 10, HAUT = 4;
+var TYPES = ['منعكس بسيط', 'منعكس بحالة', 'وكيل بغاية', 'وكيل بمنفعة'];
+var DESCR = [
+ 'لا ينظر الا الى الخانة الراهنة ولا ذاكرة له. يشفط ان كانت متسخة، والا تقدم؛ وعند الجدار يعود في الاتجاه المعاكس — فلا يغادر سطره ابدا.',
+ 'يتذكر الخانات المزارة ويمسحها على شكل افعى: فلا يمر مرتين بالمكان نفسه ابدا.',
+ 'يجعل غايته اقرب خانة متسخة معروفة ويقصدها باقصر خط منكسر.',
+ 'كالوكيل بغاية، لكن كل تنقل يكلف 2 وكل شفط يربح 10: فيتخلى عن اتساخ يبعد 5 خانات او اكثر، لان مساره يكلف اكثر مما يربح.'
+];
+/* Disposition initiale, fixee pour rendre la figure reproductible. */
+var SALE0 = ['0,0','2,0','1,1','2,1','0,2','2,2','1,3','3,3','9,0','9,3'];
+
+function cle(x, y){ return x + ',' + y; }
+
+function simuler(type, nEtapes){
+  var sale = {}, i;
+  for (i = 0; i < SALE0.length; i++){ sale[SALE0[i]] = true; }
+  var x = 0, y = 0, dir = 1, vus = {}, score = 0, deplacements = 0, aspirations = 0;
+  var etats = [{x:x, y:y, sale:copier(sale), score:score, action:'البداية'}];
+  for (var t = 0; t < nEtapes; t++){
+    var action;
+    if (sale[cle(x, y)]){
+      delete sale[cle(x, y)];
+      score += 10; aspirations++;
+      action = 'aspire';
+    } else {
+      vus[cle(x, y)] = true;
+      var cible = null;
+      if (type === 0){
+        if (x + dir < 0 || x + dir >= LARG) { dir = -dir; }   /* aucune memoire : il rebondit */
+        else { x += dir; }
+        action = 'avance';
+      } else if (type === 1){
+        /* serpentin : parcours systematique */
+        if (x + dir < 0 || x + dir >= LARG){ dir = -dir; y = y + 1; if (y >= HAUT) { y = 0; } }
+        else { x += dir; }
+        action = 'balaie';
+      } else {
+        cible = plusProche(sale, x, y, type === 3);
+        if (cible === null){ action = 'inactif'; }
+        else {
+          if (cible[0] !== x) { x += (cible[0] > x) ? 1 : -1; }
+          else if (cible[1] !== y) { y += (cible[1] > y) ? 1 : -1; }
+          action = 'يتجه نحو ' + cle(cible[0], cible[1]);
+        }
+      }
+      if (action !== 'inactif'){ score -= 2; deplacements++; }
+    }
+    etats.push({x:x, y:y, sale:copier(sale), score:score, action:action});
+  }
+  return {etats:etats, deplacements:deplacements, aspirations:aspirations, score:score};
+}
+function copier(o){ var r = {}; for (var k in o){ r[k] = o[k]; } return r; }
+function plusProche(sale, x, y, rentable){
+  var best = null, bestd = 1e9;
+  for (var k in sale){
+    var p = k.split(','), d = Math.abs(+p[0] - x) + Math.abs(+p[1] - y);
+    if (rentable && 2 * d >= 10) { continue; }   /* le trajet couterait plus qu il ne rapporte */
+    if (d < bestd){ bestd = d; best = [+p[0], +p[1]]; }
+  }
+  return best;
+}
+var CACHE = {};
+function sim(type){
+  if (!(type in CACHE)) { CACHE[type] = simuler(type, 40); }
+  return CACHE[type];
+}
+
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-1.6, 6.8, 11.6, -2.8], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: true
+});
+var sType = b1.create('slider', [[-1.4, -1.6], [4.0, -1.6], [0, 0, 3]], {
+  name: 'الوكيل', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sPas = b1.create('slider', [[5.8, -1.6], [11.4, -1.6], [0, 0, 40]], {
+  name: 'خطوة', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function typeCourant(){ return Math.round(sType.Value()); }
+function etatCourant(){
+  var s = sim(typeCourant());
+  return s.etats[Math.min(Math.round(sPas.Value()), s.etats.length - 1)];
+}
+var cGrille = b1.create('curve', [[0],[0]], {strokeColor: PAL.ref, strokeWidth: 1,
+  highlight: false, fixed: true});
+(function(){
+  var X = [], Y = [];
+  for (var i = 0; i <= LARG; i++){ X.push(i, i, NaN); Y.push(0, HAUT, NaN); }
+  for (var j = 0; j <= HAUT; j++){ X.push(0, LARG, NaN); Y.push(j, j, NaN); }
+  cGrille.dataX = X; cGrille.dataY = Y;
+})();
+var cSale = b1.create('curve', [[0],[0]], {strokeWidth: 0,
+  fillColor: function(){ return cssv('--viz-bad', '#dc2626'); }, fillOpacity: 0.30,
+  highlight: false, fixed: true});
+cSale.updateDataArray = function(){
+  var e = etatCourant(), X = [], Y = [];
+  for (var k in e.sale){
+    var p = k.split(','), x = +p[0], y = +p[1];
+    X.push(x + 0.08, x + 0.92, x + 0.92, x + 0.08, x + 0.08, NaN);
+    Y.push(y + 0.08, y + 0.08, y + 0.92, y + 0.92, y + 0.08, NaN);
+  }
+  this.dataX = X; this.dataY = Y;
+};
+var cTrace = b1.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--viz-blue', '#2563eb'); }, strokeWidth: 2,
+  dash: 1, highlight: false, fixed: true});
+cTrace.updateDataArray = function(){
+  var s = sim(typeCourant()), n = Math.min(Math.round(sPas.Value()), s.etats.length - 1);
+  var X = [], Y = [];
+  for (var i = 0; i <= n; i++){ X.push(s.etats[i].x + 0.5); Y.push(s.etats[i].y + 0.5); }
+  this.dataX = X; this.dataY = Y;
+};
+b1.create('point', [function(){ return etatCourant().x + 0.5; },
+                    function(){ return etatCourant().y + 0.5; }], {
+  name: '', size: 10, face: 'o', fixed: true, highlight: false, strokeWidth: 2.5,
+  strokeColor: function(){ return cssv('--primary-dark', '#014a55'); },
+  fillColor: function(){ return cssv('--primary', '#026573'); }, fillOpacity: 1});
+b1.create('text', [-1.5, 6.4, function(){
+  var e = etatCourant(), n = 0;
+  for (var k in e.sale){ n++; }
+  return 'الوكيل: ' + TYPES[typeCourant()] + '   |   خطوة ' + Math.min(Math.round(sPas.Value()), 40)
+       + '   |   الخانات المتسخة المتبقية: ' + n + '   |   النتيجة: ' + e.score;
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-1.5, 5.9, function(){ return DESCR[typeCourant()]; }],
+  {fontSize: 12.5, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-1.5, 5.3, function(){ return 'الفعل الاخير: ' + etatCourant().action; }],
+  {fontSize: 13, strokeColor: function(){ return cssv('--primary','#026573'); },
+   fixed: true, highlight: false});
+b1.create('text', [-1.5, -2.4, function(){
+  var s = sim(typeCourant());
+  return 'بعد 40 خطوة: ' + s.aspirations + ' aspirations, ' + s.deplacements
+       + ' تنقلا، والنتيجة النهائية ' + s.score + ' من ' + (SALE0.length * 10) + ' possibles.';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+/* ====== Figure 2.4 : d'ou vient le score de chaque architecture ========== */
+/* Trois lectures superposees : la trajectoire du score, la decomposition
+   gains / depenses, et le classement final. */
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-13, 118, 46, -46], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var COULA = ['--viz-bad', '--viz-blue', '--accent', '--primary'];
+
+/* --- reperes */
+b2.create('segment', [[0, 0], [40, 0]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b2.create('segment', [[0, -46], [0, 108]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b2.create('segment', [[0, 100], [40, 100]], {
+  strokeColor: function(){ return cssv('--viz-ok', '#16a34a'); },
+  strokeWidth: 1.8, dash: 2, straightFirst: false, straightLast: false,
+  highlight: false, fixed: true});
+b2.create('text', [40.6, 100, 'نُظف كل شيء: 100'], {fontSize: 11.5, anchorX: 'left',
+  strokeColor: function(){ return cssv('--viz-ok', '#16a34a'); }, fixed: true, highlight: false});
+for (var v = 10; v <= 40; v += 10){
+  (function(k){ b2.create('text', [k, -6, String(k)], {fontSize: 11, anchorX: 'middle',
+    strokeColor: PAL.muted, fixed: true, highlight: false}); })(v);
+}
+for (var v = -40; v <= 100; v += 20){
+  (function(k){
+    if (k === 0) { return; }
+    b2.create('segment', [[-0.7, k], [0.7, k]], {strokeColor: PAL.axis, strokeWidth: 1,
+      straightFirst: false, straightLast: false, highlight: false, fixed: true});
+    b2.create('text', [-1.6, k, String(k)], {fontSize: 10.5, anchorX: 'right',
+      strokeColor: PAL.muted, fixed: true, highlight: false});
+  })(v);
+}
+b2.create('text', [20, -12, 'عدد الخطوات المنقضية'], {fontSize: 12.5, anchorX: 'middle',
+  strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-11.5, 54, 'النتيجة'], {fontSize: 12.5, anchorX: 'middle',
+  strokeColor: PAL.muted, fixed: true, highlight: false});
+
+/* --- trajectoires, celle de l architecture choisie en epaisseur */
+for (var i = 0; i < 4; i++){
+  (function(t){
+    var c = b2.create('curve', [[0],[0]], {
+      strokeColor: function(){ return cssv(COULA[t], '#026573'); },
+      strokeWidth: function(){ return typeCourant() === t ? 4.5 : 1.8; },
+      highlight: false, fixed: true});
+    c.updateDataArray = function(){
+      var s = sim(t), X = [], Y = [];
+      for (var k = 0; k < s.etats.length; k++){ X.push(k); Y.push(s.etats[k].score); }
+      this.dataX = X; this.dataY = Y;
+    };
+    /* point mobile suivant le curseur d etape de la figure precedente */
+    b2.create('point', [
+      function(){ return Math.min(Math.round(sPas.Value()), 40); },
+      function(){ var s = sim(t);
+                  return s.etats[Math.min(Math.round(sPas.Value()), s.etats.length - 1)].score; }
+    ], {name: '', size: function(){ return typeCourant() === t ? 5 : 3; },
+        face: 'o', fixed: true, highlight: false, strokeWidth: 1.5,
+        strokeColor: function(){ return cssv(COULA[t], '#026573'); },
+        fillColor: function(){ return cssv(COULA[t], '#026573'); }, fillOpacity: 1});
+    /* etiquette au bout de la courbe */
+    b2.create('text', [40.6, function(){ return sim(t).score; }, TYPES[t]], {
+      fontSize: 12, anchorX: 'left', anchorY: 'middle', fixed: true, highlight: false,
+      strokeColor: function(){ return cssv(COULA[t], '#026573'); }});
+  })(i);
+}
+
+/* --- decomposition en barres : ce que chaque agent gagne et depense */
+for (var i = 0; i < 4; i++){
+  (function(t){
+    var x0 = 2 + t * 9.5;
+    b2.create('curve', [
+      function(){ var s = sim(t);
+        return [x0, x0 + 6, x0 + 6, x0, x0]; },
+      function(){ var s = sim(t), g = -6 - s.aspirations * 10 * 0.22;
+        return [-6, -6, g, g, -6]; }], {
+      strokeWidth: 0, highlight: false, fixed: true,
+      fillColor: function(){ return cssv('--viz-ok', '#16a34a'); },
+      fillOpacity: function(){ return typeCourant() === t ? 0.85 : 0.35; }});
+    b2.create('curve', [
+      function(){ var s = sim(t);
+        return [x0, x0 + 6, x0 + 6, x0, x0]; },
+      function(){ var s = sim(t), g = -6 - s.aspirations * 10 * 0.22;
+        var d = g - s.deplacements * 2 * 0.22;
+        return [g, g, d, d, g]; }], {
+      strokeWidth: 0, highlight: false, fixed: true,
+      fillColor: function(){ return cssv('--viz-bad', '#dc2626'); },
+      fillOpacity: function(){ return typeCourant() === t ? 0.85 : 0.35; }});
+    b2.create('text', [x0 + 3, function(){
+      var s = sim(t);
+      return -6 - (s.aspirations * 10 + s.deplacements * 2) * 0.22 - 5;
+    }, function(){
+      var s = sim(t);
+      return '+' + (s.aspirations * 10) + '  −' + (s.deplacements * 2) + '  =  ' + s.score;
+    }], {fontSize: 11, anchorX: 'middle', fixed: true, highlight: false,
+         strokeColor: function(){ return typeCourant() === t ? PAL.text() : PAL.muted(); }});
+  })(i);
+}
+b2.create('text', [-12.5, -8, 'gains'], {fontSize: 11, anchorX: 'left',
+  strokeColor: function(){ return cssv('--viz-ok', '#16a34a'); }, fixed: true, highlight: false});
+b2.create('text', [-12.5, -20, 'depenses'], {fontSize: 11, anchorX: 'left',
+  strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }, fixed: true, highlight: false});
+
+b2.create('text', [-12.5, 114, function(){
+  var r = [];
+  for (var t = 0; t < 4; t++){ r.push(TYPES[t] + ' ' + sim(t).score); }
+  return 'النتيجة بعد 40 خطوة  -  ' + r.join('   |   ');
+}], {fontSize: 13, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-12.5, 106, function(){
+  var a = sim(2), b = sim(3);
+  return 'الوكيل بغاية ينظف كل شيء في ' + a.deplacements + ' تنقلا؛ والوكيل بمنفعة '
+       + 'يتخلى عن اتساخين بعيدين ولا يقوم الا بـ' + b.deplacements
+       + '، ومع ذلك تقل نتيجته النهائية بـ' + (a.score - b.score) + '.';
+}], {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-12.5, -42,
+  'كل شفط يربح 10 نقاط، وكل تنقل يكلف 2. واشرطة الاسفل تحلل النتيجة النهائية.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

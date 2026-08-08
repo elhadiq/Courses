@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الفصل 11 &mdash; الشبكات العصبية</title>
+<meta name="description" content="العصبون الصوري، المُدرِك الحسّي، الانتشار العكسي، التقريب الكوني، الالتفافات.">
+<link href="../../assets/style.css" rel="stylesheet">
+<link href="../../assets/rtl.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+
+.src-ar { margin: 26px 0 8px; border-top: 2px solid var(--color-rule); padding-top: 16px; }
+.src-ar h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--primary); }
+.src-ar .src-note { color: var(--color-muted); font-size: 0.9rem; margin: 0 0 12px; }
+.src-ar ul { list-style: none; padding: 0; margin: 0; }
+.src-ar li { margin: 0 0 14px; padding-right: 14px; border-right: 3px solid var(--primary-soft-2);
+             line-height: 1.7; font-size: 0.95rem; }
+.src-ar li .pourquoi { display: block; color: var(--color-muted); font-size: 0.9em;
+                       margin-top: 3px; }
+.src-ar li a.lien { word-break: break-all; font-size: 0.88em; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><a class="lang-switch" href="../../../IA/lecons/11-reseaux-neurones/page.html" hreflang="fr" title="Version fran&ccedil;aise">FR</a><div class="breadcrumb"><a href="../../index.html">الذكاء الاصطناعي</a> &middot; مُقرَّر</div><span class="course-code">برنامج MP/PSI &middot; الفترة الثانية</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">القسم الرابع &middot; الفصل 11</div>
+<h1>الفصل 11 &mdash; من المُدرِك الحسّي إلى التعلّم العميق</h1>
+<div class="lesson-sub">العصبون الصوري، والمُدرِك الحسّي وحدوده، والشبكة متعدّدة الطبقات، والانتشار العكسي، ومبرهنة التقريب الكوني، والالتفافات.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">المُلحَق المرافق</div><p>العصبون الصوري، وقاعدة المُدرِك الحسّي، والانتشار العكسي، والنزول بدفعاتٍ صغيرة، مفصَّلة <strong><a href="../../../IA/lecons/11-reseaux-neurones/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">خطوة بخطوة في المُلحَق</a></strong>، مع مثالٍ رقميّ مبسوط يدوياً.</p></div>
+
+<h2>11.1 العصبون الصوري</h2>
+
+<p>يقترح مكولوك وبيتس سنة 1943 &mdash; قبل أيّ حاسوب &mdash; نموذجاً رياضياً للعصبون: وحدةً تجمع مُدخَلاتها الموزونة وتنشط إذا تجاوز المجموع عتبة. ويبرهنان أنّ شبكةً من هذه الوحدات تستطيع حساب أيّ دالّةٍ منطقية <a class="cite" href="#ref-mcculloch1943">[1]</a>.</p>
+
+<div class="box def"><div class="box-title">تعريف &mdash; العصبون الصوري</div>
+<p>عصبونٌ وسائطه \(w \in \mathbb{R}^{d}\) وM1 يحسب</p>
+<div class="eq">\[a = \varphi\!\left(\sum_{i=1}^{d} w_i x_i + b\right) = \varphi(w^{\mathsf{T}}x + b)\]</div>
+<p>حيث \(\varphi\) هي <strong>دالّة التنشيط</strong>. والمتّجه \(w\) يعطي أهمّية كلّ مُدخَل، والتحيّز \(b\) يزيح عتبة الإطلاق.</p></div>
+
+<figure class="viz"><div class="viz-title">أربع دوالّ تنشيط</div>
+<svg viewBox="0 0 760 320" role="img" style="width:100%;height:auto;display:block;"><path d="M 34 130 L 174 130" style="fill:none;stroke:var(--viz-axis);stroke-width:1.2;"/><path d="M 104 68 L 104 170" style="fill:none;stroke:var(--viz-axis);stroke-width:1.2;"/><path d="M 34 130 L 35 130 L 36 130 L 37 130 L 38 130 L 39 130 L 40 130 L 41 130 L 42 130 L 43 130 L 44 130 L 45 130 L 46 130 L 47 130 L 48 130 L 49 130 L 50 130 L 51 130 L 52 130 L 53 130 L 54 130 L 55 130 L 56 130 L 57 130 L 58 130 L 59 130 L 60 130 L 61 130 L 62 130 L 63 130 L 64 130 L 65 130 L 66 130 L 67 130 L 68 130 L 69 130 L 70 130 L 71 130 L 72 130 L 73 130 L 74 130 L 75 130 L 76 130 L 77 130 L 78 130 L 79 130 L 80 130 L 81 130 L 82 130 L 83 130 L 84 130 L 85 130 L 86 130 L 87 130 L 88 130 L 89 130 L 90 130 L 91 130 L 92 130 L 93 130 L 94 130 L 95 130 L 96 130 L 97 130 L 98 130 L 99 130 L 100 130 L 101 130 L 102 130 L 103 130 L 104 130 L 105 88 L 106 88 L 107 88 L 108 88 L 109 88 L 110 88 L 111 88 L 112 88 L 113 88 L 114 88 L 115 88 L 116 88 L 117 88 L 118 88 L 119 88 L 120 88 L 121 88 L 122 88 L 123 88 L 124 88 L 125 88 L 126 88 L 127 88 L 128 88 L 129 88 L 130 88 L 131 88 L 132 88 L 133 88 L 134 88 L 135 88 L 136 88 L 137 88 L 138 88 L 139 88 L 140 88 L 141 88 L 142 88 L 143 88 L 144 88 L 145 88 L 146 88 L 147 88 L 148 88 L 149 88 L 150 88 L 151 88 L 152 88 L 153 88 L 154 88 L 155 88 L 156 88 L 157 88 L 158 88 L 159 88 L 160 88 L 161 88 L 162 88 L 163 88 L 164 88 L 165 88 L 166 88 L 167 88 L 168 88 L 169 88 L 170 88 L 171 88 L 172 88 L 173 88 L 174 88" style="fill:none;stroke:var(--viz-bad);stroke-width:2.8;"/><text x="104" y="34" text-anchor="middle" style="fill:var(--viz-bad);font-size:12.5px;font-weight:700;font-family:inherit;">الدرجة</text><text x="104" y="200" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">مشتقّة منعدمة</text><text x="104" y="215" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">في كلّ مكان: لا</text><text x="104" y="230" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">تدرّج</text><path d="M 220 130 L 360 130" style="fill:none;stroke:var(--viz-axis);stroke-width:1.2;"/><path d="M 290 68 L 290 170" style="fill:none;stroke:var(--viz-axis);stroke-width:1.2;"/><path d="M 220 129.896 L 221 129.887 L 222 129.877 L 223 129.866 L 224 129.854 L 225 129.841 L 226 129.827 L 227 129.811 L 228 129.794 L 229 129.776 L 230 129.756 L 231 129.734 L 232 129.711 L 233 129.685 L 234 129.657 L 235 129.627 L 236 129.594 L 237 129.558 L 238 129.519 L 239 129.476 L 240 129.43 L 241 129.379 L 242 129.325 L 243 129.265 L 244 129.201 L 245 129.131 L 246 129.055 L 247 128.972 L 248 128.883 L 249 128.786 L 250 128.681 L 251 128.567 L 252 128.443 L 253 128.309 L 254 128.165 L 255 128.008 L 256 127.839 L 257 127.656 L 258 127.459 L 259 127.247 L 260 127.018 L 261 126.772 L 262 126.507 L 263 126.222 L 264 125.917 L 265 125.59 L 266 125.24 L 267 124.866 L 268 124.467 L 269 124.042 L 270 123.59 L 271 123.111 L 272 122.603 L 273 122.066 L 274 121.5 L 275 120.904 L 276 120.278 L 277 119.623 L 278 118.939 L 279 118.226 L 280 117.487 L 281 116.721 L 282 115.931 L 283 115.118 L 284 114.284 L 285 113.432 L 286 112.565 L 287 111.685 L 288 110.796 L 289 109.899 L 290 109 L 291 108.101 L 292 107.204 L 293 106.315 L 294 105.435 L 295 104.568 L 296 103.716 L 297 102.882 L 298 102.069 L 299 101.279 L 300 100.513 L 301 99.7736 L 302 99.0612 L 303 98.3771 L 304 97.722 L 305 97.0963 L 306 96.5003 L 307 95.934 L 308 95.3971 L 309 94.8891 L 310 94.4096 L 311 93.9577 L 312 93.5328 L 313 93.1339 L 314 92.76 L 315 92.41 L 316 92.083 L 317 91.7778 L 318 91.4933 L 319 91.2284 L 320 90.982 L 321 90.7531 L 322 90.5406 L 323 90.3436 L 324 90.161 L 325 89.9919 L 326 89.8354 L 327 89.6907 L 328 89.557 L 329 89.4335 L 330 89.3194 L 331 89.2142 L 332 89.1171 L 333 89.0276 L 334 88.9451 L 335 88.869 L 336 88.799 L 337 88.7345 L 338 88.6751 L 339 88.6205 L 340 88.5702 L 341 88.524 L 342 88.4814 L 343 88.4423 L 344 88.4063 L 345 88.3732 L 346 88.3428 L 347 88.3149 L 348 88.2892 L 349 88.2656 L 350 88.2439 L 351 88.224 L 352 88.2057 L 353 88.1888 L 354 88.1734 L 355 88.1592 L 356 88.1462 L 357 88.1342 L 358 88.1232 L 359 88.1131 L 360 88.1039" style="fill:none;stroke:var(--accent);stroke-width:2.8;"/><text x="290" y="34" text-anchor="middle" style="fill:var(--accent);font-size:12.5px;font-weight:700;font-family:inherit;">السينية</text><text x="290" y="200" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">مشتقّة أقصاها 1/4:</text><text x="290" y="215" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">التدرّج يتلاشى</text><text x="290" y="230" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">في العمق</text><path d="M 406 130 L 546 130" style="fill:none;stroke:var(--viz-axis);stroke-width:1.2;"/><path d="M 476 68 L 476 170" style="fill:none;stroke:var(--viz-axis);stroke-width:1.2;"/><path d="M 406 171.972 L 407 171.968 L 408 171.965 L 409 171.96 L 410 171.956 L 411 171.95 L 412 171.944 L 413 171.937 L 414 171.93 L 415 171.921 L 416 171.912 L 417 171.901 L 418 171.889 L 419 171.876 L 420 171.861 L 421 171.844 L 422 171.825 L 423 171.804 L 424 171.78 L 425 171.754 L 426 171.724 L 427 171.691 L 428 171.653 L 429 171.611 L 430 171.565 L 431 171.512 L 432 171.454 L 433 171.388 L 434 171.314 L 435 171.232 L 436 171.14 L 437 171.037 L 438 170.922 L 439 170.793 L 440 170.65 L 441 170.489 L 442 170.31 L 443 170.11 L 444 169.887 L 445 169.638 L 446 169.361 L 447 169.053 L 448 168.71 L 449 168.329 L 450 167.906 L 451 167.438 L 452 166.919 L 453 166.345 L 454 165.712 L 455 165.013 L 456 164.246 L 457 163.403 L 458 162.48 L 459 161.472 L 460 160.374 L 461 159.181 L 462 157.89 L 463 156.496 L 464 154.999 L 465 153.397 L 466 151.689 L 467 149.878 L 468 147.966 L 469 145.958 L 470 143.861 L 471 141.684 L 472 139.436 L 473 137.13 L 474 134.779 L 475 132.397 L 476 130 L 477 127.603 L 478 125.221 L 479 122.87 L 480 120.564 L 481 118.316 L 482 116.139 L 483 114.042 L 484 112.034 L 485 110.122 L 486 108.311 L 487 106.603 L 488 105.001 L 489 103.504 L 490 102.11 L 491 100.819 L 492 99.6263 L 493 98.5281 L 494 97.5199 L 495 96.597 L 496 95.7543 L 497 94.9865 L 498 94.2885 L 499 93.6551 L 500 93.0813 L 501 92.5623 L 502 92.0936 L 503 91.6708 L 504 91.2899 L 505 90.9471 L 506 90.6388 L 507 90.3618 L 508 90.1132 L 509 89.8901 L 510 89.6901 L 511 89.5108 L 512 89.3503 L 513 89.2066 L 514 89.0779 L 515 88.9629 L 516 88.8599 L 517 88.7679 L 518 88.6857 L 519 88.6121 L 520 88.5465 L 521 88.4878 L 522 88.4354 L 523 88.3886 L 524 88.3468 L 525 88.3095 L 526 88.2762 L 527 88.2464 L 528 88.2199 L 529 88.1962 L 530 88.175 L 531 88.1562 L 532 88.1393 L 533 88.1243 L 534 88.1109 L 535 88.0989 L 536 88.0883 L 537 88.0787 L 538 88.0702 L 539 88.0627 L 540 88.0559 L 541 88.0499 L 542 88.0445 L 543 88.0397 L 544 88.0354 L 545 88.0316 L 546 88.0282" style="fill:none;stroke:var(--viz-blue);stroke-width:2.8;"/><text x="476" y="34" text-anchor="middle" style="fill:var(--viz-blue);font-size:12.5px;font-weight:700;font-family:inherit;">الظلّ الزائدي</text><text x="476" y="200" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">موسَّطة عند الصفر،</text><text x="476" y="215" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">لكن بالعيب نفسه</text><text x="476" y="230" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">في التشبّع</text><path d="M 592 130 L 732 130" style="fill:none;stroke:var(--viz-axis);stroke-width:1.2;"/><path d="M 662 68 L 662 170" style="fill:none;stroke:var(--viz-axis);stroke-width:1.2;"/><path d="M 592 130 L 593 130 L 594 130 L 595 130 L 596 130 L 597 130 L 598 130 L 599 130 L 600 130 L 601 130 L 602 130 L 603 130 L 604 130 L 605 130 L 606 130 L 607 130 L 608 130 L 609 130 L 610 130 L 611 130 L 612 130 L 613 130 L 614 130 L 615 130 L 616 130 L 617 130 L 618 130 L 619 130 L 620 130 L 621 130 L 622 130 L 623 130 L 624 130 L 625 130 L 626 130 L 627 130 L 628 130 L 629 130 L 630 130 L 631 130 L 632 130 L 633 130 L 634 130 L 635 130 L 636 130 L 637 130 L 638 130 L 639 130 L 640 130 L 641 130 L 642 130 L 643 130 L 644 130 L 645 130 L 646 130 L 647 130 L 648 130 L 649 130 L 650 130 L 651 130 L 652 130 L 653 130 L 654 130 L 655 130 L 656 130 L 657 130 L 658 130 L 659 130 L 660 130 L 661 130 L 662 130 L 663 128.8 L 664 127.6 L 665 126.4 L 666 125.2 L 667 124 L 668 122.8 L 669 121.6 L 670 120.4 L 671 119.2 L 672 118 L 673 116.8 L 674 115.6 L 675 114.4 L 676 113.2 L 677 112 L 678 110.8 L 679 109.6 L 680 108.4 L 681 107.2 L 682 106 L 683 104.8 L 684 103.6 L 685 102.4 L 686 101.2 L 687 100 L 688 98.8 L 689 97.6 L 690 96.4 L 691 95.2 L 692 94 L 693 92.8 L 694 91.6 L 695 90.4 L 696 89.2 L 697 88 L 698 86.8 L 699 85.6 L 700 84.4 L 701 83.2 L 702 82 L 703 80.8 L 704 79.6 L 705 78.4 L 706 77.2 L 707 76 L 708 74.8 L 709 73.6 L 710 72.4 L 711 71.2 L 712 70 L 713 68.8 L 714 67.6 L 715 66.4 L 716 65.2 L 717 64 L 718 62.8 L 719 62.8 L 720 62.8 L 721 62.8 L 722 62.8 L 723 62.8 L 724 62.8 L 725 62.8 L 726 62.8 L 727 62.8 L 728 62.8 L 729 62.8 L 730 62.8 L 731 62.8 L 732 62.8" style="fill:none;stroke:var(--primary);stroke-width:2.8;"/><text x="662" y="34" text-anchor="middle" style="fill:var(--primary);font-size:12.5px;font-weight:700;font-family:inherit;">التقويم</text><text x="662" y="200" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">مشتقّة 1 على اليمين:</text><text x="662" y="215" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">وهذا ما فكّ حصار</text><text x="662" y="230" text-anchor="middle" style="fill:var(--color-muted);font-size:10.5px;font-family:inherit;">العميق</text><text x="380" y="278" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">بلا دالّةٍ غير خطّية، يبقى تكديس الطبقات تطبيقاً خطّياً واحداً.</text><text x="380" y="302" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">واختيار هذه الدالّة حسم عشر سنواتٍ من تاريخ الحقل.</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 11.1.</strong> النقطة الحاسمة هي المشتقّة. فالدرجة مشتقّتها منعدمة في كلّ مكان: فلا تدرّج يستطيع عبورها، وهذا يمنع تدريب شبكةٍ عميقة. والسينية والظلّ الزائدي مشتقّتهما تؤول إلى الصفر بمجرّد ابتعاد المُدخَل عن المبدأ: فعلى عشر طبقات، تتضاعف هذه المعاملات ويختفي التدرّج. أمّا التقويم فمشتقّته ثابتة تساوي 1 على جزئه المتزايد كلّه: وهذه الخاصّية التافهة هي التي جعلت الشبكات العميقة قابلة للممارسة.</figcaption></figure>
+
+<div class="box warn"><div class="box-title">لماذا لا غنى عن اللاخطّية</div>
+إذا كانت \(\varphi\) هي المطابقة، فتركيب طبقتين يعطي \(W_2(W_1x + b_1) + b_2 = (W_2W_1)x + (W_2b_1 + b_2)\)، أي تطبيقاً تآلفياً واحداً. وتكديس ألف طبقةٍ خطّية يُنتج صنف الدوالّ نفسه الذي تُنتجه طبقةٌ واحدة بالضبط. وكلّ قوّة الشبكات العميقة تأتي من هذه الدالّة غير الخطّية المُدرَجة بين الطبقات.</div>
+
+<h2>11.2 المُدرِك الحسّي وحدّه</h2>
+
+<p>يبني روزنبلات سنة 1958 أوّل آلةٍ متعلّمة، بقاعدة تحديثٍ بالغة البساطة ومبرهنة تقارب <a class="cite" href="#ref-rosenblatt1958">[2]</a>.</p>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 11.1 &mdash; قاعدة تعلّم المُدرِك الحسّي</div><div class="algo-io"><b>المُدخل:</b> \(\big((x_i, y_i)\big)_{i=1}^{n}\) مع \(y_i \in \{0,1\}\)، وعدد حِقَبٍ \(E\)<br><b>المُخرج:</b> \((w, b)\) يصنّف كلّ الأمثلة، إن كانت الأصناف قابلة للفصل</div><ol class="algo-corps"><li>\(w \leftarrow 0\) ؛ \(b \leftarrow 0\)</li><li><b class="kw">لكلّ</b> \(e = 1\) <b class="kw">إلى أن</b> \(E\) <b class="kw">نفّذ</b></li><li class="n1">\(\varepsilon \leftarrow 0\)</li><li class="n1"><b class="kw">لكلّ</b> \(i = 1\) <b class="kw">إلى أن</b> \(n\) <b class="kw">نفّذ</b></li><li class="n2">\(\hat{y} \leftarrow \mathbf{1}\big[\,w^{\mathsf{T}}x_i + b \gt 0\,\big]\)</li><li class="n2"><b class="kw">إذا</b> \(\hat{y} \neq y_i\) <b class="kw">فإنّ</b></li><li class="n3">\(w \leftarrow w + (y_i - \hat{y})\,x_i\) ؛ \(b \leftarrow b + (y_i - \hat{y})\)</li><li class="n3">\(\varepsilon \leftarrow \varepsilon + 1\)</li><li class="n1"><b class="kw">إذا</b> \(\varepsilon = 0\) <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> \((w, b)\)          <span class="cm">// لم يبق اي خطأ</span></li><li><b class="kw">أرجِع</b> \((w, b)\)</li></ol><p class="algo-note"><strong>مبرهنة نوفيكوف.</strong> إذا كانت الأصناف قابلة للفصل بهامش \(\gamma \gt 0\) وM28، فعدد التصحيحات محدود بـM29 &mdash; باستقلالٍ عن \(n\) وعن البُعد وعن الترتيب. والعكس النقيض: إن لم تتقارب الخوارزمية، فالبيانات غير قابلة للفصل.</p></div>
+
+<div class="box thm"><div class="box-title">مبرهنة تقارب المُدرِك الحسّي</div>
+<p>إذا كانت الأمثلة قابلة للفصل خطّياً بهامش \(\gamma \gt 0\)، وكانت كلّها ذات نظيمٍ أقصاه \(R\)، فإنّ قاعدة المُدرِك الحسّي ترتكب على الأكثر \(R^{2}/\gamma^{2}\) تصحيحاً قبل أن تكفّ عن الخطأ &mdash; مهما كان ترتيب عرض الأمثلة <a class="cite" href="#ref-novikoff1962">[3]</a>.</p>
+<p>والحدّ لا يتوقّف على عدد الأمثلة ولا على البُعد: وهذه نتيجة قويّة. وعكسها النقيض كذلك: فإن لم تتقارب الخوارزمية، فذلك لأنّ البيانات غير قابلة للفصل خطّياً.</p></div>
+
+<div class="box thm"><div class="box-title">مبرهنة &mdash; المُدرِك الحسّي لا يحسب «أو» الحصري</div>
+<p>لا يوجد أيّ زوج \((w, b)\) يجعل المُدرِك الحسّي يصنّف النقاط الأربع \((0,0) \mapsto 0\) وM36 وM37 وM38 تصنيفاً صحيحاً.</p>
+<p><em>البرهان.</em> القيدان الأوّلان يعطيان \(b \le 0\) وM40، ومن ثمّ \(w_2 \gt -b \ge 0\). والثالث يعطي بالمثل \(w_1 \gt -b \ge 0\). وبالجمع، \(w_1 + w_2 \gt -2b\)، ومن ثمّ \(w_1 + w_2 + b \gt -b \ge 0\). فالنقطة الرابعة ستُصنَّف 1 إذن، بينما قيمتها 0. وهذا تناقض. \(\square\)</p>
+<p>وقد نشر مينسكي وبابرت هذه النتيجة وتعميماتها سنة 1969 <a class="cite" href="#ref-minsky1969">[4]</a>. وهي صحيحة؛ لكن أُسيء تأويل مداها، لأنّها لا تقول شيئاً عن الشبكات متعدّدة الطبقات.</p></div>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">المؤشّر الأوّل يختار الدالّة البوليانية المراد تعلّمها، والثاني يتقدّم في الحِقَب. والمربّعات تساوي 0 والأقراص تساوي 1؛ والمستقيم هو الحدّ المتعلَّم.</p>
+<div id="jxg1" class="viz-board" style="height:520px;"></div>
+<p class="viz-caption"><strong>الشكل 11.2.</strong> يتقارب المُدرِك الحسّي في 6 حِقَبٍ على «و»، وفي 4 على «أو». أمّا على «أو» الحصري، فيظلّ يخطئ في الأمثلة الأربعة بعد 40 حقبة، ويتذبذب المستقيم بلا نهاية: وليست المسألة مسألة صبرٍ ولا ضبط، فلا مستقيم يفصل هذه النقاط الأربع.</p></div>
+
+<h2>11.3 الشبكة متعدّدة الطبقات والانتشار العكسي</h2>
+
+<p>كان الحلّ معلوماً منذ 1969: تكديس الطبقات. وما كان ينقص هو وسيلة ضبط أوزان الطبقات الداخلية، التي لا يتوفّر لها أيّ «جوابٍ صحيح». والجواب هو قاعدة اشتقاق الدوالّ المركّبة، مطبَّقةً من المُخرَج نحو المُدخَل <a class="cite" href="#ref-rumelhart1986">[5]</a>.</p>
+
+<figure class="viz"><div class="viz-title">المروران</div>
+<svg viewBox="0 0 760 330" role="img" style="width:100%;height:auto;display:block;"><text x="90" y="42" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">مُدخَل</text><text x="260" y="42" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">الطبقة 1</text><text x="430" y="42" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">الطبقة 2</text><text x="600" y="42" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">مُخرَج</text><path d="M 103 104 L 247 81" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 104 L 247 127" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 104 L 247 173" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 104 L 247 219" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 150 L 247 81" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 150 L 247 127" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 150 L 247 173" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 150 L 247 219" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 196 L 247 81" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 196 L 247 127" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 196 L 247 173" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 103 196 L 247 219" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 81 L 417 81" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 81 L 417 127" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 81 L 417 173" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 81 L 417 219" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 127 L 417 81" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 127 L 417 127" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 127 L 417 173" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 127 L 417 219" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 173 L 417 81" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 173 L 417 127" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 173 L 417 173" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 173 L 417 219" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 219 L 417 81" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 219 L 417 127" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 219 L 417 173" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 273 219 L 417 219" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 443 81 L 587 150" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 443 127 L 587 150" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 443 173 L 587 150" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><path d="M 443 219 L 587 150" style="fill:none;stroke:var(--viz-ref);stroke-width:1;"/><circle cx="90" cy="104" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="90" cy="150" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="90" cy="196" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="260" cy="81" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="260" cy="127" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="260" cy="173" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="260" cy="219" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="430" cy="81" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="430" cy="127" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="430" cy="173" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="430" cy="219" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><circle cx="600" cy="150" r="13" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2;"/><path d="M 60 76 L 630 76" style="fill:none;stroke:var(--primary);stroke-width:3;"/><path d="M 622 70 L 636 76 L 622 82 Z" style="fill:var(--primary);"/><text x="345" y="68" text-anchor="middle" style="fill:var(--primary);font-size:13px;font-weight:700;font-family:inherit;">المرور الأمامي: نحسب المُخرَج والخسارة</text><path d="M 630 246 L 60 246" style="fill:none;stroke:var(--viz-bad);stroke-width:3;"/><path d="M 68 240 L 54 246 L 68 252 Z" style="fill:var(--viz-bad);"/><text x="345" y="266" text-anchor="middle" style="fill:var(--viz-bad);font-size:13px;font-weight:700;font-family:inherit;">المرور الخلفي: نُعيد توزيع مسؤولية الخطأ</text><text x="668" y="146" style="fill:var(--color-text);font-size:13px;font-family:inherit;">خسارة</text><text x="380" y="306" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;"><tspan x="380" dy="0">الانتشار العكسي ليس إلّا قاعدة اشتقاق الدوالّ المركّبة، مطبَّقةً من اليمين إلى اليسار كي لا نُعيد حساب</tspan><tspan x="380" dy="16">شيء.</tspan></text></svg>
+<figcaption class="viz-caption"><strong>الشكل 11.3.</strong> يحسب المرور الأمامي المُخرَج والخسارة، مع حفظ القيم الوسيطة. ويُعيد المرور الخلفي توزيع مشتقّة الخسارة على كلّ وزن، طبقةً طبقة. والطريقة لا تكتشف شيئاً جديداً: إنّها تحسب تدرّجاً. وفضلها أنّها تفعل ذلك في زمنٍ يتناسب مع عدد الأوزان، حيث كان فرقٌ منتهٍ وسيطاً وسيطاً سيكلّف مربّع هذا العدد.</figcaption></figure>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 11.2 &mdash; الانتشار العكسي على شبكةٍ بطبقةٍ خفيّة واحدة</div><div class="algo-io"><b>المُدخل:</b> \(X \in \mathbb{R}^{n\times d}\)، وM47، والوسائط \(W_1, b_1, W_2, b_2\)، وخطوة \(\eta\)<br><b>المُخرج:</b> الوسائط المُحدَّثة</div><ol class="algo-corps"><li>\(Z_1 \leftarrow XW_1 + b_1\) ؛ \(A_1 \leftarrow \phi(Z_1)\)          <span class="cm">// المرور الامامي: نحفظ Z1 وA1</span></li><li>\(Z_2 \leftarrow A_1W_2 + b_2\) ؛ \(A_2 \leftarrow \sigma(Z_2)\)</li><li>\(\displaystyle J \leftarrow -\tfrac{1}{n}\sum_{i}\big[y_i \ln A_2^{(i)} + (1-y_i)\ln(1 - A_2^{(i)})\big]\)</li><li>&nbsp;</li><li>\(D_2 \leftarrow \tfrac{1}{n}(A_2 - y)\)          <span class="cm">// المرور الخلفي: مشتقة J بالنسبة الى Z2</span></li><li>\(\nabla_{W_2} J \leftarrow A_1^{\mathsf{T}}D_2\) ؛ \(\nabla_{b_2} J \leftarrow \mathbf{1}^{\mathsf{T}}D_2\)</li><li>\(D_1 \leftarrow \big(D_2 W_2^{\mathsf{T}}\big) \odot \phi'(Z_1)\)          <span class="cm">// قاعدة الاشتقاق المتسلسل</span></li><li>\(\nabla_{W_1} J \leftarrow X^{\mathsf{T}}D_1\) ؛ \(\nabla_{b_1} J \leftarrow \mathbf{1}^{\mathsf{T}}D_1\)</li><li>&nbsp;</li><li>\(W_j \leftarrow W_j - \eta\,\nabla_{W_j} J\) ؛ \(b_j \leftarrow b_j - \eta\,\nabla_{b_j} J\) <b class="kw">لكلّ</b> \(j \in \{1,2\}\)</li></ol><p class="algo-note">حفظُ \(Z_1\) وM65 يجعل الحساب خطّياً في عدد الأوزان، حيث كان فرقٌ منتهٍ وسيطاً وسيطاً سيكلّف مربّع هذا العدد. وهو أيضاً ما يفسّر استهلاك النماذج الكبرى للذاكرة.</p></div>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">شبكةٌ بطبقةٍ خفيّة واحدة تتعلّم «أو» الحصري. والمؤشّران يضبطان عدد العصبونات الخفيّة وخطوة النزول؛ والتهيئة هي نفسها في كلّ الحالات.</p>
+<div id="jxg2" class="viz-board" style="height:440px;"></div>
+<p class="viz-caption"><strong>الشكل 11.4.</strong> مع <strong>عصبونٍ خفيٍّ واحد</strong>، تبقى الشبكة عالقةً عند 3 أمثلة من 4: فطبقةٌ خفيّة بوحدةٍ واحدة لا تفعل إلّا أن تركّب دالّتين رتيبتين لتركيبٍ خطّي واحد، وهذا لا يستطيع فصل «أو» الحصري. وبمجرّد <strong>عصبونين</strong>، تهوي الخسارة وتصير الأمثلة الأربعة صحيحة. وهذه الترجمة التجريبية للمبرهنة التالية.</p></div>
+
+<div class="box thm"><div class="box-title">مبرهنة التقريب الكوني</div>
+<p>لتكن \(\varphi\) دالّةً مستمرّة غير كثيرة الحدود. فمن أجل كلّ دالّةٍ مستمرّة \(f\) على متراصٍّ \(K \subset \mathbb{R}^{d}\) وكلّ \(\varepsilon \gt 0\)، يوجد عدد صحيح \(N\) ووسائط تجعل الشبكة ذات الطبقة الخفيّة الواحدة بـM71 وحدة تقارب \(f\) إلى غاية \(\varepsilon\) انتظامياً على \(K\) <a class="cite" href="#ref-cybenko1989">[6]</a><a class="cite" href="#ref-hornik1991">[7]</a>.</p>
+<p><strong>ما لا تقوله المبرهنة</strong>، وهو الأهمّ. فهي لا تقول كم وحدة: إذ قد ينمو \(N\) نموّاً أُسّياً مع البُعد. ولا تقول كيف نجد الوسائط: فالوجود ليس طريقة. ولا تقول شيئاً عن التعميم: فمقاربة دالّةٍ على النقاط المعلومة ليست معرفتها. والاستشهاد بهذه المبرهنة لتبرير استعمال شبكةٍ سوءُ فهمٍ متواتر.</p></div>
+
+<h2>11.4 لماذا عميقاً لا عريضاً</h2>
+
+<p>إن كانت طبقةٌ واحدة تكفي نظرياً، فلماذا التكديس؟ لأنّ العمق يتيح اقتصاداً في الوسائط <em>أُسّياً</em> في بعض عائلات الدوالّ: فتوجد دوالّ تمثّلها شبكةٌ عمقها \(k\) بعددٍ كثير الحدود من الوحدات، وتقتضي عدداً أُسّياً من الوحدات عند العمق \(k-1\) <a class="cite" href="#ref-telgarsky2016">[8]</a>.</p>
+
+<p>والحدس حدسُ التركيب: فالطبقات الأولى تكشف أنماطاً أوّلية، والتالية تركّبها في أنماطٍ أغنى. ففي صورة: حوافّ، ثمّ نسائج، ثمّ أجزاء أشياء، ثمّ أشياء. وهذه الهرمية غير مفروضة: بل تنبثق من التعلّم.</p>
+
+<div class="box warn"><div class="box-title">ثلاثة عوائق للعمق، وعلاجاتها</div>
+<p><strong>التدرّج الذي يتلاشى.</strong> كلّ طبقةٍ تضرب التدرّج في مشتقّة تنشيطها. ومع سينية، تساوي هذه المشتقّة 0,25 على الأكثر: فعلى عشر طبقات، يهبط المعامل إلى \(10^{-6}\). والعلاجات: التقويم، وتهيئةٌ ملائمة لحجم الطبقات، والوصلات المتبقّية التي تدع التدرّج يتخطّى طبقات <a class="cite" href="#ref-he2016">[9]</a>.</p>
+<p><strong>فرط التعلّم.</strong> كثيراً ما تحوي شبكةٌ حديثة وسائط أكثر ممّا تحوي مجموعة التدريب من أمثلة. والعلاجات: التوقّف المبكر، ومعاقبة الأوزان، والإطفاء العشوائي للوحدات أثناء التدريب، والتوسيع الاصطناعي للبيانات.</p>
+<p><strong>الكلفة.</strong> وهذا ما تغيّر فعلاً بين 1986 و2012: لا الانتشار العكسي ولا البُنى، بل ثلاث رتبٍ من القدر في الحساب المتاح ومجموعات بياناتٍ بملايين الأمثلة الموسومة.</p></div>
+
+<h2>11.5 الالتفافات</h2>
+
+<p>شبكةٌ تامّة الاتّصال على صورةٍ من \(224 \times 224\) بكسل ملوّن تتطلّب أصلاً أكثر من 150 000 وزن لعصبونٍ واحد من الطبقة الأولى. وهي تتجاهل زيادةً على ذلك خاصّيتين بديهيّتين في الصور: البكسلات المتجاورة مترابطة، والنمط يحتفظ بمعناه أينما وُجِد.</p>
+
+<div class="box def"><div class="box-title">ثلاث أفكار، ومكسبٌ هائل</div>
+<ul>
+<li><strong>وصلات محلّية</strong>: فكلّ وحدةٍ لا تنظر إلّا إلى نافذةٍ صغيرة.</li>
+<li><strong>تقاسم الأوزان</strong>: فالنافذة نفسها تُطبَّق في كلّ مكانٍ من الصورة. ومُرشِّحٌ من \(3 \times 3\) على ثلاث قنوات لا يكلّف إلّا 27 وزناً، مهما كان حجم الصورة.</li>
+<li><strong>الاستعيان الأدنى</strong>: فنُنقِص الاستبانة تدريجياً، وهذا يوسّع مجال رؤية الطبقات العميقة.</li>
+</ul>
+<p>وهذه البنية، التي اقترحها لوكون لقراءة الرموز البريدية <a class="cite" href="#ref-lecun1998">[10]</a>، بقيت أقلّيةً أربع عشرة سنة قبل أن تفوز سنة 2012 بمسابقة التعرّف على الصور المرجعية بفارقٍ كبير، وتقلب الحقل كلّه <a class="cite" href="#ref-krizhevsky2017">[11]</a>.</p></div>
+
+<div class="box warn"><div class="box-title">ما لا تُحسِنه الشبكات العميقة</div>
+<p>تعديلٌ في صورةٍ لا تدركه العين قد يقلب تصنيفاً بثقةٍ عالية <a class="cite" href="#ref-szegedy2014">[12]</a>: فحدّ القرار المتعلَّم ليس بالشكل الذي نظنّ. كما تستطيع شبكةٌ أن تحفظ عن ظهر قلبٍ وسوماً مسحوبة عشوائياً على مجموعة بياناتٍ بأكملها، وهذا يُظهِر أنّ سعتها تفوق المهمّة بكثير وأنّ النظرية الكلاسيكية للتعميم لا تكفي لتفسير نجاحاتها <a class="cite" href="#ref-zhang2017">[13]</a>. وأخيراً، أثر الحساب ليس تفسيراً: وذلك موضوع الفصل 14.</p></div>
+
+<h2>الخلاصة</h2>
+<ul>
+<li>العصبون تركيبٌ خطّي متبوعٌ بلاخطّية؛ وبدونها لا يقدّم العمق شيئاً.</li>
+<li>يتقارب المُدرِك الحسّي في عددٍ محدود من التصحيحات إذا وفقط إذا كانت البيانات قابلة للفصل خطّياً <a class="cite" href="#ref-novikoff1962">[3]</a>، وهو ما ليس عليه «أو» الحصري <a class="cite" href="#ref-minsky1969">[4]</a>.</li>
+<li>يحسب الانتشار العكسي تدرّج كلّ الأوزان في زمنٍ يتناسب مع عددها <a class="cite" href="#ref-rumelhart1986">[5]</a>.</li>
+<li>طبقةٌ خفيّة واحدة تكفي لمقاربة كلّ دالّةٍ مستمرّة، بلا أيّ ضمانٍ على عدد الوحدات ولا على كيفية إيجادها <a class="cite" href="#ref-cybenko1989">[6]</a>.</li>
+<li>العمق اقتصادٌ في الوسائط، لا مكسبٌ في قوّة التعبير <a class="cite" href="#ref-telgarsky2016">[8]</a>.</li>
+<li>تستثمر الالتفافات المحلّية والثبات بالانسحاب؛ ونجاحها سنة 2012 مدينٌ للبيانات والحساب بقدر ما هو مدينٌ للأفكار <a class="cite" href="#ref-krizhevsky2017">[11]</a>.</li>
+</ul>
+
+<h2>المراجع</h2>
+<ol class="reflist">
+<li id="ref-mcculloch1943">McCulloch, W. S. &amp; Pitts, W. (1943). A logical calculus of the ideas immanent in nervous activity. <em>Bulletin of Mathematical Biophysics</em>, 5, 115&ndash;133. DOI: 10.1007/BF02478259. <a href="https://doi.org/10.1007/BF02478259">https://doi.org/10.1007/BF02478259</a></li>
+<li id="ref-rosenblatt1958">Rosenblatt, F. (1958). The perceptron: a probabilistic model for information storage and organization in the brain. <em>Psychological Review</em>, 65(6), 386&ndash;408. DOI: 10.1037/h0042519. <a href="https://doi.org/10.1037/h0042519">https://doi.org/10.1037/h0042519</a></li>
+<li id="ref-novikoff1962">Novikoff, A. B. J. (1962). On convergence proofs for perceptrons. <em>Proceedings of the Symposium on the Mathematical Theory of Automata</em>, 12, 615&ndash;622. <a href="https://apps.dtic.mil/sti/citations/AD0298258">https://apps.dtic.mil/sti/citations/AD0298258</a></li>
+<li id="ref-minsky1969">Minsky, M. &amp; Papert, S. (1969). <em>Perceptrons</em>. MIT Press. DOI: 10.7551/mitpress/11301.001.0001. <a href="https://doi.org/10.7551/mitpress/11301.001.0001">https://doi.org/10.7551/mitpress/11301.001.0001</a></li>
+<li id="ref-rumelhart1986">Rumelhart, D. E., Hinton, G. E. &amp; Williams, R. J. (1986). Learning representations by back-propagating errors. <em>Nature</em>, 323, 533&ndash;536. DOI: 10.1038/323533a0. <a href="https://doi.org/10.1038/323533a0">https://doi.org/10.1038/323533a0</a></li>
+<li id="ref-cybenko1989">Cybenko, G. (1989). Approximation by superpositions of a sigmoidal function. <em>Mathematics of Control, Signals and Systems</em>, 2, 303&ndash;314. DOI: 10.1007/BF02551274. <a href="https://doi.org/10.1007/BF02551274">https://doi.org/10.1007/BF02551274</a></li>
+<li id="ref-hornik1991">Hornik, K. (1991). Approximation capabilities of multilayer feedforward networks. <em>Neural Networks</em>, 4(2), 251&ndash;257. DOI: 10.1016/0893-6080(91)90009-T. <a href="https://doi.org/10.1016/0893-6080(91)90009-T">https://doi.org/10.1016/0893-6080(91)90009-T</a></li>
+<li id="ref-telgarsky2016">Telgarsky, M. (2016). Benefits of depth in neural networks. <em>Proceedings of COLT 2016</em>, PMLR 49, 1517&ndash;1539. <a href="https://proceedings.mlr.press/v49/telgarsky16.html">https://proceedings.mlr.press/v49/telgarsky16.html</a></li>
+<li id="ref-he2016">He, K., Zhang, X., Ren, S. &amp; Sun, J. (2016). Deep residual learning for image recognition. <em>Proceedings of CVPR 2016</em>, 770&ndash;778. DOI: 10.1109/CVPR.2016.90. <a href="https://doi.org/10.1109/CVPR.2016.90">https://doi.org/10.1109/CVPR.2016.90</a></li>
+<li id="ref-lecun1998">LeCun, Y., Bottou, L., Bengio, Y. &amp; Haffner, P. (1998). Gradient-based learning applied to document recognition. <em>Proceedings of the IEEE</em>, 86(11), 2278&ndash;2324. DOI: 10.1109/5.726791. <a href="https://doi.org/10.1109/5.726791">https://doi.org/10.1109/5.726791</a></li>
+<li id="ref-krizhevsky2017">Krizhevsky, A., Sutskever, I. &amp; Hinton, G. E. (2017). ImageNet classification with deep convolutional neural networks. <em>Communications of the ACM</em>, 60(6), 84&ndash;90. DOI: 10.1145/3065386. <a href="https://doi.org/10.1145/3065386">https://doi.org/10.1145/3065386</a></li>
+<li id="ref-szegedy2014">Szegedy, C., Zaremba, W., Sutskever, I. <em>et al.</em> (2014). Intriguing properties of neural networks. <em>Proceedings of ICLR 2014</em>. arXiv&nbsp;: 1312.6199. <a href="https://arxiv.org/abs/1312.6199">https://arxiv.org/abs/1312.6199</a></li>
+<li id="ref-zhang2017">Zhang, C., Bengio, S., Hardt, M., Recht, B. &amp; Vinyals, O. (2017). Understanding deep learning requires rethinking generalization. <em>Proceedings of ICLR 2017</em>. arXiv&nbsp;: 1611.03530. <a href="https://arxiv.org/abs/1611.03530">https://arxiv.org/abs/1611.03530</a></li>
+</ol>
+
+<section class="src-ar">
+<h3>مصادر بالعربية</h3>
+<p class="src-note">مصادر للاستزادة، لا مراجع لما ورد أعلاه: المراجع الأصلية للفصل مذكورةٌ في القائمة السابقة بلغتها. وقد عُوينت كلّ صفحةٍ من صفحات الناشرين للتحقّق من العنوان والمترجم ورخصة الإتاحة.</p>
+<ul>
+<li>بودن، مارجريت إيه. <em>الذكاء الاصطناعي: مقدّمة قصيرة جدًّا</em>. ترجمة إبراهيم سند أحمد، مراجعة هاني فتحي سليمان. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). نحو 43 ألف كلمة، متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/48149074/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/48149074/</a><span class="pourquoi">أقرب كتابٍ عربيٍّ مجّاني إلى روح الفصل الأوّل: التعريفات، والتاريخ، والحدود، والنقاش الفلسفي.</span></li>
+<li>داسجوبتا، سوبراتا. <em>علم الكمبيوتر: مقدّمة قصيرة جدًّا</em>. ترجمة إبراهيم سند أحمد، مراجعة عبد الفتاح عبد الله أحمد. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/13726364/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/13726364/</a><span class="pourquoi">فصلُ «التفكير الخوارزمي» فيه يقدّم بالعربية مفهوم الخوارزمية وتكلفتها، وهو ما يفترضه هذا الفصل مكتسَباً.</span></li>
+</ul>
+</section>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../10-non-supervise/page.html">\(\leftarrow\) الفصل 10 &mdash; التعلّم غير المُراقَب</a>
+<a href="../../../IA/lecons/11-reseaux-neurones/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">المُلحَق الخوارزمي</a>
+<a href="../../index.html">فهرس المُقرَّر</a>
+<a href="../12-renforcement/page.html">الفصل 12 &mdash; التعلّم بالتعزيز \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>الذكاء الاصطناعي &mdash; الأقسام التحضيرية MP/PSI</strong> &middot; البحث والألعاب والقيود والتعلّم<span class="footer-meta">طبعة 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">تعذّر تحميل الشكل التفاعلي. تحقّق من اتصالك بالشبكة.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ====== Figure : le perceptron et la limite du OU exclusif ================ */
+var JEUX = [
+  {nom:'«و» المنطقية',        pts:[[0,0,0],[0,1,0],[1,0,0],[1,1,1]]},
+  {nom:'«أو» المنطقية',        pts:[[0,0,0],[0,1,1],[1,0,1],[1,1,1]]},
+  {nom:'«أو» الحصري',       pts:[[0,0,0],[0,1,1],[1,0,1],[1,1,0]]}
+];
+function perceptron(pts, n_epoques){
+  var w = [0, 0], b = 0, hist = [];
+  for (var e = 0; e < n_epoques; e++){
+    var erreurs = 0;
+    for (var i = 0; i < pts.length; i++){
+      var x1 = pts[i][0], x2 = pts[i][1], y = pts[i][2];
+      var s = (w[0]*x1 + w[1]*x2 + b) > 0 ? 1 : 0;
+      if (s !== y){
+        w[0] += (y - s) * x1; w[1] += (y - s) * x2; b += (y - s);
+        erreurs++;
+      }
+    }
+    hist.push({w: w.slice(), b: b, erreurs: erreurs});
+    if (erreurs === 0) { break; }
+  }
+  return hist;
+}
+var CACHE11 = {};
+function perc(j){
+  if (!(j in CACHE11)) { CACHE11[j] = perceptron(JEUX[j].pts, 40); }
+  return CACHE11[j];
+}
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-0.75, 2.05, 1.85, -1.15], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: true
+});
+var sJeu = b1.create('slider', [[-0.65, -0.62], [0.35, -0.62], [0, 0, 2]], {
+  name: 'fonction', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sEp = b1.create('slider', [[0.70, -0.62], [1.75, -0.62], [1, 40, 40]], {
+  name: 'epoque', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function jeu(){ return Math.round(sJeu.Value()); }
+function ep(){ var h = perc(jeu()); return Math.min(Math.round(sEp.Value()), h.length) - 1; }
+function etat11(){ var h = perc(jeu()); return h[Math.max(0, ep())]; }
+b1.create('segment', [[-0.4, 0], [1.5, 0]], {strokeColor: PAL.ref, strokeWidth: 1.2,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b1.create('segment', [[0, -0.4], [0, 1.5]], {strokeColor: PAL.ref, strokeWidth: 1.2,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+/* la droite de separation w0 x + w1 y + b = 0 */
+b1.create('curve', [
+  function(t){ return t; },
+  function(t){
+    var e = etat11();
+    if (Math.abs(e.w[1]) < 1e-9) { return -10; }
+    return -(e.w[0] * t + e.b) / e.w[1];
+  }, -0.4, 1.5], {
+  strokeColor: function(){ return cssv('--primary', '#026573'); }, strokeWidth: 3,
+  highlight: false, fixed: true});
+for (var k = 0; k < 4; k++){
+  (function(idx){
+    b1.create('point', [
+      function(){ return JEUX[jeu()].pts[idx][0]; },
+      function(){ return JEUX[jeu()].pts[idx][1]; }
+    ], {name: '', size: 7, fixed: true, highlight: false, strokeWidth: 2,
+        face: function(){ return JEUX[jeu()].pts[idx][2] === 1 ? 'o' : '[]'; },
+        strokeColor: function(){
+          return JEUX[jeu()].pts[idx][2] === 1 ? cssv('--accent','#f59e0b') : cssv('--viz-blue','#2563eb'); },
+        fillColor: function(){
+          return JEUX[jeu()].pts[idx][2] === 1 ? cssv('--accent','#f59e0b') : cssv('--viz-blue','#2563eb'); },
+        fillOpacity: 1});
+  })(k);
+}
+b1.create('text', [-0.72, 1.98, function(){
+  var h = perc(jeu()), e = etat11();
+  return JEUX[jeu()].nom + '   |   حقبة ' + (ep() + 1) + ' من ' + h.length
+       + '   |   الاخطاء في هذه الحقبة: ' + e.erreurs;
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-0.72, 1.82, function(){
+  var e = etat11();
+  return 'المستقيم: ' + e.w[0].toFixed(0) + ' x1 + ' + e.w[1].toFixed(0) + ' x2 + '
+       + e.b.toFixed(0) + ' = 0';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b1.create('text', [-0.72, -0.95, function(){
+  var h = perc(jeu());
+  if (h[h.length-1].erreurs === 0){
+    return 'تقارب في ' + h.length + ' حقبة: الصنفان قابلان للفصل خطيا.';
+  }
+  return 'لا تقارب بعد ' + h.length
+       + ' حقبة: لا مستقيم يفصل هذه النقاط الاربع. والمدرك الحسي يتذبذب بلا انتهاء.';
+}], {fontSize: 13.5, fixed: true, highlight: false,
+     strokeColor: function(){
+       var h = perc(jeu());
+       return h[h.length-1].erreurs === 0 ? cssv('--viz-ok','#16a34a') : cssv('--viz-bad','#dc2626'); }});
+
+/* ====== Figure : un reseau a une couche cachee apprend le OU exclusif ==== */
+function sigm(x){ return 1 / (1 + Math.exp(-x)); }
+function entrainerMLP(nCaches, eta, nIter, graine){
+  var s = graine;
+  function rnd(){ s = (s*1103515245+12345)%2147483648; return s/2147483648; }
+  var X = [[0,0],[0,1],[1,0],[1,1]], Y = [0,1,1,0];
+  var W1 = [], b1v = [], W2 = [], b2v = 0, i, j;
+  for (j = 0; j < nCaches; j++){
+    W1.push([(rnd()-0.5)*4, (rnd()-0.5)*4]); b1v.push((rnd()-0.5)*2);
+    W2.push((rnd()-0.5)*4);
+  }
+  b2v = (rnd()-0.5)*2;
+  var hist = [];
+  for (var it = 0; it <= nIter; it++){
+    var perte = 0;
+    var gW1 = [], gb1 = [], gW2 = [], gb2 = 0;
+    for (j = 0; j < nCaches; j++){ gW1.push([0,0]); gb1.push(0); gW2.push(0); }
+    for (i = 0; i < 4; i++){
+      var h = [], a = [];
+      for (j = 0; j < nCaches; j++){
+        var z = W1[j][0]*X[i][0] + W1[j][1]*X[i][1] + b1v[j];
+        a.push(z); h.push(sigm(z));
+      }
+      var z2 = b2v;
+      for (j = 0; j < nCaches; j++){ z2 += W2[j] * h[j]; }
+      var o = sigm(z2);
+      perte += -(Y[i]*Math.log(Math.max(1e-12,o)) + (1-Y[i])*Math.log(Math.max(1e-12,1-o)));
+      var d2 = o - Y[i];                       /* derivee de l entropie croisee */
+      gb2 += d2;
+      for (j = 0; j < nCaches; j++){
+        gW2[j] += d2 * h[j];
+        var d1 = d2 * W2[j] * h[j] * (1 - h[j]);
+        gW1[j][0] += d1 * X[i][0];
+        gW1[j][1] += d1 * X[i][1];
+        gb1[j] += d1;
+      }
+    }
+    hist.push({perte: perte / 4,
+               W1: W1.map(function(w){ return w.slice(); }), b1: b1v.slice(),
+               W2: W2.slice(), b2: b2v});
+    if (it === nIter) { break; }
+    for (j = 0; j < nCaches; j++){
+      W1[j][0] -= eta * gW1[j][0] / 4; W1[j][1] -= eta * gW1[j][1] / 4;
+      b1v[j] -= eta * gb1[j] / 4; W2[j] -= eta * gW2[j] / 4;
+    }
+    b2v -= eta * gb2 / 4;
+  }
+  return hist;
+}
+var CACHEM11 = {};
+function mlp(nCaches, eta){
+  var k = nCaches + '|' + eta.toFixed(2);
+  if (!(k in CACHEM11)) { CACHEM11[k] = entrainerMLP(nCaches, eta, 3000, 20250806); }
+  return CACHEM11[k];
+}
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-0.95, 1.55, 1.95, -1.05], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sH = b2.create('slider', [[-0.85, -0.55], [0.15, -0.55], [1, 3, 6]], {
+  name: 'عصبونات خفية', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sEta = b2.create('slider', [[0.50, -0.55], [1.85, -0.55], [0.5, 5.0, 12.0]], {
+  name: 'pas', snapWidth: 0.5, precision: 1,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function nH(){ return Math.round(sH.Value()); }
+function eta11(){ return Math.round(sEta.Value() * 2) / 2; }
+b2.create('segment', [[0, 0], [1.7, 0]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+b2.create('segment', [[0, 0], [0, 1.2]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  straightFirst: false, straightLast: false, highlight: false, fixed: true});
+var cPerte = b2.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--primary', '#026573'); }, strokeWidth: 3,
+  highlight: false, fixed: true});
+cPerte.updateDataArray = function(){
+  var h = mlp(nH(), eta11()), X = [], Y = [];
+  var m = h[0].perte || 1;
+  for (var i = 0; i < h.length; i += 20){ X.push(1.7 * i / h.length); Y.push(h[i].perte / m); }
+  this.dataX = X; this.dataY = Y;
+};
+b2.create('text', [-0.9, 1.50, function(){
+  var h = mlp(nH(), eta11());
+  return nH() + ' عصبونا خفيا، خطوة ' + eta11().toFixed(1)
+       + '   |   الخسارة الابتدائية ' + h[0].perte.toFixed(3)
+       + '   |   الخسارة النهائية ' + h[h.length-1].perte.toFixed(4);
+}], {fontSize: 14, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-0.9, 1.36, function(){
+  var h = mlp(nH(), eta11()), f = h[h.length-1];
+  /* verifie si les 4 exemples sont bien classes */
+  var X = [[0,0],[0,1],[1,0],[1,1]], Y = [0,1,1,0], ok = 0;
+  for (var i = 0; i < 4; i++){
+    var z2 = f.b2;
+    for (var j = 0; j < f.W2.length; j++){
+      z2 += f.W2[j] * sigm(f.W1[j][0]*X[i][0] + f.W1[j][1]*X[i][1] + f.b1[j]);
+    }
+    if ((sigm(z2) > 0.5 ? 1 : 0) === Y[i]) { ok++; }
+  }
+  return ok + ' من الامثلة الاربعة مصنفة تصنيفا صحيحا بعد 3000 تكرار.';
+}], {fontSize: 13, fixed: true, highlight: false,
+     strokeColor: function(){ return cssv('--primary-dark', '#014a55'); }});
+b2.create('text', [0.85, -0.85, 'تكرارات النزول التدرجي'], {fontSize: 12.5,
+  anchorX: 'middle', strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-0.9, -1.0,
+  'التهيئة نفسها لكل التشكيلات: فالفروق لا تأتي الا من الضبط.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

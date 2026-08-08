@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 8 &mdash; Bayesian Games and Incomplete Information</title>
+<meta name="description" content="Types, priors, signalling and screening: playing when you do not know who you face.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; justify-content: space-between; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz { margin: 26px 0; }
+.viz-title { font-weight: 700; color: var(--primary); font-size: 0.98rem; margin-bottom: 10px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 12px 0 0; border-top: 1px solid var(--color-rule); padding-top: 10px; }
+.viz svg { max-width: 100%; height: auto; }
+.payoff { display: inline-block !important; border-collapse: collapse; margin: 0 auto; }
+.payoff th, .payoff td { border: 1px solid var(--color-rule); padding: 9px 18px; text-align: center; }
+.payoff thead th { background: var(--primary-soft); color: var(--color-text); }
+.payoff th.corner { background: var(--primary); color: #fff; font-size: 0.82rem; font-weight: 600; }
+.payoff tbody th { background: var(--primary-soft); text-align: left; }
+.payoff td { font-family: var(--font-mono); font-size: 0.98rem; }
+.glossary th:first-child, .glossary td:first-child { white-space: nowrap; font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Game Theory</a> &middot; Chapter 08</div><span class="course-code">Part III &middot; Time and information</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Part III &middot; Time and information &middot; Chapter 8</div>
+<h1>Chapter 8 &mdash; Bayesian Games and Incomplete Information</h1>
+<div class="lesson-sub">Types, priors, signalling and screening: playing when you do not know who you face.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">What you will be able to do</div><ul><li>Distinguish incomplete from imperfect information.</li><li>Apply Harsanyi's transformation: types, common prior, and strategies as functions of type.</li><li>Define and compute a Bayesian Nash equilibrium in a small example.</li><li>Distinguish separating, pooling and hybrid equilibria in a signalling game.</li><li>Explain adverse selection and the institutions that mitigate it.</li></ul></div>
+
+<h2>1. Not knowing who you are playing</h2>
+<p>Everything so far assumed the payoff matrix is common knowledge. Usually it is not. A bidder does not know rivals' valuations; an insurer does not know an applicant's risk; a firm does not know a rival's costs. These are games of <strong>incomplete information</strong>.</p>
+<div class="box warn"><div class="box-title">Careful</div><p>Do not confuse <em>incomplete</em> with <em>imperfect</em> information. Imperfect information (Chapter 6) means you do not know what has been <em>played</em>. Incomplete information means you do not know the <em>game</em> - somebody's payoffs are unknown to you.</p></div>
+
+<h2>2. Harsanyi's transformation</h2>
+<p>John Harsanyi (1967-68) showed how to convert incomplete information into imperfect information, which we already know how to handle. Each player is assigned a <strong>type</strong> \(\theta_i\) that summarises everything privately known to them - typically their payoff function. Nature moves first and draws the type profile from a <strong>common prior</strong> distribution; each player observes only their own type.</p>
+<div class="box def"><div class="box-title">Definition - Bayesian game</div><p style='margin:0;'>A <strong>Bayesian game</strong> is the tuple</p><div class="eq">\[ \bigl\langle N,\; (A_i)_{i \in N},\; (\Theta_i)_{i \in N},\; p,\; (u_i)_{i \in N} \bigr\rangle, \qquad u_i : A \times \Theta \to \mathbb{R}, \]</div><p style='margin:0;'>where \(p\) is the common prior on \(\Theta = \prod_i \Theta_i\). A <strong>strategy</strong> is now a function \(s_i : \Theta_i \to A_i\), telling each type what to do.</p></div>
+<p>The strategy-as-function point is the one to hold on to. You do not choose an action; you choose a <em>rule</em> mapping what you learn about yourself into an action. When you evaluate that rule you must average over the types your opponents might have, using Bayes' rule to update from the prior given anything you have observed.</p>
+<div class="box def"><div class="box-title">Definition - Bayesian Nash equilibrium</div><p style='margin:0;'>A profile \(s^{*}\) is a <strong>Bayesian Nash equilibrium</strong> if for every player \(i\) and every type \(\theta_i \in \Theta_i\),</p><div class="eq">\[ s_i^{*}(\theta_i) \;\in\; \arg\max_{a_i \in A_i} \; \sum_{\theta_{-i}} p(\theta_{-i} \mid \theta_i)\, u_i\bigl(a_i, s_{-i}^{*}(\theta_{-i}), \theta\bigr). \]</div><p style='margin:0;'>Each type best-responds in expectation over the opponents' types and their equilibrium actions.</p></div>
+
+<h2>3. A worked example: entry with an unknown incumbent</h2>
+<p>An entrant considers entering. The incumbent is <em>tough</em> (fighting is cheap, payoff \(-1\) rather than a loss) with probability \(\mu\), and <em>soft</em> with probability \(1 - \mu\). If the incumbent is tough it fights; if soft it accommodates. The entrant gets \(-2\) if fought, \(+2\) if accommodated, and \(0\) by staying out. The entrant cannot observe the type - only the prior.</p>
+<div class="eq">\[ \mathbb{E}\bigl[u_{\text{entrant}}(\text{In})\bigr] = \mu(-2) + (1-\mu)(2) = 2 - 4\mu, \]</div><div class="eq">\[ \text{so the entrant enters iff } \; 2 - 4\mu \gt  0 \;\Longleftrightarrow\; \mu \lt  \tfrac{1}{2}. \]</div>
+<p>So the entrant enters when it is sufficiently confident the incumbent is soft. Two lessons follow, and they drive an enormous literature. First, the incumbent now has a reason to <em>build a reputation</em> for toughness - even a soft incumbent may fight early entrants to raise \(\mu\) in later entrants' minds. Second, information itself becomes strategic: the incumbent may prefer that the entrant remain uncertain, while the entrant will pay for a signal.</p>
+
+<h2>4. Signalling and screening</h2>
+<p>When the informed party moves first to reveal something, we have <strong>signalling</strong>. Spence's (1973) education model is the classic: education may raise no productivity at all, yet high-ability workers acquire it because it is cheaper for them than for low-ability workers, and employers rationally read the diploma as evidence. The equilibrium concept is <em>perfect Bayesian equilibrium</em>: strategies optimal given beliefs, beliefs updated by Bayes' rule wherever possible.</p>
+<figure class="viz"><table><thead><tr><th>Equilibrium type</th><th>What happens</th><th>Example</th></tr></thead><tbody><tr><td>Separating</td><td>Different types choose different actions, so the action fully reveals the type.</td><td>Only high-ability workers get the degree; wages differ.</td></tr><tr><td>Pooling</td><td>All types choose the same action, so nothing is revealed and beliefs stay at the prior.</td><td>Everyone gets the degree; wages reflect the average.</td></tr><tr><td>Semi-separating (hybrid)</td><td>Some types mix, so the action shifts beliefs without settling them.</td><td>A fraction of low types bluff into the high-type action.</td></tr></tbody></table></figure>
+<p>When the <em>uninformed</em> party moves first, offering a menu designed so that different types self-select, we have <strong>screening</strong>. Insurance contracts trading a lower premium against a higher deductible are the standard example: low-risk customers accept the deductible, high-risk customers do not.</p>
+
+<h2>5. Adverse selection: the market for lemons</h2>
+<p>Akerlof's (1970) used-car market shows how private information can destroy a market outright. Sellers know quality, buyers do not. Buyers will pay only the expected quality of cars on offer; at that price, owners of above-average cars withdraw; the average quality of what remains falls; the price falls again. The market can unravel until only the worst cars - the lemons - trade, even though many mutually beneficial trades exist. Warranties, certification, brands and return policies are all institutional responses to this failure. Akerlof, Spence and Stiglitz shared the 2001 Nobel prize for this body of work.</p>
+
+<h2>6. A Bayesian game solved by types</h2>
+<p>Two firms compete in quantities with \(P = 100 - Q\). Firm 1's unit cost is 10 and is common knowledge. Firm 2's cost is \(c_2 = 10\) with probability \(\tfrac{1}{2}\) and \(c_2 = 4\) with probability \(\tfrac{1}{2}\), known only to firm 2. Firm 2 has two types and therefore two quantities to choose; firm 1 chooses one quantity, best-responding to the <em>average</em> of firm 2's two types.</p>
+<div class="eq">\[ q_2(c_2) = \frac{100 - c_2 - q_1}{2}, \qquad q_1 = \frac{90 - \mathbb{E}[q_2]}{2} \;\Longrightarrow\; q_1 = \frac{87 + q_1}{4}. \]</div><div class="eq">\[ \boxed{\; q_1 = 29, \qquad q_2(10) = 30.5, \qquad q_2(4) = 33.5. \;} \]</div>
+<p>The efficient low-cost type produces more; firm 1 hedges between the two possibilities rather than tailoring its output to either, and produces slightly less than the 30 it would choose if firm 2's cost were known to be 10.</p>
+
+<h2>Glossary</h2>
+<table class="glossary"><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Incomplete information</td><td>Some players do not know other players' payoff functions.</td></tr><tr><td>Imperfect information</td><td>Some players do not observe earlier moves; the payoff structure is still known.</td></tr><tr><td>Type</td><td>\(\theta_i \in \Theta_i\): a player's private information, summarising everything they know that others do not.</td></tr><tr><td>Common prior</td><td>The shared probability distribution over type profiles from which nature draws.</td></tr><tr><td>Bayesian Nash equilibrium</td><td>Each type of each player best-responds in expectation over opponents' types and actions.</td></tr><tr><td>Signalling</td><td>The informed party acts first in a way that credibly conveys their type.</td></tr><tr><td>Screening</td><td>The uninformed party offers a menu that induces types to self-select.</td></tr><tr><td>Adverse selection</td><td>Private information causes the best-quality participants to withdraw, degrading the market.</td></tr><tr><td>Separating equilibrium</td><td>Different types choose different actions, so type is revealed.</td></tr><tr><td>Pooling equilibrium</td><td>All types choose the same action, so nothing is revealed.</td></tr></tbody></table>
+<div class="keypoints"><h3>Check your understanding</h3><ol><li>Is not knowing a rival's cost incomplete or imperfect information? <span style='color:var(--color-muted);'>(Answer: Incomplete - the payoffs themselves are unknown)</span></li><li>What object is a strategy in a Bayesian game? <span style='color:var(--color-muted);'>(Answer: A function from the player's own type to an action)</span></li><li>In the entry example, at what prior probability of a tough incumbent does entry stop? <span style='color:var(--color-muted);'>(Answer: When \(\mu \ge \tfrac{1}{2}\))</span></li><li>Why can a used-car market unravel? <span style='color:var(--color-muted);'>(Answer: Buyers pay the average, good cars withdraw, the average falls, and so on)</span></li></ol></div>
+<div class="box tip"><div class="box-title">Practice</div><p>The chapter quiz asks you to distinguish the two kinds of missing information, compute an entry threshold from a prior, classify signalling equilibria, and identify what a Bayesian strategy actually is.</p></div>
+</main>
+<nav class="lesson-nav"><a href="../07-repeated-games/page.html">&larr; Chapter 07 &middot; Repeated Games, Reciprocity and the Folk Theorem</a><a href="../09-auctions/page.html">Chapter 09 &middot; Auctions and Mechanism Design &rarr;</a></nav>
+<footer class="site-footer"><strong>Game Theory &mdash; complete handbook</strong> &middot; Strategy, equilibrium, information and design<span class="footer-meta">Edition 2025-2026</span></footer>
+</body></html>

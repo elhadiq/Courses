@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 09 - Auctions and Mechanism Design (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 09.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C09 Q1 - Second-price dominance</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In a sealed-bid second-price auction with private values, why is bidding your true value weakly dominant?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Your bid determines only whether you win, never the price, which is the highest rival bid. Overbidding can only make you win at a price above your value; underbidding can only make you lose an auction you would have won at a profit. No beliefs about rivals are required.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Your bid affects only whether you win, not what you pay, so misreporting can only cause bad wins or lost profitable wins]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Bidding truthfully maximises the seller's revenue]]></text><feedback format="html"><text><![CDATA[<p>Dominance is about your own payoff, not the seller's.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[All bidders have the same valuation]]></text><feedback format="html"><text><![CDATA[<p>Values are private and differ.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The auction is zero-sum]]></text><feedback format="html"><text><![CDATA[<p>It is not, and the argument does not use this.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C09 Q2 - First-price bid</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Four risk-neutral bidders have values drawn independently and uniformly from [0, 1]. In the symmetric equilibrium of a first-price sealed-bid auction, what does a bidder with value 0.8 bid?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The equilibrium bid function is \(b(v) = \dfrac{n-1}{n} v\). With \(n = 4\) that is \(0.75 \times 0.8 = 0.6\). As n grows the shading shrinks, because the risk of losing a profitable auction rises.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.6</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="numerical">
+  <name><text>C09 Q3 - Expected revenue</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Same setting: 4 bidders, values uniform on [0, 1]. What is the seller's expected revenue in <em>any</em> of the four standard auctions? Give a decimal.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>By revenue equivalence, expected revenue equals the expected second-highest value, which for \(n\) uniform draws is \(\dfrac{n-1}{n+1} = \dfrac{3}{5} = 0.6\). Note that this coincides numerically with the previous answer only by construction of the example.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.6</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C09 Q4 - Strategic equivalence</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Which pairing of auction formats is strategically equivalent under independent private values?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>The Dutch auction is equivalent to the first-price sealed-bid auction: in both, a bidder commits to a single number and pays it, learning nothing useful along the way. The English auction is equivalent to the second-price auction, because the winner effectively pays the point at which the last rival dropped out.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Dutch and first-price sealed bid; English and second-price sealed bid]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Dutch and second-price sealed bid; English and first-price sealed bid]]></text><feedback format="html"><text><![CDATA[<p>The pairings are the other way round.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[All four are strategically identical]]></text><feedback format="html"><text><![CDATA[<p>They yield equal expected revenue but call for different strategies.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[None are equivalent]]></text><feedback format="html"><text><![CDATA[<p>Both equivalences are standard results.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C09 Q5 - Revenue equivalence limits</text></name>
+  <questiontext format="html"><text><![CDATA[<p>Revenue equivalence continues to hold when bidders are risk averse.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>False. With risk-averse bidders the first-price auction raises more, because bidders bid higher to reduce the risk of losing. Revenue equivalence also fails with asymmetric bidders, budget constraints, collusion and interdependent values - which is precisely why format choice matters in practice.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C09 Q6 - Winner's curse</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In a common-value auction, the winner's curse arises because:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Winning selects the most optimistic estimate, so the fact of winning is itself evidence that your estimate was too high. Rational bidders correct for this by shading, and by shading more when there are more rivals. The phenomenon is documented in oil-lease and corporate-takeover data.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[The winner is the bidder with the most optimistic estimate, so winning is evidence of over-estimation]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The winner always pays more than the second-highest bid]]></text><feedback format="html"><text><![CDATA[<p>That is false in a second-price auction and not the mechanism of the curse.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Bidders have different true values for the object]]></text><feedback format="html"><text><![CDATA[<p>Common values means the true value is the same for all.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[The seller sets a reserve price above the true value]]></text><feedback format="html"><text><![CDATA[<p>Reserve prices are a separate issue.</p>]]></text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C09 Q7 - Revelation principle</text></name>
+  <questiontext format="html"><text><![CDATA[<p>The revelation principle says that:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Any outcome that some mechanism achieves in equilibrium can also be achieved by a direct mechanism in which agents report their types truthfully. This lets the designer restrict attention to truthful direct mechanisms without loss of generality, which is what makes mechanism design tractable.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Any outcome achievable in equilibrium by some mechanism is achievable by a truthful direct mechanism]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Truthful reporting is always a dominant strategy in every mechanism]]></text><feedback format="html"><text><![CDATA[<p>Far from it; that is the property a designer must engineer.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Every mechanism reveals the agents' types to the designer]]></text><feedback format="html"><text><![CDATA[<p>Many mechanisms reveal nothing.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Auctions always reveal the true value of the object]]></text><feedback format="html"><text><![CDATA[<p>Unrelated to the principle.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C09 Q8 - Gibbard-Satterthwaite</text></name>
+  <questiontext format="html"><text><![CDATA[<p>The Gibbard-Satterthwaite theorem implies that with three or more outcomes, any deterministic, onto and strategy-proof voting rule must be a dictatorship.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True. This impossibility result is why mechanism design so often introduces money (as in VCG), restricts preference domains (as in single-peaked preferences or matching markets), or settles for Bayesian rather than dominant-strategy incentive compatibility.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+</quiz>

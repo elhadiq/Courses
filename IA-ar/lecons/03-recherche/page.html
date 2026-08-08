@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الفصل 3 &mdash; البحث في فضاء الحالات</title>
+<meta name="description" content="فضاء الحالات، البحث غير المُطّلع، المُرشِدات المقبولة والمتّسقة، A*، IDA*.">
+<link href="../../assets/style.css" rel="stylesheet">
+<link href="../../assets/rtl.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+
+.src-ar { margin: 26px 0 8px; border-top: 2px solid var(--color-rule); padding-top: 16px; }
+.src-ar h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--primary); }
+.src-ar .src-note { color: var(--color-muted); font-size: 0.9rem; margin: 0 0 12px; }
+.src-ar ul { list-style: none; padding: 0; margin: 0; }
+.src-ar li { margin: 0 0 14px; padding-right: 14px; border-right: 3px solid var(--primary-soft-2);
+             line-height: 1.7; font-size: 0.95rem; }
+.src-ar li .pourquoi { display: block; color: var(--color-muted); font-size: 0.9em;
+                       margin-top: 3px; }
+.src-ar li a.lien { word-break: break-all; font-size: 0.88em; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><a class="lang-switch" href="../../../IA/lecons/03-recherche/page.html" hreflang="fr" title="Version fran&ccedil;aise">FR</a><div class="breadcrumb"><a href="../../index.html">الذكاء الاصطناعي</a> &middot; مُقرَّر</div><span class="course-code">برنامج MP/PSI &middot; الفترة الثانية</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">القسم الثاني &middot; الفصل 3</div>
+<h1>الفصل 3 &mdash; حلّ المسائل بالبحث في فضاء الحالات</h1>
+<div class="lesson-sub">النمذجة بالحالات والانتقالات، والبحث غير المُطّلع، والمُرشِدات المقبولة والمتّسقة، وخوارزمية A*، وصيغها ذات الذاكرة المحدودة.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">المُلحَق المرافق</div><p>كلّ خوارزمية من خوارزميات هذا الفصل معروضة أيضاً <strong><a href="../../../IA/lecons/03-recherche/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">خطوة بخطوة في المُلحَق</a></strong>: ما تتلقّاه، وما تنتجه، وخطواتها بالترتيب، ومثال مبسوط يدوياً، ولماذا هي صحيحة، ولماذا تتوقّف، وما تكلّفه &mdash; بالعربية، بلا سطر برنامجٍ واحد.</p></div>
+
+<h2>1.1 ما مسألة البحث؟</h2>
+
+<p>عددٌ كبير من المهامّ المسمّاة «ذكيّة» &mdash; الخروج من متاهة، حلّ لعبة الانزلاق، تخطيط مسار، جدولة عمليات &mdash; يؤول إلى تخطيطٍ واحد: ننطلق من وضعية، ولدينا أفعال تحوّل وضعيةً إلى أخرى، ونبحث عن متتالية أفعالٍ تقود إلى وضعيةٍ تُعدّ مُرضية. وهذا التخطيط هو <strong>مسألة البحث</strong>، وقد صيغت صورياً على هذا النحو منذ الأعمال الأولى في الحلّ الآلي للمسائل <a class="cite" href="#ref-newell1959">[1]</a>.</p>
+
+<div class="box def"><div class="box-title">تعريف &mdash; مسألة البحث</div>
+<p>مسألة البحث خماسيّةٌ \((S, s_0, A, T, B)\) حيث:</p>
+<ul>
+<li>\(S\) مجموعة <strong>الحالات</strong> ;</li>
+<li>\(s_0 \in S\) هي <strong>الحالة الابتدائية</strong> ;</li>
+<li>\(A\) مجموعة <strong>الأفعال</strong>؛ وM4 تدلّ على القابلة للتطبيق في الحالة \(s\)؛</li>
+<li>\(T : S \times A \to S\) هي <strong>دالّة الانتقال</strong>؛ والانتقال من \(s\) إلى \(s'\) يحمل كلفة \(c(s,a,s') \gt 0\)؛</li>
+<li>\(B \subseteq S\) مجموعة <strong>الحالات الغاية</strong>، وتوصَف غالباً باختبار \(\text{but}(s)\).</li>
+</ul>
+<p><strong>الحلّ</strong> متتالية أفعالٍ تقود من \(s_0\) إلى حالةٍ من \(B\)؛ وهو <strong>أمثل</strong> إذا كان مجموع كُلَف انتقالاته أصغرياً.</p></div>
+
+<p>تُعرّف الخماسيّة ضمنياً مبياناً موجّهاً موزوناً، هو <strong>مبيان الحالات</strong>، رؤوسه الحالات وأقواسه الانتقالات. فحلّ المسألة إذن هو البحث عن أقصر مسار في هذا المبيان. والصعوبة أنّ هذا المبيان <em>لا يُبنى كاملاً أبداً</em>: فهو أضخم من ذلك بكثير. لعبة الانزلاق \(4\times 4\) فيها \(16!/2 \approx 1{,}05\times 10^{13}\) حالة قابلة للبلوغ؛ ومكعّب روبيك فيه نحو \(4{,}3\times 10^{19}\). ولا نملك إلّا أوّليّتين: اختبار الغاية، والدالّة التي تُعدّد خُلَفاء حالة. وكلّ الصعوبة الخوارزمية تكمن في هذا القيد: <em>استكشاف أقلّ ما يمكن من مبيانٍ لا نراه إلّا من ثقب مفتاح</em>.</p>
+
+<figure class="viz"><div class="viz-title">مبيان الحالات وشجرة البحث</div>
+<svg viewBox="0 0 760 360" role="img" style="width:100%;height:auto;display:block;"><text x="16" y="22" style="fill:var(--color-text);font-size:13px;font-family:inherit;">مبيان الحالات (منتهٍ)</text><text x="404" y="22" style="fill:var(--color-text);font-size:13px;font-family:inherit;">شجرة البحث (لا نهائية)</text><path d="M 380 40 L 380 340" style="fill:none;stroke:var(--color-rule);stroke-width:1.5;stroke-dasharray:5 5;"/><path d="M 100 100 L 270 100" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 100 100 L 100 265" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 270 100 L 270 265" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 100 265 L 270 265" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 100 100 L 270 265" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><circle cx="100" cy="100" r="21" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="100" y="105" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">A</text><circle cx="270" cy="100" r="21" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="270" y="105" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">B</text><circle cx="100" cy="265" r="21" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="100" y="270" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">C</text><circle cx="270" cy="265" r="21" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="270" y="270" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">D</text><text x="185" y="332" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">4 رؤوس، 5 أضلاع</text><path d="M 570 78 L 470 122" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 570 78 L 570 122" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 570 78 L 670 122" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 470 158 L 430 207" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 470 158 L 505 207" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 570 158 L 570 207" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 670 158 L 640 207" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><path d="M 670 158 L 700 207" style="fill:none;stroke:var(--viz-axis);stroke-width:2;"/><circle cx="570" cy="60" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="570" y="65" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">A</text><circle cx="470" cy="140" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="470" y="145" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">B</text><circle cx="570" cy="140" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="570" y="145" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">C</text><circle cx="670" cy="140" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="670" y="145" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">D</text><circle cx="430" cy="225" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="430" y="230" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">A</text><circle cx="505" cy="225" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="505" y="230" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">D</text><circle cx="570" cy="225" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="570" y="230" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">A</text><circle cx="640" cy="225" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="640" y="230" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">A</text><circle cx="700" cy="225" r="18" style="fill:var(--primary);stroke:var(--color-bg);stroke-width:2.5;"/><text x="700" y="230" text-anchor="middle" style="fill:var(--color-bg);font-size:13px;font-weight:700;font-family:inherit;">B</text><path d="M 430 243 L 430 285" style="fill:none;stroke:var(--viz-ref);stroke-width:2;stroke-dasharray:4 5;"/><path d="M 505 243 L 505 285" style="fill:none;stroke:var(--viz-ref);stroke-width:2;stroke-dasharray:4 5;"/><path d="M 570 243 L 570 285" style="fill:none;stroke:var(--viz-ref);stroke-width:2;stroke-dasharray:4 5;"/><path d="M 640 243 L 640 285" style="fill:none;stroke:var(--viz-ref);stroke-width:2;stroke-dasharray:4 5;"/><path d="M 700 243 L 700 285" style="fill:none;stroke:var(--viz-ref);stroke-width:2;stroke-dasharray:4 5;"/><text x="570" y="308" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">&hellip; بلا نهاية</text><text x="570" y="332" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">كلّ دورة في المبيان تنفرد من جديد</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 3.1.</strong> على اليسار مبيان الحالات: أربعة رؤوس، ودورات، وكائن منتهٍ. وعلى اليمين شجرة البحث المولَّدة بنشر هذا المبيان انطلاقاً من \(A\): وهي <em>لا نهائية</em>، لأنّ كلّ دورة تنفرد بلا انتهاء. وخوارزمية لا تحفظ الحالات المزارة تستكشف شجرة اليمين لا مبيان اليسار &mdash; وهذا أوّل مصدرٍ لعدم الانتهاء عملياً.</figcaption></figure>
+
+<div class="box warn"><div class="box-title">لا تخلط بين الحالة والعُقدة</div>
+<strong>الحالة</strong> تشكيلة من تشكيلات العالم؛ و<strong>العُقدة</strong> مُدخَلٌ في بنية معطيات الخوارزمية، يحفظ حالةً <em>و</em> المسار المؤدّي إليها (الأب، الفعل، الكلفة التراكمية، العمق). والحالة الواحدة قد تظهر في عُقَدٍ عديدة؛ وهذا بالضبط ما يفيد جدول الحالات المغلقة في تفاديه.</div>
+
+<h3>التخطيط العامّ للبحث</h3>
+
+<p>كلّ خوارزميات هذا الفصل حالاتٌ خاصّة من هيكلٍ واحد. نحتفظ بـ<strong>حاشية</strong> (أو مفتوحة) من العُقَد المولَّدة غير المطوَّرة بعد، وبمجموعةٍ <strong>مغلقة</strong> من الحالات المطوَّرة سلفاً. وفي كلّ دورة نستخرج عقدةً من الحاشية، ونختبر إن كانت غاية، وإلّا طوّرناها وأدرجنا خُلَفاءها. <em>والشيء الوحيد الذي يتغيّر من خوارزمية إلى أخرى هو نظام الاستخراج من الحاشية.</em></p>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 3.1 &mdash; التخطيط العامّ للبحث</div><div class="algo-io"><b>المُدخل:</b> حالة ابتدائية \(s_0\)، ودالّة خَلَف \(\sigma\)، واختبار غاية \(\beta\)، وحاشية \(\mathcal{F}\) مزوّدة بنظامها<br><b>المُخرج:</b> مسار من \(s_0\) نحو حالةٍ غاية، أو الإخفاق</div><ol class="algo-corps"><li><i class="va">C</i> &larr; \(\varnothing\)          <span class="cm">// مجموعة الحالات المطورة سلفا</span></li><li><span class="fn">أدرِج</span>(<i class="va">F</i>, \((s_0,\ [s_0],\ 0)\))</li><li><b class="kw">طالما</b> <i class="va">F</i> \(\neq \varnothing\) <b class="kw">نفّذ</b></li><li class="n1">\((s, p, g) \leftarrow\) <span class="fn">استخرِج</span>(<i class="va">F</i>)          <span class="cm">// النظام هو الذي يختار</span></li><li class="n1"><b class="kw">إذا</b> \(\beta(s)\) <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> \((p, g)\)</li><li class="n1"><b class="kw">إذا</b> <i class="va">s</i> \(\in C\) <b class="kw">فإنّ</b> <b class="kw">تابِع</b></li><li class="n1"><i class="va">C</i> &larr; \(C \cup \{s\}\)</li><li class="n1"><b class="kw">لكلّ</b> \((a, s', c) \in \sigma(s)\) <b class="kw">نفّذ</b></li><li class="n2"><b class="kw">إذا</b> \(s' \notin C\) <b class="kw">فإنّ</b> <span class="fn">أدرِج</span>(<i class="va">F</i>, \((s',\ p \cdot s',\ g + c)\))</li><li><b class="kw">أرجِع</b> إخفاق</li></ol><p class="algo-note">سطرٌ واحد يتغيّر من خوارزمية إلى أخرى: نظام الاستخراج من \(\mathcal{F}\). طابور: مسحٌ بالعرض. كدس: بالعمق. كومة صغرى على \(g\): الكلفة المنتظمة. كومة صغرى على \(g+h\): ‏A*.</p></div>
+
+<table>
+<thead><tr><th>نظام الحاشية</th><th>الخوارزمية الناتجة</th><th>ترتيب الخروج</th></tr></thead>
+<tbody>
+<tr><td>طابور (FIFO)</td><td>المسح بالعرض (BFS)</td><td>بعمقٍ متزايد</td></tr>
+<tr><td>كدس (LIFO)</td><td>المسح بالعمق (DFS)</td><td>الأحدث أوّلاً</td></tr>
+<tr><td>كومة صغرى على \(g\)</td><td>الكلفة المنتظمة (Dijkstra <a class="cite" href="#ref-dijkstra1959">[9]</a>)</td><td>بكلفةٍ تراكمية متزايدة</td></tr>
+<tr><td>كومة صغرى على \(h\)</td><td>الأفضل أوّلاً الجَشِع</td><td>بالقرب المُقدَّر من الغاية</td></tr>
+<tr><td>كومة صغرى على \(g+h\)</td><td>A*</td><td>بالكلفة الكلّية المُقدَّرة</td></tr>
+</tbody></table>
+
+<h2>1.2 البحث غير المُطّلع</h2>
+
+<p>«غير مُطّلع» يعني أنّ الخوارزمية لا تملك أيّ معرفةٍ بالمسألة تتجاوز تعريفها: فهي لا تُحسِن تقدير قرب حالةٍ من الغاية.</p>
+
+<div class="box prop"><div class="box-title">خصائص الاستراتيجيات غير المُطّلعة</div>
+<p>لتكن \(b\) معامل التفرّع، وM41 عمق أقلّ الحلول عمقاً، وM42 العمق الأقصى للشجرة، وM43 الكلفة المثلى، وM44 الكلفة الصغرى لانتقال.</p>
+<table>
+<thead><tr><th>الاستراتيجية</th><th>تامّة</th><th>مثلى</th><th>الزمن</th><th>الفضاء</th></tr></thead>
+<tbody>
+<tr><td>العرض (BFS)</td><td>نعم إذا كان \(b\) منتهياً</td><td>نعم إذا كانت الكُلَف منتظمة</td><td>\(O(b^{d})\)</td><td>\(O(b^{d})\)</td></tr>
+<tr><td>العمق (DFS)</td><td>لا (مبيان لا نهائي)</td><td>ليس</td><td>\(O(b^{m})\)</td><td>\(O(bm)\)</td></tr>
+<tr><td>الكلفة المنتظمة</td><td>نعم</td><td>نعم</td><td>\(O(b^{1+\lfloor C^*/\varepsilon\rfloor})\)</td><td>كسابقتها</td></tr>
+<tr><td>التعميق التكراري</td><td>نعم</td><td>نعم إذا كانت الكُلَف منتظمة</td><td>\(O(b^{d})\)</td><td>\(O(bd)\)</td></tr>
+</tbody></table></div>
+
+<p>التباين بين BFS وDFS <strong>مبادلةٌ بين الزمن والذاكرة</strong>، والذاكرة هي التي تحدّ عملياً. فمع \(b = 10\) ومليون عقدة مولَّدة في الثانية بمعدّل 100 بايت للعقدة، يتطلّب مسحٌ بالعرض إلى العمق 10 نحو 10 تيرابايت أصلاً: فهو غير قابل للإنجاز قبل أن يكون بطيئاً بكثير. أمّا DFS فلا يخزّن إلّا فرعاً واحداً وإخوته، أي \(O(bm)\) عقدة &mdash; لكنّه يفقد التمام والأمثلية.</p>
+
+<p><strong>التعميق التكراري</strong> (IDDFS) يوفّق بينهما: نُطلق بحثاً بالعمق محدوداً بـ0، ثمّ بـ1، ثمّ بـ2، وهكذا. فنُعيد عمل المستويات السابقة، لكنّ هذه الكلفة الزائدة محدودة. وعدد العُقَد التي يولّدها IDDFS هو \(\sum_{k=0}^{d} (d-k+1)b^{k}\)، مقابل \(\sum_{k=0}^{d} b^{k}\) لـBFS؛ والنسبة تؤول إلى \(b/(b-1)\). ومن أجل \(b = 10\)، فهذا <strong>11 % من العمل الإضافي</strong> مقابل ذاكرةٍ مقسومة على \(b^{d-1}\) <a class="cite" href="#ref-korf1985">[2]</a>.</p>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">اختر الاستراتيجية بالمؤشّر الأعلى، ثمّ حرّك مؤشّر الخطوة. تتلوّن الرؤوس بترتيب <em>تطويرها</em>؛ ومحتوى الحاشية معروض تحت المبيان.</p>
+<div id="jxg2" class="viz-board" style="height:480px;"></div>
+<p class="viz-caption"><strong>الشكل 3.2.</strong> المبيان الموزون نفسه، وأربعة أنظمة للحاشية. لاحظ أنّ البحث بالعمق يبلغ الغاية \(G\) بسرعةٍ كبيرة لكن بمسارٍ كلفته 13، حيث تطوّر الكلفةُ المنتظمة رؤوساً أكثر لتضمن الكلفة 9. وA* يبلغ الكلفة 9 نفسها بتطوير رؤوسٍ أقلّ من الكلفة المنتظمة: وهذا بالضبط ما تشتريه المُرشِدة.</p></div>
+
+<h2>1.3 البحث المُطّلع: خوارزمية A*</h2>
+
+<p><strong>المُرشِدة</strong> \(h : S \to \mathbb{R}^{+}\) تقدّر الكلفة المتبقّية لبلوغ غايةٍ انطلاقاً من حالة، مع \(h(s) = 0\) لكلّ حالةٍ غاية. وهي تُشفّر معرفةً بالمجال لا يحتويها التعريف الصوري للمسألة: المسافة المستقيمة في مسار، وعدد القطع في غير موضعها في لعبة الانزلاق.</p>
+
+<p>البحث الجَشِع يطوّر العقدة المُصغِّرة لـM63. وهو سريع غالباً وخاطئ غالباً: فهو يتجاهل تماماً ما أُنفِق سلفاً. وقد صحّح A*، الذي قدّمه هارت ونيلسون ورافائيل سنة 1968 <a class="cite" href="#ref-hart1968">[3]</a>، ذلك بترتيب الحاشية على</p>
+
+<div class="eq">\[f(n) = g(n) + h(n)\]</div>
+
+<p>حيث \(g(n)\) هي الكلفة المدفوعة فعلاً لبلوغ \(n\)، وM67 تقدير ما تبقّى دفعه: فـM68 إذن تقدير للكلفة الكلّية لحلٍّ يمرّ بـM69.</p>
+
+<div class="box def"><div class="box-title">تعريف &mdash; القبول والاتّساق</div>
+<p>لنرمز بـM70 إلى الكلفة المثلى الحقيقية من \(n\) إلى غاية.</p>
+<ul>
+<li>\(h\) <strong>مقبولة</strong> إذا كان \(h(n) \le h^{*}(n)\) لكلّ \(n\): أي إنّها لا تُفرِط في التقدير أبداً. والمُرشِدة المقبولة <em>متفائلة</em>.</li>
+<li>\(h\) <strong>متّسقة</strong> (أو رتيبة) إذا كان لكلّ انتقالٍ من \(n\) إلى \(n'\) كلفته \(c\) لدينا \(h(n) \le c + h(n')\)، وM80 لكلّ غاية \(b\). وهي متباينة مثلّثية.</li>
+</ul>
+<p>الاتّساق يستلزم القبول؛ والعكس خاطئ.</p></div>
+
+<div class="box thm"><div class="box-title">مبرهنة &mdash; أمثلية A*</div>
+<p><strong>(أ)</strong> إذا كانت \(h\) مقبولة واستُعمل A* على شجرة بحث (بلا مجموعة مغلقة)، فأوّل حلٍّ يُستخرج من الحاشية أمثل.</p>
+<p><strong>(ب)</strong> إذا كانت \(h\) متّسقة، فمتتالية \(f\) على طول أيّ مسارٍ متزايدة؛ ويطوّر A* عندئذٍ العُقَد بقيمٍ متزايدة لـM85، ويكون \(g\) عند أوّل تطويرٍ لحالةٍ أمثلَ سلفاً &mdash; فالمجموعة المغلقة آمنة إذن <a class="cite" href="#ref-hart1968">[3]</a>.</p>
+<p><strong>(ج)</strong> A* <em>كفؤٌ على النحو الأمثل</em>: فكلّ خوارزميةٍ تستعمل المُرشِدة نفسها وتضمن الأمثلية يجب أن تطوّر على الأقلّ كلّ العُقَد المحقّقة لـM87 <a class="cite" href="#ref-dechter1985">[4]</a>.</p></div>
+
+<div class="box proof"><div class="box-title">برهان (أ)</div>
+<p>لنفترض أنّ عقدةً غايةً غير مثلى \(b_2\)، كلفتها \(g(b_2) \gt C^{*}\)، استُخرِجت من الحاشية. وبما أنّ \(h(b_2)=0\)، فلدينا \(f(b_2) = g(b_2) \gt C^{*}\). ولتكن \(n\) عقدةً من الحاشية واقعةً على مسارٍ أمثل نحو غايةٍ مثلى &mdash; وهي موجودة، وإلّا لما وُلِّد المسار الأمثل. وبالقبول، \(f(n) = g(n) + h(n) \le g(n) + h^{*}(n) = C^{*}\). ومن ثمّ \(f(n) \le C^{*} \lt f(b_2)\): فاستخراج الأصغر كان سيختار \(n\) لا \(b_2\)، وهذا تناقض. \(\square\)</p></div>
+
+<div class="box warn"><div class="box-title">المَزلَق الكلاسيكي للمجموعة المغلقة</div>
+مع مُرشِدةٍ <em>مقبولة لكن غير متّسقة</em>، قد تُبلَغ حالةٌ مرّةً ثانية بمسارٍ أفضل قطعاً، بعد أن أُغلِقت. ورفض إعادة فتحها يكلّف عندئذٍ الأمثلية. وللأمر علاجان: جعل \(h\) متّسقة، أو الإذن بـ<em>إعادة فتح</em> حالةٍ مغلقة حين يُكتشَف لها \(g\) أصغر.</div>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">حرّك البداية (بالأخضر) والنهاية (بالأحمر) بالفأرة. والمؤشّر \(w\) يزن المُرشِدة في \(f = g + w\,h\): فـM102 يعطي الكلفة المنتظمة، وM103 يعطي A*، وM104 كبيراً يعطي البحث الجَشِع.</p>
+<div id="jxg1" class="viz-board" style="height:520px;"></div>
+<p class="viz-caption"><strong>الشكل 3.3.</strong> بحثٌ على شبكةٍ ذات عوائق، بتنقّلات متعامدة كلفتها 1، ومُرشِدة مانهاتن. الخلايا الزرقاء الفاتحة طُوِّرت، والسلسلة الداكنة هي المسار المعتمَد. عند \(w=0\) تكون المنطقة المستكشَفة قرصاً مركزه البداية؛ وعند \(w=1\) تمتدّ نحو الغاية؛ وبعد ذلك تصير ممرّاً رفيعاً &mdash; لكنّ المسار قد يكفّ عن أن يكون الأقصر. والمؤشّر يُشير إلى الحالات التي تتجاوز فيها الكلفة الأمثل.</p></div>
+
+<h2>1.4 اختيار المُرشِدات ومقارنتها</h2>
+
+<p>مُرشِدتان مقبولتان لا تتساويان. نقول إنّ \(h_2\) <strong>تهيمن</strong> على \(h_1\) إذا كان \(h_2(n) \ge h_1(n)\) لكلّ \(n\). وبما أنّ A* يطوّر كلّ العُقَد بحيث \(f(n) \lt C^{*}\)، أي \(h(n) \lt C^{*} - g(n)\)، فمُرشِدةٌ أكبر تُقصي عُقَداً أكثر: فعند تساوي القبول، <strong>الأكبر أفضل</strong>. والقيمة القصوى لمُرشِدتين مقبولتين مقبولةٌ وتهيمن عليهما معاً.</p>
+
+<p>في لعبة الانزلاق \(3\times 3\)، المُرشِدتان الكلاسيكيّتان هما عدد القطع في غير موضعها \(h_1\) ومجموع مسافات مانهاتن \(h_2\). ولدينا دائماً \(h_1 \le h_2 \le h^{*}\): فتحريك قطعةٍ في غير موضعها يتطلّب نقلةً واحدة على الأقلّ، ومسافة مانهاتن الخاصّة بها على الأقلّ. والقياسات المنشورة على أمثلةٍ عشوائية تعطي رتبة القدر التالية <a class="cite" href="#ref-korf1985">[2]</a><a class="cite" href="#ref-russell2020">[8]</a> :</p>
+
+<table>
+<thead><tr><th>عمق الحلّ</th><th>العُقَد المولَّدة، IDDFS</th><th>A* مع \(h_1\)</th><th>A* مع \(h_2\)</th></tr></thead>
+<tbody>
+<tr><td>8</td><td>\(\approx 6\,400\)</td><td>\(\approx 39\)</td><td>\(\approx 25\)</td></tr>
+<tr><td>12</td><td>\(\approx 3{,}6\times 10^{5}\)</td><td>\(\approx 227\)</td><td>\(\approx 73\)</td></tr>
+<tr><td>16</td><td>\(\approx 2{,}1\times 10^{7}\)</td><td>\(\approx 1\,301\)</td><td>\(\approx 211\)</td></tr>
+<tr><td>20</td><td>\(\approx 1{,}2\times 10^{9}\)</td><td>\(\approx 7\,276\)</td><td>\(\approx 676\)</td></tr>
+<tr><td>24</td><td>خارج المتناول</td><td>\(\approx 39\,135\)</td><td>\(\approx 1\,641\)</td></tr>
+</tbody></table>
+
+<p>من أين تأتي المُرشِدات الجيّدة؟ أوثق الطرائق هي <strong>الإرخاء</strong>: نحذف قيوداً من المسألة، فتكون الكلفة المثلى للمسألة المُرخاة مُرشِدةً مقبولة ومتّسقة للمسألة الأصلية <a class="cite" href="#ref-pearl1984">[5]</a>. فالإذن لقطعةٍ من لعبة الانزلاق بالانتقال الآني إلى أيّ خانة يعطي \(h_1\)؛ والإذن لها بالانزلاق إلى خانةٍ مشغولة يعطي \(h_2\). والمصدر الثاني هو <strong>قاعدة بيانات الأنماط</strong>: نحلّ بدقّة، خارج الخطّ، مسائل جزئية لا تتناول إلّا بضع قطع، ونخزّن كُلَفها <a class="cite" href="#ref-culberson1998">[6]</a>.</p>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">يحرّك المؤشّر نقطة القياس على طول المحور \(w\). والمنحنيان يُعاد حسابهما على شبكة الشكل السابق، بالبداية والنهاية اللتين وضعتهما فيه.</p>
+<div id="jxg3" class="viz-board" style="height:460px;"></div>
+<p class="viz-caption"><strong>الشكل 3.4.</strong> عدد الخلايا المطوَّرة (بالأزرق، السلّم الأيسر) وطول المسار الموجود (بالبرتقالي) بدلالة الوزن \(w\). يهوي العمل بشدّة بمجرّد أن يتجاوز \(w\) الصفر، ثمّ يستقرّ؛ ويبقى طول المسار أمثل ما دام \(w \le 1\) ثمّ قد يتدهور. ويُبرهَن أنّ A* الموزون بـM139 يُرجِع مساراً كلفته على الأكثر \(w\,C^{*}\): فالخطأ محدود، وهذا يجعل المفاضلة قابلة للاستثمار <a class="cite" href="#ref-pohl1970">[7]</a>.</p></div>
+
+<h2>1.5 حين تعوز الذاكرة: IDA*</h2>
+
+<p>يخزّن A* الحاشية كلّها: فاستهلاكه للذاكرة ينمو كعدد عُقَد \(f\) الأصغر من \(C^{*}\)، أي أُسّياً. والذاكرة، لا الزمن، هي التي تُخفِق A* على الأمثلة الكبيرة. و<strong>IDA*</strong> ينقل التعميق التكراري إلى A*: فبدل حدٍّ على العمق، نستعمل حدّاً على \(f\) <a class="cite" href="#ref-korf1985">[2]</a>.</p>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 3.2 &mdash; ‏A* بالتعميق التكراري (IDA*)</div><div class="algo-io"><b>المُدخل:</b> حالة ابتدائية \(s_0\)، واختبار غاية \(\beta\)، ومُرشِدة مقبولة \(h\)<br><b>المُخرج:</b> مسار كلفته صغرى، بذاكرةٍ من الرتبة \(O(d)\)</div><ol class="algo-corps"><li>\(\theta \leftarrow h(s_0)\)          <span class="cm">// السقف الابتدائي على f</span></li><li>\(P \leftarrow [s_0]\)          <span class="cm">// الفرع الراهن، وهو وحده في الذاكرة</span></li><li><b class="kw">كرّر</b></li><li class="n1">\(r \leftarrow\) <span class="fn">استكشف</span>\((0, \theta)\)</li><li class="n1"><b class="kw">إذا</b> \(r = \mathrm{TROUVE}\) <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> <i class="va">P</i></li><li class="n1"><b class="kw">إذا</b> \(r = +\infty\) <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> إخفاق</li><li class="n1">\(\theta \leftarrow r\)          <span class="cm">// اصغر قيمة مرفوضة لـ f</span></li><li>&nbsp;</li><li><b class="kw">دالّة</b> <span class="fn">استكشف</span>\((g, \theta)\)</li><li class="n1">\(s \leftarrow\) آخر عنصر من <i class="va">P</i> ؛ \(f \leftarrow g + h(s)\)</li><li class="n1"><b class="kw">إذا</b> \(f \gt \theta\) <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> <i class="va">f</i></li><li class="n1"><b class="kw">إذا</b> \(\beta(s)\) <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> \(\mathrm{TROUVE}\)</li><li class="n1">\(m \leftarrow +\infty\)</li><li class="n1"><b class="kw">لكلّ</b> \((a, s', c) \in \sigma(s)\) <b class="kw">بحيث</b> \(s' \notin P\) <b class="kw">نفّذ</b></li><li class="n2">كدّس \(s'\) على <i class="va">P</i></li><li class="n2">\(r \leftarrow\) <span class="fn">استكشف</span>\((g + c,\ \theta)\) ؛ انزع من <i class="va">P</i></li><li class="n2"><b class="kw">إذا</b> \(r = \mathrm{TROUVE}\) <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> \(\mathrm{TROUVE}\)</li><li class="n2">\(m \leftarrow \min(m, r)\)</li><li class="n1"><b class="kw">أرجِع</b> <i class="va">m</i></li></ol><p class="algo-note">تهبط الذاكرة من \(O(b^{d})\) إلى \(O(d)\). والثمن هو تكرار العمل: ويبقى ضئيلاً إذا أخذت \(f\) قيماً متمايزة قليلة، وباهظاً في غير ذلك.</p></div>
+
+<p>تهبط الذاكرة إلى \(O(d)\): فلا يُحفَظ إلّا الفرع الراهن. والثمن هو تكرار عمل التكرارات السابقة. ويبقى هذا الثمن معتدلاً إذا كان عدد القيم المتمايزة لـM174 صغيراً &mdash; وهي حال لعبة الانزلاق، حيث \(f\) صحيحة ومن زوجيّة \(d\) نفسها. ويصير باهظاً حين يكون لكلّ عقدةٍ تقريباً \(f\) مختلف، كما في حالة الكُلَف الحقيقية: فلا يضيف كلّ تكرارٍ عندئذٍ سوى عقدةٍ واحدة، ويتدهور IDA* إلى \(O(N^{2})\) تطويراً.</p>
+
+<div class="box tip"><div class="box-title">معلَم للقرار</div>
+إن كانت الحاشية تسع في الذاكرة، فاستعمل A*. وإلّا فاستعمل IDA* &mdash; لكن فقط إذا أخذت \(f\) قيماً متمايزة قليلة. وإن كانت الكُلَف حقيقية ومتنوّعة، ففضّل صيغةً من A* بذاكرةٍ محدودة، أو زِد الحدّ بخطوةٍ ثابتة بدل الزيادة إلى الأصغر المتجاوَز.</div>
+
+<h2>1.6 تنفيذ كامل لـA*</h2>
+
+<p>ثلاثة تفاصيل تنفيذية تصنع الفرق بين A* صحيح وA* خاطئ على نحوٍ خفيّ. أوّلاً، يجب ترتيب الكومة على \(f\) مع <strong>فصلٍ حتميّ عند التعادل</strong>: فعند تساوي \(f\)، تفضيلُ الأكبر \(g\) يقرّب من الغاية ويتجنّب التيه على هضبة. ثانياً، يجب أن تكون الحالات <strong>قابلة للتلبيد</strong> (ثنائيات، سلاسل) لتصلح مفاتيح. وأخيراً، لا توفّر بايثون إنقاصاً للمفتاح: فندرج نسخةً مكرّرة ونتجاهل عند الاستخراج كلّ مُدخَلٍ متقادم.</p>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 3.3 &mdash; A*</div><div class="algo-io"><b>المُدخل:</b> مبيان \((S, c)\) بكُلَفٍ موجبة، وM184، ومجموعة غايات \(B\)، ومُرشِدة \(h\) متّسقة<br><b>المُخرج:</b> مسار كلفته صغرى من \(s_0\) إلى \(B\)، وعدد الرؤوس المطوَّرة</div><ol class="algo-corps"><li>\(g[s] \leftarrow +\infty\) <b class="kw">لكلّ</b> \(s \in S\) ؛ \(g[s_0] \leftarrow 0\) ؛ \(\pi[s_0] \leftarrow \mathrm{nil}\)</li><li>\(O \leftarrow \{s_0\}\) ؛ \(C \leftarrow \varnothing\) ؛ \(k \leftarrow 0\)</li><li><b class="kw">طالما</b> \(O \neq \varnothing\) <b class="kw">نفّذ</b></li><li class="n1">\(n \leftarrow \operatorname*{argmin}_{x \in O}\ \big(g[x] + h(x)\big)\)          <span class="cm">// عند تساوي f، الاكبر g</span></li><li class="n1"><b class="kw">إذا</b> \(n \in C\) <b class="kw">فإنّ</b> <b class="kw">تابِع</b>          <span class="cm">// مدخل متقادم</span></li><li class="n1">\(C \leftarrow C \cup \{n\}\) ؛ \(k \leftarrow k + 1\)</li><li class="n1"><b class="kw">إذا</b> \(n \in B\) <b class="kw">فإنّ</b> <b class="kw">أرجِع</b> \(\big(\mathrm{Remonter}(\pi, n),\ g[n],\ k\big)\)</li><li class="n1"><b class="kw">لكلّ</b> \(m\) <b class="kw">مجاور لـ</b> \(n\) <b class="kw">نفّذ</b></li><li class="n2"><b class="kw">إذا</b> \(g[n] + c(n,m) \lt g[m]\) <b class="kw">فإنّ</b></li><li class="n3">\(g[m] \leftarrow g[n] + c(n,m)\) ؛ \(\pi[m] \leftarrow n\)</li><li class="n3">\(O \leftarrow O \cup \{m\}\)</li><li><b class="kw">أرجِع</b> إخفاق</li></ol><p class="algo-note"><strong>الثابت الحلقي.</strong> عند كلّ استخراج، تكون \(g[n]\) كلفة مسارٍ أمثل من \(s_0\) إلى \(n\)، بشرط أن تكون \(h\) متّسقة. <strong>المتناقص.</strong> \(|S \setminus C|\)، عددٌ صحيح موجب متناقص قطعاً عند كلّ تطوير. <strong>الكلفة.</strong> \(O(|E|\log|S|)\) عملية كومة، لكنّ \(|S|\) نفسه أُسّي في العمق.</p></div>
+
+<div class="box method"><div class="box-title">التحليل &mdash; الصحّة والانتهاء والتعقيد</div>
+<p><strong>الثابت الحلقي.</strong> عند كلّ دورة، ولكلّ حالة \(s\) من المجموعة المغلقة، تكون \(g[s]\) كلفة مسارٍ أمثل من \(s_0\) إلى \(s\)؛ وكلّ حالةٍ قابلة للبلوغ وغير مغلقة بمسارٍ كلّ رؤوسه الوسيطة مغلقة، ترد في الكومة بأفضل قيمة \(g\) معروفة. واتّساق \(h\) يضمن أنّ العقدة المستخرَجة تملك سلفاً \(g\) الأمثل.</p>
+<p><strong>الانتهاء.</strong> المتناقص: عدد الحالات القابلة للبلوغ وغير المغلقة بعد، وهو عدد صحيح موجب يتناقص قطعاً عند كلّ تطوير. والاستخراجات المتقادمة لا تُنقِصه، لكنّ الكومة منتهية ولا تتلقّى إدراجاتٍ إلّا عند التطويرات: فالحلقة تتوقّف.</p>
+<p><strong>التعقيد.</strong> مع \(N\) حالةً قابلة للبلوغ وM224 انتقالاً، على الأكثر \(M\) إدراجاً في الكومة، أي \(O(M\log M)\) عملية كومة، زائد \(N\) تقييماً لـM228. لكنّ \(N\) نفسه أُسّي في العمق: فجودة \(h\)، لا بنية المعطيات، هي التي تحدّد الزمن الفعلي.</p></div>
+
+<h2>الخلاصة</h2>
+<ul>
+<li>مسألة البحث مبيان حالاتٍ لا نلاحظه إلّا من خلال اختبار غايةٍ ودالّة خَلَف؛ والرهان استكشاف أقلّ ما يمكن منه.</li>
+<li>هيكلٌ واحد يولّد BFS وDFS والكلفة المنتظمة والجَشِع وA*: ولا يتغيّر إلّا نظام الحاشية.</li>
+<li>يرتّب A* الحاشية على \(f = g + h\)؛ وهو أمثل إذا كانت \(h\) مقبولة، وآمن مع مجموعةٍ مغلقة إذا كانت \(h\) متّسقة <a class="cite" href="#ref-hart1968">[3]</a>.</li>
+<li>عند تساوي القبول، تهيمن المُرشِدة الأكبر؛ والإرخاءات توفّرها بانتظام <a class="cite" href="#ref-pearl1984">[5]</a>.</li>
+<li>الذاكرة هي الجدار؛ وIDA* يلتفّ عليه بثمن عملٍ مكرَّر، مقبولٍ حين تأخذ \(f\) قيماً قليلة <a class="cite" href="#ref-korf1985">[2]</a>.</li>
+</ul>
+
+<h2>المراجع</h2>
+<ol class="reflist">
+<li id="ref-newell1959">Newell, A., Shaw, J. C. &amp; Simon, H. A. (1959). Report on a general problem-solving program. <em>Proceedings of the International Conference on Information Processing</em>, UNESCO, Paris, 256&ndash;264. <a href="https://exhibits.stanford.edu/feigenbaum/catalog/my698gc9130">https://exhibits.stanford.edu/feigenbaum/catalog/my698gc9130</a></li>
+<li id="ref-korf1985">Korf, R. E. (1985). Depth-first iterative-deepening: an optimal admissible tree search. <em>Artificial Intelligence</em>, 27(1), 97&ndash;109. DOI: 10.1016/0004-3702(85)90084-0. <a href="https://doi.org/10.1016/0004-3702(85)90084-0">https://doi.org/10.1016/0004-3702(85)90084-0</a></li>
+<li id="ref-hart1968">Hart, P. E., Nilsson, N. J. &amp; Raphael, B. (1968). A formal basis for the heuristic determination of minimum cost paths. <em>IEEE Transactions on Systems Science and Cybernetics</em>, 4(2), 100&ndash;107. DOI: 10.1109/TSSC.1968.300136. <a href="https://doi.org/10.1109/TSSC.1968.300136">https://doi.org/10.1109/TSSC.1968.300136</a></li>
+<li id="ref-dechter1985">Dechter, R. &amp; Pearl, J. (1985). Generalized best-first search strategies and the optimality of A*. <em>Journal of the ACM</em>, 32(3), 505&ndash;536. DOI: 10.1145/3828.3830. <a href="https://doi.org/10.1145/3828.3830">https://doi.org/10.1145/3828.3830</a></li>
+<li id="ref-pearl1984">Pearl, J. (1984). <em>Heuristics: Intelligent Search Strategies for Computer Problem Solving</em>. Addison-Wesley. ISBN 0-201-05594-5. <a href="https://archive.org/details/heuristicsintell00pear">https://archive.org/details/heuristicsintell00pear</a></li>
+<li id="ref-culberson1998">Culberson, J. C. &amp; Schaeffer, J. (1998). Pattern databases. <em>Computational Intelligence</em>, 14(3), 318&ndash;334. DOI: 10.1111/0824-7935.00065. <a href="https://doi.org/10.1111/0824-7935.00065">https://doi.org/10.1111/0824-7935.00065</a></li>
+<li id="ref-pohl1970">Pohl, I. (1970). Heuristic search viewed as path finding in a graph. <em>Artificial Intelligence</em>, 1(3&ndash;4), 193&ndash;204. DOI: 10.1016/0004-3702(70)90007-X. <a href="https://doi.org/10.1016/0004-3702(70)90007-X">https://doi.org/10.1016/0004-3702(70)90007-X</a></li>
+<li id="ref-russell2020">Russell, S. &amp; Norvig, P. (2020). <em>Artificial Intelligence: A Modern Approach</em> (الطبعة 4). Pearson. ISBN 978-0-13-461099-3. <a href="https://aima.cs.berkeley.edu/">https://aima.cs.berkeley.edu/</a></li>
+<li id="ref-dijkstra1959">Dijkstra, E. W. (1959). A note on two problems in connexion with graphs. <em>Numerische Mathematik</em>, 1(1), 269&ndash;271. DOI: 10.1007/BF01386390. <a href="https://doi.org/10.1007/BF01386390">https://doi.org/10.1007/BF01386390</a></li>
+</ol>
+
+<section class="src-ar">
+<h3>مصادر بالعربية</h3>
+<p class="src-note">مصادر للاستزادة، لا مراجع لما ورد أعلاه: المراجع الأصلية للفصل مذكورةٌ في القائمة السابقة بلغتها. وقد عُوينت كلّ صفحةٍ من صفحات الناشرين للتحقّق من العنوان والمترجم ورخصة الإتاحة.</p>
+<ul>
+<li>داسجوبتا، سوبراتا. <em>علم الكمبيوتر: مقدّمة قصيرة جدًّا</em>. ترجمة إبراهيم سند أحمد، مراجعة عبد الفتاح عبد الله أحمد. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/13726364/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/13726364/</a><span class="pourquoi">فصلُ «التفكير الخوارزمي» فيه يقدّم بالعربية مفهوم الخوارزمية وتكلفتها، وهو ما يفترضه هذا الفصل مكتسَباً.</span></li>
+<li>المنظمة العربية للتربية والثقافة والعلوم، مكتب تنسيق التعريب. <em>المعجم الموحّد لمصطلحات تقانة المعلومات</em> (عربي &ndash; إنجليزي &ndash; فرنسي). مطبعة النجاح الجديدة، الرباط، 2011. ISBN 978-9954-00-742-6.<br><a class="lien" href="https://archive.org/details/ALECSO2011AREN" hreflang="ar" target="_blank" rel="noopener">https://archive.org/details/ALECSO2011AREN</a><span class="pourquoi">المرجع المعتمَد في تعريب المصطلحات؛ ثلاثيّ اللغة، وهو ما يجعله مفيداً للانتقال بين هذا المُقرَّر ونسخته الفرنسية.</span></li>
+</ul>
+</section>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../02-agents/page.html">\(\leftarrow\) الفصل 2 &mdash; الوكلاء</a>
+<a href="../../../IA/lecons/03-recherche/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">المُلحَق الخوارزمي</a>
+<a href="../../index.html">فهرس المُقرَّر</a>
+<a href="../04-metaheuristiques/page.html">الفصل 4 &mdash; الميتاهيوريستيّات \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>الذكاء الاصطناعي &mdash; الأقسام التحضيرية MP/PSI</strong> &middot; البحث والألعاب والقيود والتعلّم<span class="footer-meta">طبعة 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">تعذّر تحميل الشكل التفاعلي. تحقّق من اتصالك بالشبكة.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ------------------------------------------------------------------ Grille */
+var GW = 15, GH = 10;
+var WALLS = {};
+(function(){
+  var spec = [
+    [3,0],[3,1],[3,2],[3,3],[3,4],[3,5],
+    [6,9],[6,8],[6,7],[6,6],[6,5],[6,4],
+    [9,0],[9,1],[9,2],[9,3],[9,4],[9,7],[9,8],[9,9],
+    [12,2],[12,3],[12,4],[12,5],[12,6],[12,7],
+    [4,7],[5,7],[7,2],[8,2],[10,5],[11,5]
+  ];
+  for (var i=0;i<spec.length;i++){ WALLS[spec[i][0]+','+spec[i][1]] = true; }
+})();
+function libre(x,y){ return x>=0 && y>=0 && x<GW && y<GH && !WALLS[x+','+y]; }
+
+/* A* pondere sur la grille : f = g + w*h, h = distance de Manhattan.
+   Departage a f egal : plus grand g d'abord (on se rapproche du but). */
+function chercheGrille(sx, sy, gx, gy, w){
+  var res = { dev: [], chemin: [], cout: Infinity, nb: 0 };
+  if (!libre(sx,sy) || !libre(gx,gy)) { return res; }
+  var g = {}, parent = {}, ferme = {}, ouvert = [];
+  function h(x,y){ return Math.abs(x-gx) + Math.abs(y-gy); }
+  var cle = sx+','+sy;
+  g[cle] = 0; parent[cle] = null;
+  ouvert.push({k:cle, x:sx, y:sy, f:w*h(sx,sy), g:0});
+  var DX = [1,-1,0,0], DY = [0,0,1,-1];
+  while (ouvert.length){
+    var best = 0;
+    for (var i=1;i<ouvert.length;i++){
+      if (ouvert[i].f < ouvert[best].f ||
+         (ouvert[i].f === ouvert[best].f && ouvert[i].g > ouvert[best].g)) { best = i; }
+    }
+    var n = ouvert.splice(best,1)[0];
+    if (ferme[n.k]) { continue; }
+    ferme[n.k] = true;
+    res.dev.push([n.x, n.y]);
+    if (n.x === gx && n.y === gy){
+      res.cout = n.g; res.nb = res.dev.length;
+      var c = n.k;
+      while (c !== null){ var p = c.split(','); res.chemin.push([+p[0], +p[1]]); c = parent[c]; }
+      res.chemin.reverse();
+      return res;
+    }
+    for (var d=0; d<4; d++){
+      var vx = n.x + DX[d], vy = n.y + DY[d];
+      if (!libre(vx,vy)) { continue; }
+      var vk = vx+','+vy, ng = n.g + 1;
+      if (!(vk in g) || ng < g[vk]){
+        g[vk] = ng; parent[vk] = n.k;
+        ouvert.push({k:vk, x:vx, y:vy, f:ng + w*h(vx,vy), g:ng});
+      }
+    }
+  }
+  res.nb = res.dev.length;
+  return res;
+}
+
+/* Memoisation : les figures 1.3 et 1.4 partagent le meme calcul. */
+var ETAT1 = { sx:1, sy:1, gx:13, gy:8, w:1, res:null, sig:'' };
+function calcul1(){
+  var sig = [ETAT1.sx,ETAT1.sy,ETAT1.gx,ETAT1.gy,ETAT1.w].join('|');
+  if (sig !== ETAT1.sig || ETAT1.res === null){
+    ETAT1.sig = sig;
+    ETAT1.res = chercheGrille(ETAT1.sx, ETAT1.sy, ETAT1.gx, ETAT1.gy, ETAT1.w);
+  }
+  return ETAT1.res;
+}
+function coutOptimal(){
+  var r = chercheGrille(ETAT1.sx, ETAT1.sy, ETAT1.gx, ETAT1.gy, 0);
+  return r.cout;
+}
+
+/* ------------------------------------------------ Figure 1.3 : grille A* */
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-1.2, GH + 1.6, GW + 1.2, -2.2], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: true
+});
+
+function carres(liste){
+  var d = [[],[]];
+  for (var i=0;i<liste.length;i++){
+    var x = liste[i][0], y = liste[i][1];
+    d[0].push(x-0.46, x+0.46, x+0.46, x-0.46, x-0.46, NaN);
+    d[1].push(y-0.46, y-0.46, y+0.46, y+0.46, y-0.46, NaN);
+  }
+  return d;
+}
+
+var murs = [];
+for (var k in WALLS){ var p = k.split(','); murs.push([+p[0], +p[1]]); }
+
+var cMurs = b1.create('curve', carres(murs), {
+  strokeWidth: 0, fillColor: PAL.muted, fillOpacity: 0.55, highlight: false, fixed: true
+});
+var cDev = b1.create('curve', [[0],[0]], {
+  strokeWidth: 0, fillColor: function(){ return cssv('--viz-blue', '#2563eb'); },
+  fillOpacity: 0.22, highlight: false, fixed: true
+});
+cDev.updateDataArray = function(){ var d = carres(calcul1().dev); this.dataX = d[0]; this.dataY = d[1]; };
+
+var cChemin = b1.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--primary', '#026573'); },
+  strokeWidth: 5, highlight: false, fixed: true
+});
+cChemin.updateDataArray = function(){
+  var c = calcul1().chemin, X = [], Y = [];
+  for (var i=0;i<c.length;i++){ X.push(c[i][0]); Y.push(c[i][1]); }
+  this.dataX = X; this.dataY = Y;
+};
+
+/* grille de fond */
+var cGrille = b1.create('curve', [[0],[0]], {
+  strokeColor: PAL.grid, strokeWidth: 1, highlight: false, fixed: true
+});
+(function(){
+  var X = [], Y = [];
+  for (var x=0; x<=GW; x++){ X.push(x-0.5, x-0.5, NaN); Y.push(-0.5, GH-0.5, NaN); }
+  for (var y=0; y<=GH; y++){ X.push(-0.5, GW-0.5, NaN); Y.push(y-0.5, y-0.5, NaN); }
+  cGrille.dataX = X; cGrille.dataY = Y;
+})();
+
+var pDepart = b1.create('point', [1,1], {
+  name: 'البداية', size: 7, face: 'o', fillColor: '#16a34a', strokeColor: '#14532d',
+  strokeWidth: 2, label: {offset: [8, 12], strokeColor: PAL.text},
+  snapToGrid: true, snapSizeX: 1, snapSizeY: 1
+});
+var pArrivee = b1.create('point', [13,8], {
+  name: 'النهاية', size: 7, face: 'o', fillColor: '#dc2626', strokeColor: '#7f1d1d',
+  strokeWidth: 2, label: {offset: [8, 12], strokeColor: PAL.text},
+  snapToGrid: true, snapSizeX: 1, snapSizeY: 1
+});
+
+var sW = b1.create('slider', [[0, -1.5], [GW - 1, -1.5], [0, 1, 2.5]], {
+  name: 'w', snapWidth: 0.1, precision: 1,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+
+function majEtat1(){
+  var sx = Math.max(0, Math.min(GW-1, Math.round(pDepart.X())));
+  var sy = Math.max(0, Math.min(GH-1, Math.round(pDepart.Y())));
+  var gx = Math.max(0, Math.min(GW-1, Math.round(pArrivee.X())));
+  var gy = Math.max(0, Math.min(GH-1, Math.round(pArrivee.Y())));
+  ETAT1.sx = sx; ETAT1.sy = sy; ETAT1.gx = gx; ETAT1.gy = gy;
+  ETAT1.w = Math.round(sW.Value() * 10) / 10;
+}
+
+b1.create('text', [-1.0, GH + 1.0, function(){
+  majEtat1();
+  var r = calcul1();
+  if (r.cout === Infinity){
+    return 'البداية او النهاية على عائق، او الغاية غير قابلة للبلوغ.';
+  }
+  var opt = coutOptimal();
+  var verdict = (r.cout === opt)
+      ? 'مسار امثل'
+      : 'مسار اطول من الامثل (' + opt + ') بـ' + (r.cout - opt);
+  return 'w = ' + ETAT1.w.toFixed(1) + '   |   الخلايا المطورة: ' + r.nb
+       + '   |   طول المسار: ' + r.cout + '   |   ' + verdict;
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+
+/* ------------------------------------ Figure 1.2 : disciplines de la frange */
+var NOMS = ['S','A','B','C','D','E','F','G'];
+var POS = {S:[0,2], A:[2,3.4], B:[2,0.6], C:[4,4.2], D:[4,2], E:[4,0], F:[6,3.2], G:[8,2]};
+var ARETES = [['S','A',2],['S','B',3],['A','C',3],['A','D',2],['B','D',4],['B','E',3],
+              ['C','F',2],['D','F',3],['D','G',6],['E','G',5],['F','G',2]];
+var HEUR = {S:7, A:5, B:6, C:3, D:4, E:4, F:2, G:0};
+var ADJ = {};
+for (var i=0;i<NOMS.length;i++){ ADJ[NOMS[i]] = []; }
+for (var i=0;i<ARETES.length;i++){
+  var u = ARETES[i][0], v = ARETES[i][1], w = ARETES[i][2];
+  ADJ[u].push([v,w]); ADJ[v].push([u,w]);
+}
+for (var i=0;i<NOMS.length;i++){ ADJ[NOMS[i]].sort(function(a,b){ return a[0] < b[0] ? -1 : 1; }); }
+
+/* Renvoie l'ordre de developpement, le chemin trouve, son cout, et la frange
+   apres chaque etape. mode : 0 largeur, 1 profondeur, 2 cout uniforme, 3 A*. */
+function parcours(mode){
+  var frange = [{s:'S', p:['S'], g:0}], vus = {}, ordre = [], franges = [], fin = null;
+  function priorite(n){
+    if (mode === 2) { return n.g; }
+    return n.g + HEUR[n.s];
+  }
+  while (frange.length){
+    var idx;
+    if (mode === 0) { idx = 0; }
+    else if (mode === 1) { idx = frange.length - 1; }
+    else {
+      idx = 0;
+      for (var i=1;i<frange.length;i++){
+        var a = priorite(frange[i]), b = priorite(frange[idx]);
+        if (a < b || (a === b && frange[i].g > frange[idx].g)) { idx = i; }
+      }
+    }
+    var n = frange.splice(idx,1)[0];
+    if (vus[n.s]) { continue; }
+    vus[n.s] = true;
+    ordre.push(n.s);
+    franges.push(frange.map(function(m){ return m.s; }));
+    if (n.s === 'G'){ fin = n; break; }
+    for (var i=0;i<ADJ[n.s].length;i++){
+      var v = ADJ[n.s][i][0], c = ADJ[n.s][i][1];
+      if (!vus[v]) { frange.push({s:v, p:n.p.concat([v]), g:n.g + c}); }
+    }
+  }
+  return {ordre: ordre, franges: franges,
+          chemin: fin ? fin.p : [], cout: fin ? fin.g : Infinity};
+}
+var PARCOURS = [parcours(0), parcours(1), parcours(2), parcours(3)];
+var LIB = ['عرض (طابور)', 'عمق (كدس)', 'كلفة منتظمة (كومة على g)', 'A* (كومة على g + h)'];
+
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-1.6, 6.4, 9.6, -2.6], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sMode = b2.create('slider', [[-1.0, -1.3], [3.4, -1.3], [0, 3, 3]], {
+  name: 'strategie', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+var sEtape = b2.create('slider', [[4.6, -1.3], [9.0, -1.3], [0, 8, 8]], {
+  name: 'خطوة', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function modeCourant(){ return Math.round(sMode.Value()); }
+function etapeCourante(){
+  var p = PARCOURS[modeCourant()];
+  return Math.min(Math.round(sEtape.Value()), p.ordre.length);
+}
+function rangDev(nom){
+  var p = PARCOURS[modeCourant()], e = etapeCourante();
+  for (var i=0;i<e;i++){ if (p.ordre[i] === nom) { return i; } }
+  return -1;
+}
+
+for (var i=0;i<ARETES.length;i++){
+  (function(a){
+    var u = POS[a[0]], v = POS[a[1]];
+    b2.create('segment', [u, v], {
+      strokeColor: function(){
+        var p = PARCOURS[modeCourant()];
+        var c = p.chemin, e = etapeCourante();
+        if (e >= p.ordre.length){
+          for (var j=0;j+1<c.length;j++){
+            if ((c[j] === a[0] && c[j+1] === a[1]) || (c[j] === a[1] && c[j+1] === a[0])){
+              return cssv('--primary', '#026573');
+            }
+          }
+        }
+        return PAL.ref();
+      },
+      strokeWidth: function(){
+        var p = PARCOURS[modeCourant()], c = p.chemin, e = etapeCourante();
+        if (e >= p.ordre.length){
+          for (var j=0;j+1<c.length;j++){
+            if ((c[j] === a[0] && c[j+1] === a[1]) || (c[j] === a[1] && c[j+1] === a[0])){ return 5; }
+          }
+        }
+        return 2;
+      },
+      highlight: false, fixed: true
+    });
+    b2.create('text', [(u[0]+v[0])/2, (u[1]+v[1])/2 + 0.18, String(a[2])],
+      {fontSize: 13, strokeColor: PAL.muted, anchorX: 'middle', fixed: true, highlight: false});
+  })(ARETES[i]);
+}
+for (var i=0;i<NOMS.length;i++){
+  (function(nom){
+    b2.create('point', POS[nom], {
+      name: '', size: 15, face: 'o', fixed: true, highlight: false, strokeWidth: 2,
+      strokeColor: function(){ return rangDev(nom) >= 0 ? cssv('--primary','#026573') : PAL.axis(); },
+      fillColor: function(){ return rangDev(nom) >= 0 ? cssv('--primary','#026573') : PAL.bg(); },
+      fillOpacity: 1
+    });
+    b2.create('text', [POS[nom][0], POS[nom][1] - 0.12, function(){
+      return nom;
+    }], {fontSize: 15, anchorX: 'middle', anchorY: 'middle', fixed: true, highlight: false,
+         strokeColor: function(){ return rangDev(nom) >= 0 ? PAL.bg() : PAL.text(); }});
+    b2.create('text', [POS[nom][0], POS[nom][1] + 0.55, function(){
+      var r = rangDev(nom);
+      return (r >= 0 ? (r+1) + '. ' : '') + 'h=' + HEUR[nom];
+    }], {fontSize: 12, anchorX: 'middle', fixed: true, highlight: false, strokeColor: PAL.muted});
+  })(NOMS[i]);
+}
+b2.create('text', [-1.5, 5.8, function(){
+  var m = modeCourant(), p = PARCOURS[m], e = etapeCourante();
+  var s = 'الاستراتيجية: ' + LIB[m] + '   |   الرؤوس المطورة: '
+        + p.ordre.slice(0, e).join(', ');
+  return s;
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-1.5, 5.2, function(){
+  var m = modeCourant(), p = PARCOURS[m], e = etapeCourante();
+  if (e === 0) { return 'الحاشية: S'; }
+  return 'الحاشية بعد هذه الخطوة: ' + (p.franges[e-1].length ? p.franges[e-1].join(', ') : 'vide');
+}], {fontSize: 14, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-1.5, -2.2, function(){
+  var m = modeCourant(), p = PARCOURS[m], e = etapeCourante();
+  if (e < p.ordre.length) { return 'البحث جار...'; }
+  return 'انتهى: مسار ' + p.chemin.join(' - ') + '   |   كلفة ' + p.cout
+       + '   |   ' + p.ordre.length + ' راسا مطورا';
+}], {fontSize: 15, strokeColor: function(){ return cssv('--primary','#026573'); },
+     fixed: true, highlight: false});
+
+/* ------------------------- Figure 1.4 : effet du poids w sur la recherche */
+var b3 = JXG.JSXGraph.initBoard('jxg3', {
+  boundingbox: [-0.35, 1.12, 2.6, -0.28], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var WS = [];
+for (var i=0;i<=20;i++){ WS.push(i/10); }
+function serie(){
+  majEtat1();
+  var dev = [], lon = [], maxd = 1, maxl = 1;
+  for (var i=0;i<WS.length;i++){
+    var r = chercheGrille(ETAT1.sx, ETAT1.sy, ETAT1.gx, ETAT1.gy, WS[i]);
+    var d = (r.cout === Infinity) ? 0 : r.nb;
+    var l = (r.cout === Infinity) ? 0 : r.cout;
+    dev.push(d); lon.push(l);
+    if (d > maxd) { maxd = d; }
+    if (l > maxl) { maxl = l; }
+  }
+  return {dev: dev, lon: lon, maxd: maxd, maxl: maxl};
+}
+var CACHE3 = {sig: '', val: null};
+function serie3(){
+  majEtat1();
+  var sig = [ETAT1.sx, ETAT1.sy, ETAT1.gx, ETAT1.gy].join('|');
+  if (sig !== CACHE3.sig){ CACHE3.sig = sig; CACHE3.val = serie(); }
+  return CACHE3.val;
+}
+b3.create('segment', [[0,0],[2.15,0]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  highlight: false, fixed: true, straightFirst: false, straightLast: false});
+b3.create('segment', [[0,0],[0,1.02]], {strokeColor: PAL.axis, strokeWidth: 1.6,
+  highlight: false, fixed: true, straightFirst: false, straightLast: false});
+for (var i=0;i<=4;i++){
+  (function(v){
+    b3.create('text', [v/2, -0.12, String(v/2)], {fontSize: 12, anchorX: 'middle',
+      strokeColor: PAL.muted, fixed: true, highlight: false});
+  })(i);
+}
+b3.create('text', [1.05, -0.24, 'وزن المرشدة w'], {fontSize: 13,
+  anchorX: 'middle', strokeColor: PAL.muted, fixed: true, highlight: false});
+
+var cDevW = b3.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--viz-blue', '#2563eb'); },
+  strokeWidth: 3, highlight: false, fixed: true});
+cDevW.updateDataArray = function(){
+  var s = serie3(), X = [], Y = [];
+  for (var i=0;i<WS.length;i++){ X.push(WS[i]); Y.push(s.dev[i]/s.maxd); }
+  this.dataX = X; this.dataY = Y;
+};
+var cLonW = b3.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--accent', '#f59e0b'); },
+  strokeWidth: 3, highlight: false, fixed: true});
+cLonW.updateDataArray = function(){
+  var s = serie3(), X = [], Y = [];
+  for (var i=0;i<WS.length;i++){ X.push(WS[i]); Y.push(s.lon[i]/s.maxl); }
+  this.dataX = X; this.dataY = Y;
+};
+var sW3 = b3.create('slider', [[0.15, 1.06], [2.0, 1.06], [0, 1, 2.0]], {
+  name: 'w', snapWidth: 0.1, precision: 1,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+b3.create('segment', [
+  function(){ return [Math.round(sW3.Value()*10)/10, 0]; },
+  function(){ return [Math.round(sW3.Value()*10)/10, 1]; }
+], {strokeColor: PAL.ref, strokeWidth: 1.6, dash: 2, highlight: false, fixed: true});
+b3.create('text', [0.02, -0.24, function(){
+  var s = serie3(), i = Math.round(Math.round(sW3.Value()*10)/10 * 10);
+  if (i < 0) { i = 0; } if (i >= WS.length) { i = WS.length - 1; }
+  return 'w = ' + WS[i].toFixed(1) + '  :  ' + s.dev[i] + ' خلية مطورة، مسار طوله '
+       + s.lon[i] + ' (optimum ' + s.lon[0] + ')';
+}], {fontSize: 14, strokeColor: PAL.text, fixed: true, highlight: false});
+b3.create('text', [2.2, 0.86, 'الخلايا المطورة'], {fontSize: 13, anchorX: 'right',
+  strokeColor: function(){ return cssv('--viz-blue', '#2563eb'); }, fixed: true, highlight: false});
+b3.create('text', [2.2, 0.74, 'طول المسار'], {fontSize: 13, anchorX: 'right',
+  strokeColor: function(){ return cssv('--accent', '#f59e0b'); }, fixed: true, highlight: false});
+
+b1.update(); b2.update(); b3.update();
+
+})();
+</script>
+</body></html>

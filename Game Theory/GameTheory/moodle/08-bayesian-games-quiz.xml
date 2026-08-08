@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<question type="category">
+  <category><text>$course$/Game Theory/Chapter 08 - Bayesian Games and Incomplete Information (Quiz)</text></category>
+  <info format="html"><text><![CDATA[<p>Auto-graded comprehension questions for Chapter 08.</p>]]></text></info>
+</question>
+<question type="multichoice">
+  <name><text>C08 Q1 - Incomplete versus imperfect</text></name>
+  <questiontext format="html"><text><![CDATA[<p>A firm does not know its rival's production cost. This is an example of:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Not knowing the rival's payoff function is incomplete information. Imperfect information would mean not observing what the rival has <em>done</em> - a different problem, handled by information sets in the extensive form.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Incomplete information]]></text><feedback format="html"><text><![CDATA[<p>Correct - a payoff function is unknown.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Imperfect information]]></text><feedback format="html"><text><![CDATA[<p>That refers to unobserved moves, not unknown payoffs.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Perfect information]]></text><feedback format="html"><text><![CDATA[<p>Something important is unknown, so this fails.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A zero-sum game]]></text><feedback format="html"><text><![CDATA[<p>Unrelated to the information structure.</p>]]></text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C08 Q2 - What a strategy is</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In a Bayesian game, a player's strategy is:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>A Bayesian strategy is a <em>function</em> from the player's own type to an action: it says what to do for each possible piece of private information. This is why a two-type player effectively makes two choices and why equilibrium requires solving one condition per type.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[A function mapping each of the player's possible types to an action]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A single action chosen before types are drawn]]></text><feedback format="html"><text><![CDATA[<p>The player observes their own type before acting.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A probability distribution over the opponents' types]]></text><feedback format="html"><text><![CDATA[<p>That is a belief, not a strategy.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A mapping from the opponents' types to actions]]></text><feedback format="html"><text><![CDATA[<p>Opponents' types are not observed.</p>]]></text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C08 Q3 - Entry threshold</text></name>
+  <questiontext format="html"><text><![CDATA[<p>An entrant earns \(-2\) if the incumbent fights, \(+2\) if it accommodates, and \(0\) by staying out. A tough incumbent (probability \(\mu\)) always fights; a soft one always accommodates. Below what value of \(\mu\) does the entrant enter? Give a decimal.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Expected payoff from entering is \(-2\mu + 2(1-\mu) = 2 - 4\mu\), which is positive exactly when \(\mu \lt  0.5\). Above that belief the entrant stays out - which is precisely why an incumbent has an incentive to invest in a reputation for toughness.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>0.5</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0.01</tolerance></answer>
+</question>
+<question type="multichoice">
+  <name><text>C08 Q4 - Separating equilibrium</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In Spence's education model, an equilibrium in which only high-ability workers acquire the degree is called:</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>This is a separating equilibrium: the action fully reveals the type, so employers can infer ability from the diploma. If all types acquired the degree it would be pooling and the signal would carry no information.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[A separating equilibrium]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A pooling equilibrium]]></text><feedback format="html"><text><![CDATA[<p>Pooling means all types take the same action.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A subgame perfect equilibrium]]></text><feedback format="html"><text><![CDATA[<p>That is a refinement of a different kind.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[A dominant strategy equilibrium]]></text><feedback format="html"><text><![CDATA[<p>Nothing here is dominant.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C08 Q5 - Signalling requires productivity</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In Spence's model, education can function as a credible signal only if it actually raises the worker's productivity.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>False, and that is the striking part of the model. The signal works because education is <em>cheaper</em> for high-ability workers, so only they find it worth acquiring. Even a completely unproductive credential can separate types if the cost difference is large enough - which raises uncomfortable questions about the social value of credentials.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="0" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="100" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="multichoice">
+  <name><text>C08 Q6 - Adverse selection</text></name>
+  <questiontext format="html"><text><![CDATA[<p>In Akerlof's market for lemons, why can the market collapse?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>Because buyers cannot verify quality, they pay only the expected quality of what is on offer. That price is below the value of above-average cars, whose owners withdraw; the average falls; the price falls; and the process repeats. Warranties, certification and reputations exist to break this loop.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <single>true</single>
+  <shuffleanswers>true</shuffleanswers>
+  <answernumbering>abc</answernumbering>
+  <correctfeedback format="html"><text>Correct.</text></correctfeedback>
+  <partiallycorrectfeedback format="html"><text>Partially correct.</text></partiallycorrectfeedback>
+  <incorrectfeedback format="html"><text>Not quite - review the reading.</text></incorrectfeedback>
+  <answer fraction="100" format="html"><text><![CDATA[Buyers pay only average quality, so above-average sellers withdraw, lowering the average further]]></text><feedback format="html"><text><![CDATA[<p>Correct.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Sellers do not know the quality of their own cars]]></text><feedback format="html"><text><![CDATA[<p>Sellers are the informed side here.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[There are too many buyers relative to sellers]]></text><feedback format="html"><text><![CDATA[<p>The failure is informational, not a matter of numbers.</p>]]></text></feedback></answer>
+  <answer fraction="0" format="html"><text><![CDATA[Buyers are irrational]]></text><feedback format="html"><text><![CDATA[<p>Buyers behave perfectly rationally given their information.</p>]]></text></feedback></answer>
+</question>
+<question type="truefalse">
+  <name><text>C08 Q7 - Screening</text></name>
+  <questiontext format="html"><text><![CDATA[<p>An insurer offering a menu of contracts - a low premium with a high deductible, and a high premium with full cover - is engaged in screening.</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>True. The uninformed party (the insurer) moves first with a menu designed so that different risk types self-select. Signalling is the mirror image, with the informed party moving first to reveal its type.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>1.0000000</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>true</text><feedback format="html"><text>Correct.</text></feedback></answer>
+  <answer fraction="0" format="moodle_auto_format"><text>false</text><feedback format="html"><text>Incorrect.</text></feedback></answer>
+</question>
+<question type="numerical">
+  <name><text>C08 Q8 - Counting Bayesian strategies</text></name>
+  <questiontext format="html"><text><![CDATA[<p>A player has 3 possible types and 4 available actions, and observes their own type before acting. How many pure strategies does this player have?</p>]]></text></questiontext>
+  <generalfeedback format="html"><text><![CDATA[<p>A strategy assigns one of 4 actions to each of 3 types, so there are \(4^{3} = 64\) pure strategies. The number of strategies grows exponentially in the number of types, which is why Bayesian games are solved type by type rather than by enumerating strategies.</p>]]></text></generalfeedback>
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.3333333</penalty>
+  <hidden>0</hidden>
+  <answer fraction="100" format="moodle_auto_format"><text>64</text><feedback format="html"><text>Correct.</text></feedback><tolerance>0</tolerance></answer>
+</question>
+</quiz>

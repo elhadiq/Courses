@@ -1,0 +1,105 @@
+<style>
+.gt{--primary:#026573;--primary-dark:#014a55;--primary-light:#2a8c9a;--primary-soft:#e6f1f3;
+ --primary-soft-2:#d0e4e8;--accent:#f59e0b;--color-text:#1f2937;--color-muted:#6b7280;
+ --color-rule:#e2e8eb;--box-bg:#fff;--def-bg:#e6f1f3;--def-br:#026573;--def-fg:#014a55;
+ --thm-bg:#f5f1ff;--thm-br:#7c3aed;--thm-fg:#6d28d9;--prop-bg:#eff6ff;--prop-br:#2563eb;
+ --prop-fg:#1d4ed8;--method-bg:#ecfdf5;--method-br:#059669;--method-fg:#047857;
+ --warn-bg:#fef2f2;--warn-br:#dc2626;--warn-fg:#b91c1c;--tip-bg:#fffbeb;--tip-br:#f59e0b;
+ --tip-fg:#b45309;--example-bg:#f8fafc;--example-br:#64748b;--example-fg:#475569;
+ --viz-axis:#94a3b8;--viz-bad:#dc2626;--radius:10px;
+ --font-serif:"Source Serif Pro","Iowan Old Style",Georgia,serif;
+ --font-sans:"Inter",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+ --font-mono:"JetBrains Mono","SF Mono",Consolas,monospace;
+ font-family:var(--font-serif);color:var(--color-text);line-height:1.75;font-size:1.02rem;
+ max-width:900px;margin:0 auto;}
+.gt h1,.gt h2,.gt h3{font-family:var(--font-sans);color:var(--primary-dark);line-height:1.3;}
+.gt h2{font-size:1.42rem;margin:1.9em 0 .7em;padding-bottom:.3em;
+ border-bottom:2px solid var(--primary-soft-2);}
+.gt h3{font-size:1.14rem;margin:1.5em 0 .5em;}
+.gt p{margin:0 0 1em;}
+.gt ul,.gt ol{margin:0 0 1em;padding-left:1.4em;}
+.gt li{margin-bottom:.4em;}
+.gt a{color:var(--primary);}
+.gt .lead{border-left:4px solid var(--primary);background:var(--primary-soft);
+ padding:14px 20px;border-radius:0 var(--radius) var(--radius) 0;margin:0 0 1.6em;}
+.gt .lead .lead-label{font-family:var(--font-sans);font-size:.74rem;letter-spacing:.09em;
+ text-transform:uppercase;font-weight:700;color:var(--primary-dark);display:block;margin-bottom:4px;}
+.gt .lead h1{font-size:1.6rem;margin:0 0 6px;}
+.gt .lead .lead-sub{color:var(--color-muted);font-size:.97rem;margin:0;}
+.gt .box{background:var(--box-bg);border:1px solid var(--color-rule);border-left-width:4px;
+ border-radius:var(--radius);padding:14px 20px;margin:1.4em 0;}
+.gt .box>.box-title{font-family:var(--font-sans);font-weight:700;font-size:.95rem;margin-bottom:6px;}
+.gt .box>*:last-child{margin-bottom:0;}
+.gt .box.def{background:var(--def-bg);border-left-color:var(--def-br);}
+.gt .box.def>.box-title{color:var(--def-fg);}
+.gt .box.thm{background:var(--thm-bg);border-left-color:var(--thm-br);}
+.gt .box.thm>.box-title{color:var(--thm-fg);}
+.gt .box.prop{background:var(--prop-bg);border-left-color:var(--prop-br);}
+.gt .box.prop>.box-title{color:var(--prop-fg);}
+.gt .box.method{background:var(--method-bg);border-left-color:var(--method-br);}
+.gt .box.method>.box-title{color:var(--method-fg);}
+.gt .box.warn{background:var(--warn-bg);border-left-color:var(--warn-br);}
+.gt .box.warn>.box-title{color:var(--warn-fg);}
+.gt .box.tip{background:var(--tip-bg);border-left-color:var(--tip-br);}
+.gt .box.tip>.box-title{color:var(--tip-fg);}
+.gt .box.example{background:var(--example-bg);border-left-color:var(--example-br);}
+.gt .box.example>.box-title{color:var(--example-fg);}
+.gt .eq{margin:1.1em 0;overflow-x:auto;text-align:center;}
+.gt .keypoints{background:var(--primary-soft);border:1px solid var(--primary-soft-2);
+ border-radius:var(--radius);padding:16px 22px;margin:2em 0;}
+.gt .keypoints h3{margin-top:0;}
+.gt .viz{margin:1.6em 0;}
+.gt .viz-title{font-family:var(--font-sans);font-weight:700;color:var(--primary);
+ font-size:.95rem;margin-bottom:8px;}
+.gt .viz-caption{color:var(--color-muted);font-size:.9rem;margin:10px 0 0;
+ border-top:1px solid var(--color-rule);padding-top:9px;}
+.gt table{border-collapse:collapse;width:100%;font-size:.96rem;margin:0;}
+.gt th,.gt td{border:1px solid var(--color-rule);padding:8px 14px;text-align:left;
+ vertical-align:top;}
+.gt thead th{background:var(--primary-soft);}
+.gt .payoff{width:auto;margin:0 auto;}
+.gt .payoff th,.gt .payoff td{text-align:center;}
+.gt .payoff th.corner{background:var(--primary);color:#fff;font-size:.8rem;}
+.gt .payoff tbody th{background:var(--primary-soft);text-align:left;}
+.gt .payoff td{font-family:var(--font-mono);}
+.gt .glossary td:first-child{white-space:nowrap;font-weight:600;}
+.gt svg{max-width:100%;height:auto;}
+</style>
+<div class="gt">
+<div class="lead"><span class="lead-label">Part III &middot; Time and information &middot; Chapter 6</span><h1>Extensive-Form Games, Backward Induction and Subgame Perfection</h1><p class="lead-sub">Put timing back into the model, and throw out equilibria built on empty threats.</p></div>
+<div class="box method"><div class="box-title">What you will be able to do</div><ul><li>Draw and read a game tree with decision nodes, actions, payoffs and information sets.</li><li>Convert a small extensive-form game to its strategic form and find all Nash equilibria.</li><li>Apply backward induction and identify the subgame perfect equilibrium.</li><li>Explain non-credible threats and why commitment devices have value.</li><li>Compute the Stackelberg leader and follower quantities and compare them with Cournot.</li></ul></div>
+
+<h2>1. Order matters</h2>
+<p>The strategic form throws away timing. Yet in most real interactions someone moves first and the other sees it: a firm builds a plant before a rival responds, a parent makes a threat before the child misbehaves, a bidder raises before others call. The <strong>extensive form</strong> keeps the timing by describing the game as a tree.</p>
+<p>A game tree has <em>decision nodes</em> labelled with whose turn it is, <em>branches</em> for the available actions, <em>terminal nodes</em> carrying a payoff vector, and <em>information sets</em> grouping nodes a player cannot tell apart. If every information set is a single node, the game has <strong>perfect information</strong>: everyone always knows exactly where they are. Chess has perfect information; poker does not.</p>
+
+<h2>2. A worked tree: entry deterrence</h2>
+<p>An entrant decides whether to enter a market. If it stays out, it earns 0 and the incumbent keeps a monopoly worth 10. If it enters, the incumbent chooses to fight a price war (\(-2\) for the entrant, \(-2\) for the incumbent) or accommodate (\(2\) and \(5\)).</p>
+<figure class="viz"><div class="viz-title">The entry-deterrence game in extensive form</div><div style="text-align:center;"><svg viewBox='0 0 760 380' style='width:100%;max-width:760px;height:auto;font-family:var(--font-sans);' xmlns='http://www.w3.org/2000/svg'><line x1='120' y1='170' x2='340' y2='70' stroke='var(--viz-axis)' stroke-width='2'/><text x='230' y='112' font-size='13' fill='var(--color-muted)' text-anchor='middle'>Out</text><line x1='120' y1='170' x2='340' y2='270' stroke='var(--viz-axis)' stroke-width='2'/><text x='230' y='238' font-size='13' fill='var(--color-muted)' text-anchor='middle'>In</text><line x1='340' y1='270' x2='590' y2='190' stroke='var(--viz-axis)' stroke-width='2'/><text x='465' y='222' font-size='13' fill='var(--color-muted)' text-anchor='middle'>Fight</text><line x1='340' y1='270' x2='590' y2='330' stroke='var(--viz-axis)' stroke-width='2'/><text x='465' y='318' font-size='13' fill='var(--color-muted)' text-anchor='middle'>Accommodate</text><circle cx='120' cy='170' r='11' fill='var(--primary)'/><text x='120' y='150' font-size='13' font-weight='bold' fill='var(--color-text)' text-anchor='middle'>Entrant</text><circle cx='340' cy='270' r='11' fill='var(--primary)'/><text x='340' y='250' font-size='13' font-weight='bold' fill='var(--color-text)' text-anchor='middle'>Incumbent</text><rect x='600' y='175' width='84' height='30' rx='6' fill='var(--primary-soft)' stroke='var(--primary)'/><text x='642' y='195' font-size='14' font-family='var(--font-mono)' text-anchor='middle' fill='var(--color-text)'>(-2, -2)</text><rect x='600' y='315' width='84' height='30' rx='6' fill='var(--primary-soft)' stroke='var(--primary)'/><text x='642' y='335' font-size='14' font-family='var(--font-mono)' text-anchor='middle' fill='var(--color-text)'>(2, 5)</text><rect x='350' y='55' width='84' height='30' rx='6' fill='var(--primary-soft)' stroke='var(--primary)'/><text x='392' y='75' font-size='14' font-family='var(--font-mono)' text-anchor='middle' fill='var(--color-text)'>(0, 10)</text></svg></div><p class="viz-caption">Payoffs are (entrant, incumbent). The incumbent moves only if entry occurs.</p></figure>
+<p>Now translate to the strategic form. The entrant has two strategies, In and Out. The incumbent also has two - Fight and Accommodate - even though it may never get to move; recall from Chapter 1 that a strategy specifies behaviour at every decision point.</p>
+<figure class="viz"><div class="viz-title">The same game in strategic form</div><div style="text-align:center;overflow-x:auto;"><table class="payoff"><thead><tr><th class="corner">Entrant \ Incumbent</th><th>Fight</th><th>Accommodate</th></tr></thead><tbody><tr><th>In</th><td>-2, -2</td><td>2, 5</td></tr><tr><th>Out</th><td>0, 10</td><td>0, 10</td></tr></tbody></table></div></figure>
+<p>Two pure Nash equilibria appear: (In, Accommodate) and (Out, Fight). The second is odd. It rests on the entrant believing a threat to fight - but if entry actually happened, fighting gives the incumbent \(-2\) and accommodating gives \(5\). The threat is <strong>not credible</strong>. Nash equilibrium cannot see this, because it never asks what would happen at a node that is not reached.</p>
+
+<h2>3. Backward induction</h2>
+<p>The cure is to solve the tree from the leaves back. At each decision node, assume the player there will choose optimally given what follows, replace the node by that payoff, and repeat.</p>
+<p>In our tree: at the incumbent's node, \(5 \gt  -2\), so Accommodate. Fold that back - entering now yields 2 for the entrant, staying out yields 0 - so the entrant enters. The backward-induction solution is <strong>(In, Accommodate)</strong> with payoffs (2, 5), and the equilibrium built on an empty threat is eliminated.</p>
+<div class="box thm"><div class="box-title">Theorem &mdash; Zermelo (1913)</div><p>Every finite game of perfect information has a solution by backward induction, hence a pure-strategy equilibrium. Applied to chess: from the opening position, either White can force a win, or Black can, or both can force at least a draw. Which one is true is unknown - the theorem asserts existence, not computability.</p></div>
+
+<h2>4. Subgame perfect Nash equilibrium</h2>
+<p>Backward induction generalises to trees with imperfect information through the notion of a <em>subgame</em>: a node together with everything that follows it, provided the node is alone in its information set and no information set is cut in half.</p>
+<div class="box def"><div class="box-title">Definition - SPNE</div><p>A strategy profile is a <strong>subgame perfect Nash equilibrium (SPNE)</strong> if it induces a Nash equilibrium in <em>every</em> subgame, including those never reached in play. (Selten, 1965.)</p></div>
+<p>Every SPNE is a Nash equilibrium; the converse fails, as (Out, Fight) shows. Subgame perfection is the first and most important <em>refinement</em>: it discards equilibria sustained by non-credible threats or promises. The practical lesson - the one that carries into negotiation, deterrence and monetary policy - is that a threat is only useful if carrying it out is in your interest at the time. That is why <strong>commitment</strong> is valuable: burning your ships, signing a penalty clause, or delegating to a stubborn agent changes the payoffs at the future node and thereby makes the threat credible.</p>
+
+<h2>5. First-mover advantage: Stackelberg competition</h2>
+<p>Return to the Cournot duopoly with \(P = a - Q\) and unit cost \(c\), but let firm 1 choose its quantity first and firm 2 observe it before choosing. Firm 2's best response is unchanged: \(q_2 = (a - c - q_1)/2\). Firm 1 therefore maximises \(\pi_1 = \bigl[a - q_1 - \tfrac{a - c - q_1}{2} - c\bigr] q_1 = \tfrac{1}{2}(a - c - q_1) q_1\), and the solution is</p>
+<div class="eq">\[ q_1^{*} = \frac{a - c}{2} \;\; \text{(leader)}, \qquad q_2^{*} = \frac{a - c}{4} \;\; \text{(follower)}. \]</div>
+<p>With \(a = 100\) and \(c = 10\): the leader produces 45, the follower 22.5, total 67.5 and the price is 32.5. Profits are 1012.5 for the leader and 506.25 for the follower, against 900 each under Cournot. Moving first is worth 112.5 here - not because the leader is cleverer, but because committing to a large quantity forces the follower to shrink. Note the contrast with Bertrand competition, where firms set prices and the follower can undercut, so moving first is a disadvantage. Whether commitment helps depends on whether the rival's best response goes down or up with your move.</p>
+
+<h2>6. Where backward induction strains</h2>
+<p>The <strong>centipede game</strong> is the standard stress test. Two players alternate; at each turn a player may Take a growing pot (ending the game) or Pass, which enlarges the pot but hands the choice over. Backward induction says: the last player would Take, so the second-to-last should Take, and so on back to the first move - the game ends immediately, with both players receiving far less than they could have. In laboratory play, most people pass for several rounds and earn more. The gap tells us something real: backward induction requires common knowledge of rationality to hold even at nodes whose very existence would be evidence that someone is not maximising in the assumed way.</p>
+
+<h2>Glossary</h2>
+<table class="glossary"><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Extensive form</td><td>A description of a game as a tree: nodes, actions, information sets and terminal payoffs.</td></tr><tr><td>Perfect information</td><td>Every information set is a singleton, so each player always knows the full history.</td></tr><tr><td>Information set</td><td>A collection of nodes a player cannot distinguish when called on to move.</td></tr><tr><td>Subgame</td><td>A node whose information set is a singleton, together with everything that follows it.</td></tr><tr><td>Backward induction</td><td>Solving a finite perfect-information tree from the terminal nodes back to the root.</td></tr><tr><td>SPNE</td><td>A profile that is a Nash equilibrium in every subgame; rules out non-credible threats.</td></tr><tr><td>Commitment</td><td>An irreversible action that changes one's own future payoffs so as to make a threat or promise credible.</td></tr><tr><td>Stackelberg competition</td><td>Quantity competition in which one firm chooses first and the other observes before choosing.</td></tr></tbody></table>
+<div class="keypoints"><h3>Check your understanding</h3><ol><li>Why is (Out, Fight) a Nash equilibrium but not subgame perfect? <span style='color:#6b7280;'>(Answer: Fighting is not optimal at the node where it would be used)</span></li><li>How many strategies does the incumbent have in the entry game? <span style='color:#6b7280;'>(Answer: Two - a strategy must specify play even at nodes that may not be reached)</span></li><li>With \(a = 100\) and \(c = 10\), what is the Stackelberg leader's quantity? <span style='color:#6b7280;'>(Answer: \(\tfrac{100-10}{2} = 45\))</span></li><li>What does Zermelo's theorem say about chess? <span style='color:#6b7280;'>(Answer: One of the three outcomes can be forced; it does not say which)</span></li></ol></div>
+<div class="box tip"><div class="box-title">Practice</div><p>The chapter quiz asks you to fold a tree back, tell Nash from subgame perfect equilibria, count strategies in an extensive-form game, and compute Stackelberg quantities.</p></div>
+</div>

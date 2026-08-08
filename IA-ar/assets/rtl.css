@@ -1,0 +1,80 @@
+/* ============================================================
+   النسخة العربية — تعديلات الاتجاه والخطوط فوق style.css
+   يُحمَّل بعد style.css ولا يغيّر أياً من متغيّرات الألوان.
+   ============================================================ */
+
+/* ---- الخطوط ---- */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap');
+
+:root {
+  --font-sans:  "Noto Kufi Arabic", "Segoe UI", Tahoma, sans-serif;
+  --font-serif: "Noto Naskh Arabic", "Amiri", "Traditional Arabic", Georgia, serif;
+}
+
+/* ---- الاتجاه العام ---- */
+html[dir="rtl"] body { direction: rtl; text-align: right; }
+
+html[dir="rtl"] ul, html[dir="rtl"] ol { padding-right: 1.4em; padding-left: 0; }
+html[dir="rtl"] blockquote { border-right: 4px solid var(--primary);
+                             border-left: none; padding-right: 18px; padding-left: 0; }
+html[dir="rtl"] table { direction: rtl; }
+html[dir="rtl"] th, html[dir="rtl"] td { text-align: right; }
+
+/* الأطر البيداغوجية: الشريط الملوّن ينتقل إلى اليمين */
+html[dir="rtl"] .box, html[dir="rtl"] .callout,
+html[dir="rtl"] .keypoints, html[dir="rtl"] .viz {
+  border-right-width: 4px; border-right-style: solid;
+  border-left-width: 1px;
+}
+
+/* ---- النصوص اللاتينية داخل جملة عربية ---- */
+.lat  { direction: ltr; unicode-bidi: isolate; font-family: var(--font-sans); }
+.term { direction: ltr; unicode-bidi: isolate; white-space: nowrap;
+        color: var(--color-muted); font-size: 0.9em; }
+
+/* الصيغ الرياضية تبقى من اليسار إلى اليمين مهما كان سياقها */
+mjx-container { direction: ltr; unicode-bidi: isolate; }
+html[dir="rtl"] .eq { text-align: center; }
+
+/* ---- الشيفرة الزائفة: الإطار كلّه من اليمين إلى اليسار ---- */
+html[dir="rtl"] .algo { direction: rtl; }
+html[dir="rtl"] .algo-cap, html[dir="rtl"] .algo-io { text-align: right; }
+html[dir="rtl"] .algo ol.algo-corps { direction: rtl; }
+html[dir="rtl"] .algo ol.algo-corps li {
+  padding-right: 3.1em; padding-left: 0; text-align: right; }
+html[dir="rtl"] .algo ol.algo-corps li::before {
+  right: 0; left: auto; text-align: left; }
+html[dir="rtl"] .algo .n1 { padding-right: 4.6em !important; padding-left: 0 !important; }
+html[dir="rtl"] .algo .n2 { padding-right: 6.1em !important; padding-left: 0 !important; }
+html[dir="rtl"] .algo .n3 { padding-right: 7.6em !important; padding-left: 0 !important; }
+html[dir="rtl"] .algo .n4 { padding-right: 9.1em !important; padding-left: 0 !important; }
+html[dir="rtl"] .algo .n5 { padding-right: 10.6em !important; padding-left: 0 !important; }
+html[dir="rtl"] .algo span.cm { padding-right: 1.2em; padding-left: 0; }
+/* المتغيّرات وأسماء الدوال تبقى لاتينية ومعزولة عن اتجاه السطر */
+html[dir="rtl"] .algo i.va { direction: ltr; unicode-bidi: isolate; }
+html[dir="rtl"] .algo span.fn { unicode-bidi: isolate; }
+html[dir="rtl"] .algo b.kw { font-family: var(--font-sans); font-weight: 700; }
+
+/* ---- الأرقام والجداول العددية تبقى لاتينية ---- */
+.num { direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
+
+/* ---- التنقّل وزر اللغة ---- */
+html[dir="rtl"] .lesson-nav { direction: rtl; }
+html[dir="rtl"] .breadcrumb { direction: rtl; }
+.lang-switch { float: left; font-size: 0.85rem; font-weight: 600;
+               color: var(--primary); text-decoration: none;
+               border: 1px solid var(--color-rule); border-radius: 6px;
+               padding: 2px 10px; direction: ltr; }
+.lang-switch:hover { background: var(--primary-soft); text-decoration: none; }
+
+/* ---- الأشكال ---- */
+html[dir="rtl"] .viz-intro, html[dir="rtl"] .viz-caption { text-align: right; }
+html[dir="rtl"] figure, html[dir="rtl"] .viz svg { direction: ltr; }
+html[dir="rtl"] .viz figcaption { direction: rtl; text-align: right; }
+/* لوحات JSXGraph تُبنى بإحداثيات ديكارتية: تبقى LTR */
+html[dir="rtl"] .viz-board { direction: ltr; }
+
+/* ---- المراجع ---- */
+html[dir="rtl"] ol.reflist { direction: rtl; text-align: right; }
+html[dir="rtl"] ol.reflist li { direction: rtl; }
+html[dir="rtl"] ol.reflist a { direction: ltr; unicode-bidi: embed; }

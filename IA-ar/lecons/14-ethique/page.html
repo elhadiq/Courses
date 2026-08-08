@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الفصل 14 &mdash; الأخلاقيات والمجتمع</title>
+<meta name="description" content="التحيّز، الإنصاف، الاستحالة، القابلية للتفسير، الكلفة، التوثيق، التنظيم.">
+<link href="../../assets/style.css" rel="stylesheet">
+<link href="../../assets/rtl.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+
+.src-ar { margin: 26px 0 8px; border-top: 2px solid var(--color-rule); padding-top: 16px; }
+.src-ar h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--primary); }
+.src-ar .src-note { color: var(--color-muted); font-size: 0.9rem; margin: 0 0 12px; }
+.src-ar ul { list-style: none; padding: 0; margin: 0; }
+.src-ar li { margin: 0 0 14px; padding-right: 14px; border-right: 3px solid var(--primary-soft-2);
+             line-height: 1.7; font-size: 0.95rem; }
+.src-ar li .pourquoi { display: block; color: var(--color-muted); font-size: 0.9em;
+                       margin-top: 3px; }
+.src-ar li a.lien { word-break: break-all; font-size: 0.88em; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><a class="lang-switch" href="../../../IA/lecons/14-ethique/page.html" hreflang="fr" title="Version fran&ccedil;aise">FR</a><div class="breadcrumb"><a href="../../index.html">الذكاء الاصطناعي</a> &middot; مُقرَّر</div><span class="course-code">برنامج MP/PSI &middot; الفترة الثانية</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">القسم الخامس &middot; الفصل 14</div>
+<h1>الفصل 14 &mdash; التحيّز والقابلية للتفسير والمسؤولية</h1>
+<div class="lesson-sub">من أين تأتي أشكال التحيّز، وأيّ تعريفات الإنصاف متنافية رياضياً، وكيف نفسّر قراراً، وأيّ كلفةٍ بيئية، وأيّ تنظيم.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">المُلحَق المرافق</div><p>تدقيق نظام، وقياس فارق إنصاف، وإنتاج تفسيرٍ خلافي للواقع، وبطاقة وصفٍ لنموذج، مفصَّلة <strong><a href="../../../IA/lecons/14-ethique/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">خطوة بخطوة في المُلحَق</a></strong>.</p></div>
+
+<h2>14.1 لماذا هذا الفصل تقنيّ</h2>
+
+<p>لا ينتمي هذا الفصل إلى الأخلاق العامّة. فللمسائل التي يعالجها أجوبةٌ رياضية دقيقة، بعضها <em>مبرهنات استحالة</em>: فهي تغلق نهائياً خياراتٍ ما يزال الخطاب الشائع يقترحها. فلا يمكن «ببساطة جعل الخوارزمية منصفة»، لأنّ كلمة «منصف» تغطّي مطالب متنافية فيما بينها.</p>
+
+<h2>14.2 من أين يأتي التحيّز</h2>
+
+<p>التحيّز لا يكاد يكون خطأ برمجةٍ أبداً. فهو يدخل النظام في ستّة مواضع متمايزة، واحدٌ منها فقط يخصّ اختيار الخوارزمية.</p>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">يجوب المؤشّر السلسلة، من العالم الحقيقي إلى الاستعمال. وعند كلّ مرحلة، يُوصَف مصدر التحيّز المقابل.</p>
+<div id="jxg2" class="viz-board" style="height:460px;"></div>
+<p class="viz-caption"><strong>الشكل 14.1.</strong> مرحلتان تستحقّان انتباهاً خاصّاً. <strong>الوسم</strong>: فنحن لا نكاد نقيس المتغيّر الذي يهمّنا أبداً. نريد التنبّؤ بالإجرام فنقيس الاعتقالات؛ ونريد التنبّؤ بالكفاءة فنقيس التقييمات الماضية. والنموذج يتعلّم البديل بأمانة، بتحيّزه. و<strong>حلقة التغذية الراجعة</strong>: فالقرار يعدّل العالم الذي سنقيسه غداً. فإرسال دورياتٍ أكثر إلى حيٍّ يجعل المخالفات المُعايَنة فيه أكثر، وهذا يبرّر إرسال دورياتٍ أكثر إليه. فالنظام يؤكّد نفسه بنفسه.</p></div>
+
+<div class="box warn"><div class="box-title">حذف السمة الحسّاسة لا يحذف التحيّز</div>
+وهذه أوّل فكرةٍ تخطر للجميع، وهي لا تنجح. ففي بياناتٍ غنيّة، تكون السمة الحسّاسة قابلة لإعادة البناء من غيرها: الرمز البريدي، والاسم الشخصي، وتاريخ الشراء، والمعجم المستعمل. فيجد النموذج المتغيّر الذي أُخفِي عنه، ونفقد زيادةً على ذلك إمكان <em>قياس</em> الفارق، ومن ثمّ تصحيحه. وقياس السمة الحسّاسة ضروري عموماً لكشف التمييز، وهذا يُنشئ توتّراً حقيقياً مع حماية البيانات.</div>
+
+<p>وأكثر الدراسات استشهاداً في الموضوع قاست معدّلات خطأ ثلاثة أنظمة تجارية لتصنيف الجنس من الصور: أقلّ من 1 % من الخطأ عند الرجال فاتحي البشرة، وحتّى 34,7 % عند النساء داكنات البشرة <a class="cite" href="#ref-buolamwini2018">[1]</a>. ولم يكن أيٌّ من هذه الأنظمة «سيّئ البرمجة»: بل كانت مجموعات تدريبها غير متوازنة، ونتيجتها الإجمالية المرتفعة تحجب إخفاقها في ساكنةٍ فرعية.</p>
+
+<h2>14.3 ثلاثة تعريفات للإنصاف، ومبرهنة استحالة</h2>
+
+<div class="box def"><div class="box-title">ثلاثة معايير، كلّها معقولة</div>
+<ul>
+<li><strong>التكافؤ الديموغرافي</strong>: نسبة المنتقَين هي نفسها في كلّ مجموعة.</li>
+<li><strong>تكافؤ الفرص</strong>: من بين من يستحقّون الانتقاء، نسبةُ المنتقَين فعلاً هي نفسها في كلّ مجموعة <a class="cite" href="#ref-hardt2016">[2]</a>.</li>
+<li><strong>المعايرة</strong>: النتيجة الواحدة تعني الشيء نفسه مهما كانت المجموعة &mdash; فمن بين الحاصلين على 0,8، النسبة نفسها إيجابية فعلاً.</li>
+</ul></div>
+
+<div class="box thm"><div class="box-title">مبرهنة الاستحالة</div>
+<p>بمجرّد اختلاف المعدّلات القاعدية بين المجموعات وكون المصنّف غير كامل، يستحيل <strong>رياضياً</strong> إرضاءُ المعايرة وتساوي معدّلات الخطأ في آنٍ واحد <a class="cite" href="#ref-kleinberg2017">[3]</a><a class="cite" href="#ref-chouldechova2017">[4]</a>.</p>
+<p>وليس ذلك حدّاً تقنياً يُتجاوَز: بل قيدٌ جبريّ. فيجب إذن <em>اختر</em>، وتصريحُ الاختيار، وتبريره بالنظر إلى الاستعمال. فنظام مساعدةٍ على التشخيص ونظام منح قروضٍ لا يستدعيان الترجيح نفسه.</p></div>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">مجموعتان، ونموذج واحد، وعتبة قرارٍ قابلة للضبط لكلّ مجموعة. والمعدّلات القاعدية مختلفة: 30 % في A و10 % في B.</p>
+<div id="jxg1" class="viz-board" style="height:480px;"></div>
+<p class="viz-caption"><strong>الشكل 14.2.</strong> ابحث عن ضبطٍ يُرضي المعايير الثلاثة. مسحٌ كامل للعتبتين بخطوة 0,05 &mdash; أي 2601 تركيب &mdash; يجد منها <strong>صفرا</strong>. وتوجد تركيباتٌ تُرضي التكافؤ وتكافؤ الفرص معاً؛ لكن الثلاثة أبداً. وبعتباتٍ متطابقة، يكون تكافؤ الفرص تامّاً وينتقل الإحكام من 62,8 % في A إلى 30,5 % في B: فالنتيجة نفسها لا تعني الشيء نفسه هناك.</p></div>
+
+<h2>14.4 تفسير قرار</h2>
+
+<p>يعترف النظام الأوروبي لحماية البيانات لكلّ شخصٍ بالحقّ في ألّا يخضع لقرارٍ آلي بالكامل يُنتج آثاراً قانونية، وبالحقّ في الحصول على تدخّلٍ بشري وفي الطعن في القرار <a class="cite" href="#ref-rgpd2016">[5]</a>. ويبقى أن نعرف ما يعنيه التفسير.</p>
+
+<figure class="viz"><div class="viz-title">أربعة أشياء تُسمّى «تفسيراً»</div>
+<svg viewBox="0 0 760 330" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="28" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">أربعة أشياء مختلفة جدّاً تُسمّى «تفسيراً»</text><rect x="22" y="52" width="716" height="58" rx="8" style="fill:var(--viz-ok);fill-opacity:0.08;stroke:var(--viz-ok);stroke-width:2;"/><text x="44" y="76" style="fill:var(--viz-ok);font-size:13px;font-weight:700;font-family:inherit;">نموذج مقروء ذاتياً</text><text x="44" y="96" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">شجرة قليلة العمق، أو قواعد، أو انحدار خطّي</text><text x="716" y="86" text-anchor="end" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">التفسير هو النموذج: فهو دقيق بالبناء</text><rect x="22" y="120" width="716" height="58" rx="8" style="fill:var(--accent);fill-opacity:0.08;stroke:var(--accent);stroke-width:2;"/><text x="44" y="144" style="fill:var(--accent);font-size:13px;font-weight:700;font-family:inherit;">تفسير محلّي بعديّ</text><text x="44" y="164" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">نقارب النموذج قرب نقطةٍ بنموذجٍ بسيط</text><text x="716" y="154" text-anchor="end" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">التفسير <tspan style="font-weight:700;">مقاربة</tspan>، لا سبب</text><rect x="22" y="188" width="716" height="58" rx="8" style="fill:var(--viz-blue);fill-opacity:0.08;stroke:var(--viz-blue);stroke-width:2;"/><text x="44" y="212" style="fill:var(--viz-blue);font-size:13px;font-weight:700;font-family:inherit;">خريطة بروز</text><text x="44" y="232" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">ننظر إلى ما يكون المُخرَج حسّاساً له</text><text x="716" y="222" text-anchor="end" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تُظهِر أين ينظر النموذج، لا لماذا يستنتج</text><rect x="22" y="256" width="716" height="58" rx="8" style="fill:var(--primary);fill-opacity:0.08;stroke:var(--primary);stroke-width:2;"/><text x="44" y="280" style="fill:var(--primary);font-size:13px;font-weight:700;font-family:inherit;">خلافي للواقع</text><text x="44" y="300" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">أيّ تغييرٍ أدنى كان سيقلب القرار؟</text><text x="716" y="290" text-anchor="end" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">قابل للتنفيذ من المعنيّ، لكنّه غير وحيد</text><text x="380" y="324" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">السطر الأوّل وحده يعطي تفسيراً أميناً. والثلاثة الأخرى تفسّر <tspan style="font-style:italic;">بديلاً</tspan> عن النموذج.</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 14.3.</strong> السطر الأوّل وحده يعطي تفسيراً أميناً، لأنّ النموذج <em>هو</em> التفسير. والطرائق المحلّية مثل LIME <a class="cite" href="#ref-ribeiro2016">[6]</a> أو قيم شابلي <a class="cite" href="#ref-lundberg2017">[7]</a> تضبط نموذجاً بسيطاً في جوار نقطة: فهي تفسّر هذا البديل، لا النموذج. وتفسيران من طريقتين مختلفتين للقرار نفسه قد يتناقضان، دون أن يكون أيٌّ منهما خاطئاً.</figcaption></figure>
+
+<div class="box tip"><div class="box-title">التفسير الخلافي للواقع</div>
+«رُفِض قرضك؛ وكان سيُمنَح بدخلٍ أعلى بـ300 يورو» أنفعُ للمعنيّ من لائحة أوزان النموذج. وهذه الصورة قابلة للتنفيذ ولا تقتضي فتح الصندوق <a class="cite" href="#ref-wachter2018">[8]</a>. واحتياطان: يجب تفضيل المتغيّرات التي يستطيع الشخص التأثير فيها &mdash; فاقتراح تغيير السنّ بلا معنى &mdash; ويوجد منها عددٌ لا نهائي، واختيارها نفسه فعلُ تصميم.</div>
+
+<div class="box warn"><div class="box-title">احتياطٌ كثيراً ما يُنسى</div>
+التفسير المعقول يزيد الثقة باستقلالٍ عن صوابه. وتقديم تفسيرٍ إلى جانب تنبّؤٍ خاطئ يجعل المستعمل <em>أكثر</em> ميلاً إلى اتّباعه. فالتفسير إذن ليس خدمةً مُسداة فحسب: بل هو جهاز إقناع، ويجب تقييمه بوصفه كذلك.</div>
+
+<h2>14.5 الكلفة البيئية</h2>
+
+<figure class="viz"><div class="viz-title">أين تذهب الطاقة</div>
+<svg viewBox="0 0 760 300" role="img" style="width:100%;height:auto;display:block;"><text x="380" y="30" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">أين تذهب طاقة نظامٍ متعلِّم، برتبة القدر</text><rect x="60" y="72" width="51.2" height="56" style="fill:var(--viz-blue);fill-opacity:0.85;"/><text x="85.6" y="106" text-anchor="middle" style="fill:var(--color-bg);font-size:14px;font-weight:700;font-family:inherit;">8 %</text><text x="85.6" y="152" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;"><tspan x="85.6" dy="0">جمع البيانات</tspan><tspan x="85.6" dy="16">وتخزينها</tspan></text><rect x="111.2" y="72" width="217.6" height="56" style="fill:var(--viz-bad);fill-opacity:0.85;"/><text x="220" y="106" text-anchor="middle" style="fill:var(--color-bg);font-size:14px;font-weight:700;font-family:inherit;">34 %</text><text x="220" y="174" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تدريب النموذج</text><rect x="328.8" y="72" width="140.8" height="56" style="fill:var(--accent);fill-opacity:0.85;"/><text x="399.2" y="106" text-anchor="middle" style="fill:var(--color-bg);font-size:14px;font-weight:700;font-family:inherit;">22 %</text><text x="399.2" y="152" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">البحث عن بنيةٍ والتجارب</text><rect x="469.6" y="72" width="230.4" height="56" style="fill:var(--primary);fill-opacity:0.85;"/><text x="584.8" y="106" text-anchor="middle" style="fill:var(--color-bg);font-size:14px;font-weight:700;font-family:inherit;">36 %</text><text x="584.8" y="174" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">التشغيل، طلباً بعد طلب</text><text x="380" y="216" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">يتوقّف التوزيع كلّياً على النظام: فهذه النسب توضيحية لا مقيسة.</text><text x="380" y="242" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">والنقطة المتينة في مكانٍ آخر: فمن أجل نموذجٍ كثير الاستعمال، تنتهي الخدمة إلى أن تكلّف أكثر من التدريب،</text><text x="380" y="264" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">وقد يكلّف البحث عن بنيةٍ أكثر من التدريب النهائي نفسه.</text><text x="380" y="290" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">ويبقى نشر الاستهلاك المقيس نادراً، وهذا يجعل كلّ مقارنةٍ صعبة.</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 14.4.</strong> ملاحظتان متينتان، مستقلّتان عن الأرقام الدقيقة. أوّلاً، من أجل نموذجٍ كثير الاستعمال، تنتهي الخدمة إلى أن تكلّف أكثر من التدريب، لأنّها تتكرّر عند كلّ طلب. ثانياً، البحث عن بنية &mdash; أي مئات التجارب السابقة على النموذج المنشور &mdash; قد يكلّف أكثر بكثير من التدريب النهائي <a class="cite" href="#ref-strubell2019">[9]</a>. والنسب الممثَّلة توضيحية: فنشر الاستهلاكات المقيسة يبقى نادراً، وهذا يجعل كلّ مقارنةٍ صعبة.</figcaption></figure>
+
+<h2>14.6 التوثيق والتنظيم</h2>
+
+<div class="box def"><div class="box-title">ممارستان في التوثيق</div>
+<ul>
+<li><strong>بطاقة النموذج</strong>: الاستعمال المتوقَّع، والاستعمالات المنهيّ عنها صراحةً، والأداءات <em>مفصَّلةً بحسب الساكنة الفرعية</em>، وبيانات التقييم، والحدود المعلومة <a class="cite" href="#ref-mitchell2019">[10]</a>.</li>
+<li><strong>بطاقة مجموعة البيانات</strong>: لماذا كُوِّنت، ومن كوّنها، وكيف، ومن وسمها وبأيّ تعليمات، وأيّ ساكنات ترد فيها وأيّها غائبة عنها <a class="cite" href="#ref-gebru2021">[11]</a>.</li>
+</ul>
+<p>وهاتان الوثيقتان تكلّفان بضعة أيّام وتتجنّبان أغلب سوء الاستعمال. والسطر الأنفع غالباً هو الأقصر: «لم يُقيَّم هذا النموذج على تلك الساكنة».</p></div>
+
+<p>والنظام الأوروبي للذكاء الاصطناعي، المعتمَد سنة 2024، يرتّب الالتزامات بحسب <em>مستوى الخطر</em>: فبعض الممارسات ممنوعة، والأنظمة العالية الخطر خاضعة لالتزامات توثيقٍ وجودة بياناتٍ وتتبّعٍ وإشرافٍ بشري، وغيرها لالتزامات شفافيةٍ بسيطة <a class="cite" href="#ref-aiact2024">[12]</a>. والمبدأ الموجِّه أنّ المطلب يتناول <em>الاستعمال</em>، لا التقنية المستعملة.</p>
+
+<div class="box warn"><div class="box-title">ثلاثة مَزالِق في الإشراف البشري</div>
+<p><strong>تحيّز الأتمتة.</strong> المشغّل الذي عليه المصادقة على قرارات نظامٍ موثوقٍ بنسبة 95 % ينتهي إلى المصادقة على كلّ شيء: وذلك عقلاني فردياً وكارثيّ جماعياً.</p>
+<p><strong>المسؤولية الشكلية.</strong> وضعُ إنسانٍ في الحلقة دون منحه الوقت ولا المعلومة ولا سلطة المعارضة يُنتج مسؤولاً مُعيَّناً، لا إشرافاً.</p>
+<p><strong>ستار التعقيد.</strong> «هذا أعقد من أن يُفسَّر» ليس حجّةً مقبولة: بل هو اختيار تصميم، وثمّة اختيارات أخرى.</p></div>
+
+<h2>14.7 ما يطلبه هذا الفصل من المهندس</h2>
+
+<div class="box tip"><div class="box-title">ستّة أسئلة تُطرَح قبل التسليم</div>
+<ol>
+<li>على أيّ ساكنةٍ قُيِّم النظام؟ وعلى أيّها سيُستعمَل؟</li>
+<li>هل قِيست الأداءات <em>بحسب المجموعات الفرعية</em>، لا وسطياً فحسب؟</li>
+<li>أيّ معيار إنصافٍ فُضِّل، ولماذا هذا بالذات؟</li>
+<li>ماذا يحلّ بشخصٍ صُنِّف تصنيفاً خاطئاً؟ هل ثمّة طعن، وهل هو حقيقي؟</li>
+<li>هل يعدّل القرارُ البياناتِ المستقبلية؟ فإن كان كذلك، فكيف سيُكشَف الانحراف؟</li>
+<li>ما الذي لم يُختبَر، وينبغي أن يرد صراحةً في التوثيق؟</li>
+</ol></div>
+
+<h2>الخلاصة</h2>
+<ul>
+<li>يدخل التحيّز في ستّة مواضع؛ واحدٌ منها فقط يخصّ اختيار الخوارزمية.</li>
+<li>حذف السمة الحسّاسة لا يحذف التمييز ويمنع قياسه.</li>
+<li>التكافؤ وتكافؤ الفرص والمعايرة متنافية رياضياً بمجرّد اختلاف المعدّلات القاعدية <a class="cite" href="#ref-kleinberg2017">[3]</a>.</li>
+<li>التفسيرات البعديّة تتناول بديلاً عن النموذج وتزيد الثقة باستقلالٍ عن صوابها <a class="cite" href="#ref-ribeiro2016">[6]</a>.</li>
+<li>الخدمة المتكرّرة والبحث عن بنيةٍ يزنان غالباً أكثر من التدريب النهائي <a class="cite" href="#ref-strubell2019">[9]</a>.</li>
+<li>توثيق النموذج ومجموعة البيانات يكلّف قليلاً ويتجنّب جُلّ سوء الاستعمال <a class="cite" href="#ref-mitchell2019">[10]</a>.</li>
+</ul>
+
+<h2>مُلحَق: إجراء التدقيق</h2>
+<div class="algo"><div class="algo-cap">الخوارزمية 14.1 &mdash; تدقيق نظام قرار</div><div class="algo-io"><b>المُدخل:</b> مصنّف \(f\)، ومجموعة موسومة ممثِّلة، وسمات حسّاسة<br><b>المُخرج:</b> جدولُ معدّلاتٍ بحسب المجموعة والمعيار &mdash; لا نتيجةٌ واحدة أبداً</div><ol class="algo-corps"><li><b class="kw">لكلّ</b> سمةٍ حسّاسة \(s\) <b class="kw">وكلّ</b> مجموعة \(G\) تحدّدها <b class="kw">نفّذ</b></li><li class="n1">\(\displaystyle \mathrm{sel}(G) \leftarrow P\big(f = 1 \mid G\big)\)          <span class="cm">// التكافؤ الديموغرافي</span></li><li class="n1">\(\displaystyle \mathrm{tvp}(G) \leftarrow P\big(f = 1 \mid Y = 1,\ G\big)\)          <span class="cm">// تكافؤ الفرص</span></li><li class="n1">\(\displaystyle \mathrm{tfp}(G) \leftarrow P\big(f = 1 \mid Y = 0,\ G\big)\)</li><li class="n1">\(\displaystyle \mathrm{pr\acute{e}c}(G) \leftarrow P\big(Y = 1 \mid f = 1,\ G\big)\)          <span class="cm">// المعايرة</span></li><li><b class="kw">لكلّ</b> معيار \(\kappa \in \{\mathrm{sel}, \mathrm{tvp}, \mathrm{tfp}, \mathrm{pr\acute{e}c}\}\) <b class="kw">نفّذ</b></li><li class="n1"><b class="kw">إذا</b> \(\max_{G,G'} |\kappa(G) - \kappa(G')| \gt \text{seuil admis}\) <b class="kw">فإنّ</b> أشِر إلى \((\kappa, G, G')\)</li><li><b class="kw">أرجِع</b> الجدول كاملاً، والمعيار المُفضَّل مع تبريره</li></ol><p class="algo-note"><strong>مبرهنة الاستحالة.</strong> إذا كان \(P(Y=1 \mid G) \neq P(Y=1 \mid G')\) وكان \(f\) غير كامل، فإنّ \(\mathrm{pr\acute{e}c}\) والزوج \((\mathrm{tvp}, \mathrm{tfp})\) لا يمكن تسويتهما معاً. وردُّ الإنصاف إلى نتيجةٍ واحدة يعني اختيار أحد المعايير المتنافية سرّاً.</p></div>
+
+<h2>المراجع</h2>
+<ol class="reflist">
+<li id="ref-buolamwini2018">Buolamwini, J. &amp; Gebru, T. (2018). Gender shades: intersectional accuracy disparities in commercial gender classification. <em>Proceedings of Machine Learning Research</em>, 81, 77&ndash;91. <a href="https://proceedings.mlr.press/v81/buolamwini18a.html">https://proceedings.mlr.press/v81/buolamwini18a.html</a></li>
+<li id="ref-hardt2016">Hardt, M., Price, E. &amp; Srebro, N. (2016). Equality of opportunity in supervised learning. <em>Advances in Neural Information Processing Systems 29</em>. arXiv&nbsp;: 1610.02413. <a href="https://arxiv.org/abs/1610.02413">https://arxiv.org/abs/1610.02413</a></li>
+<li id="ref-kleinberg2017">Kleinberg, J., Mullainathan, S. &amp; Raghavan, M. (2017). Inherent trade-offs in the fair determination of risk scores. <em>Proceedings of ITCS 2017</em>. DOI: 10.4230/LIPIcs.ITCS.2017.43. <a href="https://doi.org/10.4230/LIPIcs.ITCS.2017.43">https://doi.org/10.4230/LIPIcs.ITCS.2017.43</a></li>
+<li id="ref-chouldechova2017">Chouldechova, A. (2017). Fair prediction with disparate impact. <em>Big Data</em>, 5(2), 153&ndash;163. DOI: 10.1089/big.2016.0047. <a href="https://doi.org/10.1089/big.2016.0047">https://doi.org/10.1089/big.2016.0047</a></li>
+<li id="ref-rgpd2016">European Parliament and Council (2016). Regulation (EU) 2016/679 on the protection of natural persons with regard to the processing of personal data, Article 22. <a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj">https://eur-lex.europa.eu/eli/reg/2016/679/oj</a></li>
+<li id="ref-ribeiro2016">Ribeiro, M. T., Singh, S. &amp; Guestrin, C. (2016). &laquo; Why should I trust you? &raquo; Explaining the predictions of any classifier. <em>Proceedings of KDD 2016</em>, 1135&ndash;1144. DOI: 10.1145/2939672.2939778. <a href="https://doi.org/10.1145/2939672.2939778">https://doi.org/10.1145/2939672.2939778</a></li>
+<li id="ref-lundberg2017">Lundberg, S. M. &amp; Lee, S.-I. (2017). A unified approach to interpreting model predictions. <em>Advances in Neural Information Processing Systems 30</em>. arXiv&nbsp;: 1705.07874. <a href="https://arxiv.org/abs/1705.07874">https://arxiv.org/abs/1705.07874</a></li>
+<li id="ref-wachter2018">Wachter, S., Mittelstadt, B. &amp; Russell, C. (2018). Counterfactual explanations without opening the black box. <em>Harvard Journal of Law &amp; Technology</em>, 31(2), 841&ndash;887. DOI: 10.2139/ssrn.3063289. <a href="https://doi.org/10.2139/ssrn.3063289">https://doi.org/10.2139/ssrn.3063289</a></li>
+<li id="ref-strubell2019">Strubell, E., Ganesh, A. &amp; McCallum, A. (2019). Energy and policy considerations for deep learning in NLP. <em>Proceedings of ACL 2019</em>, 3645&ndash;3650. DOI: 10.18653/v1/P19-1355. <a href="https://doi.org/10.18653/v1/P19-1355">https://doi.org/10.18653/v1/P19-1355</a></li>
+<li id="ref-mitchell2019">Mitchell, M., Wu, S., Zaldivar, A. <em>et al.</em> (2019). Model cards for model reporting. <em>Proceedings of FAT* 2019</em>, 220&ndash;229. DOI: 10.1145/3287560.3287596. <a href="https://doi.org/10.1145/3287560.3287596">https://doi.org/10.1145/3287560.3287596</a></li>
+<li id="ref-gebru2021">Gebru, T., Morgenstern, J., Vecchione, B. <em>et al.</em> (2021). Datasheets for datasets. <em>Communications of the ACM</em>, 64(12), 86&ndash;92. DOI: 10.1145/3458723. <a href="https://doi.org/10.1145/3458723">https://doi.org/10.1145/3458723</a></li>
+<li id="ref-aiact2024">European Parliament and Council (2024). Regulation (EU) 2024/1689 laying down harmonised rules on artificial intelligence. <a href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj">https://eur-lex.europa.eu/eli/reg/2024/1689/oj</a></li>
+</ol>
+
+<section class="src-ar">
+<h3>مصادر بالعربية</h3>
+<p class="src-note">مصادر للاستزادة، لا مراجع لما ورد أعلاه: المراجع الأصلية للفصل مذكورةٌ في القائمة السابقة بلغتها. وقد عُوينت كلّ صفحةٍ من صفحات الناشرين للتحقّق من العنوان والمترجم ورخصة الإتاحة.</p>
+<ul>
+<li>اليونسكو. <em>التوصية الخاصّة بأخلاقيات الذكاء الاصطناعي</em>، المعتمَدة بالإجماع من الدول الأعضاء الـ193 في تشرين الثاني/نوفمبر 2021. النصّ الكامل بالعربية.<br><a class="lien" href="https://www.unesco.org/ar/artificial-intelligence/recommendation-ethics" hreflang="ar" target="_blank" rel="noopener">https://www.unesco.org/ar/artificial-intelligence/recommendation-ethics</a><span class="pourquoi">أوّل وثيقة تقنينية عالمية في الموضوع، وقيمها الأربع ومبادئها العشرة مصوغة بالعربية صياغةً رسمية — مفيدة لضبط المصطلح في هذا الفصل.</span></li>
+<li>كوكلبيرج، مارك. <em>أخلاقيات الذكاء الاصطناعي</em>. ترجمة هبة عبد العزيز غانم، مراجعة هبة عبد المولى أحمد. مؤسسة هنداوي (بترخيصٍ من معهد ماساتشوستس للتقانة). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/57073919/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/57073919/</a><span class="pourquoi">يعالج بالعربية المسائل نفسها التي يعالجها الفصل 14: التحيّز، والمسؤولية، والشفافية، وتفويض القرار.</span></li>
+<li>راسل، ستيوارت. <em>ذكاء اصطناعي متوافق مع البشر: حتّى لا تفرض الآلات سيطرتها على العالم</em>. ترجمة مصطفى محمد فؤاد وأسامة إسماعيل عبد العليم. مؤسسة هنداوي (بترخيصٍ من المؤلّف). نحو 103 آلاف كلمة، متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/25350464/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/25350464/</a><span class="pourquoi">المؤلّف نفسه صاحب المرجع الأساسي لهذا المُقرَّر؛ والكتاب مبنيٌّ كلّه على فكرة الوكيل العقلاني ومقياس الأداء، وعلى ما يحدث حين يُساء وضعه.</span></li>
+<li>هولمز، دون إي. <em>البيانات الضخمة: مقدّمة قصيرة جدًّا</em>. ترجمة أحمد عبد المنعم، مراجعة هبة عبد المولى أحمد. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/70929638/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/70929638/</a><span class="pourquoi">يضع البيانات التي تتغذّى عليها هذه الطرائق في سياقها، ويناقش حدودها الأخلاقية.</span></li>
+</ul>
+</section>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../13-generative/page.html">\(\leftarrow\) الفصل 13 &mdash; الذكاء الاصطناعي التوليدي</a>
+<a href="../../../IA/lecons/14-ethique/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">المُلحَق الخوارزمي</a>
+<a href="../../index.html">فهرس المُقرَّر</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>الذكاء الاصطناعي &mdash; الأقسام التحضيرية MP/PSI</strong> &middot; البحث والألعاب والقيود والتعلّم<span class="footer-meta">طبعة 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">تعذّر تحميل الشكل التفاعلي. تحقّق من اتصالك بالشبكة.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ==== Figure : trois definitions d'equite, incompatibles entre elles ====== */
+/* Population de deux groupes, avec des taux de base differents.
+   On fixe un seuil de decision par groupe et l'on mesure trois criteres. */
+var GROUPES = [
+  {nom: 'المجموعة A', n: 1000, base: 0.30, couleur: '--viz-blue'},
+  {nom: 'المجموعة B', n: 1000, base: 0.10, couleur: '--accent'}
+];
+/* Le score est suppose gaussien : moyenne 1 pour les positifs, 0 pour les negatifs,
+   ecart-type 0.6 dans les deux cas. C'est le meme modele pour les deux groupes. */
+function phi(x){
+  /* fonction de repartition normale centree reduite, approximation d'Abramowitz-Stegun */
+  var t = 1 / (1 + 0.2316419 * Math.abs(x));
+  var d = 0.3989422804014327 * Math.exp(-x * x / 2);
+  var p = d * t * (0.319381530 + t * (-0.356563782 + t * (1.781477937
+        + t * (-1.821255978 + t * 1.330274429))));
+  return x >= 0 ? 1 - p : p;
+}
+function mesures(g, seuil){
+  var s = 0.6;
+  var tvp = 1 - phi((seuil - 1) / s);      /* taux de vrais positifs */
+  var tfp = 1 - phi((seuil - 0) / s);      /* taux de faux positifs */
+  var b = g.base;
+  var vp = b * tvp, fn = b * (1 - tvp), fp = (1 - b) * tfp, vn = (1 - b) * (1 - tfp);
+  var selection = vp + fp;
+  var precision = selection > 0 ? vp / selection : 0;
+  return {tvp: tvp, tfp: tfp, vp: vp, fn: fn, fp: fp, vn: vn,
+          selection: selection, precision: precision};
+}
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-0.35, 1.36, 2.55, -0.72], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sA = b1.create('slider', [[0.00, -0.30], [1.00, -0.30], [-0.5, 0.50, 2.0]], {
+  name: 'عتبة المجموعة A', snapWidth: 0.05, precision: 2,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--viz-blue', '#2563eb'); }}
+});
+var sB = b1.create('slider', [[1.40, -0.30], [2.40, -0.30], [-0.5, 0.50, 2.0]], {
+  name: 'عتبة المجموعة B', snapWidth: 0.05, precision: 2,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--accent', '#f59e0b'); }}
+});
+function seuilA(){ return Math.round(sA.Value() * 20) / 20; }
+function seuilB(){ return Math.round(sB.Value() * 20) / 20; }
+function ecart(a, b){ return Math.abs(a - b); }
+var CRITERES = [
+  {nom: 'التكافؤ الديموغرافي', desc: 'معدل انتقاء واحد في المجموعتين',
+   calc: function(){ return ecart(mesures(GROUPES[0], seuilA()).selection,
+                                  mesures(GROUPES[1], seuilB()).selection); }},
+  {nom: 'تكافؤ الفرص', desc: 'معدل ايجابيات صادقة واحد في المجموعتين',
+   calc: function(){ return ecart(mesures(GROUPES[0], seuilA()).tvp,
+                                  mesures(GROUPES[1], seuilB()).tvp); }},
+  {nom: 'Calibration', desc: 'احكام واحد: النتيجة تعني الشيء نفسه في كل مكان',
+   calc: function(){ return ecart(mesures(GROUPES[0], seuilA()).precision,
+                                  mesures(GROUPES[1], seuilB()).precision); }}
+];
+for (var i = 0; i < 3; i++){
+  (function(k){
+    var y = 0.92 - k * 0.30;
+    b1.create('text', [-0.30, y + 0.10, CRITERES[k].nom], {fontSize: 14, fixed: true,
+      highlight: false, strokeColor: PAL.text});
+    b1.create('text', [-0.30, y - 0.02, CRITERES[k].desc], {fontSize: 11.5, fixed: true,
+      highlight: false, strokeColor: PAL.muted});
+    /* barre d'ecart */
+    b1.create('curve', [
+      function(){ return [1.20, 1.20 + Math.min(1.2, CRITERES[k].calc() * 4),
+                          1.20 + Math.min(1.2, CRITERES[k].calc() * 4), 1.20, 1.20]; },
+      function(){ return [y - 0.03, y - 0.03, y + 0.11, y + 0.11, y - 0.03]; }], {
+      strokeWidth: 0, highlight: false, fixed: true,
+      fillColor: function(){
+        return CRITERES[k].calc() < 0.01 ? cssv('--viz-ok', '#16a34a') : cssv('--viz-bad', '#dc2626'); },
+      fillOpacity: 0.8});
+    b1.create('text', [2.50, y + 0.05, function(){
+      var e = CRITERES[k].calc();
+      return (e < 0.01 ? 'satisfait' : 'فارق قدره ' + (100 * e).toFixed(1) + ' points');
+    }], {fontSize: 12.5, anchorX: 'right', fixed: true, highlight: false,
+         strokeColor: function(){
+           return CRITERES[k].calc() < 0.01 ? cssv('--viz-ok','#16a34a') : cssv('--viz-bad','#dc2626'); }});
+  })(i);
+}
+b1.create('text', [-0.30, 1.30, function(){
+  var a = mesures(GROUPES[0], seuilA()), b = mesures(GROUPES[1], seuilB());
+  return 'المعدلات القاعدية: 30 % في A و10 % في B  -  النموذج نفسه، ولا تختلف الا العتبات.';
+}], {fontSize: 13, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-0.30, 1.18, function(){
+  var a = mesures(GROUPES[0], seuilA()), b = mesures(GROUPES[1], seuilB());
+  return 'A : ' + (100*a.selection).toFixed(1) + ' % منتقين، ' + (100*a.tvp).toFixed(1)
+       + ' % من الايجابيات الصادقة مكتشفة، احكام ' + (100*a.precision).toFixed(1) + ' %.';
+}], {fontSize: 12.5, strokeColor: function(){ return cssv('--viz-blue','#2563eb'); },
+     fixed: true, highlight: false});
+b1.create('text', [-0.30, 1.08, function(){
+  var b = mesures(GROUPES[1], seuilB());
+  return 'B : ' + (100*b.selection).toFixed(1) + ' % منتقين، ' + (100*b.tvp).toFixed(1)
+       + ' % من الايجابيات الصادقة مكتشفة، احكام ' + (100*b.precision).toFixed(1) + ' %.';
+}], {fontSize: 12.5, strokeColor: function(){ return cssv('--accent','#f59e0b'); },
+     fixed: true, highlight: false});
+b1.create('text', [-0.30, -0.58, function(){
+  var n = 0;
+  for (var k = 0; k < 3; k++){ if (CRITERES[k].calc() < 0.01) { n++; } }
+  if (n === 3) { return 'مستحيل: لا زوج عتبات يرضي الثلاثة معا.'; }
+  if (n === 2) { return 'معياران من ثلاثة مرضيان — وهذا الاقصى الممكن هنا.'; }
+  return n + ' معيار من 3 مرضٍ. اثنان قابلان للتحقق معا، والثلاثة ابدا.';
+}], {fontSize: 13, fixed: true, highlight: false,
+     strokeColor: function(){ return cssv('--primary','#026573'); }});
+b1.create('text', [-0.30, -0.68,
+  'تقول مبرهنة الاستحالة ان الثلاثة لا تتعايش بمجرد اختلاف المعدلات القاعدية.'],
+  {fontSize: 12, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+/* ==== Figure : d'ou vient un biais, etape par etape ====================== */
+var ETAPES = [
+  {nom: 'العالم',              biais: 'لامساواة حقيقية سابقة'},
+  {nom: 'الجمع',           biais: 'بعض المجموعات ممثلة تمثيلا ناقصا'},
+  {nom: 'L’etiquetage',          biais: 'الغاية المقيسة تحل محل الغاية المرادة'},
+  {nom: 'النموذج',             biais: 'يحسّن المتوسط، اي الاغلبية'},
+  {nom: 'العتبة',              biais: 'عتبة واحدة لساكنات مختلفة'},
+  {nom: 'L’usage',               biais: 'القرار يعدل العالم ويؤكد نفسه'}
+];
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-0.4, 3.4, 6.4, -2.4], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: false
+});
+var sEt14 = b2.create('slider', [[0.0, -1.4], [4.0, -1.4], [0, 0, 5]], {
+  name: 'خطوة', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }}
+});
+function et14(){ return Math.round(sEt14.Value()); }
+for (var e = 0; e < ETAPES.length; e++){
+  (function(k){
+    var x = 0.15 + k * 1.02;
+    b2.create('curve', [[x, x + 0.86, x + 0.86, x, x], [1.2, 1.2, 2.2, 2.2, 1.2]], {
+      strokeWidth: function(){ return k === et14() ? 3 : 1.4; },
+      strokeColor: function(){ return k === et14() ? cssv('--viz-bad','#dc2626') : PAL.axis(); },
+      fillColor: function(){ return cssv('--viz-bad', '#dc2626'); },
+      fillOpacity: function(){ return k <= et14() ? 0.10 + 0.06 * k : 0.03; },
+      highlight: false, fixed: true});
+    b2.create('text', [x + 0.43, 1.70, ETAPES[k].nom], {fontSize: 12.5, anchorX: 'middle',
+      anchorY: 'middle', strokeColor: PAL.text, fixed: true, highlight: false});
+    if (k < ETAPES.length - 1){
+      b2.create('arrow', [[x + 0.88, 1.7], [x + 1.13, 1.7]], {strokeColor: PAL.axis,
+        strokeWidth: 1.6, highlight: false, fixed: true});
+    }
+  })(e);
+}
+b2.create('arrow', [[5.6, 1.2], [5.6, 0.5]], {strokeColor: function(){ return cssv('--viz-bad','#dc2626'); },
+  strokeWidth: 2, highlight: false, fixed: true});
+b2.create('curve', [[5.6, 0.3, 0.3, 0.58], [0.5, 0.5, 1.2, 1.2]], {
+  strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }, strokeWidth: 2, dash: 2,
+  highlight: false, fixed: true});
+b2.create('text', [3.0, 0.30, 'حلقة تغذية راجعة: القرار يغير العالم الذي سنقيسه غدا'],
+  {fontSize: 12.5, anchorX: 'middle', fixed: true, highlight: false,
+   strokeColor: function(){ return cssv('--viz-bad', '#dc2626'); }});
+b2.create('text', [-0.35, 3.2, function(){
+  return 'الخطوة ' + (et14() + 1) + ' من 6: ' + ETAPES[et14()].nom;
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-0.35, 2.8, function(){
+  return 'مصدر التحيز في هذه الخطوة: ' + ETAPES[et14()].biais + '.';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-0.35, -1.9,
+  'لا يُصحَّح اي من هذه المصادر الستة بتغيير الخوارزمية: فهي سابقة على النموذج او لاحقة له.'],
+  {fontSize: 12.5, strokeColor: PAL.muted, fixed: true, highlight: false});
+b2.create('text', [-0.35, -2.25,
+  'والمرحلة الوحيدة التي يتدخل فيها المهندس مباشرة هي الرابعة، وهي الاقل حسما.'],
+  {fontSize: 12.5, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

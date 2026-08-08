@@ -1,0 +1,104 @@
+<style>
+.gt{--primary:#026573;--primary-dark:#014a55;--primary-light:#2a8c9a;--primary-soft:#e6f1f3;
+ --primary-soft-2:#d0e4e8;--accent:#f59e0b;--color-text:#1f2937;--color-muted:#6b7280;
+ --color-rule:#e2e8eb;--box-bg:#fff;--def-bg:#e6f1f3;--def-br:#026573;--def-fg:#014a55;
+ --thm-bg:#f5f1ff;--thm-br:#7c3aed;--thm-fg:#6d28d9;--prop-bg:#eff6ff;--prop-br:#2563eb;
+ --prop-fg:#1d4ed8;--method-bg:#ecfdf5;--method-br:#059669;--method-fg:#047857;
+ --warn-bg:#fef2f2;--warn-br:#dc2626;--warn-fg:#b91c1c;--tip-bg:#fffbeb;--tip-br:#f59e0b;
+ --tip-fg:#b45309;--example-bg:#f8fafc;--example-br:#64748b;--example-fg:#475569;
+ --viz-axis:#94a3b8;--viz-bad:#dc2626;--radius:10px;
+ --font-serif:"Source Serif Pro","Iowan Old Style",Georgia,serif;
+ --font-sans:"Inter",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+ --font-mono:"JetBrains Mono","SF Mono",Consolas,monospace;
+ font-family:var(--font-serif);color:var(--color-text);line-height:1.75;font-size:1.02rem;
+ max-width:900px;margin:0 auto;}
+.gt h1,.gt h2,.gt h3{font-family:var(--font-sans);color:var(--primary-dark);line-height:1.3;}
+.gt h2{font-size:1.42rem;margin:1.9em 0 .7em;padding-bottom:.3em;
+ border-bottom:2px solid var(--primary-soft-2);}
+.gt h3{font-size:1.14rem;margin:1.5em 0 .5em;}
+.gt p{margin:0 0 1em;}
+.gt ul,.gt ol{margin:0 0 1em;padding-left:1.4em;}
+.gt li{margin-bottom:.4em;}
+.gt a{color:var(--primary);}
+.gt .lead{border-left:4px solid var(--primary);background:var(--primary-soft);
+ padding:14px 20px;border-radius:0 var(--radius) var(--radius) 0;margin:0 0 1.6em;}
+.gt .lead .lead-label{font-family:var(--font-sans);font-size:.74rem;letter-spacing:.09em;
+ text-transform:uppercase;font-weight:700;color:var(--primary-dark);display:block;margin-bottom:4px;}
+.gt .lead h1{font-size:1.6rem;margin:0 0 6px;}
+.gt .lead .lead-sub{color:var(--color-muted);font-size:.97rem;margin:0;}
+.gt .box{background:var(--box-bg);border:1px solid var(--color-rule);border-left-width:4px;
+ border-radius:var(--radius);padding:14px 20px;margin:1.4em 0;}
+.gt .box>.box-title{font-family:var(--font-sans);font-weight:700;font-size:.95rem;margin-bottom:6px;}
+.gt .box>*:last-child{margin-bottom:0;}
+.gt .box.def{background:var(--def-bg);border-left-color:var(--def-br);}
+.gt .box.def>.box-title{color:var(--def-fg);}
+.gt .box.thm{background:var(--thm-bg);border-left-color:var(--thm-br);}
+.gt .box.thm>.box-title{color:var(--thm-fg);}
+.gt .box.prop{background:var(--prop-bg);border-left-color:var(--prop-br);}
+.gt .box.prop>.box-title{color:var(--prop-fg);}
+.gt .box.method{background:var(--method-bg);border-left-color:var(--method-br);}
+.gt .box.method>.box-title{color:var(--method-fg);}
+.gt .box.warn{background:var(--warn-bg);border-left-color:var(--warn-br);}
+.gt .box.warn>.box-title{color:var(--warn-fg);}
+.gt .box.tip{background:var(--tip-bg);border-left-color:var(--tip-br);}
+.gt .box.tip>.box-title{color:var(--tip-fg);}
+.gt .box.example{background:var(--example-bg);border-left-color:var(--example-br);}
+.gt .box.example>.box-title{color:var(--example-fg);}
+.gt .eq{margin:1.1em 0;overflow-x:auto;text-align:center;}
+.gt .keypoints{background:var(--primary-soft);border:1px solid var(--primary-soft-2);
+ border-radius:var(--radius);padding:16px 22px;margin:2em 0;}
+.gt .keypoints h3{margin-top:0;}
+.gt .viz{margin:1.6em 0;}
+.gt .viz-title{font-family:var(--font-sans);font-weight:700;color:var(--primary);
+ font-size:.95rem;margin-bottom:8px;}
+.gt .viz-caption{color:var(--color-muted);font-size:.9rem;margin:10px 0 0;
+ border-top:1px solid var(--color-rule);padding-top:9px;}
+.gt table{border-collapse:collapse;width:100%;font-size:.96rem;margin:0;}
+.gt th,.gt td{border:1px solid var(--color-rule);padding:8px 14px;text-align:left;
+ vertical-align:top;}
+.gt thead th{background:var(--primary-soft);}
+.gt .payoff{width:auto;margin:0 auto;}
+.gt .payoff th,.gt .payoff td{text-align:center;}
+.gt .payoff th.corner{background:var(--primary);color:#fff;font-size:.8rem;}
+.gt .payoff tbody th{background:var(--primary-soft);text-align:left;}
+.gt .payoff td{font-family:var(--font-mono);}
+.gt .glossary td:first-child{white-space:nowrap;font-weight:600;}
+.gt svg{max-width:100%;height:auto;}
+</style>
+<div class="gt">
+<div class="lead"><span class="lead-label">Part III &middot; Time and information &middot; Chapter 8</span><h1>Bayesian Games and Incomplete Information</h1><p class="lead-sub">Types, priors, signalling and screening: playing when you do not know who you face.</p></div>
+<div class="box method"><div class="box-title">What you will be able to do</div><ul><li>Distinguish incomplete from imperfect information.</li><li>Apply Harsanyi's transformation: types, common prior, and strategies as functions of type.</li><li>Define and compute a Bayesian Nash equilibrium in a small example.</li><li>Distinguish separating, pooling and hybrid equilibria in a signalling game.</li><li>Explain adverse selection and the institutions that mitigate it.</li></ul></div>
+
+<h2>1. Not knowing who you are playing</h2>
+<p>Everything so far assumed the payoff matrix is common knowledge. Usually it is not. A bidder does not know rivals' valuations; an insurer does not know an applicant's risk; a firm does not know a rival's costs. These are games of <strong>incomplete information</strong>.</p>
+<div class="box warn"><div class="box-title">Careful</div><p>Do not confuse <em>incomplete</em> with <em>imperfect</em> information. Imperfect information (Chapter 6) means you do not know what has been <em>played</em>. Incomplete information means you do not know the <em>game</em> - somebody's payoffs are unknown to you.</p></div>
+
+<h2>2. Harsanyi's transformation</h2>
+<p>John Harsanyi (1967-68) showed how to convert incomplete information into imperfect information, which we already know how to handle. Each player is assigned a <strong>type</strong> \(\theta_i\) that summarises everything privately known to them - typically their payoff function. Nature moves first and draws the type profile from a <strong>common prior</strong> distribution; each player observes only their own type.</p>
+<div class="box def"><div class="box-title">Definition - Bayesian game</div><p style='margin:0;'>A <strong>Bayesian game</strong> is the tuple</p><div class="eq">\[ \bigl\langle N,\; (A_i)_{i \in N},\; (\Theta_i)_{i \in N},\; p,\; (u_i)_{i \in N} \bigr\rangle, \qquad u_i : A \times \Theta \to \mathbb{R}, \]</div><p style='margin:0;'>where \(p\) is the common prior on \(\Theta = \prod_i \Theta_i\). A <strong>strategy</strong> is now a function \(s_i : \Theta_i \to A_i\), telling each type what to do.</p></div>
+<p>The strategy-as-function point is the one to hold on to. You do not choose an action; you choose a <em>rule</em> mapping what you learn about yourself into an action. When you evaluate that rule you must average over the types your opponents might have, using Bayes' rule to update from the prior given anything you have observed.</p>
+<div class="box def"><div class="box-title">Definition - Bayesian Nash equilibrium</div><p style='margin:0;'>A profile \(s^{*}\) is a <strong>Bayesian Nash equilibrium</strong> if for every player \(i\) and every type \(\theta_i \in \Theta_i\),</p><div class="eq">\[ s_i^{*}(\theta_i) \;\in\; \arg\max_{a_i \in A_i} \; \sum_{\theta_{-i}} p(\theta_{-i} \mid \theta_i)\, u_i\bigl(a_i, s_{-i}^{*}(\theta_{-i}), \theta\bigr). \]</div><p style='margin:0;'>Each type best-responds in expectation over the opponents' types and their equilibrium actions.</p></div>
+
+<h2>3. A worked example: entry with an unknown incumbent</h2>
+<p>An entrant considers entering. The incumbent is <em>tough</em> (fighting is cheap, payoff \(-1\) rather than a loss) with probability \(\mu\), and <em>soft</em> with probability \(1 - \mu\). If the incumbent is tough it fights; if soft it accommodates. The entrant gets \(-2\) if fought, \(+2\) if accommodated, and \(0\) by staying out. The entrant cannot observe the type - only the prior.</p>
+<div class="eq">\[ \mathbb{E}\bigl[u_{\text{entrant}}(\text{In})\bigr] = \mu(-2) + (1-\mu)(2) = 2 - 4\mu, \]</div><div class="eq">\[ \text{so the entrant enters iff } \; 2 - 4\mu \gt  0 \;\Longleftrightarrow\; \mu \lt  \tfrac{1}{2}. \]</div>
+<p>So the entrant enters when it is sufficiently confident the incumbent is soft. Two lessons follow, and they drive an enormous literature. First, the incumbent now has a reason to <em>build a reputation</em> for toughness - even a soft incumbent may fight early entrants to raise \(\mu\) in later entrants' minds. Second, information itself becomes strategic: the incumbent may prefer that the entrant remain uncertain, while the entrant will pay for a signal.</p>
+
+<h2>4. Signalling and screening</h2>
+<p>When the informed party moves first to reveal something, we have <strong>signalling</strong>. Spence's (1973) education model is the classic: education may raise no productivity at all, yet high-ability workers acquire it because it is cheaper for them than for low-ability workers, and employers rationally read the diploma as evidence. The equilibrium concept is <em>perfect Bayesian equilibrium</em>: strategies optimal given beliefs, beliefs updated by Bayes' rule wherever possible.</p>
+<figure class="viz"><table><thead><tr><th>Equilibrium type</th><th>What happens</th><th>Example</th></tr></thead><tbody><tr><td>Separating</td><td>Different types choose different actions, so the action fully reveals the type.</td><td>Only high-ability workers get the degree; wages differ.</td></tr><tr><td>Pooling</td><td>All types choose the same action, so nothing is revealed and beliefs stay at the prior.</td><td>Everyone gets the degree; wages reflect the average.</td></tr><tr><td>Semi-separating (hybrid)</td><td>Some types mix, so the action shifts beliefs without settling them.</td><td>A fraction of low types bluff into the high-type action.</td></tr></tbody></table></figure>
+<p>When the <em>uninformed</em> party moves first, offering a menu designed so that different types self-select, we have <strong>screening</strong>. Insurance contracts trading a lower premium against a higher deductible are the standard example: low-risk customers accept the deductible, high-risk customers do not.</p>
+
+<h2>5. Adverse selection: the market for lemons</h2>
+<p>Akerlof's (1970) used-car market shows how private information can destroy a market outright. Sellers know quality, buyers do not. Buyers will pay only the expected quality of cars on offer; at that price, owners of above-average cars withdraw; the average quality of what remains falls; the price falls again. The market can unravel until only the worst cars - the lemons - trade, even though many mutually beneficial trades exist. Warranties, certification, brands and return policies are all institutional responses to this failure. Akerlof, Spence and Stiglitz shared the 2001 Nobel prize for this body of work.</p>
+
+<h2>6. A Bayesian game solved by types</h2>
+<p>Two firms compete in quantities with \(P = 100 - Q\). Firm 1's unit cost is 10 and is common knowledge. Firm 2's cost is \(c_2 = 10\) with probability \(\tfrac{1}{2}\) and \(c_2 = 4\) with probability \(\tfrac{1}{2}\), known only to firm 2. Firm 2 has two types and therefore two quantities to choose; firm 1 chooses one quantity, best-responding to the <em>average</em> of firm 2's two types.</p>
+<div class="eq">\[ q_2(c_2) = \frac{100 - c_2 - q_1}{2}, \qquad q_1 = \frac{90 - \mathbb{E}[q_2]}{2} \;\Longrightarrow\; q_1 = \frac{87 + q_1}{4}. \]</div><div class="eq">\[ \boxed{\; q_1 = 29, \qquad q_2(10) = 30.5, \qquad q_2(4) = 33.5. \;} \]</div>
+<p>The efficient low-cost type produces more; firm 1 hedges between the two possibilities rather than tailoring its output to either, and produces slightly less than the 30 it would choose if firm 2's cost were known to be 10.</p>
+
+<h2>Glossary</h2>
+<table class="glossary"><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Incomplete information</td><td>Some players do not know other players' payoff functions.</td></tr><tr><td>Imperfect information</td><td>Some players do not observe earlier moves; the payoff structure is still known.</td></tr><tr><td>Type</td><td>\(\theta_i \in \Theta_i\): a player's private information, summarising everything they know that others do not.</td></tr><tr><td>Common prior</td><td>The shared probability distribution over type profiles from which nature draws.</td></tr><tr><td>Bayesian Nash equilibrium</td><td>Each type of each player best-responds in expectation over opponents' types and actions.</td></tr><tr><td>Signalling</td><td>The informed party acts first in a way that credibly conveys their type.</td></tr><tr><td>Screening</td><td>The uninformed party offers a menu that induces types to self-select.</td></tr><tr><td>Adverse selection</td><td>Private information causes the best-quality participants to withdraw, degrading the market.</td></tr><tr><td>Separating equilibrium</td><td>Different types choose different actions, so type is revealed.</td></tr><tr><td>Pooling equilibrium</td><td>All types choose the same action, so nothing is revealed.</td></tr></tbody></table>
+<div class="keypoints"><h3>Check your understanding</h3><ol><li>Is not knowing a rival's cost incomplete or imperfect information? <span style='color:#6b7280;'>(Answer: Incomplete - the payoffs themselves are unknown)</span></li><li>What object is a strategy in a Bayesian game? <span style='color:#6b7280;'>(Answer: A function from the player's own type to an action)</span></li><li>In the entry example, at what prior probability of a tough incumbent does entry stop? <span style='color:#6b7280;'>(Answer: When \(\mu \ge \tfrac{1}{2}\))</span></li><li>Why can a used-car market unravel? <span style='color:#6b7280;'>(Answer: Buyers pay the average, good cars withdraw, the average falls, and so on)</span></li></ol></div>
+<div class="box tip"><div class="box-title">Practice</div><p>The chapter quiz asks you to distinguish the two kinds of missing information, compute an entry threshold from a prior, classify signalling equilibria, and identify what a Bayesian strategy actually is.</p></div>
+</div>

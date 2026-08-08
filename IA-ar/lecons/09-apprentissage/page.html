@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الفصل 9 &mdash; التعلّم من الأمثلة</title>
+<meta name="description" content="التعلّم المُراقَب، الجيران الأقرب k، الانحدار، الأشجار، التحقّق المتقاطع.">
+<link href="../../assets/style.css" rel="stylesheet">
+<link href="../../assets/rtl.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], macros: { textsc: ['\\mathrm{#1}', 1], nil: '\\mathrm{nil}', vrai: '\\mathrm{vrai}', faux: '\\mathrm{faux}' } }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraph.css">
+<script src="https://cdn.jsdelivr.net/npm/jsxgraph@1.9.2/distrib/jsxgraphcore.js"></script>
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.viz-board, .viz svg { max-width: 100%; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz-intro { color: var(--color-muted); font-style: italic; margin: 0 0 12px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 14px 0 0; border-top: 1px solid var(--color-rule); padding-top: 12px; }
+.viz-board { width: 100%; margin: 0 auto; }
+.viz-offline { color: var(--viz-bad); font-weight: 600; text-align: center; padding: 30px 10px; }
+a.cite { font-size: 0.72em; vertical-align: super; font-weight: 700;
+         color: var(--primary); text-decoration: none; }
+a.cite:hover { text-decoration: underline; }
+ol.reflist { font-size: 0.92rem; line-height: 1.7; }
+ol.reflist li { margin-bottom: 0.6em; }
+ol.reflist a { word-break: break-all; font-size: 0.95em; }
+.keypoints h4 { margin-top: 0; }
+.algo { margin: 22px 0; border-top: 2.5px solid var(--color-text);
+        border-bottom: 2.5px solid var(--color-text); padding: 0 0 10px;
+        overflow-x: auto; }
+.algo-cap { font-weight: 700; font-size: 0.98rem; color: var(--color-text);
+        padding: 9px 4px 8px; border-bottom: 1px solid var(--color-rule);
+        letter-spacing: 0.01em; }
+.algo-io { font-size: 0.93rem; color: var(--color-text); padding: 9px 4px 8px;
+        border-bottom: 1px solid var(--color-rule); line-height: 1.7; }
+.algo-io b { font-weight: 700; }
+.algo ol.algo-corps { list-style: none; counter-reset: algoligne; margin: 10px 0 0;
+        padding: 0; font-size: 0.97rem; line-height: 1.85; }
+.algo ol.algo-corps li { counter-increment: algoligne; position: relative;
+        padding-left: 3.1em; margin: 0; white-space: nowrap; }
+.algo ol.algo-corps li::before { content: counter(algoligne) ":";
+        position: absolute; left: 0; width: 2.3em; text-align: right;
+        color: var(--color-muted); font-size: 0.9em; font-variant-numeric: tabular-nums; }
+.algo .n1 { padding-left: 4.6em !important; }
+.algo .n2 { padding-left: 6.1em !important; }
+.algo .n3 { padding-left: 7.6em !important; }
+.algo .n4 { padding-left: 9.1em !important; }
+.algo .n5 { padding-left: 10.6em !important; }
+.algo b.kw { font-weight: 700; color: var(--color-text); }
+.algo i.va { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math",
+        Georgia, serif; font-style: italic; font-size: 1.04em; }
+.algo span.fn { font-family: "Iowan Old Style", Georgia, serif; font-style: normal;
+        letter-spacing: 0.02em; }
+.algo span.cm { color: var(--color-muted); font-style: italic; font-size: 0.92em;
+        padding-left: 1.2em; }
+.algo .algo-note { color: var(--color-muted); font-size: 0.9rem; line-height: 1.65;
+        margin: 12px 4px 0; padding-top: 9px; border-top: 1px solid var(--color-rule);
+        white-space: normal; }
+@media (max-width: 760px) { .algo ol.algo-corps { font-size: 0.88rem; } }
+
+.src-ar { margin: 26px 0 8px; border-top: 2px solid var(--color-rule); padding-top: 16px; }
+.src-ar h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--primary); }
+.src-ar .src-note { color: var(--color-muted); font-size: 0.9rem; margin: 0 0 12px; }
+.src-ar ul { list-style: none; padding: 0; margin: 0; }
+.src-ar li { margin: 0 0 14px; padding-right: 14px; border-right: 3px solid var(--primary-soft-2);
+             line-height: 1.7; font-size: 0.95rem; }
+.src-ar li .pourquoi { display: block; color: var(--color-muted); font-size: 0.9em;
+                       margin-top: 3px; }
+.src-ar li a.lien { word-break: break-all; font-size: 0.88em; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><a class="lang-switch" href="../../../IA/lecons/09-apprentissage/page.html" hreflang="fr" title="Version fran&ccedil;aise">FR</a><div class="breadcrumb"><a href="../../index.html">الذكاء الاصطناعي</a> &middot; مُقرَّر</div><span class="course-code">برنامج MP/PSI &middot; الفترة الثانية</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">القسم الرابع &middot; الفصل 9</div>
+<h1>الفصل 9 &mdash; التعلّم من الأمثلة</h1>
+<div class="lesson-sub">الإطار المُراقَب، والجيران الأقرب، والانحدار الخطّي واللوجستي، وأشجار القرار، وفرط التعلّم، والتقييم الصادق.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">المُلحَق المرافق</div><p>الجيران الأقرب، والنزول التدرّجي، وبناء شجرة قرار، والتحقّق المتقاطع، مفصَّلة <strong><a href="../../../IA/lecons/09-apprentissage/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">خطوة بخطوة في المُلحَق</a></strong>، بأمثلةٍ رقمية قابلة للتحقّق يدوياً.</p></div>
+
+<h2>4.1 الإطار المُراقَب</h2>
+
+<p>كانت الفصول السابقة تنطلق من نموذجٍ صريح: فقواعد العالم معلومة، والمطلوب الاستدلال عليها. وهنا نقلب المسألة: فالقواعد مجهولة، لكن لدينا أمثلة على أثرها، ونريد استنباط دالّةٍ تُعمِّم على حالاتٍ لم تُرَ قطّ.</p>
+
+<div class="box def"><div class="box-title">تعريف &mdash; التعلّم المُراقَب</div>
+<p>نفترض توزيع احتمالٍ \(P\) مجهولاً على \(\mathcal{X}\times\mathcal{Y}\). ونرصد عيّنةً \(D = \{(x_1,y_1),\dots,(x_n,y_n)\}\) مسحوبةً باستقلالٍ حسب \(P\). ودالّةُ خسارةٍ \(L(y,\hat{y})\) تقيس كلفة تنبّؤ. ونبحث عن \(f\) يُصغّر <strong>الخطر الحقيقي</strong></p>
+<div class="eq">\[R(f) = \mathbb{E}_{(x,y)\sim P}\big[L(y, f(x))\big]\]</div>
+<p>وبما أنّ \(P\) مجهولة، نُصغّر مكانه <strong>الخطر التجريبي</strong> \(\hat{R}(f) = \tfrac{1}{n}\sum_{i=1}^{n} L(y_i, f(x_i))\)، على صنف دوالّ \(\mathcal{H}\) محدَّدٍ سلفاً.</p></div>
+
+<p>ويتمايز نظامان بحسب طبيعة \(\mathcal{Y}\): <strong>التصنيف</strong> إذا كانت \(\mathcal{Y}\) منتهية، و<strong>الانحدار</strong> إذا كانت \(\mathcal{Y} = \mathbb{R}\). والخسارة المعتادة هي دالّة الخطأ المميِّزة \(L(y,\hat{y}) = \mathbf{1}[y \ne \hat{y}]\) في الحالة الأولى، والخطأ التربيعي \((y-\hat{y})^{2}\) في الثانية.</p>
+
+<div class="box warn"><div class="box-title">المَزلَق المركزي في الفصل كلّه</div>
+تصغير الخطر التجريبي <em>ليس</em> الغاية. فدالّةٌ تحفظ الأمثلة \(n\) تبلغ خطراً تجريبياً منعدماً ولا تتعلّم شيئاً. والفارق بين الخطر التجريبي والخطر الحقيقي هو <strong>فرط التعلّم</strong>، وهو يتزايد بغنى \(\mathcal{H}\). وكلّ هذا الاختصاص هو الترجيح بين صنفٍ غنيٍّ بما يكفي لتمثيل الظاهرة وفقيرٍ بما يكفي لتُغني البياناتُ القليلة المتاحة عن الاختيار السليم فيه.</div>
+
+<p>ولهذه المفاضلة تعبيرٌ كمّي في الانحدار، هو <strong>تحليل التحيّز والتباين</strong> <a class="cite" href="#ref-geman1992">[1]</a>: فمن أجل \(y = g(x) + \varepsilon\) مع \(\mathbb{E}[\varepsilon]=0\) وM19،</p>
+
+<div class="eq">\[\mathbb{E}\big[(y - \hat{f}(x))^{2}\big] = \underbrace{\big(g(x)-\mathbb{E}[\hat{f}(x)]\big)^{2}}_{\text{biais}^{2}} + \underbrace{\operatorname{Var}\big(\hat{f}(x)\big)}_{\text{variance}} + \sigma^{2}\]</div>
+
+<p>الحدّ الأوّل يقيس ما لا يستطيع صنف الدوالّ تمثيله، والثاني الحسّاسية للعيّنة المسحوبة، والثالث الضجيج غير القابل للاختزال. وإغناء الصنف يخفض التحيّز ويرفع التباين. ولا نموذج ينزل تحت \(\sigma^{2}\). ولا طريقة أفضل كوناً: فبالتوسيط على كلّ الدوالّ الهدف الممكنة، لكلّ الخوارزميات الخطأ نفسه خارج العيّنة <a class="cite" href="#ref-wolpert1996">[2]</a>. والأداء يأتي دائماً من فرضيّاتٍ تصادف ملاءمة المسألة.</p>
+
+<h2>4.2 الجيران الأقرب \(k\)</h2>
+
+<p>أبسط الطرائق لا تبني نموذجاً: بل تحتفظ بالأمثلة، ولتصنيف نقطةٍ جديدة تجعل جيرانها الأقرب \(k\) يصوّتون. وترجع إلى فيكس وهودجز سنة 1951؛ وأثبت كوفر وهارت خاصّيتها النظرية اللافتة <a class="cite" href="#ref-cover1967">[3]</a>.</p>
+
+<div class="box thm"><div class="box-title">مبرهنة &mdash; الحدّ القريب للجار الأقرب</div>
+<p>حين \(n \to \infty\)، يحقّق خطرُ قاعدة الجار الواحد \(R^{*} \le R_{1\text{-ppv}} \le 2R^{*}\)، حيث \(R^{*}\) خطر بايز، أي الأصغرية المطلقة القابلة للبلوغ بمعرفة \(P\) <a class="cite" href="#ref-cover1967">[3]</a>. بعبارةٍ أخرى: <em>نصف المعلومة الواردة في عيّنةٍ لا نهائية يحمله الجار الأقرب وحده.</em></p></div>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">يحدّد المؤشّر عدد الجيران المستشارين (فردياً دائماً، تفادياً للتعادل). والخلفية الملوّنة هي حدّ القرار، مُعاد حسابه على بيانات التعلّم وحدها.</p>
+<div id="jxg1" class="viz-board" style="height:560px;"></div>
+<p class="viz-caption"><strong>الشكل 9.1.</strong> أربع مجموعات غاوسية موضوعة على شكل رقعة شطرنج: فالصنفان غير قابلين للفصل بأيّ مستقيم. عند \(k=1\)، يكون الحدّ مسنّناً وخطأ التعلّم منعدماً بالبناء &mdash; إذ كلّ نقطةٍ هي جارتها الأقرب. ثمّ يُصقَل حين يتزايد \(k\). وبعد \(k=15\)، تفيض الجوارات على مجموعات الصنف الآخر ويهوي الخطآن معاً: فيصير النموذج شديد الجمود.</p></div>
+
+<div class="box warn"><div class="box-title">ثلاثة احتياطات لا غنى عنها</div>
+<p><strong>التنظيم.</strong> المسافة الإقليدية تجمع مربّعات الفروق؛ فمتغيّرٌ مُعبَّرٌ عنه بالآلاف يسحق كلّ ما عداه. فتوسيط كلّ عمودٍ واختزاله إلزامي، ويجب أن يجري هذا الحساب <em>على بيانات التعلّم وحدها</em>.</p>
+<p><strong>البُعد.</strong> في البُعد \(d\)، حجم كرةٍ شعاعها \(r\) يتناسب مع \(r^{d}\): فلالتقاط كسرٍ ثابت من النقاط، يجب أن ينمو الشعاع كـM34. وبمجرّد \(d \approx 20\)، لم تعد «الجيران الأقرب» قريبةً البتّة وتفقد الطريقة كلّ معنى.</p>
+<p><strong>الكلفة.</strong> لا زمن تعلّمٍ، لكن \(O(nd)\) لكلّ تنبّؤ: وهذا عكس النسق المعتاد، ويصير باهظاً في الإنتاج.</p></div>
+
+<h2>4.3 النماذج الخطّية والنزول التدرّجي</h2>
+
+<p>على النقيض من الاستدلال بالجوار، يمكن افتراض صورةٍ دالّية وضبط وسائطها. وأبسطها التآلفية: \(f_{\theta}(x) = \theta^{\mathsf{T}}\tilde{x}\)، حيث \(\tilde{x}\) هي \(x\) مزيدةً بإحداثيّةٍ ثابتة.</p>
+
+<div class="box thm"><div class="box-title">مبرهنة &mdash; المعادلات الناظمية</div>
+<p>مع الخسارة التربيعية، تكون \(J(\theta) = \|y - X\theta\|^{2}\) محدّبة وقابلة للاشتقاق؛ وإلغاء \(\nabla J(\theta) = -2X^{\mathsf{T}}(y - X\theta)\) يعطي \(X^{\mathsf{T}}X\theta = X^{\mathsf{T}}y\). وإن كانت \(X\) من رتبة أعمدةٍ تامّة، فالمُصغِّر الوحيد هو \(\hat{\theta} = (X^{\mathsf{T}}X)^{-1}X^{\mathsf{T}}y\)، وM45 هو الإسقاط المتعامد لـM46 على الفضاء المولَّد بأعمدة \(X\). والطريقة للوجندر <a class="cite" href="#ref-legendre1805">[4]</a>، وتبريرها الاحتمالي لغاوس.</p></div>
+
+<p>وفي التصنيف الثنائي، نركّب الجزء الخطّي مع الدالّة اللوجستية \(\sigma(t) = 1/(1+e^{-t})\) ونؤوّل \(\sigma(\theta^{\mathsf{T}}\tilde{x})\) احتمالاً. والخسارة الملائمة هي الإنتروبيا المتقاطعة، وتدرّجها يأخذ صورةً بسيطة على نحوٍ لافت:</p>
+
+<div class="eq">\[J(\theta) = -\frac{1}{n}\sum_{i=1}^{n}\Big[y_i\ln \hat{p}_i + (1-y_i)\ln(1-\hat{p}_i)\Big], \qquad \nabla J(\theta) = \frac{1}{n}X^{\mathsf{T}}(\hat{p} - y)\]</div>
+
+<p>ولا يوجد حلٌّ مغلق؛ فنُصغّر تكرارياً بـM51. ومن أجل هدفٍ محدّب وM52-منتظم، يتقارب النزول بمجرّد \(\eta \le 1/L\)، بخطأٍ من الرتبة \(O(1/t)\)؛ وإن كان الهدف زيادةً على ذلك \(\mu\)-شديد التحدّب، كان التقارب هندسياً بأساس \(1 - \mu/L\). والصيغة العشوائية، التي تستبدل بالتدرّج الكامل تدرّجَ دفعةٍ صغيرة، تتقارب تحت شرطَي روبنز ومونرو \(\sum_t \eta_t = \infty\) وM58 <a class="cite" href="#ref-robbins1951">[5]</a>.</p>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 9.1 &mdash; الانحدار اللوجستي بالنزول التدرّجي</div><div class="algo-io"><b>المُدخل:</b> \(X \in \mathbb{R}^{n \times d}\) مع عمود التحيّز، وM60، وخطوة \(\eta\)، وعدد تكرارات \(T\)<br><b>المُخرج:</b> \(\hat{\theta} \in \mathbb{R}^{d}\)</div><ol class="algo-corps"><li>\(\theta^{(0)} \leftarrow 0\)</li><li><b class="kw">لكلّ</b> \(t = 0\) <b class="kw">إلى أن</b> \(T-1\) <b class="kw">نفّذ</b></li><li class="n1">\(\hat{p} \leftarrow \sigma\big(X\theta^{(t)}\big)\)          <span class="cm">// sigma(z) = 1 / (1 + exp(-z))</span></li><li class="n1">\(\nabla J \leftarrow \tfrac{1}{n} X^{\mathsf{T}}(\hat{p} - y)\)</li><li class="n1">\(\theta^{(t+1)} \leftarrow \theta^{(t)} - \eta\,\nabla J\)</li><li><b class="kw">أرجِع</b> \(\theta^{(T)}\)</li></ol><p class="algo-note">للتدرّج صورةُ تدرّج المربّعات الصغرى بالضبط: ولا تتغيّر إلّا الدالّة المطبَّقة على \(X\theta\). <strong>التقارب.</strong> بما أنّ \(J\) محدّبة وM73-منتظمة، يتقارب النزول بمجرّد \(\eta \le 1/L\)، بخطأٍ من الرتبة \(O(1/t)\).</p></div>
+
+<div class="box tip"><div class="box-title">التنظيم</div>
+بدل تقييد الصنف يدوياً، نعاقب التعقيد في دالّة الهدف: \(J(\theta) + \lambda\|\theta\|_2^{2}\) (انحدار الحرف، الذي يُثبِّت المسائل سيّئة التكييف <a class="cite" href="#ref-hoerl1970">[6]</a>) أو \(J(\theta) + \lambda\|\theta\|_1\) (لاسو، التي تقود خطوطُ مستواها الحادّة الحلَّ إلى المحاور وتُلغي معاملاتٍ بالضبط <a class="cite" href="#ref-tibshirani1996">[7]</a>). وفي الحالتين، يُختار \(\lambda\) بالتحقّق المتقاطع، لا بالنظر أبداً.</div>
+
+<h2>4.4 أشجار القرار</h2>
+
+<p>تقطّع شجرة القرار الفضاء تراجعياً باختباراتٍ على متغيّرٍ واحد في المرّة، حتّى الحصول على مناطق متجانسة. وهو النموذج الأقرب مباشرةً إلى القراءة: فالمسار من الجذر إلى ورقةٍ <em>هو</em> تفسير التنبّؤ.</p>
+
+<p>والبناء جَشِع: فعند كلّ عقدة، نختار الاختبار الذي يُنقِص أكثر ما يمكن شوائبَ المجموعات الجزئية المُحصَّلة. ومقياسان يهيمنان:</p>
+
+<div class="eq">\[H(S) = -\sum_{c} p_{c}\log_{2}p_{c} \qquad\text{(entropie, ID3)} \qquad\qquad G(S) = 1 - \sum_{c} p_{c}^{2} \qquad\text{(indice de Gini, CART)}\]</div>
+
+<p>حيث \(p_c\) نسبة الصنف \(c\) في \(S\). والمعيار المُحسَّن هو <strong>الكسب</strong>، أي الفرق بين شوائب العقدة والمتوسّط الموزون لشوائب الأبناء. وID3 لكوينلان <a class="cite" href="#ref-quinlan1986">[8]</a>، وCART لبريمان وشركائه <a class="cite" href="#ref-breiman1984">[9]</a>.</p>
+
+<div class="box warn"><div class="box-title">كسب المعلومة يُحابي المتغيّرات كثيرة القيم</div>
+معرّفٌ فريد لكلّ مثالٍ يقطّع العيّنة تقطيعاً تامّاً ويحصل على الكسب الأقصى &mdash; مع أنّه بلا أيّ قدرةٍ تنبّؤية. وعلاج كوينلان: قسمة الكسب على إنتروبيا التوزيع نفسه، وهذا يعطي <em>نسبة الكسب</em>. وتلتفّ CART على المشكل على نحوٍ آخر، بألّا تسمح إلّا بقطوعٍ ثنائية.</div>
+
+<div class="viz"><div class="viz-title">شكل تفاعلي</div>
+<p class="viz-intro">يحدّ المؤشّر من عمق الشجرة. والمستطيلات هي الأوراق، ملوّنةً بالصنف الأغلبي لنقاط التعلّم التي تحويها.</p>
+<div id="jxg2" class="viz-board" style="height:560px;"></div>
+<p class="viz-caption"><strong>الشكل 9.2.</strong> البيانات نفسها الواردة في الشكل السابق، مقسَّمةً بشجرةٍ ذات قطوعٍ موازية للمحاور. عند العمق 0 أو 1، يعجز النموذج عن فصل أربع مجموعاتٍ على شكل رقعة شطرنج؛ وعند العمق 2، تكفي أربع أوراقٍ لردّ خطأ التعلّم إلى 13 % وخطأ الاختبار إلى 42 %. وبعد العمق 5، يهوي خطأ التعلّم إلى الصفر بينما يبقى خطأ الاختبار عالقاً عند 42 %: فالشجرة تحفظ ضجيج العيّنة. واستبدال نموذجٍ خطّي بالمستطيلات سيكون هنا أسوأ &mdash; فلا مستقيم يفصل رقعة شطرنج.</p></div>
+
+<p>وعلاجات فرط تعلّم الشجرة نوعان. <strong>التوقّف المبكر</strong> يحدّ من العمق أو يفرض عدداً أدنى لكلّ ورقة. و<strong>التقليم</strong> يدع الشجرة تنمو ثمّ يحذف الأشجار الجزئية التي لا يُفاقِم حذفُها الخطأ المقدَّر على بياناتٍ لم تُرَ؛ وهو عموماً أفضل الاثنين، لأنّ اختباراً قليل الإفادة قد يسبق آخر شديد الإفادة. وأخيراً، تجميعُ أشجارٍ كثيرة مبنيّة على عيّناتٍ ومجموعاتٍ جزئية من المتغيّرات مسحوبة عشوائياً يُنقِص التباين كثيراً: وهذه هي الغابة العشوائية <a class="cite" href="#ref-breiman2001">[10]</a>.</p>
+
+<h2>4.5 التقييم الصادق</h2>
+
+<p>الخطأ المقيس على بيانات التعلّم متفائلٌ منهجياً. والقياس الوحيد ذو المعنى هو ما يتناول بياناتٍ لم يرها النموذج قطّ.</p>
+
+<figure class="viz"><div class="viz-title">مصفوفة الالتباس والمقاييس المشتقّة منها</div>
+<svg viewBox="0 0 760 432" role="img" style="width:100%;height:auto;display:block;"><rect x="202" y="74" width="148" height="78" rx="6" style="fill:var(--viz-ok);fill-opacity:0.16;stroke:var(--viz-ok);stroke-width:2;"/><text x="276" y="101" text-anchor="middle" style="fill:var(--viz-ok);font-size:12px;font-weight:700;font-family:inherit;">إيجابيات صادقة</text><text x="276" y="132" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">42</text><rect x="358" y="74" width="148" height="78" rx="6" style="fill:var(--viz-bad);fill-opacity:0.16;stroke:var(--viz-bad);stroke-width:2;"/><text x="432" y="101" text-anchor="middle" style="fill:var(--viz-bad);font-size:12px;font-weight:700;font-family:inherit;">سلبيات كاذبة</text><text x="432" y="132" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">18</text><rect x="202" y="160" width="148" height="78" rx="6" style="fill:var(--viz-bad);fill-opacity:0.16;stroke:var(--viz-bad);stroke-width:2;"/><text x="276" y="187" text-anchor="middle" style="fill:var(--viz-bad);font-size:12px;font-weight:700;font-family:inherit;">إيجابيات كاذبة</text><text x="276" y="218" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">27</text><rect x="358" y="160" width="148" height="78" rx="6" style="fill:var(--viz-ok);fill-opacity:0.16;stroke:var(--viz-ok);stroke-width:2;"/><text x="432" y="187" text-anchor="middle" style="fill:var(--viz-ok);font-size:12px;font-weight:700;font-family:inherit;">سلبيات صادقة</text><text x="432" y="218" text-anchor="middle" style="fill:var(--color-text);font-size:13px;font-family:inherit;">913</text><text x="276" y="58" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">مُتنبَّأ إيجابي</text><text x="432" y="58" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">مُتنبَّأ سلبي</text><text x="176" y="119" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">إيجابي فعلاً</text><text x="176" y="205" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">سلبي فعلاً</text><path d="M 20 260 L 740 260" style="fill:none;stroke:var(--color-rule);stroke-width:1.4;"/><text x="20" y="288" style="fill:var(--color-text);font-size:13px;font-family:inherit;">الدقّة الكلّية = (42 + 913) / 1000 = 95,5 %</text><text x="740" y="288" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">مُبهِر &mdash; ومع ذلك بلا فائدةٍ هنا</text><text x="20" y="318" style="fill:var(--color-text);font-size:13px;font-family:inherit;">الإحكام = 42 / (42 + 27) = 60,9 %</text><text x="740" y="318" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">نسبة الصادق من بين الإنذارات</text><text x="20" y="348" style="fill:var(--color-text);font-size:13px;font-family:inherit;">الاستدعاء = 42 / (42 + 18) = 70,0 %</text><text x="740" y="348" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">نسبة المكتشَف من بين الحالات الحقيقية</text><text x="20" y="378" style="fill:var(--color-text);font-size:13px;font-family:inherit;">نتيجة F1 = 2 &middot; 0,609 &middot; 0,700 / (0,609 + 0,700) = 65,1 %</text><text x="740" y="378" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">المتوسّط التوافقي للاثنين</text><text x="20" y="414" style="fill:var(--viz-bad);font-size:12.5px;font-weight:700;font-family:inherit;">مصنّف ثابت «سلبي دائماً»: دقّة كلّية 94,0 %، واستدعاء 0 % &mdash; ومن هنا انعدام فائدة الدقّة الكلّية وحدها</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 9.3.</strong> كشفٌ على 1000 مريض، منهم 60 مرضى فعلاً. الدقّة الكلّية 95,5 % تبدو ممتازة، لكنّ مصنّفاً يجيب «غير مريض أبداً» سيبلغ 94,0 % باستدعاءٍ منعدم. ولهذا نُبلِّغ دائماً عن الإحكام والاستدعاء، لا عن الدقّة الكلّية وحدها، بمجرّد أن تكون الأصناف غير متوازنة.</figcaption></figure>
+
+<p>تقطيعٌ واحد إلى جزأين يُبدّد البيانات ويجعل النتيجة متوقّفةً على السحب. و<strong>التحقّق المتقاطع</strong> بـM83 كتلة، الذي صاغه ستون <a class="cite" href="#ref-stone1974">[11]</a>، يجيب عن الاعتراضين: فكلّ مثالٍ يخدم \(K-1\) مرّةً في التعلّم ومرّةً في التقييم.</p>
+
+<figure class="viz"><div class="viz-title">التحقّق المتقاطع بخمس كتل</div>
+<svg viewBox="0 0 760 300" role="img" style="width:100%;height:auto;display:block;"><text x="136" y="82" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">الدورة 1</text><rect x="150" y="60" width="100" height="34" rx="4" style="fill:var(--accent);fill-opacity:0.3;stroke:var(--accent);stroke-width:2;"/><text x="200" y="82" text-anchor="middle" style="fill:var(--color-text);font-size:11.5px;font-weight:700;font-family:inherit;">تحقّق</text><rect x="256" y="60" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="306" y="82" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><rect x="362" y="60" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="412" y="82" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><rect x="468" y="60" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="518" y="82" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><rect x="574" y="60" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="624" y="82" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><text x="136" y="126" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">الدورة 2</text><rect x="150" y="104" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="200" y="126" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><rect x="256" y="104" width="100" height="34" rx="4" style="fill:var(--accent);fill-opacity:0.3;stroke:var(--accent);stroke-width:2;"/><text x="306" y="126" text-anchor="middle" style="fill:var(--color-text);font-size:11.5px;font-weight:700;font-family:inherit;">تحقّق</text><rect x="362" y="104" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="412" y="126" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><rect x="468" y="104" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="518" y="126" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><rect x="574" y="104" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="624" y="126" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><text x="136" y="170" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">الدورة 3</text><rect x="150" y="148" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="200" y="170" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><rect x="256" y="148" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="306" y="170" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><rect x="362" y="148" width="100" height="34" rx="4" style="fill:var(--accent);fill-opacity:0.3;stroke:var(--accent);stroke-width:2;"/><text x="412" y="170" text-anchor="middle" style="fill:var(--color-text);font-size:11.5px;font-weight:700;font-family:inherit;">تحقّق</text><rect x="468" y="148" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="518" y="170" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><rect x="574" y="148" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="624" y="170" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><text x="136" y="214" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">الدورة 4</text><rect x="150" y="192" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="200" y="214" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><rect x="256" y="192" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="306" y="214" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><rect x="362" y="192" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="412" y="214" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><rect x="468" y="192" width="100" height="34" rx="4" style="fill:var(--accent);fill-opacity:0.3;stroke:var(--accent);stroke-width:2;"/><text x="518" y="214" text-anchor="middle" style="fill:var(--color-text);font-size:11.5px;font-weight:700;font-family:inherit;">تحقّق</text><rect x="574" y="192" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="624" y="214" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><text x="136" y="258" text-anchor="end" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">الدورة 5</text><rect x="150" y="236" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="200" y="258" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><rect x="256" y="236" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="306" y="258" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><rect x="362" y="236" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="412" y="258" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><rect x="468" y="236" width="100" height="34" rx="4" style="fill:var(--primary);fill-opacity:0.14;stroke:var(--primary);stroke-width:1.5;"/><text x="518" y="258" text-anchor="middle" style="fill:var(--color-muted);font-size:11.5px;font-family:inherit;">تعلّم</text><rect x="574" y="236" width="100" height="34" rx="4" style="fill:var(--accent);fill-opacity:0.3;stroke:var(--accent);stroke-width:2;"/><text x="624" y="258" text-anchor="middle" style="fill:var(--color-text);font-size:11.5px;font-weight:700;font-family:inherit;">تحقّق</text><text x="415" y="40" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">تُقطَّع البيانات إلى 5 كتلٍ متساوية الحجم</text><text x="415" y="290" text-anchor="middle" style="fill:var(--color-muted);font-size:12px;font-family:inherit;">والنتيجة المعتمَدة هي متوسّط الدورات الخمس؛ وانحرافها المعياري يقيس استقرار النموذج</text></svg>
+<figcaption class="viz-caption"><strong>الشكل 9.4.</strong> \(K = 5\) أو \(10\) هي المفاضلة المعتادة. فـM87 صغيرٌ يعطي تقديراً متشائماً، لأنّ كلّ نموذجٍ يُتعلَّم على بياناتٍ قليلة؛ وM88 (سحب مثالٍ واحد) شبه عديم التحيّز لكنّه شديد التباين ويكلّف \(n\) عملية تعلّم.</figcaption></figure>
+
+<div class="box warn"><div class="box-title">تسرّب البيانات، الخطأ رقم واحد عملياً</div>
+كلّ معالجةٍ <em>تتعلّم</em> شيئاً من البيانات &mdash; تنظيم، انتقاء متغيّرات، إسناد قيمٍ ناقصة، اختزال بُعد &mdash; يجب ضبطها داخل كلّ كتلة، على جزء التعلّم وحده. فتنظيم مجموعة البيانات كلّها قبل تقطيعها يُدخِل معلومةً من الاختبار في النموذج ويُنتج نتائج مُطرِية تتبخّر في الإنتاج. والقاعدة نفسها تسري على اختيار فرط الوسائط: فانتقاؤها على مجموعة الاختبار يعني جعلها مجموعة تعلّم.</div>
+
+<h2>4.6 التنفيذ</h2>
+
+<p>يتبع نموذج المكتبات المعيارية اصطلاحاً موحّداً: فالكائن يعرض <em>fit</em> للضبط، و<em>predict</em> للتنبّؤ، ويتركّب في سلسلةٍ تضمن بقاء التنظيم داخل كتل التحقّق <a class="cite" href="#ref-pedregosa2011">[12]</a>.</p>
+
+<div class="algo"><div class="algo-cap">الخوارزمية 9.2 &mdash; انتقاء النموذج بالتحقّق المتقاطع</div><div class="algo-io"><b>المُدخل:</b> مجموعة \(D\)، وعائلة نماذج \(\mathcal{M}\)، وعدد صحيح \(K\)<br><b>المُخرج:</b> النموذج الأفضل نتيجةً وسطية، والانحراف المعياري لهذه النتيجة</div><ol class="algo-corps"><li>قسّم \(D\) إلى \(K\) كتلة \(D_1, \dots, D_K\) متساوية الحجم، مع احترام الطبقات</li><li><b class="kw">لكلّ</b> \(M \in \mathcal{M}\) <b class="kw">نفّذ</b></li><li class="n1"><b class="kw">لكلّ</b> \(k = 1\) <b class="kw">إلى أن</b> \(K\) <b class="kw">نفّذ</b></li><li class="n2">\(A \leftarrow D \setminus D_k\)          <span class="cm">// تعلم</span></li><li class="n2">اضبط المعالجات القَبْلية على \(A\) وحده          <span class="cm">// والا: تسرب بيانات</span></li><li class="n2">اضبط \(M\) على \(A\) المحوَّل</li><li class="n2">\(s_k \leftarrow\) نتيجة \(M\) على \(D_k\) المحوَّل</li><li class="n1">\(\mu_M \leftarrow \tfrac{1}{K}\sum_k s_k\) ؛ \(\varsigma_M \leftarrow \operatorname{ecart\text{-}type}(s_1,\dots,s_K)\)</li><li><b class="kw">أرجِع</b> \(\operatorname*{argmax}_{M} \mu_M\) <b class="kw">و</b> \(\varsigma_M\)</li></ol><p class="algo-note">ضبط التنظيم <em>قبل</em> التقطيع يُدخِل معلومةً من كتلة التحقّق في النموذج. وفارقُ متوسّطٍ أصغر من \(\varsigma\) لا يتيح استنتاج أيّ تفوّق.</p></div>
+
+<p>و<em>خطّ المعالجة</em> ليس تسهيلاً في الكتابة: بل هو الذي يمنع تسرّب البيانات، لأنّ التنظيم يُضبَط في كلّ دورةٍ على جزء التعلّم من الكتلة وحده. وكتابة <code>X = StandardScaler().fit_transform(X)</code> مكانه قبل الاستدعاء تُنتج نتائج متفائلة منهجياً.</p>
+
+<h2>الخلاصة</h2>
+<ul>
+<li>التعلّم هو تصغير خطرٍ حقيقي <em>غير قابل للرصد</em> عبر تقديره التجريبي، على صنف دوالّ مختارٍ سلفاً.</li>
+<li>الخطأ المُنتظَر = التحيّزM111 + التباين + الضجيج <a class="cite" href="#ref-geman1992">[1]</a>؛ وتعقيد النموذج يُزيح الحدَّين الأوّلين في اتّجاهين متعاكسين، ولا طريقة متفوّقة كوناً <a class="cite" href="#ref-wolpert1996">[2]</a>.</li>
+<li>الجيران الأقرب لا يبنون شيئاً لكنّهم يدفعون عند التنبّؤ، ويقتضون تنظيماً، وينهارون في البُعد الكبير <a class="cite" href="#ref-cover1967">[3]</a>.</li>
+<li>للنماذج الخطّية حلٌّ مغلق في الانحدار وتُضبَط بالتدرّج في التصنيف؛ والتنظيم يُرجّح بين المطابقة والاستقرار <a class="cite" href="#ref-hoerl1970">[6]</a>.</li>
+<li>الأشجار مقروءة وغير خطّية، لكنّها تُفرِط في التعلّم بلا توقّفٍ مبكر ولا تقليم؛ وتجميعها يُنقِص التباين <a class="cite" href="#ref-breiman2001">[10]</a>.</li>
+<li>لا قيمة لنتيجةٍ إلّا مقيسةً على بياناتٍ لم تُرَ قطّ، بالتحقّق المتقاطع، وبلا أيّ تسرّبٍ في المعالجة القَبْلية <a class="cite" href="#ref-stone1974">[11]</a>.</li>
+</ul>
+
+<h2>المراجع</h2>
+<ol class="reflist">
+<li id="ref-geman1992">Geman, S., Bienenstock, E. &amp; Doursat, R. (1992). Neural networks and the bias/variance dilemma. <em>Neural Computation</em>, 4(1), 1&ndash;58. DOI: 10.1162/neco.1992.4.1.1. <a href="https://doi.org/10.1162/neco.1992.4.1.1">https://doi.org/10.1162/neco.1992.4.1.1</a></li>
+<li id="ref-wolpert1996">Wolpert, D. H. (1996). The lack of a priori distinctions between learning algorithms. <em>Neural Computation</em>, 8(7), 1341&ndash;1390. DOI: 10.1162/neco.1996.8.7.1341. <a href="https://doi.org/10.1162/neco.1996.8.7.1341">https://doi.org/10.1162/neco.1996.8.7.1341</a></li>
+<li id="ref-cover1967">Cover, T. M. &amp; Hart, P. E. (1967). Nearest neighbor pattern classification. <em>IEEE Transactions on Information Theory</em>, 13(1), 21&ndash;27. DOI: 10.1109/TIT.1967.1053964. <a href="https://doi.org/10.1109/TIT.1967.1053964">https://doi.org/10.1109/TIT.1967.1053964</a></li>
+<li id="ref-legendre1805">Legendre, A.-M. (1805). <em>Nouvelles m&eacute;thodes pour la d&eacute;termination des orbites des com&egrave;tes</em>. Firmin Didot, Paris. <a href="https://archive.org/details/nouvellesmthode00legegoog">https://archive.org/details/nouvellesmthode00legegoog</a></li>
+<li id="ref-robbins1951">Robbins, H. &amp; Monro, S. (1951). A stochastic approximation method. <em>Annals of Mathematical Statistics</em>, 22(3), 400&ndash;407. DOI: 10.1214/aoms/1177729586. <a href="https://doi.org/10.1214/aoms/1177729586">https://doi.org/10.1214/aoms/1177729586</a></li>
+<li id="ref-hoerl1970">Hoerl, A. E. &amp; Kennard, R. W. (1970). Ridge regression: biased estimation for nonorthogonal problems. <em>Technometrics</em>, 12(1), 55&ndash;67. DOI: 10.1080/00401706.1970.10488634. <a href="https://doi.org/10.1080/00401706.1970.10488634">https://doi.org/10.1080/00401706.1970.10488634</a></li>
+<li id="ref-tibshirani1996">Tibshirani, R. (1996). Regression shrinkage and selection via the lasso. <em>Journal of the Royal Statistical Society B</em>, 58(1), 267&ndash;288. DOI: 10.1111/j.2517-6161.1996.tb02080.x. <a href="https://doi.org/10.1111/j.2517-6161.1996.tb02080.x">https://doi.org/10.1111/j.2517-6161.1996.tb02080.x</a></li>
+<li id="ref-quinlan1986">Quinlan, J. R. (1986). Induction of decision trees. <em>Machine Learning</em>, 1(1), 81&ndash;106. DOI: 10.1007/BF00116251. <a href="https://doi.org/10.1007/BF00116251">https://doi.org/10.1007/BF00116251</a></li>
+<li id="ref-breiman1984">Breiman, L., Friedman, J. H., Olshen, R. A. &amp; Stone, C. J. (1984). <em>Classification and Regression Trees</em>. Wadsworth. DOI: 10.1201/9781315139470. <a href="https://doi.org/10.1201/9781315139470">https://doi.org/10.1201/9781315139470</a></li>
+<li id="ref-breiman2001">Breiman, L. (2001). Random forests. <em>Machine Learning</em>, 45(1), 5&ndash;32. DOI: 10.1023/A:1010933404324. <a href="https://doi.org/10.1023/A:1010933404324">https://doi.org/10.1023/A:1010933404324</a></li>
+<li id="ref-stone1974">Stone, M. (1974). Cross-validatory choice and assessment of statistical predictions. <em>Journal of the Royal Statistical Society B</em>, 36(2), 111&ndash;147. DOI: 10.1111/j.2517-6161.1974.tb00994.x. <a href="https://doi.org/10.1111/j.2517-6161.1974.tb00994.x">https://doi.org/10.1111/j.2517-6161.1974.tb00994.x</a></li>
+<li id="ref-pedregosa2011">Pedregosa, F. <em>et al.</em> (2011). Scikit-learn: machine learning in Python. <em>Journal of Machine Learning Research</em>, 12, 2825&ndash;2830. <a href="https://www.jmlr.org/papers/v12/pedregosa11a.html">https://www.jmlr.org/papers/v12/pedregosa11a.html</a></li>
+</ol>
+
+<section class="src-ar">
+<h3>مصادر بالعربية</h3>
+<p class="src-note">مصادر للاستزادة، لا مراجع لما ورد أعلاه: المراجع الأصلية للفصل مذكورةٌ في القائمة السابقة بلغتها. وقد عُوينت كلّ صفحةٍ من صفحات الناشرين للتحقّق من العنوان والمترجم ورخصة الإتاحة.</p>
+<ul>
+<li>هاند، ديفيد جيه. <em>علم الإحصاء: مقدّمة قصيرة جدًّا</em>. ترجمة أحمد شكل، مراجعة محمد فتحي خضر. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/42848630/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/42848630/</a><span class="pourquoi">موجَّه إلى قارئٍ بلا خلفية رياضية مسبقة، ويشرح بالعربية الاستدلال الإحصائي الذي يقوم عليه هذا الفصل.</span></li>
+<li>هولمز، دون إي. <em>البيانات الضخمة: مقدّمة قصيرة جدًّا</em>. ترجمة أحمد عبد المنعم، مراجعة هبة عبد المولى أحمد. مؤسسة هنداوي (بترخيصٍ من دار نشر جامعة أكسفورد). متاح مجّاناً.<br><a class="lien" href="https://www.safahat.org/books/70929638/" hreflang="ar" target="_blank" rel="noopener">https://www.safahat.org/books/70929638/</a><span class="pourquoi">يضع البيانات التي تتغذّى عليها هذه الطرائق في سياقها، ويناقش حدودها الأخلاقية.</span></li>
+</ul>
+</section>
+
+<nav class="lesson-nav"><div class="container">
+<a href="../08-probabiliste/page.html">\(\leftarrow\) الفصل 8 &mdash; الاستدلال الاحتمالي</a>
+<a href="../../../IA/lecons/09-apprentissage/algorithms.html" hreflang="fr" title="المُلحَق متاح بالفرنسية">المُلحَق الخوارزمي</a>
+<a href="../../index.html">فهرس المُقرَّر</a>
+<a href="../10-non-supervise/page.html">الفصل 10 &mdash; التعلّم غير المُراقَب \(\to\)</a>
+</div></nav>
+</main>
+<footer class="site-footer"><strong>الذكاء الاصطناعي &mdash; الأقسام التحضيرية MP/PSI</strong> &middot; البحث والألعاب والقيود والتعلّم<span class="footer-meta">طبعة 2025-2026</span></footer>
+<script>
+(function(){
+  if (typeof JXG === 'undefined') {
+    var boxes = document.querySelectorAll('.viz-board');
+    for (var i=0;i<boxes.length;i++){
+      boxes[i].innerHTML = '<p class="viz-offline">تعذّر تحميل الشكل التفاعلي. تحقّق من اتصالك بالشبكة.</p>';
+    }
+    return;
+  }
+  JXG.Options.text.useMathJax = false;
+  var _init = JXG.JSXGraph.initBoard;
+  JXG.JSXGraph.initBoard = function(){
+    var b = _init.apply(JXG.JSXGraph, arguments); BOARDS.push(b); return b;
+  };
+
+var BOARDS = [];
+function cssv(name, fallback){
+  try { var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return (v && v.trim()) ? v.trim() : fallback; } catch (e) { return fallback; }
+}
+var PAL = {
+  text:  function(){ return cssv('--color-text',  '#1f2937'); },
+  muted: function(){ return cssv('--color-muted', '#6b7280'); },
+  axis:  function(){ return cssv('--viz-axis',    '#94a3b8'); },
+  ref:   function(){ return cssv('--viz-ref',     '#cbd5e1'); },
+  grid:  function(){ return cssv('--viz-grid',    '#eef2f4'); },
+  bg:    function(){ return cssv('--color-bg',    '#ffffff'); }
+};
+if (window.MutationObserver) {
+  new MutationObserver(function(){
+    for (var i = 0; i < BOARDS.length; i++) { try { BOARDS[i].fullUpdate(); } catch (e) {} }
+  }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+}
+/* ============== Jeu de donnees 2D deterministe, deux classes ============== */
+function alea(graine){
+  var s = graine;
+  return function(){ s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648; };
+}
+function gauss(rnd){
+  var u = Math.max(1e-9, rnd()), v = rnd();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+var DONNEES = (function(){
+  var rnd = alea(20250806), pts = [];
+  var centres = [[2.6, 6.2, 0], [6.6, 3.0, 0], [6.4, 7.0, 1], [2.8, 2.6, 1]];
+  for (var c = 0; c < centres.length; c++){
+    for (var i = 0; i < 11; i++){
+      pts.push({x: centres[c][0] + 1.0 * gauss(rnd),
+                y: centres[c][1] + 1.0 * gauss(rnd),
+                cl: centres[c][2],
+                test: (i % 3 === 2)});           /* un tiers en jeu de test */
+    }
+  }
+  return pts;
+})();
+function appr(){ return DONNEES.filter(function(p){ return !p.test; }); }
+function tests(){ return DONNEES.filter(function(p){ return p.test; }); }
+
+/* --------------------------------- Figure : k plus proches voisins ------- */
+function voteKnn(x, y, k, base){
+  var d = base.map(function(p){
+    return {d: (p.x-x)*(p.x-x) + (p.y-y)*(p.y-y), cl: p.cl};
+  });
+  d.sort(function(a,b){ return a.d - b.d; });
+  var s = 0;
+  for (var i = 0; i < k && i < d.length; i++){ s += (d[i].cl === 1 ? 1 : -1); }
+  return s >= 0 ? 1 : 0;
+}
+var b1 = JXG.JSXGraph.initBoard('jxg1', {
+  boundingbox: [-0.7, 10.2, 9.7, -2.4], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: true
+});
+var sK = b1.create('slider', [[0.2, -1.3], [5.4, -1.3], [1, 5, 21]], {
+  name: 'k', snapWidth: 2, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+function kCourant(){ var k = Math.round(sK.Value()); return k % 2 === 0 ? k + 1 : k; }
+var NX = 34, NY = 34, X0 = 0, X1 = 9, Y0 = 0, Y1 = 9;
+function grilleKnn(classe){
+  var k = kCourant(), base = appr(), X = [], Y = [];
+  var dx = (X1 - X0) / NX, dy = (Y1 - Y0) / NY;
+  for (var i = 0; i < NX; i++){
+    for (var j = 0; j < NY; j++){
+      var cx = X0 + (i + 0.5) * dx, cy = Y0 + (j + 0.5) * dy;
+      if (voteKnn(cx, cy, k, base) !== classe) { continue; }
+      X.push(cx-dx/2, cx+dx/2, cx+dx/2, cx-dx/2, cx-dx/2, NaN);
+      Y.push(cy-dy/2, cy-dy/2, cy+dy/2, cy+dy/2, cy-dy/2, NaN);
+    }
+  }
+  return [X, Y];
+}
+var cZone0 = b1.create('curve', [[0],[0]], {
+  strokeWidth: 0, fillColor: function(){ return cssv('--viz-blue', '#2563eb'); },
+  fillOpacity: 0.16, highlight: false, fixed: true});
+cZone0.updateDataArray = function(){ var d = grilleKnn(0); this.dataX = d[0]; this.dataY = d[1]; };
+var cZone1 = b1.create('curve', [[0],[0]], {
+  strokeWidth: 0, fillColor: function(){ return cssv('--accent', '#f59e0b'); },
+  fillOpacity: 0.20, highlight: false, fixed: true});
+cZone1.updateDataArray = function(){ var d = grilleKnn(1); this.dataX = d[0]; this.dataY = d[1]; };
+
+for (var i = 0; i < DONNEES.length; i++){
+  (function(p){
+    b1.create('point', [p.x, p.y], {
+      name: '', size: p.test ? 4 : 5, face: p.test ? 'x' : 'o',
+      fixed: true, highlight: false, strokeWidth: 2,
+      strokeColor: p.cl === 1 ? '#b45309' : '#1d4ed8',
+      fillColor: p.cl === 1 ? '#f59e0b' : '#2563eb'
+    });
+  })(DONNEES[i]);
+}
+function erreurKnn(ens){
+  var k = kCourant(), base = appr(), e = 0;
+  for (var i = 0; i < ens.length; i++){
+    if (voteKnn(ens[i].x, ens[i].y, k, base) !== ens[i].cl) { e++; }
+  }
+  return e;
+}
+b1.create('text', [-0.6, 9.9, function(){
+  var a = appr(), t = tests();
+  var ea = erreurKnn(a), et = erreurKnn(t);
+  return 'k = ' + kCourant()
+       + '   |   خطأ التعلم: ' + ea + ' / ' + a.length
+       + ' (' + (100*ea/a.length).toFixed(0) + ' %)'
+       + '   |   خطأ الاختبار: ' + et + ' / ' + t.length
+       + ' (' + (100*et/t.length).toFixed(0) + ' %)';
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b1.create('text', [-0.6, -2.1, 'الاقراص: بيانات التعلم   |   الصلبان: بيانات الاختبار'],
+  {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+/* --------------------------------- Figure : arbre de decision ------------ */
+function gini(ens){
+  if (!ens.length) { return 0; }
+  var p = 0;
+  for (var i = 0; i < ens.length; i++){ p += ens[i].cl; }
+  p /= ens.length;
+  return 2 * p * (1 - p);
+}
+function meilleureCoupe(ens){
+  var best = null;
+  for (var axe = 0; axe < 2; axe++){
+    var vals = ens.map(function(p){ return axe === 0 ? p.x : p.y; }).slice().sort(function(a,b){ return a-b; });
+    for (var i = 0; i + 1 < vals.length; i++){
+      var seuil = (vals[i] + vals[i+1]) / 2;
+      if (seuil === vals[i]) { continue; }
+      var g = [], d = [];
+      for (var j = 0; j < ens.length; j++){
+        ((axe === 0 ? ens[j].x : ens[j].y) <= seuil ? g : d).push(ens[j]);
+      }
+      if (!g.length || !d.length) { continue; }
+      var cout = (g.length * gini(g) + d.length * gini(d)) / ens.length;
+      if (best === null || cout < best.cout) { best = {axe: axe, seuil: seuil, cout: cout, g: g, d: d}; }
+    }
+  }
+  return best;
+}
+function construire(ens, prof, boite){
+  var majorite = 0, s = 0;
+  for (var i = 0; i < ens.length; i++){ s += ens[i].cl; }
+  majorite = (s * 2 >= ens.length) ? 1 : 0;
+  var noeud = {boite: boite, cl: majorite, n: ens.length, feuille: true};
+  if (prof === 0 || ens.length < 2 || gini(ens) === 0) { return noeud; }
+  var c = meilleureCoupe(ens);
+  if (c === null) { return noeud; }
+  noeud.feuille = false; noeud.axe = c.axe; noeud.seuil = c.seuil;
+  var bg = boite.slice(), bd = boite.slice();
+  if (c.axe === 0){ bg[2] = c.seuil; bd[0] = c.seuil; } else { bg[3] = c.seuil; bd[1] = c.seuil; }
+  noeud.g = construire(c.g, prof - 1, bg);
+  noeud.d = construire(c.d, prof - 1, bd);
+  return noeud;
+}
+function predire(noeud, p){
+  while (!noeud.feuille){
+    noeud = ((noeud.axe === 0 ? p.x : p.y) <= noeud.seuil) ? noeud.g : noeud.d;
+  }
+  return noeud.cl;
+}
+function feuilles(noeud, acc){
+  acc = acc || [];
+  if (noeud.feuille) { acc.push(noeud); } else { feuilles(noeud.g, acc); feuilles(noeud.d, acc); }
+  return acc;
+}
+var CACHE4 = {};
+function arbre(prof){
+  if (!(prof in CACHE4)) { CACHE4[prof] = construire(appr(), prof, [X0, Y0, X1, Y1]); }
+  return CACHE4[prof];
+}
+var b2 = JXG.JSXGraph.initBoard('jxg2', {
+  boundingbox: [-0.7, 10.2, 9.7, -2.4], axis: false,
+  showCopyright: false, showNavigation: false, keepaspectratio: true
+});
+var sProf = b2.create('slider', [[0.2, -1.3], [5.4, -1.3], [0, 2, 8]], {
+  name: 'العمق الاقصى', snapWidth: 1, precision: 0,
+  label: {strokeColor: PAL.text}, baseline: {strokeColor: PAL.axis},
+  highline: {strokeColor: function(){ return cssv('--primary', '#026573'); }}
+});
+function profCourante(){ return Math.round(sProf.Value()); }
+function zonesArbre(classe){
+  var f = feuilles(arbre(profCourante())), X = [], Y = [];
+  for (var i = 0; i < f.length; i++){
+    if (f[i].cl !== classe) { continue; }
+    var b = f[i].boite;
+    X.push(b[0], b[2], b[2], b[0], b[0], NaN);
+    Y.push(b[1], b[1], b[3], b[3], b[1], NaN);
+  }
+  return [X, Y];
+}
+var dZ0 = b2.create('curve', [[0],[0]], {
+  strokeWidth: 0, fillColor: function(){ return cssv('--viz-blue', '#2563eb'); },
+  fillOpacity: 0.16, highlight: false, fixed: true});
+dZ0.updateDataArray = function(){ var d = zonesArbre(0); this.dataX = d[0]; this.dataY = d[1]; };
+var dZ1 = b2.create('curve', [[0],[0]], {
+  strokeWidth: 0, fillColor: function(){ return cssv('--accent', '#f59e0b'); },
+  fillOpacity: 0.20, highlight: false, fixed: true});
+dZ1.updateDataArray = function(){ var d = zonesArbre(1); this.dataX = d[0]; this.dataY = d[1]; };
+var dBord = b2.create('curve', [[0],[0]], {
+  strokeColor: function(){ return cssv('--primary', '#026573'); },
+  strokeWidth: 1.6, highlight: false, fixed: true});
+dBord.updateDataArray = function(){
+  var f = feuilles(arbre(profCourante())), X = [], Y = [];
+  for (var i = 0; i < f.length; i++){
+    var b = f[i].boite;
+    X.push(b[0], b[2], b[2], b[0], b[0], NaN);
+    Y.push(b[1], b[1], b[3], b[3], b[1], NaN);
+  }
+  this.dataX = X; this.dataY = Y;
+};
+for (var i = 0; i < DONNEES.length; i++){
+  (function(p){
+    b2.create('point', [p.x, p.y], {
+      name: '', size: p.test ? 4 : 5, face: p.test ? 'x' : 'o',
+      fixed: true, highlight: false, strokeWidth: 2,
+      strokeColor: p.cl === 1 ? '#b45309' : '#1d4ed8',
+      fillColor: p.cl === 1 ? '#f59e0b' : '#2563eb'
+    });
+  })(DONNEES[i]);
+}
+function erreurArbre(ens){
+  var a = arbre(profCourante()), e = 0;
+  for (var i = 0; i < ens.length; i++){ if (predire(a, ens[i]) !== ens[i].cl) { e++; } }
+  return e;
+}
+b2.create('text', [-0.6, 9.9, function(){
+  var a = appr(), t = tests();
+  var ea = erreurArbre(a), et = erreurArbre(t);
+  return 'profondeur ' + profCourante() + '   |   ' + feuilles(arbre(profCourante())).length
+       + ' ورقة   |   خطأ التعلم: ' + (100*ea/a.length).toFixed(0)
+       + ' %   |   خطأ الاختبار: ' + (100*et/t.length).toFixed(0) + ' %';
+}], {fontSize: 15, strokeColor: PAL.text, fixed: true, highlight: false});
+b2.create('text', [-0.6, -2.1, function(){
+  var a = appr(), t = tests();
+  var ea = erreurArbre(a), et = erreurArbre(t);
+  if (ea === 0 && et > 0) { return 'خطأ تعلم منعدم وخطأ اختبار غير منعدم: فرط تعلم.'; }
+  if (profCourante() <= 1) { return 'نموذج افقر من ان يفصل اربع مجموعات: نقص تعلم.'; }
+  return 'مفاضلة معقولة بين الخطأين.';
+}], {fontSize: 13, strokeColor: PAL.muted, fixed: true, highlight: false});
+
+b1.update(); b2.update();
+
+})();
+</script>
+</body></html>

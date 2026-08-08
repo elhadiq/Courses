@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 1 &mdash; What Is a Game? Players, Strategies and Payoffs</title>
+<meta name="description" content="Build the vocabulary and the payoff matrix that the whole course runs on.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; justify-content: space-between; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz { margin: 26px 0; }
+.viz-title { font-weight: 700; color: var(--primary); font-size: 0.98rem; margin-bottom: 10px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 12px 0 0; border-top: 1px solid var(--color-rule); padding-top: 10px; }
+.viz svg { max-width: 100%; height: auto; }
+.payoff { display: inline-block !important; border-collapse: collapse; margin: 0 auto; }
+.payoff th, .payoff td { border: 1px solid var(--color-rule); padding: 9px 18px; text-align: center; }
+.payoff thead th { background: var(--primary-soft); color: var(--color-text); }
+.payoff th.corner { background: var(--primary); color: #fff; font-size: 0.82rem; font-weight: 600; }
+.payoff tbody th { background: var(--primary-soft); text-align: left; }
+.payoff td { font-family: var(--font-mono); font-size: 0.98rem; }
+.glossary th:first-child, .glossary td:first-child { white-space: nowrap; font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Game Theory</a> &middot; Chapter 01</div><span class="course-code">Part I &middot; Foundations</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Part I &middot; Foundations &middot; Chapter 1</div>
+<h1>Chapter 1 &mdash; What Is a Game? Players, Strategies and Payoffs</h1>
+<div class="lesson-sub">Build the vocabulary and the payoff matrix that the whole course runs on.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">What you will be able to do</div><ul><li>Say precisely what a game is: players, strategy sets, payoff functions.</li><li>Read and write a two-player payoff matrix without confusing whose number is whose.</li><li>Compute a best response to a fixed profile of opponents' strategies.</li><li>Recognise the Prisoner's Dilemma, Stag Hunt, Chicken and Matching Pennies on sight.</li><li>State the rationality and common-knowledge assumptions, and say what they do not claim.</li></ul></div>
+
+<h2>1. Why we need a special theory</h2>
+<p>Most of what you learned in earlier courses was <em>decision theory</em>: one person faces a world that does not care what they do. A farmer choosing when to harvest faces weather; the weather has no opinion about the farmer. Game theory begins the moment the thing you are reacting to is <strong>reacting back</strong>. When you undercut a competitor's price, the competitor answers. When you bluff at poker, your opponent is trying to read you reading them.</p>
+<p>This circularity - my best action depends on your action, which depends on mine - is what makes strategic situations hard, and it is exactly what game theory was invented to tame. The founding text is von Neumann and Morgenstern's <em>Theory of Games and Economic Behavior</em> (1944).</p>
+
+<h2>2. The three ingredients of a game</h2>
+<p>Stripped to essentials, a game is three lists.</p>
+<figure class="viz"><table><thead><tr><th>Ingredient</th><th>Notation</th><th>Meaning</th></tr></thead><tbody><tr><td>Players</td><td>\(N = \{1, 2, \dots, n\}\)</td><td>The decision makers. A player is anything that chooses: a person, a firm, a country, a species.</td></tr><tr><td>Strategies</td><td>\(S_i\) for each player \(i\)</td><td>The complete list of actions available to player \(i\). A <em>strategy profile</em> \(s = (s_1, \dots, s_n)\) picks one strategy per player.</td></tr><tr><td>Payoffs</td><td>\(u_i(s)\)</td><td>A number telling how much player \(i\) likes the outcome that results from profile \(s\). Higher is better.</td></tr></tbody></table><p class="viz-caption">The triple \((N, S, u)\) is called the <strong>normal form</strong> or <strong>strategic form</strong> of the game.</p></figure>
+<p>Two remarks that trip up beginners. First, payoffs are <em>utilities</em>, not necessarily money: they already include everything the player cares about - spite, fairness, reputation, prison time. If a player would rather have less money and a clean conscience, that is a fact about their payoff function, not a violation of rationality. Second, a strategy is a <em>complete</em> plan. In a one-shot simultaneous game a strategy is just an action, but later, in games with several stages, a strategy will have to say what to do at every point where the player might be called on to move.</p>
+
+<h2>3. The payoff matrix</h2>
+<p>When there are two players with finitely many strategies each, the whole game fits in a table. Rows are the strategies of player 1 (the <em>row player</em>), columns those of player 2 (the <em>column player</em>). Each cell holds a pair: the row player's payoff first, the column player's second. The order is a convention, and it is worth saying out loud every time you read a matrix, because reversing it silently reverses your conclusions.</p>
+<p>Here is the most famous game in the subject, the <strong>Prisoner's Dilemma</strong>. Two arrested accomplices are questioned separately. Each may stay silent (Cooperate with the other prisoner) or testify (Defect). Payoffs are years of freedom gained, so bigger is better.</p>
+<figure class="viz"><div class="viz-title">Prisoner's Dilemma</div><div style="text-align:center;overflow-x:auto;"><table class="payoff"><thead><tr><th class="corner">Player 1 \ Player 2</th><th>Cooperate</th><th>Defect</th></tr></thead><tbody><tr><th>Cooperate</th><td>3, 3</td><td>0, 5</td></tr><tr><th>Defect</th><td>5, 0</td><td>1, 1</td></tr></tbody></table></div><p class="viz-caption">Cell entries are (payoff to player 1, payoff to player 2).</p></figure>
+<p>Read the cell (Defect, Cooperate) = (5, 0): player 1 defected, player 2 cooperated, so player 1 gets 5 and player 2 gets 0. Notice already the paradox that gave the game its name. Whatever player 2 does, player 1 earns more by defecting (5 &gt; 3 if 2 cooperates; 1 &gt; 0 if 2 defects). The same is true for player 2. So both defect and both get 1 - even though both would have preferred the 3, 3 they could have had. Individual rationality and collective rationality come apart. We will make this argument precise in Chapter 2.</p>
+
+<h2>4. Best responses</h2>
+<p>The central computational move in all of game theory is: <em>fix what everybody else does, then ask what is best for me</em>. Write \(s_{-i}\) for the strategies of everyone except \(i\). Player \(i\)'s strategy \(s_i^{*}\) is a <strong>best response</strong> to \(s_{-i}\) if</p>
+<div class="box def"><div class="box-title">Definition - best response</div><div class="eq">\[ u_i(s_i^{*},\, s_{-i}) \;\ge\; u_i(s_i,\, s_{-i}) \qquad \text{for every } s_i \in S_i. \]</div></div>
+<p>A practical trick for 2-player matrices: go column by column and underline the row player's best payoff in that column; then go row by row and underline the column player's best payoff in that row. Cells where <em>both</em> numbers are underlined are the cells we will call Nash equilibria in Chapter 3. Try it on the matrix above - only (Defect, Defect) survives.</p>
+
+<h2>5. A small gallery of games</h2>
+<p>Four two-by-two games appear constantly. Learning to recognise them is like learning to recognise chord shapes.</p>
+<figure class="viz"><div class="viz-title">Stag Hunt - a coordination game with risk</div><div style="text-align:center;overflow-x:auto;"><table class="payoff"><thead><tr><th class="corner">Hunter 1 \ Hunter 2</th><th>Stag</th><th>Hare</th></tr></thead><tbody><tr><th>Stag</th><td>4, 4</td><td>0, 3</td></tr><tr><th>Hare</th><td>3, 0</td><td>3, 3</td></tr></tbody></table></div><p class="viz-caption">Hunting stag together is best, but a lone stag hunter goes hungry. Trust versus safety.</p></figure>
+<figure class="viz"><div class="viz-title">Chicken (Hawk-Dove)</div><div style="text-align:center;overflow-x:auto;"><table class="payoff"><thead><tr><th class="corner">Driver 1 \ Driver 2</th><th>Swerve</th><th>Straight</th></tr></thead><tbody><tr><th>Swerve</th><td>0, 0</td><td>-1, 1</td></tr><tr><th>Straight</th><td>1, -1</td><td>-10, -10</td></tr></tbody></table></div><p class="viz-caption">Each wants the other to yield; mutual aggression is catastrophic.</p></figure>
+<figure class="viz"><div class="viz-title">Matching Pennies - pure conflict</div><div style="text-align:center;overflow-x:auto;"><table class="payoff"><thead><tr><th class="corner">Player 1 \ Player 2</th><th>Heads</th><th>Tails</th></tr></thead><tbody><tr><th>Heads</th><td>1, -1</td><td>-1, 1</td></tr><tr><th>Tails</th><td>-1, 1</td><td>1, -1</td></tr></tbody></table></div><p class="viz-caption">Payoffs sum to zero in every cell. Player 1 wants to match, player 2 wants to mismatch.</p></figure>
+<p>Matching Pennies has no cell where both players are simultaneously happy - whichever cell you point at, one player wants to move. That is not a defect in the game; it is a signal that the players should <em>randomise</em>. Chapter 4 develops that idea.</p>
+
+<h2>6. What we are assuming</h2>
+<p>Standard game theory rests on assumptions worth stating plainly, because the interesting modern work consists largely of relaxing them.</p>
+<figure class="viz"><table><thead><tr><th>Assumption</th><th>What it says</th><th>Where it is questioned</th></tr></thead><tbody><tr><td>Rationality</td><td>Each player maximises their own expected payoff.</td><td>Behavioural game theory: people show loss aversion, fairness concerns, limited computation.</td></tr><tr><td>Common knowledge</td><td>Everyone knows the game, everyone knows that everyone knows, and so on infinitely.</td><td>Chapter 8: games of incomplete information relax the 'everyone knows the payoffs' part.</td></tr><tr><td>Well-defined payoffs</td><td>Preferences over outcomes can be represented by numbers you may take expectations of.</td><td>Requires the von Neumann-Morgenstern axioms over lotteries.</td></tr></tbody></table></figure>
+<div class="box warn"><div class="box-title">Careful</div><p><strong>A frequent misreading.</strong> Game theory does not claim people are selfish. It claims they act to maximise <em>their own payoff function</em>, and that function may assign high value to a friend's wellbeing. Selfishness is an assumption about the content of payoffs; rationality is an assumption about their use.</p></div>
+
+<h2>7. Two dimensions for classifying games</h2>
+<p>Two questions organise the rest of the course. <strong>Timing:</strong> do players move at the same time (simultaneous, or <em>strategic form</em>, Chapters 1-5) or one after another while observing history (sequential, or <em>extensive form</em>, Chapter 6)? <strong>Interests:</strong> is one player's gain exactly the other's loss (zero-sum, Chapter 5) or is there room for shared gains (non-zero-sum, everywhere else)? Independently, a game is <em>cooperative</em> if binding agreements are possible (Chapter 10) and <em>non-cooperative</em> otherwise - which is the default for everything before that.</p>
+
+<h2>Glossary</h2>
+<table class="glossary"><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Player</td><td>Any entity that chooses a strategy and has payoffs over outcomes.</td></tr><tr><td>Strategy</td><td>A complete plan of action for a player, specifying a choice at every point where the player may have to move.</td></tr><tr><td>Strategy profile</td><td>One strategy for each player: \(s = (s_1, \dots, s_n)\). It determines the outcome.</td></tr><tr><td>Payoff (utility)</td><td>A number measuring how much a player values an outcome; already includes all the player's concerns.</td></tr><tr><td>Normal (strategic) form</td><td>The description of a game as the triple (players, strategy sets, payoff functions).</td></tr><tr><td>Best response</td><td>A strategy \(s_i^{*}\) maximising \(u_i(\cdot,\, s_{-i})\) for fixed strategies of the others.</td></tr><tr><td>Zero-sum game</td><td>A game in which payoffs in every cell sum to a constant (usually zero): pure conflict.</td></tr><tr><td>Common knowledge</td><td>A fact everyone knows, everyone knows everyone knows, ad infinitum.</td></tr></tbody></table>
+<div class="keypoints"><h3>Check your understanding</h3><ol><li>In the Prisoner's Dilemma above, what does player 2 get in the cell (Cooperate, Defect)? <span style='color:var(--color-muted);'>(Answer: 5 - the second number in that cell)</span></li><li>Is (Stag, Hare) in the Stag Hunt a pair of mutual best responses? <span style='color:var(--color-muted);'>(Answer: No: hunter 1 gets 0 and would rather play Hare for 3)</span></li><li>Why can Matching Pennies not have a cell where neither player wants to deviate? <span style='color:var(--color-muted);'>(Answer: It is zero-sum with no matching interest; one player always wants to switch)</span></li><li>A player prefers giving money to charity over keeping it. Does that break the rationality assumption? <span style='color:var(--color-muted);'>(Answer: No - it is a statement about their payoff function)</span></li></ol></div>
+<div class="box tip"><div class="box-title">Practice</div><p>The chapter quiz checks that you can read a matrix in the right order, identify best responses cell by cell, name the four classic games from their payoff structure, and separate the rationality assumption from the selfishness assumption.</p></div>
+</main>
+<nav class="lesson-nav"><span></span><a href="../02-dominance/page.html">Chapter 02 &middot; Dominance and Iterated Elimination &rarr;</a></nav>
+<footer class="site-footer"><strong>Game Theory &mdash; complete handbook</strong> &middot; Strategy, equilibrium, information and design<span class="footer-meta">Edition 2025-2026</span></footer>
+</body></html>

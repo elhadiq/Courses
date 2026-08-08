@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 9 &mdash; Auctions and Mechanism Design</title>
+<meta name="description" content="Design the rules so that self-interested behaviour produces the outcome you want.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; justify-content: space-between; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz { margin: 26px 0; }
+.viz-title { font-weight: 700; color: var(--primary); font-size: 0.98rem; margin-bottom: 10px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 12px 0 0; border-top: 1px solid var(--color-rule); padding-top: 10px; }
+.viz svg { max-width: 100%; height: auto; }
+.payoff { display: inline-block !important; border-collapse: collapse; margin: 0 auto; }
+.payoff th, .payoff td { border: 1px solid var(--color-rule); padding: 9px 18px; text-align: center; }
+.payoff thead th { background: var(--primary-soft); color: var(--color-text); }
+.payoff th.corner { background: var(--primary); color: #fff; font-size: 0.82rem; font-weight: 600; }
+.payoff tbody th { background: var(--primary-soft); text-align: left; }
+.payoff td { font-family: var(--font-mono); font-size: 0.98rem; }
+.glossary th:first-child, .glossary td:first-child { white-space: nowrap; font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Game Theory</a> &middot; Chapter 09</div><span class="course-code">Part IV &middot; Design and cooperation</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Part IV &middot; Design and cooperation &middot; Chapter 9</div>
+<h1>Chapter 9 &mdash; Auctions and Mechanism Design</h1>
+<div class="lesson-sub">Design the rules so that self-interested behaviour produces the outcome you want.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">What you will be able to do</div><ul><li>Describe the four standard auction formats and their strategic equivalences.</li><li>Prove that truthful bidding is weakly dominant in a second-price auction.</li><li>Compute equilibrium bids in a first-price auction with uniform values.</li><li>State the revenue equivalence theorem and the assumptions that make it fail.</li><li>Explain the winner's curse and the revelation principle, and describe what VCG does.</li></ul></div>
+
+<h2>1. Auctions as Bayesian games</h2>
+<p>An auction is a Bayesian game in the sense of Chapter 8: each bidder has a private type - their valuation of the object - and chooses a bid as a function of it. Auctions are the flagship application of game theory because the rules are explicit, the stakes are real, and the theory has repeatedly been used to design working institutions, from spectrum auctions to online advertising.</p>
+<figure class="viz"><table><thead><tr><th>Format</th><th>Rules</th><th>Strategic character</th></tr></thead><tbody><tr><td>English (ascending)</td><td>Price rises until one bidder remains.</td><td>Stay in until the price reaches your value; strategically equivalent to the second-price auction under private values.</td></tr><tr><td>Dutch (descending)</td><td>Price falls until someone accepts.</td><td>Strategically equivalent to the first-price sealed-bid auction.</td></tr><tr><td>First-price sealed bid</td><td>Highest bid wins and pays its own bid.</td><td>Bidders shade below their value; the shading depends on beliefs about rivals.</td></tr><tr><td>Second-price sealed bid (Vickrey)</td><td>Highest bid wins but pays the second-highest bid.</td><td>Bidding your true value is a weakly dominant strategy.</td></tr></tbody></table></figure>
+
+<h2>2. Why truth-telling is dominant in a second-price auction</h2>
+<p>Let your value be \(v\) and let the highest of the other bids be \(m = \max_{j \ne i} b_j\). Your payoff is</p>
+<div class="eq">\[ u_i(b_i) \;=\; v - m \;\;\text{ if } b_i \gt  m, \qquad u_i(b_i) \;=\; 0 \;\;\text{ if } b_i \lt  m. \]</div>
+<p>Crucially, \(b_i\) affects <em>whether</em> you win but never <em>what you pay</em>. Compare bidding \(v\) with any alternative \(b\).</p>
+<div class="box prop"><div class="box-title">Vickrey's argument (1961)</div><p style='margin:0 0 6px;'><strong>If \(b \gt  v\) (overbid).</strong> The outcome changes only when \(v \lt  m \lt  b\). Then bidding \(v\) loses (payoff \(0\)) but bidding \(b\) wins and pays \(v - m \lt  0\). Overbidding can only hurt.</p><p style='margin:0;'><strong>If \(b \lt  v\) (underbid).</strong> The outcome changes only when \(b \lt  m \lt  v\). Then bidding \(v\) wins with profit \(v - m \gt  0\) but bidding \(b\) loses and earns \(0\). Underbidding can only hurt.</p><p style='margin:6px 0 0;'>In every other case the outcome is identical, so \(b_i = v\) weakly dominates every alternative - no beliefs about rivals are needed.</p></div>
+<p>This is a remarkable property. In a first-price auction you must forecast your rivals to bid well; in a second-price auction you need only know yourself. Institutions with this feature are called <strong>strategy-proof</strong> or <em>dominant-strategy incentive compatible</em>, and designing them is the core ambition of mechanism design.</p>
+
+<h2>3. Bidding in a first-price auction</h2>
+<p>Here you do need beliefs. Bidding your value guarantees a payoff of zero, so you shade downwards - but shading too much loses auctions you would have wanted to win. With n risk-neutral bidders whose values are independent draws from the uniform distribution on [0, 1], the symmetric equilibrium bid is</p>
+<div class="eq">\[ b(v) \;=\; \frac{n - 1}{n}\, v. \]</div>
+<p>With 2 bidders you bid half your value; with 4 bidders you bid three quarters; with 10 bidders, 90%. Competition erodes the rent from shading. A bidder with value 0.8 facing 3 rivals bids 0.6.</p>
+
+<h2>4. Revenue equivalence</h2>
+<div class="box thm"><div class="box-title">Theorem &mdash; revenue equivalence (Vickrey 1961; Myerson 1981; Riley and Samuelson 1981)</div><p>With risk-neutral bidders, independent private values drawn from the same continuous distribution, and any mechanism that (i) always awards the object to the highest-value bidder and (ii) gives a bidder with the lowest possible value zero expected surplus, the seller's expected revenue is the same.</p></div>
+<p>The four standard formats all satisfy the conditions, so all four raise the same expected revenue - namely the expected second-highest value. With n bidders and values uniform on \([0,1]\), that is \(\dfrac{n-1}{n+1}\): with 4 bidders, \(0.6\). In the first-price auction the winner pays their own shaded bid; in the second-price auction they pay a rival's unshaded bid; on average the two coincide exactly.</p>
+<div class="box warn"><div class="box-title">Careful</div><p>The theorem is a benchmark, not a description. Revenue equivalence fails with risk-averse bidders (first-price raises more), with asymmetric bidders, with budget constraints, with collusion (ascending auctions are easier to collude in, since bidders observe each other), and with interdependent values.</p></div>
+
+<h2>5. The winner's curse</h2>
+<p>Under <strong>common values</strong> - an oil tract, a company, a construction contract - the object is worth roughly the same to everyone, but bidders hold noisy private estimates. The winner is, by construction, the bidder with the most optimistic estimate. Winning is therefore <em>bad news</em> about the object's true value: conditional on having won, the estimate that led you there was probably too high.</p>
+<p>The rational response is to shade your bid by the expected degree of over-optimism, and to shade more as the number of bidders grows, since the highest of many estimates is further from the truth. Bidders who ignore this systematically overpay; the effect has been documented in offshore oil leases and in corporate acquisitions.</p>
+
+<h2>6. Mechanism design: designing the game backwards</h2>
+<p>Mechanism design inverts the usual question. Instead of taking rules as given and predicting behaviour, it fixes a desired outcome and asks which rules produce it in equilibrium - 'reverse game theory' in Hurwicz's phrase. Two results frame the field.</p>
+<div class="box thm"><div class="box-title">Theorem &mdash; the revelation principle</div><p>Any outcome achievable by some mechanism in equilibrium is achievable by a direct mechanism in which participants simply report their types truthfully. The designer can therefore search only over truthful direct mechanisms - an enormous simplification.</p></div>
+<div class="box thm"><div class="box-title">Theorem &mdash; Gibbard-Satterthwaite impossibility</div><p>With three or more possible outcomes, any voting rule that is deterministic, onto and strategy-proof is a dictatorship. Outside restricted settings, strategy-proofness comes at a heavy price.</p></div>
+<p>The <strong>Vickrey-Clarke-Groves (VCG)</strong> mechanism escapes the negative result by using money. It chooses the outcome maximising total reported value, and charges each participant the <em>externality</em> they impose - the loss their presence causes to everyone else. Truth-telling is then dominant, and the second-price auction is the single-item special case. VCG is theoretically elegant but has practical weaknesses: revenue can be very low, it is vulnerable to collusion and to false-name bidding, and the underlying allocation problem is often computationally hard.</p>
+<p>The subject's applied record is substantial: the 1994 US spectrum auctions designed by Milgrom, Wilson and McAfee; the deferred-acceptance algorithms behind school choice and kidney exchange (Roth and Shapley, Nobel 2012); and the generalised second-price auctions that price search advertising. Milgrom and Wilson received the 2020 Nobel prize for auction theory and design.</p>
+
+<h2>Glossary</h2>
+<table class="glossary"><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Private values</td><td>Each bidder knows their own valuation and it does not depend on others' information.</td></tr><tr><td>Common values</td><td>The object is worth the same to all bidders, who hold noisy private estimates of that value.</td></tr><tr><td>Second-price (Vickrey) auction</td><td>The highest bidder wins and pays the second-highest bid; truth-telling is weakly dominant.</td></tr><tr><td>Bid shading</td><td>Bidding below one's valuation, rational in first-price and Dutch auctions.</td></tr><tr><td>Revenue equivalence</td><td>Under stated conditions all standard auctions yield the same expected revenue to the seller.</td></tr><tr><td>Winner's curse</td><td>In common-value auctions, winning implies your estimate was probably too optimistic.</td></tr><tr><td>Strategy-proof</td><td>Truthful reporting is a dominant strategy for every participant.</td></tr><tr><td>Revelation principle</td><td>Any equilibrium outcome can be replicated by a truthful direct mechanism.</td></tr><tr><td>VCG mechanism</td><td>A mechanism that maximises total reported value and charges each agent the externality they impose.</td></tr></tbody></table>
+<div class="keypoints"><h3>Check your understanding</h3><ol><li>Why does your bid not affect your payment in a second-price auction? <span style='color:var(--color-muted);'>(Answer: You pay the highest rival bid, which you do not control)</span></li><li>What does a bidder with value \(0.8\) bid against 3 rivals with uniform values? <span style='color:var(--color-muted);'>(Answer: \(\tfrac{3}{4}(0.8) = 0.6\))</span></li><li>Which auction format is strategically equivalent to the Dutch auction? <span style='color:var(--color-muted);'>(Answer: First-price sealed bid)</span></li><li>Why should you shade more as the number of bidders rises in a common-value auction? <span style='color:var(--color-muted);'>(Answer: The highest of more estimates is more over-optimistic)</span></li></ol></div>
+<div class="box tip"><div class="box-title">Practice</div><p>The chapter quiz asks you to reason through the dominance argument for truthful bidding, compute first-price bids and expected revenue, and identify when revenue equivalence breaks down.</p></div>
+</main>
+<nav class="lesson-nav"><a href="../08-bayesian-games/page.html">&larr; Chapter 08 &middot; Bayesian Games and Incomplete Information</a><a href="../10-bargaining-cooperative/page.html">Chapter 10 &middot; Bargaining, Coalitions and the Shapley Value &rarr;</a></nav>
+<footer class="site-footer"><strong>Game Theory &mdash; complete handbook</strong> &middot; Strategy, equilibrium, information and design<span class="footer-meta">Edition 2025-2026</span></footer>
+</body></html>

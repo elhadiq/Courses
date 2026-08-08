@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 7 &mdash; Repeated Games, Reciprocity and the Folk Theorem</title>
+<meta name="description" content="How self-interested players sustain cooperation when they expect to meet again.">
+<link href="../../assets/style.css" rel="stylesheet">
+<script src="../../assets/theme.js"></script>
+<script>window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<meta name="theme-color" content="#026573">
+<style>
+.lesson-content { max-width: var(--max-w); padding-left: 32px; padding-right: 32px; }
+.lesson-hero .container { max-width: var(--max-w); }
+.lesson-nav { max-width: var(--max-w); margin: 0 auto 40px; padding: 0 32px;
+              display: flex; gap: 18px; flex-wrap: wrap; justify-content: space-between; }
+.lesson-nav a { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.lesson-nav a:hover { text-decoration: underline; }
+.lesson-content table { display: block; overflow-x: auto; }
+@media (max-width: 760px) { .lesson-content { padding-left: 16px; padding-right: 16px; } }
+.eq { margin: 1.1em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.eq mjx-container { margin: 0 !important; }
+.viz { margin: 26px 0; }
+.viz-title { font-weight: 700; color: var(--primary); font-size: 0.98rem; margin-bottom: 10px; }
+.viz-caption { color: var(--color-text); font-size: 0.92rem; line-height: 1.65;
+               margin: 12px 0 0; border-top: 1px solid var(--color-rule); padding-top: 10px; }
+.viz svg { max-width: 100%; height: auto; }
+.payoff { display: inline-block !important; border-collapse: collapse; margin: 0 auto; }
+.payoff th, .payoff td { border: 1px solid var(--color-rule); padding: 9px 18px; text-align: center; }
+.payoff thead th { background: var(--primary-soft); color: var(--color-text); }
+.payoff th.corner { background: var(--primary); color: #fff; font-size: 0.82rem; font-weight: 600; }
+.payoff tbody th { background: var(--primary-soft); text-align: left; }
+.payoff td { font-family: var(--font-mono); font-size: 0.98rem; }
+.glossary th:first-child, .glossary td:first-child { white-space: nowrap; font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="breadcrumb"><a href="../../index.html">Game Theory</a> &middot; Chapter 07</div><span class="course-code">Part III &middot; Time and information</span></div></header>
+<section class="lesson-hero"><div class="container">
+<div class="lesson-label">Part III &middot; Time and information &middot; Chapter 7</div>
+<h1>Chapter 7 &mdash; Repeated Games, Reciprocity and the Folk Theorem</h1>
+<div class="lesson-sub">How self-interested players sustain cooperation when they expect to meet again.</div>
+</div></section>
+<main class="lesson-content">
+
+<div class="box method"><div class="box-title">What you will be able to do</div><ul><li>Explain why finite repetition of a game with a unique equilibrium unravels by backward induction.</li><li>Compute the present value of an infinite payoff stream with discount factor delta.</li><li>Derive the critical discount factor that makes grim trigger an equilibrium.</li><li>Describe tit-for-tat and the four properties Axelrod credited for its success.</li><li>State the folk theorem and explain why its generality is a mixed blessing.</li></ul></div>
+
+<h2>1. The shadow of the future</h2>
+<p>The Prisoner's Dilemma predicts that self-interested players never cooperate. Yet firms sustain tacit collusion, neighbours maintain quiet streets, and traders honour deals without contracts. The missing ingredient is <strong>repetition</strong>: if we meet again, today's defection can be punished tomorrow. Robert Axelrod called the resulting discipline the shadow of the future.</p>
+
+<h2>2. Finite repetition: the unravelling problem</h2>
+<p>Suppose the Prisoner's Dilemma is played exactly 10 times, with both players knowing this. Apply backward induction. In round 10 there is no future, so both defect. Since round 10's outcome is fixed regardless of what happens in round 9, round 9 is effectively the last round too - so both defect there. The argument marches back to round 1.</p>
+<div class="box thm"><div class="box-title">Result &mdash; finite repetition unravels</div><p>If a stage game has a unique Nash equilibrium and is repeated a known finite number of times, the unique subgame perfect equilibrium is that stage equilibrium in every round.</p></div>
+<p>The prediction is famously at odds with behaviour: in finitely repeated experiments people cooperate until the last few rounds. Kreps, Milgrom, Roberts and Wilson (1982) showed that a small probability that the opponent is a committed cooperator - a Chapter 8 idea - is enough to restore long cooperation in a finite game. What breaks cooperation is not finiteness as such; it is the certainty of a known last round.</p>
+
+<h2>3. Infinite (or indefinite) repetition and discounting</h2>
+<p>Suppose instead that after each round the game continues with probability \(\delta\), or equivalently that future payoffs are discounted by \(\delta \in (0, 1)\) per period. A constant payoff \(u\) every round is worth</p>
+<div class="eq">\[ u + \delta u + \delta^{2} u + \dots \;=\; \sum_{t=0}^{\infty} \delta^{t} u \;=\; \frac{u}{1 - \delta}. \]</div>
+<p>Now there is never a known last round, so backward induction has nothing to bite on, and strategies that condition on history become viable.</p>
+
+<h2>4. Grim trigger, with the algebra</h2>
+<p><strong>Grim trigger:</strong> cooperate in round 1; keep cooperating as long as nobody has ever defected; if anyone ever defects, defect in every subsequent round forever. Use the Prisoner's Dilemma payoffs \(T = 5\) (defect against a cooperator), \(R = 3\) (mutual cooperation), \(P = 1\) (mutual defection), \(S = 0\) (cooperate against a defector).</p>
+<p>If a player follows the strategy, they earn \(R\) every period; if instead they defect once, they get \(T\) today and then \(P\) forever. Cooperation is sustainable when</p>
+<div class="box prop"><div class="box-title">The critical discount factor</div><div class="eq">\[ \underbrace{\frac{R}{1 - \delta}}_{\text{cooperate forever}} \;\ge\; \underbrace{T + \frac{\delta P}{1 - \delta}}_{\text{defect once, then punished}} \]</div><div class="eq">\[ \Longleftrightarrow\; R \ge T(1-\delta) + \delta P \;\Longleftrightarrow\; \delta \;\ge\; \delta^{*} = \frac{T - R}{T - P}. \]</div><p style='margin:6px 0 0;'>With \(T=5, R=3, P=1\) this gives \(\delta^{*} = \dfrac{5-3}{5-1} = \dfrac{1}{2}\).</p></div>
+<p>Read this as a statement about patience or about the frequency of interaction: cooperation survives if the future matters at least half as much as the present. Raise the temptation \(T\) and the threshold \(\delta^{*}\) rises; make punishment harsher (lower \(P\)) and it falls. Every prescription for sustaining cooperation - meet often, make relationships long, publicise cheating, keep the gain from cheating small - is a way of moving one of these terms.</p>
+
+<h2>5. Tit-for-tat and Axelrod's tournaments</h2>
+<p><strong>Tit-for-tat</strong> cooperates in round 1 and then copies the opponent's previous move. In Axelrod's computer tournaments (1980) it won against far more elaborate programs. Axelrod attributed its success to four properties: it is <em>nice</em> (never defects first), <em>retaliatory</em> (punishes immediately), <em>forgiving</em> (returns to cooperation as soon as the opponent does), and <em>clear</em> (easy for an opponent to understand and therefore to reciprocate).</p>
+<figure class="viz"><table><thead><tr><th>Strategy</th><th>Behaviour</th><th>Weakness</th></tr></thead><tbody><tr><td>Always Defect</td><td>Defect every round</td><td>Cannot exploit a cooperative environment</td></tr><tr><td>Always Cooperate</td><td>Cooperate every round</td><td>Exploited by any defector</td></tr><tr><td>Grim trigger</td><td>Cooperate until any defection, then defect forever</td><td>Unforgiving: a single mistake destroys the relationship permanently</td></tr><tr><td>Tit-for-tat</td><td>Copy the opponent's last move</td><td>With noise, a mistaken defection triggers alternating retaliation</td></tr><tr><td>Tit-for-two-tats</td><td>Defect only after two consecutive defections</td><td>More robust to noise; slightly more exploitable</td></tr></tbody></table></figure>
+<div class="box warn"><div class="box-title">Careful</div><p>Tit-for-tat is <em>not</em> a dominant strategy and it does not win in all environments. Against Always Defect it loses the first round and merely ties thereafter. Its strength is in a population of reciprocators - which is why evolutionary and population framings matter for interpreting the result.</p></div>
+
+<h2>6. The folk theorem</h2>
+<p>Grim trigger is one of many strategies that work. The general statement is startling in its generality.</p>
+<div class="box thm"><div class="box-title">Theorem &mdash; the folk theorem (informal)</div><p>In an infinitely repeated game with sufficiently patient players, <em>every</em> feasible payoff vector that gives each player strictly more than their minmax payoff can be sustained as a subgame perfect equilibrium.</p></div>
+<p>Feasible means achievable as an average of stage-game outcomes; the minmax payoff is the worst the others can hold a player to. In the repeated Prisoner's Dilemma the minmax is 1, so any pair of average payoffs above (1, 1) inside the feasible set - including (3, 3), \((4, 2)\) and \((2.5, 3.5)\) - is an equilibrium for \(\delta\) near 1.</p>
+<p>The folk theorem is both liberating and deflating. Liberating, because it explains how cooperation, norms and reputation can be self-enforcing without any external enforcer. Deflating, because a theory that permits almost every outcome predicts almost nothing. Applied work therefore adds structure - renegotiation-proofness, bounded memory, imperfect monitoring, or evolutionary selection - to cut the equilibrium set back down.</p>
+
+<h2>Glossary</h2>
+<table class="glossary"><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td>Stage game</td><td>The one-shot game that is repeated in each period.</td></tr><tr><td>Discount factor</td><td>\(\delta \in (0,1)\): the weight on next period's payoff, or the probability the game continues.</td></tr><tr><td>Grim trigger</td><td>Cooperate until any defection occurs, then defect forever.</td></tr><tr><td>Tit-for-tat</td><td>Cooperate first, then copy the opponent's previous action.</td></tr><tr><td>Minmax payoff</td><td>The lowest payoff the other players can force on a player who best-responds.</td></tr><tr><td>Folk theorem</td><td>For \(\delta\) close enough to 1, any feasible payoff vector strictly above the minmax is a subgame perfect equilibrium of the repeated game.</td></tr><tr><td>Unravelling</td><td>The backward-induction collapse of cooperation in a game with a known final round.</td></tr></tbody></table>
+<div class="keypoints"><h3>Check your understanding</h3><ol><li>Why does cooperation collapse in a Prisoner's Dilemma repeated exactly 10 times? <span style='color:var(--color-muted);'>(Answer: Round 10 is a one-shot game, so defection unravels back to round 1)</span></li><li>What is the present value of 4 per period with \(\delta = 0.8\)? <span style='color:var(--color-muted);'>(Answer: \(\tfrac{4}{1 - 0.8} = 20\))</span></li><li>With \(T=5, R=3, P=1\), what discount factor sustains grim trigger? <span style='color:var(--color-muted);'>(Answer: \(\delta \ge \tfrac{1}{2}\))</span></li><li>Which of Axelrod's four properties does grim trigger lack? <span style='color:var(--color-muted);'>(Answer: Forgiveness)</span></li></ol></div>
+<div class="box tip"><div class="box-title">Practice</div><p>The chapter quiz asks you to compute present values and critical discount factors, reason about the unravelling argument, and state the folk theorem's condition precisely.</p></div>
+</main>
+<nav class="lesson-nav"><a href="../06-extensive-form/page.html">&larr; Chapter 06 &middot; Extensive-Form Games, Backward Induction and Subgame Perfection</a><a href="../08-bayesian-games/page.html">Chapter 08 &middot; Bayesian Games and Incomplete Information &rarr;</a></nav>
+<footer class="site-footer"><strong>Game Theory &mdash; complete handbook</strong> &middot; Strategy, equilibrium, information and design<span class="footer-meta">Edition 2025-2026</span></footer>
+</body></html>
