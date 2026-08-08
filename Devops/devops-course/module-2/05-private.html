@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2.5 Private ranges, NAT and why your laptop is invisible — Module 2 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-2.html">Module 2 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 02</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">2.1 Why this module comes before Docker</a>
+<a href="02-model.html">2.2 The TCP/IP model: four layers, one journey</a>
+<a href="03-ip.html">2.3 IP addressing</a>
+<a href="04-subnet.html">2.4 Subnets and CIDR</a>
+<a href="05-private.html" class="cur">2.5 Private ranges, NAT and why your laptop is invisible</a>
+<a href="06-tcp.html">2.6 TCP vs UDP</a>
+<a href="07-ports.html">2.7 Ports and sockets</a>
+<a href="08-dns.html">2.8 DNS: how a name becomes an address</a>
+<a href="09-http.html">2.9 HTTP: the request you will read a thousand times</a>
+<a href="10-https.html">2.10 HTTPS and TLS</a>
+<a href="11-fw.html">2.11 Firewalls and the ports that matter</a>
+<a href="12-tools.html">2.12 The troubleshooting toolkit</a>
+<a class="grp">Practice</a>
+<a href="13-lab.html">Lab: trace a request end to end</a>
+<a href="14-ex.html">Exercises</a>
+<a href="15-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-2.html">Networking Basics</a>
+</div>
+<div class="secmeta">Module 02 · Section 5 of 15</div>
+
+<h2 id="private">2.5 Private ranges, NAT and why your laptop is invisible</h2>
+<p>Three IPv4 ranges are reserved for private networks. They are not routable on the internet, so
+everyone reuses them:</p>
+<table>
+<tr><th>Range</th><th>CIDR</th><th>Where you meet it</th></tr>
+<tr><td>10.0.0.0 – 10.255.255.255</td><td><code>10.0.0.0/8</code></td><td>Cloud VPCs, Kubernetes pod networks</td></tr>
+<tr><td>172.16.0.0 – 172.31.255.255</td><td><code>172.16.0.0/12</code></td><td><b>Docker's default bridge</b> — usually <code>172.17.0.0/16</code></td></tr>
+<tr><td>192.168.0.0 – 192.168.255.255</td><td><code>192.168.0.0/16</code></td><td>Home and office LANs</td></tr>
+<tr><td>127.0.0.0 – 127.255.255.255</td><td><code>127.0.0.0/8</code></td><td>Loopback — never leaves the machine</td></tr>
+</table>
+
+<p><b>NAT</b> (Network Address Translation) is what lets many private addresses share one public one.
+Your router rewrites the source address and port of outbound packets, remembers the mapping, and
+reverses it on the way back.</p>
+
+
+<figure id="fig-nat">
+<svg viewBox="0 0 720 208" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <defs><marker id="an1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent2)"/></marker></defs>
+  <g stroke="var(--line)" fill="none" stroke-width="1.2"><rect x="8" y="30" width="210" height="140" rx="8"/></g>
+  <text x="18" y="48" fill="var(--muted)" font-size="10">private LAN · 192.168.1.0/24</text>
+  <g stroke="var(--accent)" fill="none" stroke-width="1.3">
+    <rect x="24" y="58" width="120" height="30" rx="5"/>
+    <rect x="24" y="98" width="120" height="30" rx="5"/>
+    <rect x="24" y="136" width="120" height="26" rx="5"/>
+  </g>
+  <g fill="var(--txt)" font-size="10">
+    <text x="34" y="77">192.168.1.34</text><text x="34" y="117">192.168.1.35</text><text x="34" y="153">192.168.1.36</text>
+  </g>
+  <g stroke="var(--accent2)" fill="none" stroke-width="1.5"><rect x="270" y="78" width="120" height="52" rx="8"/></g>
+  <text x="330" y="100" fill="var(--accent2)" text-anchor="middle" font-size="11">router / NAT</text>
+  <text x="330" y="116" fill="var(--muted)" text-anchor="middle" font-size="9">public 203.0.113.7</text>
+  <g stroke="var(--accent2)" stroke-width="1.2" marker-end="url(#an1)">
+    <line x1="146" y1="73" x2="266" y2="96"/><line x1="146" y1="113" x2="266" y2="106"/>
+  </g>
+  <g stroke="var(--accent2)" stroke-width="1.2" marker-end="url(#an1)"><line x1="392" y1="104" x2="500" y2="104"/></g>
+  <g stroke="var(--line)" fill="none" stroke-width="1.3"><rect x="506" y="78" width="200" height="52" rx="8"/></g>
+  <text x="606" y="108" fill="var(--txt)" text-anchor="middle" font-size="11">the internet</text>
+  <g fill="var(--muted)" font-size="9">
+    <text x="238" y="150">translation table</text>
+    <text x="238" y="163">192.168.1.34:51234 → 203.0.113.7:40001</text>
+    <text x="238" y="172">192.168.1.35:49900 → 203.0.113.7:40002</text>
+  </g>
+  <text x="8" y="186" fill="var(--warn)" font-size="10">Outbound creates the mapping, so replies find their way home.</text>
+  <text x="8" y="199" fill="var(--warn)" font-size="10">Inbound has none — hence port forwarding, and hence -p 8080:80.</text>
+</svg>
+<figcaption>NAT multiplexes many private addresses onto one public address.</figcaption>
+</figure>
+
+<div class="box why">
+<b>Why NAT explains a whole class of problems</b>
+NAT is directional. Outbound connections work because the router created a mapping when you initiated
+them. Inbound connections have no mapping, so they fail — which is why you can browse the web from
+your laptop but nobody can browse <i>to</i> your laptop without explicit port forwarding.
+<br><br>
+Docker's <code>-p 8080:80</code> is exactly this: a port-forwarding rule from the host into the
+container's private network. Kubernetes <code>NodePort</code> is the same idea again. Once you see NAT,
+you see it everywhere in this course.
+</div>
+
+<div class="pager">
+  <a href="04-subnet.html"><span class="sub">← Previous</span>2.4 Subnets and CIDR</a>
+  <a href="06-tcp.html" class="nx"><span class="sub">Next →</span>2.6 TCP vs UDP</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 2 · 2.5 Private ranges, NAT and why your laptop is invisible</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

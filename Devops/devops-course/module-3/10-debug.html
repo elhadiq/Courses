@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3.10 Debugging a container that won't start — Module 3 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-3.html">Module 3 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 03</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">3.1 The problem containers solve</a>
+<a href="02-what.html">3.2 What a container actually is</a>
+<a href="03-images.html">3.3 Images, layers and the cache</a>
+<a href="04-cli.html">3.4 The commands you will use daily</a>
+<a href="05-app.html">3.5 The application</a>
+<a href="06-dockerfile.html">3.6 Writing a Dockerfile — three revisions</a>
+<a href="07-data.html">3.7 Data: volumes and why containers are ephemeral</a>
+<a href="08-net.html">3.8 Networking between containers</a>
+<a href="09-compose.html">3.9 Docker Compose</a>
+<a href="10-debug.html" class="cur">3.10 Debugging a container that won't start</a>
+<a href="11-registry.html">3.11 Registries and tagging</a>
+<a class="grp">Practice</a>
+<a href="12-lab.html">Lab: containerise urlshort end to end</a>
+<a href="13-ex.html">Exercises</a>
+<a href="14-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-3.html">Containers: Docker &amp; Compose</a>
+</div>
+<div class="secmeta">Module 03 · Section 10 of 14</div>
+
+<h2 id="debug">3.10 Debugging a container that won't start</h2>
+<p>Work down this list in order. It resolves nearly every case:</p>
+
+<table>
+<tr><th>Step</th><th>Command</th><th>What you learn</th></tr>
+<tr><td>1. Did it exit?</td><td><code>docker compose ps -a</code></td><td>Exit code. 137 = OOM-killed. 1 = your app crashed. 127 = command not found.</td></tr>
+<tr><td>2. What did it say?</td><td><code>docker compose logs api</code></td><td>The stack trace. Usually the whole answer.</td></tr>
+<tr><td>3. Is the image right?</td><td><code>docker run --rm -it urlshort sh</code></td><td>Poke around the filesystem; is your code where you think?</td></tr>
+<tr><td>4. Is the env right?</td><td><code>docker compose exec api env</code></td><td>Missing or misspelled variables.</td></tr>
+<tr><td>5. Can it reach its dependency?</td><td><code>docker compose exec api sh -c "getent hosts redis"</code></td><td>DNS/network problem vs. app problem.</td></tr>
+<tr><td>6. Is the port mapped?</td><td><code>docker compose ps</code></td><td>Host:container mapping, and whether it bound at all.</td></tr>
+</table>
+
+<div class="box">
+<b>When the container exits instantly and logs are empty</b>
+Override the entrypoint to get a shell instead of your app:
+<pre><code>docker run --rm -it --entrypoint sh urlshort:dev</code></pre>
+Then run your <code>CMD</code> by hand and read the error directly.
+</div>
+
+<div class="pager">
+  <a href="09-compose.html"><span class="sub">← Previous</span>3.9 Docker Compose</a>
+  <a href="11-registry.html" class="nx"><span class="sub">Next →</span>3.11 Registries and tagging</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 3 · 3.10 Debugging a container that won't start</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

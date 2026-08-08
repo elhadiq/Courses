@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>1.9 Branching, merging and the conflict you will hit — Module 1 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-1.html">Module 1 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 01</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">1.1 Why the terminal, still</a>
+<a href="02-fs.html">1.2 The filesystem and moving around it</a>
+<a href="03-perm.html">1.3 Permissions, users and sudo</a>
+<a href="04-pipes.html">1.4 Pipes: the idea that makes the shell powerful</a>
+<a href="05-proc.html">1.5 Processes, ports and logs</a>
+<a href="06-script.html">1.6 Writing a real shell script</a>
+<a href="07-ssh.html">1.7 SSH and keys</a>
+<a href="08-git.html">1.8 Git: the mental model</a>
+<a href="09-branch.html" class="cur">1.9 Branching, merging and the conflict you will hit</a>
+<a href="10-flow.html">1.10 A workflow a team can actually live with</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html">Lab: bootstrap the course repository</a>
+<a href="12-ex.html">Exercises</a>
+<a href="13-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-1.html">The Ground Floor: Linux, Shell &amp; Git</a>
+</div>
+<div class="secmeta">Module 01 · Section 9 of 13</div>
+
+<h2 id="branch">1.9 Branching, merging and the conflict you will hit</h2>
+<p>A branch is a movable pointer to a commit. Creating one is instant and costs nothing, which is why
+Git-based workflows lean on them so heavily.</p>
+
+<pre><code>git switch -c feat/rate-limit    <span class="c"># create and switch (modern form)</span>
+<span class="c">... edit, add, commit ...</span>
+git push -u origin feat/rate-limit
+
+<span class="c"># bring main's newest work into your branch before opening a PR</span>
+git switch main &amp;&amp; git pull
+git switch feat/rate-limit
+git merge main</code></pre>
+
+
+<figure id="fig-branch">
+<svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <g stroke="var(--line)" stroke-width="2" fill="none">
+    <path d="M40 60 H660"/>
+  </g>
+  <g stroke="var(--accent2)" stroke-width="2" fill="none">
+    <path d="M180 60 C210 60 210 130 240 130 H460 C500 130 490 62 540 60"/>
+  </g>
+  <g fill="var(--bg)" stroke="var(--accent)" stroke-width="2">
+    <circle cx="60" cy="60" r="9"/><circle cx="180" cy="60" r="9"/>
+    <circle cx="360" cy="60" r="9"/><circle cx="540" cy="60" r="11"/><circle cx="650" cy="60" r="9"/>
+  </g>
+  <g fill="var(--bg)" stroke="var(--accent2)" stroke-width="2">
+    <circle cx="300" cy="130" r="9"/><circle cx="420" cy="130" r="9"/>
+  </g>
+  <text x="40" y="36" fill="var(--accent)" font-size="11">main</text>
+  <text x="110" y="134" fill="var(--accent2)" font-size="11">feat/rate-limit</text>
+  <g fill="var(--muted)" font-size="9" text-anchor="middle">
+    <text x="60" y="84">C1</text><text x="180" y="84">C2</text><text x="360" y="84">C3</text>
+    <text x="650" y="84">C6</text>
+    <text x="300" y="152">C4</text><text x="420" y="152">C5</text>
+  </g>
+  <text x="540" y="40" fill="var(--txt)" font-size="10" text-anchor="middle">merge commit</text>
+  <text x="40" y="188" fill="var(--muted)" font-size="10">Branch at C2, work at C4–C5, merge at C6. Main moved too (C3) — that overlap is where conflicts come from.</text>
+</svg>
+<figcaption>A branch is a pointer. Merging reconciles two lines of history.</figcaption>
+</figure>
+
+<p>When both branches changed the same lines, Git stops and marks the file:</p>
+<pre><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+limit = 100
+=======
+limit = 250
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; main</code></pre>
+<p>Git cannot know which is correct. Edit the file so it contains the code you actually want, delete
+all three marker lines, then:</p>
+<pre><code>git add limits.py
+git commit          <span class="c"># completes the merge</span></code></pre>
+
+<div class="pager">
+  <a href="08-git.html"><span class="sub">← Previous</span>1.8 Git: the mental model</a>
+  <a href="10-flow.html" class="nx"><span class="sub">Next →</span>1.10 A workflow a team can actually live with</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 1 · 1.9 Branching, merging and the conflict you will hit</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

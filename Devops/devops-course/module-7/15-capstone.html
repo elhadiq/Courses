@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Capstone project — Module 7 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-7.html">Module 7 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 07</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">7.1 Monitoring vs observability</a>
+<a href="02-pillars.html">7.2 Metrics, logs, traces</a>
+<a href="03-prom.html">7.3 How Prometheus works</a>
+<a href="04-types.html">7.4 Metric types, and the one everyone misuses</a>
+<a href="05-instr.html">7.5 Instrumenting the application</a>
+<a href="06-promql.html">7.6 PromQL, enough to be useful</a>
+<a href="07-golden.html">7.7 The four golden signals</a>
+<a href="08-grafana.html">7.8 Dashboards worth looking at</a>
+<a href="09-alert.html">7.9 Alerting on symptoms, not causes</a>
+<a href="10-slo.html">7.10 SLIs, SLOs and error budgets</a>
+<a href="11-logs.html">7.11 Logs that are actually searchable</a>
+<a class="grp">Practice</a>
+<a href="12-lab.html">Lab: full observability stack</a>
+<a href="13-ex.html">Exercises</a>
+<a href="14-check.html">Checkpoint</a>
+<a href="15-capstone.html" class="cur">Capstone project</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-7.html">Observability: Prometheus &amp; Grafana</a>
+</div>
+<div class="secmeta">Module 07 · Section 15 of 15</div>
+
+<h2 id="capstone">Capstone project</h2>
+<div class="card">
+<p><b>Build a new service end to end, from an empty directory, using nothing but the docs.</b>
+Pick something small with a datastore — a paste bin, a feature-flag API, a webhook receiver.</p>
+
+<h3>Deliverables</h3>
+<ul class="chk">
+<li>A Git repository with protected <code>main</code> and short-lived feature branches.</li>
+<li>A multi-stage Dockerfile: non-root, correct layer ordering, under 150 MB.</li>
+<li>A Compose file for local development, with a healthcheck-gated dependency.</li>
+<li>A GitHub Actions pipeline: lint → test (against a real service container) → build → push a
+SHA-tagged image to GHCR → smoke test the published image.</li>
+<li>Terraform describing the environment, with variables, outputs and a clean plan.</li>
+<li>An idempotent Ansible playbook (second run: <code>changed=0</code>).</li>
+<li>Kubernetes manifests: probes that distinguish liveness from readiness, resource requests and
+limits, ConfigMap and Secret, <code>maxUnavailable: 0</code>.</li>
+<li>Prometheus instrumentation for all four golden signals, a Grafana dashboard committed as JSON,
+and at least two symptom-based alerts.</li>
+<li>A <code>README.md</code> that a stranger can follow from clone to running system.</li>
+</ul>
+
+<h3>The demonstration</h3>
+<p>Record or perform these four things live. They are what an interviewer would ask for:</p>
+<ol>
+<li>Push a commit that breaks a test; show the merge being blocked.</li>
+<li>Perform a rolling update under continuous traffic with zero non-200 responses.</li>
+<li>Deploy a broken image; show that users are unaffected; roll back.</li>
+<li>Kill the datastore; show the alert firing, pods leaving rotation without restarting, and automatic
+recovery when it returns.</li>
+</ol>
+
+<h3>Where to go next</h3>
+<ul>
+<li><b>GitOps</b> — Argo CD or Flux: the cluster pulls its desired state from Git instead of CI pushing to it.</li>
+<li><b>Helm</b> — package your manifests so environments differ by values, not by copies.</li>
+<li><b>Distributed tracing</b> — OpenTelemetry and Jaeger, once you have more than one service.</li>
+<li><b>Policy and supply chain</b> — OPA/Kyverno for admission control, cosign for image signing, SBOMs.</li>
+<li><b>Cloud</b> — take this exact stack to EKS or GKE; the Terraform providers change, the concepts do not.</li>
+</ul>
+</div>
+
+<div class="pager">
+  <a href="14-check.html"><span class="sub">← Previous</span>Checkpoint</a>
+  <a href="../index.html" class="nx"><span class="sub">Done →</span>Back to the course index</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 7 · Capstone project</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

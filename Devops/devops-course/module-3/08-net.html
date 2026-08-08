@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3.8 Networking between containers — Module 3 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-3.html">Module 3 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 03</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">3.1 The problem containers solve</a>
+<a href="02-what.html">3.2 What a container actually is</a>
+<a href="03-images.html">3.3 Images, layers and the cache</a>
+<a href="04-cli.html">3.4 The commands you will use daily</a>
+<a href="05-app.html">3.5 The application</a>
+<a href="06-dockerfile.html">3.6 Writing a Dockerfile — three revisions</a>
+<a href="07-data.html">3.7 Data: volumes and why containers are ephemeral</a>
+<a href="08-net.html" class="cur">3.8 Networking between containers</a>
+<a href="09-compose.html">3.9 Docker Compose</a>
+<a href="10-debug.html">3.10 Debugging a container that won't start</a>
+<a href="11-registry.html">3.11 Registries and tagging</a>
+<a class="grp">Practice</a>
+<a href="12-lab.html">Lab: containerise urlshort end to end</a>
+<a href="13-ex.html">Exercises</a>
+<a href="14-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-3.html">Containers: Docker &amp; Compose</a>
+</div>
+<div class="secmeta">Module 03 · Section 8 of 14</div>
+
+<h2 id="net">3.8 Networking between containers</h2>
+<p>Containers on the same user-defined network reach each other <b>by container name</b>, resolved by
+Docker's built-in DNS. This is why the app can connect to <code>redis://redis:6379</code> without
+knowing any IP address.</p>
+
+<pre><code>docker network create appnet
+docker run -d --name redis --network appnet redis:7-alpine
+docker run -d --name api --network appnet -p 8000:8000 \
+  -e REDIS_URL=redis://redis:6379/0 urlshort:dev
+
+<span class="c"># prove the DNS works, from inside the api container</span>
+docker exec -it api sh -c "getent hosts redis"</code></pre>
+
+
+<figure id="fig-net">
+<svg viewBox="0 0 720 258" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <defs><marker id="ac1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent2)"/></marker></defs>
+  <defs><marker id="ac2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+    <path d="M0,0 L8,4 L0,8 z" fill="var(--ok)"/></marker></defs>
+  <g stroke="var(--accent)" fill="none" stroke-width="1.4" stroke-dasharray="5 4">
+    <rect x="150" y="40" width="430" height="122" rx="10"/>
+  </g>
+  <text x="162" y="60" fill="var(--accent)" font-size="10">network "appnet" — Docker runs a DNS server here</text>
+  <g stroke="var(--accent2)" fill="none" stroke-width="1.4">
+    <rect x="180" y="78" width="155" height="62" rx="8"/>
+    <rect x="405" y="78" width="150" height="62" rx="8"/>
+  </g>
+  <text x="257" y="100" fill="var(--txt)" text-anchor="middle" font-size="11">api</text>
+  <text x="257" y="116" fill="var(--muted)" text-anchor="middle" font-size="9">172.18.0.3:8000</text>
+  <text x="257" y="131" fill="var(--muted)" text-anchor="middle" font-size="9">has its own localhost</text>
+  <text x="480" y="100" fill="var(--txt)" text-anchor="middle" font-size="11">redis</text>
+  <text x="480" y="116" fill="var(--muted)" text-anchor="middle" font-size="9">172.18.0.2:6379</text>
+  <text x="480" y="131" fill="var(--muted)" text-anchor="middle" font-size="9">has its own localhost</text>
+  <g stroke="var(--line)" fill="none" stroke-width="1.3"><rect x="8" y="78" width="112" height="62" rx="8"/></g>
+  <text x="64" y="104" fill="var(--txt)" text-anchor="middle" font-size="10">your host</text>
+  <text x="64" y="120" fill="var(--muted)" text-anchor="middle" font-size="9">:8000</text>
+  <g stroke="var(--accent2)" stroke-width="1.4" marker-end="url(#ac1)"><line x1="122" y1="109" x2="176" y2="109"/></g>
+  <text x="64" y="156" fill="var(--accent2)" text-anchor="middle" font-size="9">-p 8000:8000</text>
+  <g stroke="var(--ok)" stroke-width="1.5" marker-end="url(#ac2)"><line x1="339" y1="109" x2="401" y2="109"/></g>
+  <text x="370" y="102" fill="var(--ok)" text-anchor="middle" font-size="11">✓</text>
+  <g font-size="10">
+    <text x="12" y="192" fill="var(--ok)" font-size="12">✓</text>
+    <text x="30" y="192" fill="var(--txt)">redis://redis:6379</text>
+    <text x="230" y="192" fill="var(--muted)">Docker's DNS answers 172.18.0.2 — works</text>
+    <text x="12" y="216" fill="var(--err)" font-size="12">✗</text>
+    <text x="30" y="216" fill="var(--txt)">redis://localhost:6379</text>
+    <text x="230" y="216" fill="var(--muted)">never leaves api — connection refused</text>
+  </g>
+  <line x1="8" y1="172" x2="712" y2="172" stroke="var(--line)" stroke-width="1"/>
+  <text x="8" y="244" fill="var(--muted)" font-size="10">Each container has its own network namespace, so each has its own localhost.</text>
+</svg>
+<figcaption>Service names resolve; localhost does not cross the container boundary.</figcaption>
+</figure>
+
+<div class="box warn">
+<b>localhost inside a container means the container</b>
+If your app is configured with <code>redis://localhost:6379</code> and Redis is a different container,
+you get "connection refused" — the app is looking at its own network namespace. Use the service name.
+This is the single most common beginner error in this module.
+<br><br>
+Note the error is <i>refused</i> and not <i>timed out</i>: the packet reached a real interface that
+replied "nothing here", exactly as in <a href="../module-2/01-why.html">Module 2.2</a>. And the reason
+<code>redis</code> resolves at all is that Docker runs a DNS server on user-defined networks —
+ordinary DNS (<a href="../module-2/08-dns.html">Module 2.8</a>), just with a different resolver.
+</div>
+
+<div class="pager">
+  <a href="07-data.html"><span class="sub">← Previous</span>3.7 Data: volumes and why containers are ephemeral</a>
+  <a href="09-compose.html" class="nx"><span class="sub">Next →</span>3.9 Docker Compose</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 3 · 3.8 Networking between containers</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

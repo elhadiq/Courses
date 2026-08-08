@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4.6 Quality gates: lint, format, type, scan — Module 4 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-4.html">Module 4 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 04</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">4.1 What CI and CD actually mean</a>
+<a href="02-anatomy.html">4.2 Anatomy of a workflow</a>
+<a href="03-first.html">4.3 Your first pipeline: test on every push</a>
+<a href="04-services.html">4.4 Services: a real Redis for your tests</a>
+<a href="05-cache.html">4.5 Caching, and why pipelines get slow</a>
+<a href="06-quality.html" class="cur">4.6 Quality gates: lint, format, type, scan</a>
+<a href="07-build.html">4.7 Build and publish the image</a>
+<a href="08-secrets.html">4.8 Secrets, and how pipelines leak them</a>
+<a href="09-deploy.html">4.9 Deployment, environments and approvals</a>
+<a href="10-design.html">4.10 Designing a pipeline people trust</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html">Lab: the full pipeline</a>
+<a href="12-ex.html">Exercises</a>
+<a href="13-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-4.html">CI/CD with GitHub Actions</a>
+</div>
+<div class="secmeta">Module 04 · Section 6 of 13</div>
+
+<h2 id="quality">4.6 Quality gates: lint, format, type, scan</h2>
+<p>Tests catch broken behaviour. These catch the rest, and — more usefully — they end style arguments
+in code review by making them a machine's decision.</p>
+
+<pre><code>  <span class="v">quality</span>:
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: actions/checkout@v4
+      - <span class="v">uses</span>: actions/setup-python@v5
+        <span class="v">with</span>: { <span class="v">python-version</span>: <span class="s">"3.12"</span> }
+
+      - <span class="v">run</span>: pip install ruff
+      - <span class="v">name</span>: Lint
+        <span class="v">run</span>: ruff check .
+      - <span class="v">name</span>: Format check
+        <span class="v">run</span>: ruff format --check .
+
+      - <span class="v">name</span>: Scan filesystem for vulnerabilities
+        <span class="v">uses</span>: aquasecurity/trivy-action@0.24.0
+        <span class="v">with</span>:
+          <span class="v">scan-type</span>: fs
+          <span class="v">severity</span>: <span class="s">"HIGH,CRITICAL"</span>
+          <span class="v">exit-code</span>: <span class="s">"1"</span></code></pre>
+
+<p><code>quality</code> and <code>test</code> declare no <code>needs</code>, so they run in parallel —
+you get both sets of failures in one run instead of discovering the lint error after waiting for tests.</p>
+
+<div class="box why">
+<b>Shift left</b>
+The cost of a defect grows by roughly an order of magnitude at each stage it survives: caught by a
+linter in your editor (seconds), by CI (minutes), by a reviewer (hours), in production (days, plus
+users). Every gate you add early is buying down that multiplier.
+</div>
+
+
+<figure id="fig-shiftleft">
+<svg viewBox="0 0 720 230" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <text x="8" y="16" fill="var(--muted)" font-size="10">relative cost to fix one defect, by the stage that catches it (log scale)</text>
+  <g stroke="var(--line)" stroke-width="1"><line x1="60" y1="180" x2="700" y2="180"/></g>
+  <g stroke="var(--line)" stroke-dasharray="2 4" stroke-width=".8">
+    <line x1="60" y1="150" x2="700" y2="150"/><line x1="60" y1="110" x2="700" y2="110"/>
+    <line x1="60" y1="70" x2="700" y2="70"/><line x1="60" y1="30" x2="700" y2="30"/>
+  </g>
+  <g fill="var(--muted)" font-size="9" text-anchor="end">
+    <text x="54" y="153">1×</text><text x="54" y="113">10×</text>
+    <text x="54" y="73">100×</text><text x="54" y="33">1000×</text>
+  </g>
+  <g>
+    <rect x="100" y="150" width="90" height="30" rx="3" fill="var(--ok)" opacity=".8"/>
+    <rect x="252" y="110" width="90" height="70" rx="3" fill="var(--accent)" opacity=".8"/>
+    <rect x="404" y="70"  width="90" height="110" rx="3" fill="var(--warn)" opacity=".8"/>
+    <rect x="556" y="30"  width="90" height="150" rx="3" fill="var(--err)" opacity=".8"/>
+  </g>
+  <g fill="var(--txt)" text-anchor="middle" font-size="10">
+    <text x="145" y="198">linter</text><text x="297" y="198">CI</text>
+    <text x="449" y="198">code review</text><text x="601" y="198">production</text>
+  </g>
+  <g fill="var(--muted)" text-anchor="middle" font-size="9">
+    <text x="145" y="211">in your editor</text><text x="297" y="211">minutes later</text>
+    <text x="449" y="211">hours later</text><text x="601" y="211">days later + users</text>
+  </g>
+  <g fill="var(--txt)" text-anchor="middle" font-size="9">
+    <text x="145" y="145">seconds</text><text x="297" y="105">minutes</text>
+    <text x="449" y="65">hours</text><text x="601" y="25">days</text>
+  </g>
+  <text x="8" y="226" fill="var(--warn)" font-size="10">"Shift left" is this chart: every gate you add earlier buys down an order-of-magnitude multiplier.</text>
+</svg>
+<figcaption>The cost of a defect grows roughly tenfold at each stage it survives.</figcaption>
+</figure>
+
+<div class="pager">
+  <a href="05-cache.html"><span class="sub">← Previous</span>4.5 Caching, and why pipelines get slow</a>
+  <a href="07-build.html" class="nx"><span class="sub">Next →</span>4.7 Build and publish the image</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 4 · 4.6 Quality gates: lint, format, type, scan</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

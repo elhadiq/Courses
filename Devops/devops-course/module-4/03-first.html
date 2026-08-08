@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4.3 Your first pipeline: test on every push — Module 4 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-4.html">Module 4 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 04</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">4.1 What CI and CD actually mean</a>
+<a href="02-anatomy.html">4.2 Anatomy of a workflow</a>
+<a href="03-first.html" class="cur">4.3 Your first pipeline: test on every push</a>
+<a href="04-services.html">4.4 Services: a real Redis for your tests</a>
+<a href="05-cache.html">4.5 Caching, and why pipelines get slow</a>
+<a href="06-quality.html">4.6 Quality gates: lint, format, type, scan</a>
+<a href="07-build.html">4.7 Build and publish the image</a>
+<a href="08-secrets.html">4.8 Secrets, and how pipelines leak them</a>
+<a href="09-deploy.html">4.9 Deployment, environments and approvals</a>
+<a href="10-design.html">4.10 Designing a pipeline people trust</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html">Lab: the full pipeline</a>
+<a href="12-ex.html">Exercises</a>
+<a href="13-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-4.html">CI/CD with GitHub Actions</a>
+</div>
+<div class="secmeta">Module 04 · Section 3 of 13</div>
+
+<h2 id="first">4.3 Your first pipeline: test on every push</h2>
+<p><code>.github/workflows/ci.yml</code>:</p>
+
+<pre><code><span class="v">name</span>: CI
+
+<span class="v">on</span>:
+  <span class="v">push</span>:
+    <span class="v">branches</span>: [main]
+  <span class="v">pull_request</span>:
+
+<span class="v">jobs</span>:
+  <span class="v">test</span>:
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: actions/checkout@v4
+
+      - <span class="v">uses</span>: actions/setup-python@v5
+        <span class="v">with</span>:
+          <span class="v">python-version</span>: <span class="s">"3.12"</span>
+          <span class="v">cache</span>: pip
+
+      - <span class="v">name</span>: Install dependencies
+        <span class="v">run</span>: pip install -r requirements.txt
+
+      - <span class="v">name</span>: Run tests
+        <span class="v">run</span>: python -m pytest -q</code></pre>
+
+<p>Commit and push. Open the <b>Actions</b> tab on GitHub and watch it run. It will <b>fail</b> —
+there is no Redis on the runner, so <code>/health</code> returns 503. That failure is the next section.</p>
+
+<div class="pager">
+  <a href="02-anatomy.html"><span class="sub">← Previous</span>4.2 Anatomy of a workflow</a>
+  <a href="04-services.html" class="nx"><span class="sub">Next →</span>4.4 Services: a real Redis for your tests</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 4 · 4.3 Your first pipeline: test on every push</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

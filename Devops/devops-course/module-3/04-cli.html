@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3.4 The commands you will use daily — Module 3 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-3.html">Module 3 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 03</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">3.1 The problem containers solve</a>
+<a href="02-what.html">3.2 What a container actually is</a>
+<a href="03-images.html">3.3 Images, layers and the cache</a>
+<a href="04-cli.html" class="cur">3.4 The commands you will use daily</a>
+<a href="05-app.html">3.5 The application</a>
+<a href="06-dockerfile.html">3.6 Writing a Dockerfile — three revisions</a>
+<a href="07-data.html">3.7 Data: volumes and why containers are ephemeral</a>
+<a href="08-net.html">3.8 Networking between containers</a>
+<a href="09-compose.html">3.9 Docker Compose</a>
+<a href="10-debug.html">3.10 Debugging a container that won't start</a>
+<a href="11-registry.html">3.11 Registries and tagging</a>
+<a class="grp">Practice</a>
+<a href="12-lab.html">Lab: containerise urlshort end to end</a>
+<a href="13-ex.html">Exercises</a>
+<a href="14-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-3.html">Containers: Docker &amp; Compose</a>
+</div>
+<div class="secmeta">Module 03 · Section 4 of 14</div>
+
+<h2 id="cli">3.4 The commands you will use daily</h2>
+<pre><code><span class="c"># run: -d detached, -p host:container port, --name for a stable handle</span>
+docker run -d --name web -p 8080:80 nginx:1.27-alpine
+
+docker ps              <span class="c"># running containers</span>
+docker ps -a           <span class="c"># including stopped ones</span>
+docker logs -f web     <span class="c"># follow stdout/stderr</span>
+docker exec -it web sh <span class="c"># a shell INSIDE the running container</span>
+docker stop web        <span class="c"># SIGTERM, then SIGKILL after 10s</span>
+docker rm web
+docker images
+docker rmi nginx:1.27-alpine
+
+<span class="c"># reclaim disk — this WILL delete unused images and build cache</span>
+docker system df
+docker system prune -a</code></pre>
+
+<div class="box">
+<b>Read <code>-p 8080:80</code> as HOST:CONTAINER</b>
+Traffic arriving on your machine's port 8080 is forwarded to port 80 inside the container.
+Getting this the wrong way round is a rite of passage; <code>docker ps</code> shows the mapping.
+This is precisely the NAT port-forwarding from <a href="../module-2/05-private.html">Module 2.5</a> —
+the container sits on a private network and the publish creates the inbound mapping.
+</div>
+
+<div class="pager">
+  <a href="03-images.html"><span class="sub">← Previous</span>3.3 Images, layers and the cache</a>
+  <a href="05-app.html" class="nx"><span class="sub">Next →</span>3.5 The application</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 3 · 3.4 The commands you will use daily</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

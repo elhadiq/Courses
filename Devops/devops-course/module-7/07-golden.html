@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>7.7 The four golden signals — Module 7 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-7.html">Module 7 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 07</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">7.1 Monitoring vs observability</a>
+<a href="02-pillars.html">7.2 Metrics, logs, traces</a>
+<a href="03-prom.html">7.3 How Prometheus works</a>
+<a href="04-types.html">7.4 Metric types, and the one everyone misuses</a>
+<a href="05-instr.html">7.5 Instrumenting the application</a>
+<a href="06-promql.html">7.6 PromQL, enough to be useful</a>
+<a href="07-golden.html" class="cur">7.7 The four golden signals</a>
+<a href="08-grafana.html">7.8 Dashboards worth looking at</a>
+<a href="09-alert.html">7.9 Alerting on symptoms, not causes</a>
+<a href="10-slo.html">7.10 SLIs, SLOs and error budgets</a>
+<a href="11-logs.html">7.11 Logs that are actually searchable</a>
+<a class="grp">Practice</a>
+<a href="12-lab.html">Lab: full observability stack</a>
+<a href="13-ex.html">Exercises</a>
+<a href="14-check.html">Checkpoint</a>
+<a href="15-capstone.html">Capstone project</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-7.html">Observability: Prometheus &amp; Grafana</a>
+</div>
+<div class="secmeta">Module 07 · Section 7 of 15</div>
+
+<h2 id="golden">7.7 The four golden signals</h2>
+<p>From Google's SRE practice — if you instrument only four things, instrument these:</p>
+<table>
+<tr><th>Signal</th><th>Question</th><th>PromQL</th></tr>
+<tr><td><b>Latency</b></td><td>How slow, especially for the unlucky?</td><td><code>histogram_quantile(0.95, …)</code></td></tr>
+<tr><td><b>Traffic</b></td><td>How much demand?</td><td><code>sum(rate(http_requests_total[5m]))</code></td></tr>
+<tr><td><b>Errors</b></td><td>What fraction is failing?</td><td><code>rate(…{status=~"5.."}[5m]) / rate(…[5m])</code></td></tr>
+<tr><td><b>Saturation</b></td><td>How close to a limit?</td><td>memory used ÷ memory limit, queue depth</td></tr>
+</table>
+<div class="box why">
+<b>Why percentiles instead of averages</b>
+Average latency hides your worst experiences. If 95% of requests take 50 ms and 5% take 10 seconds,
+the average is a comfortable 550 ms while one user in twenty is having a terrible time. Always look at
+p95 and p99 — those are real users, and often your most active ones.
+</div>
+
+
+<figure id="fig-p95">
+<svg viewBox="0 0 720 242" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <text x="8" y="16" fill="var(--muted)" font-size="10">distribution of request latency — why the average is a comforting lie</text>
+  <g stroke="var(--line)" stroke-width="1"><line x1="50" y1="170" x2="700" y2="170"/></g>
+  <path d="M50,170 C110,170 120,60 175,58 C230,56 245,140 300,156 C360,172 420,166 470,164
+           C540,162 600,163 700,163"
+        fill="color-mix(in srgb,var(--accent2) 22%,transparent)" stroke="var(--accent2)" stroke-width="1.6"/>
+  <g stroke="var(--ok)" stroke-width="1.6" stroke-dasharray="5 3"><line x1="205" y1="40" x2="205" y2="170"/></g>
+  <text x="205" y="34" fill="var(--ok)" text-anchor="middle" font-size="10">average 55 ms</text>
+  <text x="205" y="186" fill="var(--muted)" text-anchor="middle" font-size="9">"everything is fine"</text>
+  <g stroke="var(--warn)" stroke-width="1.6" stroke-dasharray="5 3"><line x1="470" y1="40" x2="470" y2="170"/></g>
+  <text x="470" y="34" fill="var(--warn)" text-anchor="middle" font-size="10">p95 = 1.2 s</text>
+  <g stroke="var(--err)" stroke-width="1.6" stroke-dasharray="5 3"><line x1="620" y1="40" x2="620" y2="170"/></g>
+  <text x="620" y="34" fill="var(--err)" text-anchor="middle" font-size="10">p99 = 4 s</text>
+  <path d="M470 150 H700 V170 H470 Z" fill="color-mix(in srgb,var(--err) 30%,transparent)"/>
+  <text x="585" y="186" fill="var(--err)" text-anchor="middle" font-size="9">the tail — 1 user in 20 lives here</text>
+  <g fill="var(--muted)" font-size="9" text-anchor="middle">
+    <text x="120" y="186">fast</text><text x="300" y="186">typical</text>
+  </g>
+  <text x="8" y="208" fill="var(--muted)" font-size="10">95% at 50 ms and 5% at 10 s averages to a healthy-looking 550 ms —</text>
+  <text x="8" y="220" fill="var(--muted)" font-size="10">while one user in twenty is having a terrible time.</text>
+  <text x="8" y="233" fill="var(--warn)" font-size="10">Alert on p95/p99. Those are real people, and often your heaviest users.</text>
+</svg>
+<figcaption>Averages hide the tail. Percentiles are where user pain actually shows up.</figcaption>
+</figure>
+
+<div class="pager">
+  <a href="06-promql.html"><span class="sub">← Previous</span>7.6 PromQL, enough to be useful</a>
+  <a href="08-grafana.html" class="nx"><span class="sub">Next →</span>7.8 Dashboards worth looking at</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 7 · 7.7 The four golden signals</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4.4 Services: a real Redis for your tests — Module 4 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-4.html">Module 4 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 04</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">4.1 What CI and CD actually mean</a>
+<a href="02-anatomy.html">4.2 Anatomy of a workflow</a>
+<a href="03-first.html">4.3 Your first pipeline: test on every push</a>
+<a href="04-services.html" class="cur">4.4 Services: a real Redis for your tests</a>
+<a href="05-cache.html">4.5 Caching, and why pipelines get slow</a>
+<a href="06-quality.html">4.6 Quality gates: lint, format, type, scan</a>
+<a href="07-build.html">4.7 Build and publish the image</a>
+<a href="08-secrets.html">4.8 Secrets, and how pipelines leak them</a>
+<a href="09-deploy.html">4.9 Deployment, environments and approvals</a>
+<a href="10-design.html">4.10 Designing a pipeline people trust</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html">Lab: the full pipeline</a>
+<a href="12-ex.html">Exercises</a>
+<a href="13-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-4.html">CI/CD with GitHub Actions</a>
+</div>
+<div class="secmeta">Module 04 · Section 4 of 13</div>
+
+<h2 id="services">4.4 Services: a real Redis for your tests</h2>
+<p>You have two options, and the choice is a genuine engineering decision rather than a detail.</p>
+
+<h3>Option A — mock Redis</h3>
+<p>Fast, no infrastructure, but you are testing against a fake. Bugs in how you actually use Redis
+(expiry semantics, connection loss, pipelining) go undetected.</p>
+
+<h3>Option B — a service container</h3>
+<p>Actions can start real containers alongside the job. Slower by seconds, but you test the real thing.
+For an app whose entire behaviour depends on Redis, this is the right call:</p>
+
+<pre><code><span class="v">jobs</span>:
+  <span class="v">test</span>:
+    <span class="v">runs-on</span>: ubuntu-latest
+
+    <span class="v">services</span>:
+      <span class="v">redis</span>:
+        <span class="v">image</span>: redis:7-alpine
+        <span class="v">ports</span>: [<span class="s">"6379:6379"</span>]
+        <span class="v">options</span>: &gt;-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+
+    <span class="v">env</span>:
+      <span class="v">REDIS_URL</span>: redis://localhost:6379/0
+
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: actions/checkout@v4
+      - <span class="v">uses</span>: actions/setup-python@v5
+        <span class="v">with</span>: { <span class="v">python-version</span>: <span class="s">"3.12"</span>, <span class="v">cache</span>: pip }
+      - <span class="v">run</span>: pip install -r requirements.txt
+      - <span class="v">run</span>: python -m pytest -q</code></pre>
+
+<div class="box">
+<b>Here <code>localhost</code> is correct</b>
+Opposite of Module 3. Service containers have their ports published onto the runner's network, and
+your test process runs directly on the runner — not in a container. So <code>localhost:6379</code>
+reaches Redis. If you instead run your <i>tests</i> inside a container, you would use the service name.
+The rule underneath both cases is the same: address things by where the client is running —
+which network namespace the process making the call sits in
+(<a href="../module-2/07-ports.html">Module 2.7</a>).
+</div>
+
+<div class="pager">
+  <a href="03-first.html"><span class="sub">← Previous</span>4.3 Your first pipeline: test on every push</a>
+  <a href="05-cache.html" class="nx"><span class="sub">Next →</span>4.5 Caching, and why pipelines get slow</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 4 · 4.4 Services: a real Redis for your tests</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4.9 Deployment, environments and approvals — Module 4 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-4.html">Module 4 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 04</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">4.1 What CI and CD actually mean</a>
+<a href="02-anatomy.html">4.2 Anatomy of a workflow</a>
+<a href="03-first.html">4.3 Your first pipeline: test on every push</a>
+<a href="04-services.html">4.4 Services: a real Redis for your tests</a>
+<a href="05-cache.html">4.5 Caching, and why pipelines get slow</a>
+<a href="06-quality.html">4.6 Quality gates: lint, format, type, scan</a>
+<a href="07-build.html">4.7 Build and publish the image</a>
+<a href="08-secrets.html">4.8 Secrets, and how pipelines leak them</a>
+<a href="09-deploy.html" class="cur">4.9 Deployment, environments and approvals</a>
+<a href="10-design.html">4.10 Designing a pipeline people trust</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html">Lab: the full pipeline</a>
+<a href="12-ex.html">Exercises</a>
+<a href="13-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-4.html">CI/CD with GitHub Actions</a>
+</div>
+<div class="secmeta">Module 04 · Section 9 of 13</div>
+
+<h2 id="deploy">4.9 Deployment, environments and approvals</h2>
+<p>GitHub <b>Environments</b> (Settings → Environments) add protection rules to a job: required
+reviewers, wait timers, and branch restrictions. This is what turns continuous delivery into something
+an organisation will actually sign off on.</p>
+
+<pre><code>  <span class="v">deploy-staging</span>:
+    <span class="v">needs</span>: build
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">environment</span>:
+      <span class="v">name</span>: staging
+      <span class="v">url</span>: https://staging.example.com
+    <span class="v">steps</span>:
+      - <span class="v">run</span>: echo "deploying ${{ github.sha }} to staging"
+
+  <span class="v">deploy-production</span>:
+    <span class="v">needs</span>: deploy-staging
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">environment</span>:
+      <span class="v">name</span>: production      <span class="c"># configure "required reviewers" on this env</span>
+      <span class="v">url</span>: https://example.com
+    <span class="v">steps</span>:
+      - <span class="v">run</span>: echo "deploying ${{ github.sha }} to production"</code></pre>
+
+<h3>Deployment strategies, briefly</h3>
+<table>
+<tr><th>Strategy</th><th>How</th><th>Cost / benefit</th></tr>
+<tr><td><b>Recreate</b></td><td>Stop old, start new</td><td>Simple; has downtime. Fine for internal tools.</td></tr>
+<tr><td><b>Rolling</b></td><td>Replace instances a few at a time</td><td>No downtime, but two versions run simultaneously — your API must tolerate that. Kubernetes default (Module 6).</td></tr>
+<tr><td><b>Blue/green</b></td><td>Two full environments, flip the router</td><td>Instant rollback; costs double infrastructure during the switch.</td></tr>
+<tr><td><b>Canary</b></td><td>Send 5% of traffic to the new version, watch metrics, ramp up</td><td>Safest; requires the observability you build in Module 7.</td></tr>
+</table>
+
+
+<figure id="fig-deploystrat">
+<svg viewBox="0 0 720 250" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <g fill="var(--accent)" font-size="11">
+    <text x="8" y="20">rolling</text><text x="8" y="100">blue / green</text><text x="8" y="180">canary</text>
+  </g>
+  <g fill="var(--muted)" font-size="9">
+    <text x="8" y="34">replace a few at a time</text>
+    <text x="8" y="114">flip all traffic at once</text>
+    <text x="8" y="194">ramp by percentage</text>
+  </g>
+  <g font-size="9" fill="var(--muted)" text-anchor="middle">
+    <text x="220" y="14">t0</text><text x="340" y="14">t1</text><text x="460" y="14">t2</text><text x="580" y="14">t3</text>
+  </g>
+  <g stroke="var(--line)" stroke-width="1">
+    <rect x="180" y="22" width="100" height="34" rx="4" fill="none"/><rect x="300" y="22" width="100" height="34" rx="4" fill="none"/><rect x="420" y="22" width="100" height="34" rx="4" fill="none"/><rect x="540" y="22" width="100" height="34" rx="4" fill="none"/><rect x="180" y="102" width="100" height="34" rx="4" fill="none"/><rect x="300" y="102" width="100" height="34" rx="4" fill="none"/><rect x="420" y="102" width="100" height="34" rx="4" fill="none"/><rect x="540" y="102" width="100" height="34" rx="4" fill="none"/><rect x="180" y="182" width="100" height="34" rx="4" fill="none"/><rect x="300" y="182" width="100" height="34" rx="4" fill="none"/><rect x="420" y="182" width="100" height="34" rx="4" fill="none"/><rect x="540" y="182" width="100" height="34" rx="4" fill="none"/>
+  </g>
+  <!-- rolling -->
+  <rect x="186" y="28" width="19" height="22" rx="2" fill="var(--accent2)"/><rect x="209" y="28" width="19" height="22" rx="2" fill="var(--accent2)"/><rect x="232" y="28" width="19" height="22" rx="2" fill="var(--accent2)"/><rect x="255" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="306" y="28" width="19" height="22" rx="2" fill="var(--accent2)"/><rect x="329" y="28" width="19" height="22" rx="2" fill="var(--accent2)"/><rect x="352" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="375" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="426" y="28" width="19" height="22" rx="2" fill="var(--accent2)"/><rect x="449" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="472" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="495" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="546" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="569" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="592" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="615" y="28" width="19" height="22" rx="2" fill="var(--ok)"/>
+  <!-- blue/green -->
+  <rect x="186" y="108" width="42" height="22" rx="2" fill="var(--accent2)" opacity="1"/><rect x="234" y="108" width="42" height="22" rx="2" fill="var(--ok)" opacity="0.25"/><rect x="306" y="108" width="42" height="22" rx="2" fill="var(--accent2)" opacity="1"/><rect x="354" y="108" width="42" height="22" rx="2" fill="var(--ok)" opacity="0.25"/><rect x="426" y="108" width="42" height="22" rx="2" fill="var(--accent2)" opacity="1"/><rect x="474" y="108" width="42" height="22" rx="2" fill="var(--ok)" opacity="0.25"/><rect x="546" y="108" width="42" height="22" rx="2" fill="var(--accent2)" opacity="0.25"/><rect x="594" y="108" width="42" height="22" rx="2" fill="var(--ok)" opacity="1"/>
+  <!-- canary -->
+  <rect x="186" y="188" width="88" height="22" rx="2" fill="var(--accent2)"/><rect x="274" y="188" width="0" height="22" rx="2" fill="var(--ok)"/><rect x="306" y="188" width="60" height="22" rx="2" fill="var(--accent2)"/><rect x="366" y="188" width="28" height="22" rx="2" fill="var(--ok)"/><rect x="426" y="188" width="32" height="22" rx="2" fill="var(--accent2)"/><rect x="458" y="188" width="56" height="22" rx="2" fill="var(--ok)"/><rect x="546" y="188" width="4" height="22" rx="2" fill="var(--accent2)"/><rect x="550" y="188" width="84" height="22" rx="2" fill="var(--ok)"/>
+  <g fill="var(--muted)" font-size="9" text-anchor="middle">
+    <text x="230" y="70">25% new</text><text x="350" y="70">50%</text><text x="470" y="70">75%</text><text x="590" y="70">100%</text>
+    <text x="230" y="150">idle green</text><text x="350" y="150">warming</text><text x="470" y="150">tested</text><text x="590" y="150">switch!</text>
+    <text x="230" y="230">0%</text><text x="350" y="230">~30%</text><text x="470" y="230">~60%</text><text x="590" y="230">100%</text>
+  </g>
+  <g font-size="9"><rect x="440" y="238" width="12" height="9" fill="var(--accent2)"/><text x="458" y="246" fill="var(--muted)">old version</text>
+  <rect x="540" y="238" width="12" height="9" fill="var(--ok)"/><text x="558" y="246" fill="var(--muted)">new version</text></g>
+</svg>
+<figcaption>Three ways to replace a running version, in increasing order of safety and cost.</figcaption>
+</figure>
+
+<div class="pager">
+  <a href="08-secrets.html"><span class="sub">← Previous</span>4.8 Secrets, and how pipelines leak them</a>
+  <a href="10-design.html" class="nx"><span class="sub">Next →</span>4.10 Designing a pipeline people trust</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 4 · 4.9 Deployment, environments and approvals</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

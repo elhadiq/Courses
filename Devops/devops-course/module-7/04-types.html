@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>7.4 Metric types, and the one everyone misuses — Module 7 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-7.html">Module 7 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 07</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">7.1 Monitoring vs observability</a>
+<a href="02-pillars.html">7.2 Metrics, logs, traces</a>
+<a href="03-prom.html">7.3 How Prometheus works</a>
+<a href="04-types.html" class="cur">7.4 Metric types, and the one everyone misuses</a>
+<a href="05-instr.html">7.5 Instrumenting the application</a>
+<a href="06-promql.html">7.6 PromQL, enough to be useful</a>
+<a href="07-golden.html">7.7 The four golden signals</a>
+<a href="08-grafana.html">7.8 Dashboards worth looking at</a>
+<a href="09-alert.html">7.9 Alerting on symptoms, not causes</a>
+<a href="10-slo.html">7.10 SLIs, SLOs and error budgets</a>
+<a href="11-logs.html">7.11 Logs that are actually searchable</a>
+<a class="grp">Practice</a>
+<a href="12-lab.html">Lab: full observability stack</a>
+<a href="13-ex.html">Exercises</a>
+<a href="14-check.html">Checkpoint</a>
+<a href="15-capstone.html">Capstone project</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-7.html">Observability: Prometheus &amp; Grafana</a>
+</div>
+<div class="secmeta">Module 07 · Section 4 of 15</div>
+
+<h2 id="types">7.4 Metric types, and the one everyone misuses</h2>
+<table>
+<tr><th>Type</th><th>Behaviour</th><th>Use for</th></tr>
+<tr><td><b>Counter</b></td><td>Only increases (resets to 0 on restart)</td><td>Requests, errors, bytes. Always query with <code>rate()</code>.</td></tr>
+<tr><td><b>Gauge</b></td><td>Goes up and down</td><td>Memory in use, queue depth, active connections, temperature.</td></tr>
+<tr><td><b>Histogram</b></td><td>Counts observations into buckets</td><td>Latency, payload sizes. Enables percentiles.</td></tr>
+<tr><td><b>Summary</b></td><td>Client-side quantiles</td><td>Rarely what you want — cannot be aggregated across instances.</td></tr>
+</table>
+
+
+<figure id="fig-mtypes">
+<svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <g stroke="var(--line)" fill="none" stroke-width="1">
+    <rect x="8" y="26" width="225" height="120" rx="7"/>
+    <rect x="247" y="26" width="225" height="120" rx="7"/>
+    <rect x="486" y="26" width="226" height="120" rx="7"/>
+  </g>
+  <g text-anchor="middle" font-size="11" fill="var(--accent)">
+    <text x="120" y="18">counter</text><text x="359" y="18">gauge</text><text x="599" y="18">histogram</text>
+  </g>
+  <polyline points="24,132 50,120 76,106 102,92 128,78 128,132 154,120 180,106 206,94"
+            fill="none" stroke="var(--accent2)" stroke-width="1.8"/>
+  <text x="120" y="162" fill="var(--muted)" text-anchor="middle" font-size="9">only goes up · resets on restart</text>
+  <text x="120" y="177" fill="var(--warn)" text-anchor="middle" font-size="9">always wrap in rate()</text>
+  <polyline points="263,100 289,78 315,112 341,66 367,94 393,72 419,118 445,88"
+            fill="none" stroke="var(--accent2)" stroke-width="1.8"/>
+  <text x="359" y="162" fill="var(--muted)" text-anchor="middle" font-size="9">up and down</text>
+  <text x="359" y="177" fill="var(--muted)" text-anchor="middle" font-size="9">memory · queue depth · replicas</text>
+  <g fill="var(--accent2)" opacity=".85">
+    <rect x="502" y="112" width="22" height="26"/><rect x="528" y="88" width="22" height="50"/>
+    <rect x="554" y="60" width="22" height="78"/><rect x="580" y="76" width="22" height="62"/>
+    <rect x="606" y="100" width="22" height="38"/><rect x="632" y="118" width="22" height="20"/>
+    <rect x="658" y="128" width="22" height="10"/>
+  </g>
+  <text x="599" y="162" fill="var(--muted)" text-anchor="middle" font-size="9">observations bucketed</text>
+  <text x="599" y="177" fill="var(--muted)" text-anchor="middle" font-size="9">gives you percentiles</text>
+  <text x="8" y="196" fill="var(--muted)" font-size="10">"how often?" → counter · "how much now?" → gauge · "how slow, for whom?" → histogram</text>
+</svg>
+<figcaption>The three metric types you will actually use, and their shapes.</figcaption>
+</figure>
+
+<div class="box">
+<b>Never graph a counter directly</b>
+A counter's raw value is a meaningless ever-growing line that resets to zero on restart. What you want
+is its rate of change: <code>rate(http_requests_total[5m])</code> gives requests per second, and
+<code>rate()</code> handles the resets correctly. This is the most common beginner mistake in PromQL.
+</div>
+
+<div class="pager">
+  <a href="03-prom.html"><span class="sub">← Previous</span>7.3 How Prometheus works</a>
+  <a href="05-instr.html" class="nx"><span class="sub">Next →</span>7.5 Instrumenting the application</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 7 · 7.4 Metric types, and the one everyone misuses</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

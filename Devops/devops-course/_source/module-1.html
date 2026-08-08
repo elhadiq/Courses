@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Module 1 — Linux, Shell &amp; Git | Practical DevOps</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <a class="brand hm" href="index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="index.html">All modules</a>
+    <a href="module-2.html">Next →</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap">
+
+<div class="kicker" style="margin-top:40px">Module 01 · ~5 hours</div>
+<h1>The Ground Floor: Linux, Shell &amp; Git</h1>
+<p class="lead">Every other tool in this course is a program you run from a shell, on a Linux machine,
+against a Git repository. Get fluent here and the rest is much easier than it looks.</p>
+
+<div class="card toc">
+<b>In this module</b>
+<a href="#why">1.1 Why the terminal, still</a>
+<a href="#fs">1.2 The filesystem and moving around it</a>
+<a href="#perm">1.3 Permissions, users and sudo</a>
+<a href="#pipes">1.4 Pipes: the idea that makes the shell powerful</a>
+<a href="#proc">1.5 Processes, ports and logs</a>
+<a href="#script">1.6 Writing a real shell script</a>
+<a href="#ssh">1.7 SSH and keys</a>
+<a href="#git">1.8 Git: the mental model</a>
+<a href="#branch">1.9 Branching, merging and the conflict you will hit</a>
+<a href="#flow">1.10 A workflow a team can actually live with</a>
+<a href="#lab">Lab: bootstrap the course repository</a>
+<a href="#ex">Exercises</a>
+<a href="#check">Checkpoint</a>
+</div>
+
+<h2 id="why">1.1 Why the terminal, still</h2>
+<p>Servers do not have a desktop. A production machine typically runs no graphical layer at all —
+it would consume memory and add attack surface for no benefit. When you connect to one, you get a text
+prompt and nothing else.</p>
+<p>But the deeper reason is <b>reproducibility</b>. A sequence of clicks cannot be committed to Git,
+reviewed by a colleague, or replayed on a hundred machines. A sequence of commands can. Everything in
+DevOps flows from that one property: <i>if you can type it, you can automate it; if you can only
+click it, you will do it by hand forever.</i></p>
+
+<div class="box why">
+<b>Why it exists</b>
+The shell is a programming language whose primitives are programs. That is unusual and it is the source
+of its power — you compose small tools you did not write into behaviour nobody anticipated.
+</div>
+
+<h2 id="fs">1.2 The filesystem and moving around it</h2>
+<p>Linux has a single tree rooted at <code>/</code>. There are no drive letters. Directories you will
+meet constantly:</p>
+
+<table>
+<tr><th>Path</th><th>What lives there</th></tr>
+<tr><td><code>/etc</code></td><td>System-wide configuration files. Text, always. <code>/etc/nginx/nginx.conf</code>, <code>/etc/hosts</code>.</td></tr>
+<tr><td><code>/var/log</code></td><td>Logs. Your first stop when something is broken.</td></tr>
+<tr><td><code>/home/&lt;user&gt;</code></td><td>Your files. Abbreviated <code>~</code>.</td></tr>
+<tr><td><code>/usr/bin</code>, <code>/usr/local/bin</code></td><td>Installed programs. <code>/usr/local/bin</code> is for things you installed manually.</td></tr>
+<tr><td><code>/tmp</code></td><td>Scratch space, wiped on reboot.</td></tr>
+<tr><td><code>/opt</code></td><td>Self-contained third-party software.</td></tr>
+</table>
+
+<pre><code><span class="c"># where am I</span>
+pwd
+
+<span class="c"># what's here — long, all files incl. hidden, human-readable sizes</span>
+ls -lah
+
+<span class="c"># move: absolute path, relative path, home, previous directory</span>
+cd /var/log
+cd ../..
+cd ~
+cd -
+
+<span class="c"># make a nested tree in one shot</span>
+mkdir -p ~/devops/labs/module1
+
+<span class="c"># copy a directory recursively; move/rename; delete</span>
+cp -r src/ backup/
+mv notes.txt docs/notes.txt
+rm -r build/</code></pre>
+
+<div class="box warn">
+<b>rm has no undo</b>
+There is no recycle bin. <code>rm -rf /</code> with root privileges destroys the machine.
+Get in the habit of running <code>ls</code> on a glob before you <code>rm</code> it:
+<code>ls *.log</code> then <code>rm *.log</code>.
+</div>
+
+<h3>Reading files without opening an editor</h3>
+<pre><code>cat  app.conf          <span class="c"># dump the whole file</span>
+less app.log           <span class="c"># scrollable pager: /search, n next, q quit</span>
+head -n 20 app.log     <span class="c"># first 20 lines</span>
+tail -n 50 app.log     <span class="c"># last 50 lines</span>
+tail -f  app.log       <span class="c"># follow live — you will use this constantly</span></code></pre>
+
+<h3>Finding things</h3>
+<pre><code><span class="c"># find files by name, under a directory</span>
+find /etc -name "*.conf"
+
+<span class="c"># find text inside files: recursive, show line numbers, ignore case</span>
+grep -rni "database_url" ./src
+
+<span class="c"># which binary will actually run when I type this?</span>
+which docker
+<span class="c"># /usr/bin/docker</span></code></pre>
+
+<h2 id="perm">1.3 Permissions, users and sudo</h2>
+<p>Every file has an owner, a group, and three permission triplets: owner / group / everyone else.
+<code>ls -l</code> shows them:</p>
+
+<pre><code>-rwxr-xr--  1 zouhair devs  2048 Aug  8 10:22 deploy.sh
+<span class="c">│└┬┘└┬┘└┬┘    └──┬──┘ └─┬┘</span>
+<span class="c">│ │  │  │        │     └── group</span>
+<span class="c">│ │  │  └─ others: read only        </span>
+<span class="c">│ │  └──── group:  read + execute   </span>
+<span class="c">│ └─────── owner:  read+write+exec  </span>
+<span class="c">└───────── type: - file, d directory, l symlink</span></code></pre>
+
+<p>Numerically, read=4, write=2, execute=1. So <code>755</code> = owner 7 (rwx), group 5 (r-x),
+others 5 (r-x). The two you will use in practice:</p>
+
+<pre><code>chmod +x deploy.sh        <span class="c"># make a script runnable</span>
+chmod 600 ~/.ssh/id_ed25519  <span class="c"># private key: owner only, or SSH refuses it</span>
+chown -R app:app /srv/app <span class="c"># give a service account ownership</span></code></pre>
+
+<p><b>sudo</b> runs one command as root. Use it for system changes; never for your own project files —
+if you find yourself typing <code>sudo</code> to edit code you wrote, ownership is wrong somewhere.</p>
+
+<h2 id="pipes">1.4 Pipes: the idea that makes the shell powerful</h2>
+<p>Every program has three streams: <b>stdin</b> (input), <b>stdout</b> (normal output),
+<b>stderr</b> (errors). The pipe <code>|</code> connects one program's stdout to the next one's stdin.
+That single mechanism lets you build one-off analysis tools in seconds.</p>
+
+<pre><code><span class="c"># Top 5 IPs hitting your server, from an nginx access log:</span>
+cat access.log | awk '{print $1}' | sort | uniq -c | sort -rn | head -5
+
+<span class="c"># read the chain right-to-left as a question:</span>
+<span class="c">#   head -5     ... show the top five</span>
+<span class="c">#   sort -rn    ... of the largest counts</span>
+<span class="c">#   uniq -c     ... counted per distinct value</span>
+<span class="c">#   sort        ... (uniq needs sorted input)</span>
+<span class="c">#   awk '{$1}'  ... of the first field (the IP)</span></code></pre>
+
+
+<figure id="fig-pipes">
+<svg viewBox="0 0 720 170" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <defs><marker id="ap1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent2)"/></marker></defs>
+  <text x="10" y="18" fill="var(--muted)" font-size="10">each stage reads the previous stage's stdout — the data shrinks as you narrow the question</text>
+  <g stroke="var(--accent)" fill="none" stroke-width="1.3">
+    <rect x="8"   y="40" width="104" height="42" rx="6"/>
+    <rect x="150" y="40" width="104" height="42" rx="6"/>
+    <rect x="292" y="40" width="104" height="42" rx="6"/>
+    <rect x="434" y="40" width="104" height="42" rx="6"/>
+    <rect x="576" y="40" width="136" height="42" rx="6"/>
+  </g>
+  <g fill="var(--txt)" text-anchor="middle" font-size="11">
+    <text x="60"  y="60">access.log</text>
+    <text x="202" y="60">awk '{print $1}'</text>
+    <text x="344" y="60">sort</text>
+    <text x="486" y="60">uniq -c</text>
+    <text x="644" y="60">sort -rn | head -5</text>
+  </g>
+  <g fill="var(--muted)" text-anchor="middle" font-size="9">
+    <text x="60"  y="74">40 000 lines</text>
+    <text x="202" y="74">40 000 IPs</text>
+    <text x="344" y="74">sorted</text>
+    <text x="486" y="74">820 unique</text>
+    <text x="644" y="74">5 rows</text>
+  </g>
+  <g stroke="var(--accent2)" stroke-width="1.4" marker-end="url(#ap1)">
+    <line x1="114" y1="61" x2="146" y2="61"/><line x1="256" y1="61" x2="288" y2="61"/>
+    <line x1="398" y1="61" x2="430" y2="61"/><line x1="540" y1="61" x2="572" y2="61"/>
+  </g>
+  <g fill="var(--accent2)" text-anchor="middle" font-size="12">
+    <text x="130" y="57">|</text><text x="272" y="57">|</text>
+    <text x="414" y="57">|</text><text x="556" y="57">|</text>
+  </g>
+  <g fill="var(--muted)" font-size="10">
+    <text x="8" y="112">stdout ──▶ stdin of the next command. stderr (2&gt;) bypasses the pipe entirely,</text>
+    <text x="8" y="128">which is why an error message still reaches your terminal mid-pipeline.</text>
+    <text x="8" y="152" fill="var(--warn)">Read a pipeline right-to-left to recover the question it answers.</text>
+  </g>
+</svg>
+<figcaption>A pipeline is a series of filters, each narrowing the data.</figcaption>
+</figure>
+
+<p>Redirection sends streams to files instead:</p>
+<pre><code>./build.sh &gt; build.log          <span class="c"># stdout to file (overwrite)</span>
+./build.sh &gt;&gt; build.log         <span class="c"># append</span>
+./build.sh &gt; out.log 2&gt; err.log <span class="c"># separate the streams</span>
+./build.sh &gt; all.log 2&gt;&amp;1       <span class="c"># both into one file</span>
+./noisy.sh &gt; /dev/null 2&gt;&amp;1     <span class="c"># discard everything</span></code></pre>
+
+<div class="box why">
+<b>Why this matters later</b>
+CI pipelines, Docker builds and Kubernetes containers all communicate by writing to stdout/stderr.
+A container that logs to a file instead of stdout is a container whose logs you cannot see.
+That is a rule you will meet again in Module 3.
+</div>
+
+<h2 id="proc">1.5 Processes, ports and logs</h2>
+<p>Three questions you will ask on every broken machine: <i>Is it running? Is it listening?
+What did it say before it died?</i></p>
+
+<pre><code><span class="c"># Is it running?</span>
+ps aux | grep nginx
+top            <span class="c"># live view; press q to quit</span>
+
+<span class="c"># Is it listening, and on what port?</span>
+ss -tulpn | grep 8080
+<span class="c"># tcp LISTEN 0 128 0.0.0.0:8080 ... users:(("python3",pid=4711,fd=3))</span>
+
+<span class="c"># What did it say?</span>
+journalctl -u nginx --since "10 min ago"   <span class="c"># systemd services</span>
+tail -f /var/log/syslog
+
+<span class="c"># Stop it: TERM asks politely, KILL does not ask</span>
+kill 4711
+kill -9 4711</code></pre>
+
+<div class="box warn">
+<b>"Port already in use"</b>
+The single most common local error in this course. Find the culprit and decide deliberately:
+<pre><code>ss -tulpn | grep :8080
+kill &lt;pid&gt;   <span class="c"># or change your app's port</span></code></pre>
+</div>
+
+<h2 id="script">1.6 Writing a real shell script</h2>
+<p>A script is a file of commands. But a script anyone else will run needs four things most tutorials
+skip: a shebang, strict mode, arguments, and an exit code.</p>
+
+<pre><code><span class="c">#!/usr/bin/env bash</span>
+<span class="c"># deploy.sh — build and ship one service</span>
+
+<span class="k">set</span> -euo pipefail
+<span class="c">#  -e  exit immediately if any command fails</span>
+<span class="c">#  -u  error on undefined variables (catches typos in $VAR)</span>
+<span class="c">#  -o pipefail  a pipeline fails if ANY stage fails, not just the last</span>
+
+SERVICE=<span class="s">"${1:-}"</span>
+TAG=<span class="s">"${2:-latest}"</span>
+
+<span class="k">if</span> [[ -z <span class="s">"$SERVICE"</span> ]]; <span class="k">then</span>
+  <span class="k">echo</span> <span class="s">"usage: $0 &lt;service&gt; [tag]"</span> &gt;&amp;2
+  <span class="k">exit</span> 1
+<span class="k">fi</span>
+
+<span class="k">echo</span> <span class="s">"==&gt; building $SERVICE:$TAG"</span>
+docker build -t <span class="s">"$SERVICE:$TAG"</span> .
+
+<span class="k">if</span> docker run --rm <span class="s">"$SERVICE:$TAG"</span> pytest -q; <span class="k">then</span>
+  <span class="k">echo</span> <span class="s">"==&gt; tests passed"</span>
+<span class="k">else</span>
+  <span class="k">echo</span> <span class="s">"==&gt; tests FAILED, not shipping"</span> &gt;&amp;2
+  <span class="k">exit</span> 1
+<span class="k">fi</span></code></pre>
+
+<div class="box">
+<b>Always quote your variables</b>
+<code>"$SERVICE"</code>, not <code>$SERVICE</code>. Unquoted, a value containing a space becomes two
+arguments and your script does something you did not intend. This is the number-one source of shell bugs.
+</div>
+
+<p>Exit codes matter more than they look: <code>0</code> means success, anything else means failure.
+CI systems decide whether your pipeline is green purely by reading that number. Check the last one with
+<code>echo $?</code>.</p>
+
+<h2 id="ssh">1.7 SSH and keys</h2>
+<p>SSH gives you an encrypted shell on a remote machine. Passwords are the weak way; key pairs are
+the standard. You generate two files: a private key (never leaves your machine) and a public key
+(copied to every server and to GitHub).</p>
+
+<pre><code>ssh-keygen -t ed25519 -C <span class="s">"zouhair@laptop"</span>
+<span class="c"># Enter file: press Enter for the default ~/.ssh/id_ed25519</span>
+<span class="c"># Passphrase: use one. It encrypts the key at rest.</span>
+
+<span class="c"># copy the PUBLIC key to a server</span>
+ssh-copy-id user@203.0.113.10
+
+<span class="c"># connect</span>
+ssh user@203.0.113.10
+
+<span class="c"># run one command remotely and come straight back</span>
+ssh user@203.0.113.10 <span class="s">'df -h /'</span></code></pre>
+
+<p>For GitHub, paste the contents of <code>~/.ssh/id_ed25519.pub</code> into
+<i>Settings → SSH and GPG keys</i>, then verify:</p>
+<pre><code>cat ~/.ssh/id_ed25519.pub
+ssh -T git@github.com
+<span class="c"># Hi zouhair! You've successfully authenticated...</span></code></pre>
+
+<div class="box warn">
+<b>The private key is the secret</b>
+<code>id_ed25519</code> never leaves your machine, is never committed, never pasted into a chat.
+Only the <code>.pub</code> file is shared. If a private key leaks, revoke it everywhere and regenerate.
+</div>
+
+<h2 id="git">1.8 Git: the mental model</h2>
+<p>Most Git confusion comes from not knowing which of four places a change is in. Learn these and
+the commands become obvious:</p>
+
+<figure>
+<svg viewBox="0 0 720 220" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="12">
+  <g fill="none" stroke="var(--accent)" stroke-width="1.5">
+    <rect x="10"  y="60" width="150" height="60" rx="8"/>
+    <rect x="200" y="60" width="150" height="60" rx="8"/>
+    <rect x="390" y="60" width="150" height="60" rx="8"/>
+    <rect x="565" y="60" width="145" height="60" rx="8"/>
+  </g>
+  <g fill="var(--txt)" text-anchor="middle" font-size="13">
+    <text x="85"  y="85">Working dir</text>
+    <text x="275" y="85">Staging area</text>
+    <text x="465" y="85">Local repo</text>
+    <text x="637" y="85">Remote</text>
+  </g>
+  <g fill="var(--muted)" text-anchor="middle" font-size="10">
+    <text x="85"  y="105">your edited files</text>
+    <text x="275" y="105">the index</text>
+    <text x="465" y="105">.git history</text>
+    <text x="637" y="105">GitHub</text>
+  </g>
+  <g stroke="var(--accent2)" stroke-width="1.5" marker-end="url(#a)">
+    <line x1="162" y1="90" x2="196" y2="90"/>
+    <line x1="352" y1="90" x2="386" y2="90"/>
+    <line x1="542" y1="90" x2="561" y2="90"/>
+  </g>
+  <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+    <path d="M0,0 L8,4 L0,8 z" fill="var(--accent2)"/></marker></defs>
+  <g fill="var(--accent2)" text-anchor="middle" font-size="9">
+    <text x="179" y="80">add</text>
+    <text x="369" y="80">commit</text>
+    <text x="551" y="80">push</text>
+  </g>
+  <g fill="var(--muted)" text-anchor="middle" font-size="11">
+    <text x="360" y="170">git status tells you which boxes your changes are sitting in — read it constantly</text>
+  </g>
+</svg>
+<figcaption>The four states of a change in Git.</figcaption>
+</figure>
+
+<pre><code>git init                       <span class="c"># create a repo here</span>
+git status                     <span class="c"># READ THIS AFTER EVERY COMMAND</span>
+git add file.py                <span class="c"># working dir -&gt; staging</span>
+git add -p                     <span class="c"># stage hunk by hunk; forces you to review</span>
+git commit -m "Add rate limit" <span class="c"># staging -&gt; local repo</span>
+git push origin main           <span class="c"># local repo -&gt; remote</span>
+
+git log --oneline --graph --all  <span class="c"># the history, visually</span>
+git diff                       <span class="c"># unstaged changes</span>
+git diff --staged              <span class="c"># what a commit would contain</span></code></pre>
+
+<h3>Undoing things</h3>
+<table>
+<tr><th>Situation</th><th>Command</th></tr>
+<tr><td>Discard edits to a file, not yet staged</td><td><code>git restore file.py</code></td></tr>
+<tr><td>Unstage a file, keep the edits</td><td><code>git restore --staged file.py</code></td></tr>
+<tr><td>Fix the last commit's message or contents</td><td><code>git commit --amend</code></td></tr>
+<tr><td>Undo last commit, keep changes in working dir</td><td><code>git reset --soft HEAD~1</code></td></tr>
+<tr><td>Undo a commit that is already pushed</td><td><code>git revert &lt;sha&gt;</code></td></tr>
+</table>
+
+<div class="box warn">
+<b>reset vs revert on shared branches</b>
+<code>reset</code> rewrites history. On a branch other people have pulled, that forces everyone into a
+painful recovery. <code>revert</code> creates a <i>new</i> commit that undoes the old one — history stays
+intact. On <code>main</code>, always revert.
+</div>
+
+<h3>Commit messages</h3>
+<p>A commit message is documentation your future self reads at 2 a.m. during an incident.
+The convention most teams use:</p>
+<pre><code>feat: add per-IP rate limiting to /shorten
+fix: handle Redis timeout instead of returning 500
+docs: document the DATABASE_URL variable
+refactor: extract link validation into its own module
+chore: bump python base image to 3.12</code></pre>
+<p>Imperative mood ("add", not "added"), under ~60 characters, explaining <b>why</b> in the body if
+the why is not obvious. This convention also lets tools generate changelogs automatically.</p>
+
+<h3>.gitignore</h3>
+<p>Commit source, never build output or secrets:</p>
+<pre><code>__pycache__/
+*.pyc
+.venv/
+node_modules/
+.env
+*.log
+.terraform/
+terraform.tfstate*</code></pre>
+
+<div class="box warn">
+<b>Removing a secret from history is hard</b>
+Adding <code>.env</code> to <code>.gitignore</code> after committing it does nothing — it is still in
+history. Assume any secret ever pushed is compromised: <b>rotate the credential</b>, then clean history
+with <code>git filter-repo</code>. Prevention is the only good option.
+</div>
+
+<h2 id="branch">1.9 Branching, merging and the conflict you will hit</h2>
+<p>A branch is a movable pointer to a commit. Creating one is instant and costs nothing, which is why
+Git-based workflows lean on them so heavily.</p>
+
+<pre><code>git switch -c feat/rate-limit    <span class="c"># create and switch (modern form)</span>
+<span class="c">... edit, add, commit ...</span>
+git push -u origin feat/rate-limit
+
+<span class="c"># bring main's newest work into your branch before opening a PR</span>
+git switch main &amp;&amp; git pull
+git switch feat/rate-limit
+git merge main</code></pre>
+
+
+<figure id="fig-branch">
+<svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <g stroke="var(--line)" stroke-width="2" fill="none">
+    <path d="M40 60 H660"/>
+  </g>
+  <g stroke="var(--accent2)" stroke-width="2" fill="none">
+    <path d="M180 60 C210 60 210 130 240 130 H460 C500 130 490 62 540 60"/>
+  </g>
+  <g fill="var(--bg)" stroke="var(--accent)" stroke-width="2">
+    <circle cx="60" cy="60" r="9"/><circle cx="180" cy="60" r="9"/>
+    <circle cx="360" cy="60" r="9"/><circle cx="540" cy="60" r="11"/><circle cx="650" cy="60" r="9"/>
+  </g>
+  <g fill="var(--bg)" stroke="var(--accent2)" stroke-width="2">
+    <circle cx="300" cy="130" r="9"/><circle cx="420" cy="130" r="9"/>
+  </g>
+  <text x="40" y="36" fill="var(--accent)" font-size="11">main</text>
+  <text x="110" y="134" fill="var(--accent2)" font-size="11">feat/rate-limit</text>
+  <g fill="var(--muted)" font-size="9" text-anchor="middle">
+    <text x="60" y="84">C1</text><text x="180" y="84">C2</text><text x="360" y="84">C3</text>
+    <text x="650" y="84">C6</text>
+    <text x="300" y="152">C4</text><text x="420" y="152">C5</text>
+  </g>
+  <text x="540" y="40" fill="var(--txt)" font-size="10" text-anchor="middle">merge commit</text>
+  <text x="40" y="188" fill="var(--muted)" font-size="10">Branch at C2, work at C4–C5, merge at C6. Main moved too (C3) — that overlap is where conflicts come from.</text>
+</svg>
+<figcaption>A branch is a pointer. Merging reconciles two lines of history.</figcaption>
+</figure>
+
+<p>When both branches changed the same lines, Git stops and marks the file:</p>
+<pre><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+limit = 100
+=======
+limit = 250
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; main</code></pre>
+<p>Git cannot know which is correct. Edit the file so it contains the code you actually want, delete
+all three marker lines, then:</p>
+<pre><code>git add limits.py
+git commit          <span class="c"># completes the merge</span></code></pre>
+
+<h2 id="flow">1.10 A workflow a team can actually live with</h2>
+<p><b>Trunk-based development with short-lived branches</b> is what most high-performing teams use, and
+it is what the rest of this course assumes:</p>
+<ol>
+<li><code>main</code> is always deployable. It is protected — nobody pushes to it directly.</li>
+<li>Work happens on a branch that lives <b>hours to two days</b>, not weeks. Long branches guarantee
+painful conflicts.</li>
+<li>Open a Pull Request. CI runs automatically (Module 4). A human reviews.</li>
+<li>Merge when both CI and the reviewer are green. Delete the branch.</li>
+</ol>
+<p>The reason branches must be short-lived is mechanical, not cultural: merge pain grows with the
+square of divergence. Two branches that each moved a little are easy to reconcile; two that each moved
+a lot are not.</p>
+
+<h2 id="lab">Lab: bootstrap the course repository</h2>
+<div class="box lab">
+<b>Goal</b>
+Create the repo you will use for the rest of the course, with a working script, a sane
+<code>.gitignore</code>, a branch, a merge and a deliberate conflict you resolve.
+</div>
+
+<h3>Step 1 — create the repo</h3>
+<pre><code>mkdir -p ~/devops/urlshort &amp;&amp; cd ~/devops/urlshort
+git init -b main
+git config user.name  <span class="s">"Your Name"</span>
+git config user.email <span class="s">"you@example.com"</span></code></pre>
+
+<h3>Step 2 — a script that does something</h3>
+<pre><code>cat &gt; healthcheck.sh &lt;&lt;'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+URL="${1:-http://localhost:8000/health}"
+TRIES="${2:-5}"
+
+for i in $(seq 1 "$TRIES"); do
+  code=$(curl -s -o /dev/null -w '%{http_code}' "$URL") || code=000
+  if [[ "$code" == "200" ]]; then
+    echo "OK  $URL responded 200 on attempt $i"
+    exit 0
+  fi
+  echo "... attempt $i/$TRIES got $code, retrying in 2s"
+  sleep 2
+done
+
+echo "FAIL $URL never returned 200" >&2
+exit 1
+EOF
+
+chmod +x healthcheck.sh
+./healthcheck.sh https://example.com</code></pre>
+
+<p>That last line should print <code>OK</code>. Now watch it fail correctly — this is the important half:</p>
+<pre><code>./healthcheck.sh http://localhost:9999/nope 2
+echo "exit code was: $?"
+<span class="c"># exit code was: 1</span></code></pre>
+
+<div class="box why">
+<b>Why this script is shaped this way</b>
+It retries (services take time to start), it takes arguments instead of hardcoding, it writes failures
+to stderr, and it exits non-zero on failure. Those four properties are exactly what a CI system and a
+Kubernetes probe need. You will reuse this file in Modules 4 and 6.
+</div>
+
+<h3>Step 3 — ignore, commit</h3>
+<pre><code>printf '%s\n' '__pycache__/' '.venv/' '.env' '*.log' &gt; .gitignore
+
+echo "SECRET_KEY=hunter2" &gt; .env          <span class="c"># deliberately untracked</span>
+git status                                <span class="c"># .env must NOT appear</span>
+
+git add .
+git commit -m "chore: add healthcheck script and gitignore"
+git log --oneline</code></pre>
+
+<h3>Step 4 — branch, change, merge</h3>
+<pre><code>git switch -c feat/configurable-timeout
+sed -i 's/sleep 2/sleep "${DELAY:-2}"/' healthcheck.sh
+git commit -am "feat: make retry delay configurable via DELAY"
+
+git switch main
+git merge feat/configurable-timeout
+git branch -d feat/configurable-timeout</code></pre>
+
+<h3>Step 5 — create a conflict on purpose, then resolve it</h3>
+<pre><code>git switch -c fix/tries-10
+sed -i 's/TRIES="${2:-5}"/TRIES="${2:-10}"/' healthcheck.sh
+git commit -am "fix: default to 10 retries"
+
+git switch main
+sed -i 's/TRIES="${2:-5}"/TRIES="${2:-3}"/' healthcheck.sh
+git commit -am "fix: default to 3 retries"
+
+git merge fix/tries-10
+<span class="c"># CONFLICT (content): Merge conflict in healthcheck.sh</span></code></pre>
+
+<p>Open <code>healthcheck.sh</code>, choose the value you want, delete the
+<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> / <code>=======</code> / <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> lines, then:</p>
+<pre><code>git add healthcheck.sh
+git commit -m "merge: resolve retry-count conflict, settle on 5"
+git log --oneline --graph --all</code></pre>
+
+<h3>Step 6 — push to GitHub</h3>
+<p>Create an empty repo named <code>urlshort</code> on GitHub (no README, no .gitignore), then:</p>
+<pre><code>git remote add origin git@github.com:&lt;you&gt;/urlshort.git
+git push -u origin main</code></pre>
+
+<h3>Step 7 — protect main</h3>
+<p>On GitHub: <i>Settings → Branches → Add branch protection rule</i> for <code>main</code>.
+Enable <b>Require a pull request before merging</b>. In Module 4 you will add
+<b>Require status checks to pass</b> once your CI exists.</p>
+
+<h2 id="ex">Exercises</h2>
+
+<h3>Exercise 1 — log analysis with pipes</h3>
+<p>Given an nginx-style access log, produce a count of requests per HTTP status code, sorted by
+frequency. Generate test data first:</p>
+<pre><code>printf '%s\n' \
+ '10.0.0.1 - - "GET /a" 200' '10.0.0.2 - - "GET /b" 404' \
+ '10.0.0.1 - - "GET /c" 200' '10.0.0.3 - - "GET /d" 500' \
+ '10.0.0.2 - - "GET /e" 404' '10.0.0.1 - - "GET /f" 200' &gt; access.log</code></pre>
+<details><summary>Solution</summary>
+<pre><code>awk '{print $NF}' access.log | sort | uniq -c | sort -rn
+<span class="c">#  3 200</span>
+<span class="c">#  2 404</span>
+<span class="c">#  1 500</span></code></pre>
+<p><code>$NF</code> is awk's "last field", which is more robust than counting columns when the
+request path contains spaces.</p>
+</details>
+
+<h3>Exercise 2 — a disk-space guard</h3>
+<p>Write <code>diskguard.sh</code> that takes a threshold percentage (default 80), checks usage of
+<code>/</code>, prints a warning and exits 1 if usage exceeds it, exits 0 otherwise.</p>
+<details><summary>Solution</summary>
+<pre><code><span class="c">#!/usr/bin/env bash</span>
+<span class="k">set</span> -euo pipefail
+THRESHOLD=<span class="s">"${1:-80}"</span>
+USED=$(df --output=pcent / | tail -1 | tr -dc '0-9')
+
+<span class="k">if</span> (( USED &gt; THRESHOLD )); <span class="k">then</span>
+  <span class="k">echo</span> <span class="s">"WARN: / is ${USED}% full (threshold ${THRESHOLD}%)"</span> &gt;&amp;2
+  <span class="k">exit</span> 1
+<span class="k">fi</span>
+<span class="k">echo</span> <span class="s">"OK: / is ${USED}% full"</span></code></pre>
+<p><code>tr -dc '0-9'</code> strips everything that is not a digit — simpler and safer than parsing
+the <code>%</code> sign out by hand.</p>
+</details>
+
+<h3>Exercise 3 — recover a lost commit</h3>
+<p>Commit something, then run <code>git reset --hard HEAD~1</code> to "lose" it.
+Recover it without having written down the SHA.</p>
+<details><summary>Solution</summary>
+<pre><code>git reflog
+<span class="c"># a1b2c3d HEAD@{1}: commit: the one you thought you lost</span>
+git reset --hard a1b2c3d</code></pre>
+<p><code>reflog</code> records every position HEAD has occupied for ~90 days. Almost nothing committed
+in Git is truly unrecoverable, which is worth knowing before you panic.</p>
+</details>
+
+<h3>Exercise 4 — clean history</h3>
+<p>Make three commits: <code>wip</code>, <code>wip2</code>, <code>fix typo</code>.
+Squash them into one well-named commit before "opening a PR".</p>
+<details><summary>Solution</summary>
+<pre><code>git rebase -i HEAD~3
+<span class="c"># keep the first as "pick", change the other two to "squash" (or "s")</span>
+<span class="c"># save; then write one good message in the editor that appears</span></code></pre>
+<p>Only rebase branches nobody else has pulled. Rewriting shared history is the one Git operation that
+genuinely ruins other people's afternoons.</p>
+</details>
+
+<h2 id="check">Checkpoint</h2>
+
+<div class="quiz" data-answer="b">
+<div class="q">Your script runs <code>curl … | grep 200</code> and the curl fails, but the script keeps going. Why?</div>
+<button data-opt="a">Because <code>set -e</code> does not apply to scripts, only to interactive shells</button>
+<button data-opt="b">Because a pipeline's exit code is its <i>last</i> command's — you need <code>set -o pipefail</code></button>
+<button data-opt="c">Because grep swallows errors from stdin</button>
+<div class="fb">Without <code>pipefail</code>, bash reports only the final stage's status. <code>set -euo pipefail</code> at the top of every script prevents this whole class of silent failure.</div>
+</div>
+
+<div class="quiz" data-answer="c">
+<div class="q">You accidentally pushed a commit to <code>main</code> containing an API key. What is the correct first action?</div>
+<button data-opt="a">Add the file to <code>.gitignore</code> and push again</button>
+<button data-opt="b">Run <code>git reset --hard</code> and force-push</button>
+<button data-opt="c">Rotate the key at the provider immediately, then clean the history</button>
+<div class="fb">The key is already public the moment it is pushed — cleaning history does not un-leak it, and bots scrape public repos within minutes. Revocation first, cleanup second.</div>
+</div>
+
+<div class="quiz" data-answer="a">
+<div class="q">Why does the course insist branches live hours, not weeks?</div>
+<button data-opt="a">Merge difficulty grows with how far two branches diverge</button>
+<button data-opt="b">Git stores long branches less efficiently</button>
+<button data-opt="c">GitHub charges for stale branches</button>
+<div class="fb">It is a mechanical property, not a preference. Small, frequent integrations mean small, tractable conflicts — which is why continuous integration is called that.</div>
+</div>
+
+<div class="card">
+<b>You should now be able to, without notes:</b>
+<ul class="chk">
+<li>Navigate a server, find a config file in <code>/etc</code> and follow a log with <code>tail -f</code>.</li>
+<li>Chain <code>grep</code>/<code>awk</code>/<code>sort</code>/<code>uniq</code> to answer a question about a log file.</li>
+<li>Find which process holds a port and stop it.</li>
+<li>Write a script with strict mode, arguments, stderr output and correct exit codes.</li>
+<li>Generate an SSH key pair and authenticate to GitHub with it.</li>
+<li>Explain the four states of a change and pick the right undo command for each.</li>
+<li>Create a branch, merge it, and resolve a conflict without panic.</li>
+</ul>
+</div>
+
+<div class="pager">
+  <a href="index.html">← All modules</a>
+  <a href="module-2.html">Module 2 · Networking Basics →</a>
+</div>
+
+</main>
+<footer><div class="wrap">Practical DevOps · Module 1</div></footer>
+<script src="assets/course.js"></script>
+</body>
+</html>

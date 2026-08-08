@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>5.7 Modules and environments — Module 5 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-5.html">Module 5 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 05</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">5.1 The problem: snowflake servers and drift</a>
+<a href="02-decl.html">5.2 Declarative vs imperative</a>
+<a href="03-split.html">5.3 Terraform vs Ansible — the division of labour</a>
+<a href="04-tf.html">5.4 Terraform: the core loop</a>
+<a href="05-hcl.html">5.5 HCL: variables, outputs, resources, data</a>
+<a href="06-state.html">5.6 State — the concept that trips everyone</a>
+<a href="07-mod.html" class="cur">5.7 Modules and environments</a>
+<a href="08-ansible.html">5.8 Ansible: configuring what exists</a>
+<a href="09-idem.html">5.9 Idempotency, concretely</a>
+<a href="10-secrets.html">5.10 Secrets in infrastructure code</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html">Lab: provision and configure, locally</a>
+<a href="12-ex.html">Exercises</a>
+<a href="13-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-5.html">Infrastructure as Code: Terraform &amp; Ansible</a>
+</div>
+<div class="secmeta">Module 05 · Section 7 of 13</div>
+
+<h2 id="mod">5.7 Modules and environments</h2>
+<p>A module is just a directory of <code>.tf</code> files you can call with different inputs. It is how
+you avoid copy-pasting staging into production and letting them drift apart.</p>
+
+<pre><code>terraform/
+├── modules/
+│   └── app/
+│       ├── main.tf
+│       ├── variables.tf
+│       └── outputs.tf
+└── envs/
+    ├── dev/main.tf
+    └── prod/main.tf</code></pre>
+
+<pre><code><span class="c"># envs/dev/main.tf</span>
+<span class="k">module</span> <span class="s">"app"</span> {
+  source = <span class="s">"../../modules/app"</span>
+
+  project   = <span class="s">"urlshort-dev"</span>
+  api_port  = 8000
+  api_image = <span class="s">"urlshort:0.1.0"</span>
+  replicas  = 1
+}</code></pre>
+
+<p>Same code, different inputs — so staging is genuinely a smaller copy of production rather than a
+different system that resembles it.</p>
+
+<div class="pager">
+  <a href="06-state.html"><span class="sub">← Previous</span>5.6 State — the concept that trips everyone</a>
+  <a href="08-ansible.html" class="nx"><span class="sub">Next →</span>5.8 Ansible: configuring what exists</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 5 · 5.7 Modules and environments</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2.10 HTTPS and TLS — Module 2 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-2.html">Module 2 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 02</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">2.1 Why this module comes before Docker</a>
+<a href="02-model.html">2.2 The TCP/IP model: four layers, one journey</a>
+<a href="03-ip.html">2.3 IP addressing</a>
+<a href="04-subnet.html">2.4 Subnets and CIDR</a>
+<a href="05-private.html">2.5 Private ranges, NAT and why your laptop is invisible</a>
+<a href="06-tcp.html">2.6 TCP vs UDP</a>
+<a href="07-ports.html">2.7 Ports and sockets</a>
+<a href="08-dns.html">2.8 DNS: how a name becomes an address</a>
+<a href="09-http.html">2.9 HTTP: the request you will read a thousand times</a>
+<a href="10-https.html" class="cur">2.10 HTTPS and TLS</a>
+<a href="11-fw.html">2.11 Firewalls and the ports that matter</a>
+<a href="12-tools.html">2.12 The troubleshooting toolkit</a>
+<a class="grp">Practice</a>
+<a href="13-lab.html">Lab: trace a request end to end</a>
+<a href="14-ex.html">Exercises</a>
+<a href="15-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-2.html">Networking Basics</a>
+</div>
+<div class="secmeta">Module 02 · Section 10 of 15</div>
+
+<h2 id="https">2.10 HTTPS and TLS</h2>
+<p>HTTPS is HTTP inside a TLS tunnel. TLS gives you three distinct things, and conflating them causes
+confusion:</p>
+<ul>
+<li><b>Encryption</b> — nobody in between can read the traffic.</li>
+<li><b>Integrity</b> — nobody can modify it undetected.</li>
+<li><b>Authentication</b> — you are talking to the server the certificate names. This is the part a
+self-signed certificate does not give you.</li>
+</ul>
+
+<p>The handshake, simplified: the client says hello, the server presents a <b>certificate</b> containing
+its public key and a signature from a <b>Certificate Authority</b>, the client verifies that signature
+against its trust store, and they derive a shared symmetric key for the actual data.</p>
+
+<pre><code><span class="c"># inspect a live certificate: who issued it, and when does it expire?</span>
+echo | openssl s_client -connect example.com:443 -servername example.com 2&gt;/dev/null \
+  | openssl x509 -noout -subject -issuer -dates
+
+<span class="c"># expiry only — the check worth putting on a schedule</span>
+echo | openssl s_client -connect example.com:443 2&gt;/dev/null \
+  | openssl x509 -noout -enddate</code></pre>
+
+<div class="box warn">
+<b>Three TLS failures and what they actually mean</b>
+<ul style="margin:.4em 0 0">
+<li><b>certificate has expired</b> — the single most common self-inflicted outage in this category.
+Automate renewal (cert-manager, certbot) and alert on days remaining, not on the failure.</li>
+<li><b>self-signed certificate / unable to verify</b> — the chain does not lead to a trusted CA.
+Fine inside a lab; never paper over it in production with <code>curl -k</code>, which disables the
+authentication guarantee entirely.</li>
+<li><b>hostname mismatch</b> — the certificate is valid but for a different name. Usually SNI:
+one IP serves many sites, and the server needs the <code>-servername</code> to pick the right cert.</li>
+</ul>
+</div>
+
+<p><b>Where TLS terminates</b> matters architecturally. Usually a load balancer or ingress controller
+holds the certificate and speaks plain HTTP to your app behind it. That is why your container listens
+on port 8000 with no certificate at all — and why, in Module 6, the app is happily HTTP inside the
+cluster while users see HTTPS.</p>
+
+<div class="pager">
+  <a href="09-http.html"><span class="sub">← Previous</span>2.9 HTTP: the request you will read a thousand times</a>
+  <a href="11-fw.html" class="nx"><span class="sub">Next →</span>2.11 Firewalls and the ports that matter</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 2 · 2.10 HTTPS and TLS</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Module 5 — Infrastructure as Code | Practical DevOps</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <a class="brand hm" href="index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="index.html">All modules</a>
+    <a href="module-4.html">← Prev</a>
+    <a href="module-6.html">Next →</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap">
+
+<div class="kicker" style="margin-top:40px">Module 05 · ~5 hours</div>
+<h1>Infrastructure as Code: Terraform &amp; Ansible</h1>
+<p class="lead">Stop clicking consoles and SSH-ing into servers to "just fix one thing".
+Declare what should exist, commit it, review it, and let a tool make reality match the file.</p>
+
+<div class="card toc">
+<b>In this module</b>
+<a href="#why">5.1 The problem: snowflake servers and drift</a>
+<a href="#decl">5.2 Declarative vs imperative</a>
+<a href="#split">5.3 Terraform vs Ansible — the division of labour</a>
+<a href="#tf">5.4 Terraform: the core loop</a>
+<a href="#hcl">5.5 HCL: variables, outputs, resources, data</a>
+<a href="#state">5.6 State — the concept that trips everyone</a>
+<a href="#mod">5.7 Modules and environments</a>
+<a href="#ansible">5.8 Ansible: configuring what exists</a>
+<a href="#idem">5.9 Idempotency, concretely</a>
+<a href="#secrets">5.10 Secrets in infrastructure code</a>
+<a href="#lab">Lab: provision and configure, locally</a>
+<a href="#ex">Exercises</a>
+<a href="#check">Checkpoint</a>
+</div>
+
+<h2 id="why">5.1 The problem: snowflake servers and drift</h2>
+<p>A server is set up by hand in 2023. Someone patches a config in 2024 during an outage. Someone else
+installs a debugging tool and forgets to remove it. By 2026 nobody knows what is on that machine, and
+nobody dares rebuild it because it cannot be reproduced. That is a <b>snowflake</b>: unique, fragile,
+and impossible to replace.</p>
+<p><b>Configuration drift</b> is how you get there — the slow, invisible divergence between what you
+think is deployed and what is actually deployed. Every manual change is a small increment of drift.</p>
+
+<div class="box why">
+<b>Why it exists</b>
+Infrastructure as Code makes infrastructure obey the same rules as application code: it lives in Git,
+it is reviewed in a PR, changes are diffable, and rebuilding from scratch is a routine operation rather
+than a disaster-recovery exercise. The real payoff is that <i>rebuilding becomes boring</i>.
+</div>
+
+<h2 id="decl">5.2 Declarative vs imperative</h2>
+<table>
+<tr><th></th><th>Imperative</th><th>Declarative</th></tr>
+<tr><td>You write</td><td>The steps to take</td><td>The end state you want</td></tr>
+<tr><td>Example</td><td><code>apt install nginx &amp;&amp; systemctl start nginx</code></td><td><code>nginx is installed and running</code></td></tr>
+<tr><td>Run twice</td><td>May error or duplicate work</td><td>Second run does nothing — already true</td></tr>
+<tr><td>Tools</td><td>Shell scripts</td><td>Terraform, Ansible modules, Kubernetes manifests</td></tr>
+</table>
+<p>The declarative model gives you <b>idempotency</b>: applying the same configuration any number of
+times converges on the same result. That property is what makes automation safe to re-run, which is
+what makes it usable at all — an automation you are afraid to run twice is not automation.</p>
+
+<h2 id="split">5.3 Terraform vs Ansible — the division of labour</h2>
+<p>Beginners often ask which one to learn. They solve adjacent problems and are commonly used together.</p>
+
+<table>
+<tr><th></th><th>Terraform</th><th>Ansible</th></tr>
+<tr><td>Job</td><td><b>Provisioning</b>: create the things — networks, VMs, databases, DNS, load balancers</td><td><b>Configuration</b>: make an existing machine correct — packages, files, services, users</td></tr>
+<tr><td>Model</td><td>Declarative, with persistent state</td><td>Mostly declarative modules, executed in order, stateless</td></tr>
+<tr><td>Knows about</td><td>What it created (via state file)</td><td>Nothing between runs — it inspects each time</td></tr>
+<tr><td>Transport</td><td>Provider APIs</td><td>SSH (agentless)</td></tr>
+<tr><td>Deleting</td><td><code>terraform destroy</code> removes what it made</td><td>No concept of teardown</td></tr>
+</table>
+
+<p><b>Typical flow:</b> Terraform creates three VMs and outputs their IPs → Ansible connects to those
+IPs and installs Docker, deploys config, starts services.</p>
+
+<h2 id="tf">5.4 Terraform: the core loop</h2>
+<pre><code>terraform init      <span class="c"># download providers, set up the backend. Run once per project/change.</span>
+terraform fmt       <span class="c"># canonical formatting — put this in CI</span>
+terraform validate  <span class="c"># syntax and internal consistency</span>
+terraform plan      <span class="c"># show me what you WOULD change. Read this. Every time.</span>
+terraform apply     <span class="c"># make it so</span>
+terraform destroy   <span class="c"># tear it all down</span></code></pre>
+
+
+<figure id="fig-plan">
+<svg viewBox="0 0 720 170" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <text x="8" y="16" fill="var(--muted)" font-size="10">read these four symbols before you ever type "yes"</text>
+  <g stroke="var(--line)" fill="none" stroke-width="1.2">
+    <rect x="8" y="28" width="172" height="86" rx="7"/><rect x="188" y="28" width="172" height="86" rx="7"/>
+    <rect x="368" y="28" width="172" height="86" rx="7"/><rect x="548" y="28" width="164" height="86" rx="7"/>
+  </g>
+  <g font-size="22" text-anchor="middle">
+    <text x="94" y="60" fill="var(--ok)">+</text><text x="274" y="60" fill="var(--accent2)">~</text>
+    <text x="454" y="60" fill="var(--warn)">-</text><text x="630" y="60" fill="var(--err)">-/+</text>
+  </g>
+  <g fill="var(--txt)" text-anchor="middle" font-size="11">
+    <text x="94" y="84">create</text><text x="274" y="84">update in place</text>
+    <text x="454" y="84">destroy</text><text x="630" y="84">replace</text>
+  </g>
+  <g fill="var(--muted)" text-anchor="middle" font-size="9">
+    <text x="94" y="102">safe</text><text x="274" y="102">usually safe</text>
+    <text x="454" y="102">intended? check</text><text x="630" y="102">destroy THEN create</text>
+  </g>
+  <g stroke="var(--err)" fill="none" stroke-width="1.4"><rect x="548" y="122" width="164" height="38" rx="6"/></g>
+  <text x="630" y="139" fill="var(--err)" text-anchor="middle" font-size="10">data loss lives here</text>
+  <text x="630" y="153" fill="var(--muted)" text-anchor="middle" font-size="9">find the forcing attribute</text>
+  <text x="8" y="134" fill="var(--muted)" font-size="10">Terraform always tells you what it is about to do, before it does it.</text>
+  <text x="8" y="152" fill="var(--warn)" font-size="10">A plan you did not read is an apply you did not authorise.</text>
+</svg>
+<figcaption>The four plan symbols. Only one of them can lose your data.</figcaption>
+</figure>
+
+<div class="box warn">
+<b><code>plan</code> is the safety mechanism, not a formality</b>
+Read the plan symbols before typing yes:
+<code>+</code> create, <code>~</code> update in place, <code>-</code> destroy,
+<code>-/+</code> <b>destroy and recreate</b>. That last one is where production databases die.
+When you see <code>-/+</code> on something stateful, stop and find out which attribute forced it.
+</div>
+
+<h2 id="hcl">5.5 HCL: variables, outputs, resources, data</h2>
+<p>This course uses the <b>Docker provider</b> so everything runs locally with no cloud bill — the
+concepts are identical to AWS or Azure providers, only the resource names change.</p>
+
+<p><code>terraform/main.tf</code>:</p>
+<pre><code><span class="k">terraform</span> {
+  required_version = <span class="s">"&gt;= 1.6"</span>
+  required_providers {
+    docker = {
+      source  = <span class="s">"kreuzwerker/docker"</span>
+      version = <span class="s">"~&gt; 3.0"</span>
+    }
+  }
+}
+
+<span class="k">provider</span> <span class="s">"docker"</span> {}
+
+<span class="c"># a network, so containers can find each other by name</span>
+<span class="k">resource</span> <span class="s">"docker_network"</span> <span class="s">"app"</span> {
+  name = <span class="s">"${var.project}-net"</span>
+}
+
+<span class="c"># a named volume for redis persistence</span>
+<span class="k">resource</span> <span class="s">"docker_volume"</span> <span class="s">"redis_data"</span> {
+  name = <span class="s">"${var.project}-redis-data"</span>
+}
+
+<span class="c"># pull the image (data-like resource: describes something external)</span>
+<span class="k">resource</span> <span class="s">"docker_image"</span> <span class="s">"redis"</span> {
+  name         = <span class="s">"redis:7-alpine"</span>
+  keep_locally = <span class="k">true</span>
+}
+
+<span class="k">resource</span> <span class="s">"docker_container"</span> <span class="s">"redis"</span> {
+  name  = <span class="s">"${var.project}-redis"</span>
+  image = docker_image.redis.image_id
+
+  command = [<span class="s">"redis-server"</span>, <span class="s">"--appendonly"</span>, <span class="s">"yes"</span>]
+
+  networks_advanced {
+    name    = docker_network.app.name
+    aliases = [<span class="s">"redis"</span>]
+  }
+
+  volumes {
+    volume_name    = docker_volume.redis_data.name
+    container_path = <span class="s">"/data"</span>
+  }
+
+  restart = <span class="s">"unless-stopped"</span>
+}</code></pre>
+
+<p><code>terraform/variables.tf</code>:</p>
+<pre><code><span class="k">variable</span> <span class="s">"project"</span> {
+  description = <span class="s">"Name prefix for all resources"</span>
+  type        = string
+  default     = <span class="s">"urlshort"</span>
+}
+
+<span class="k">variable</span> <span class="s">"api_port"</span> {
+  description = <span class="s">"Host port to expose the API on"</span>
+  type        = number
+  default     = 8000
+
+  validation {
+    condition     = var.api_port &gt; 1024 &amp;&amp; var.api_port &lt; 65536
+    error_message = <span class="s">"api_port must be an unprivileged port."</span>
+  }
+}
+
+<span class="k">variable</span> <span class="s">"api_image"</span> {
+  description = <span class="s">"Fully qualified image, ideally tagged with a commit SHA"</span>
+  type        = string
+  default     = <span class="s">"urlshort:0.1.0"</span>
+}</code></pre>
+
+<p><code>terraform/outputs.tf</code> — outputs are how Terraform hands facts to the next tool:</p>
+<pre><code><span class="k">output</span> <span class="s">"api_url"</span> {
+  description = <span class="s">"Where the API is reachable"</span>
+  value       = <span class="s">"http://localhost:${var.api_port}"</span>
+}
+
+<span class="k">output</span> <span class="s">"network_name"</span> {
+  value = docker_network.app.name
+}</code></pre>
+
+<h3>Dependencies are inferred, not declared</h3>
+<p>Because <code>docker_container.redis</code> references <code>docker_network.app.name</code>,
+Terraform knows the network must exist first. You almost never write explicit ordering —
+it builds a dependency graph from the references and parallelises everything unrelated.
+Use <code>depends_on</code> only for dependencies that exist in reality but not in the code.</p>
+
+<h2 id="state">5.6 State — the concept that trips everyone</h2>
+<p>Terraform records what it created in <code>terraform.tfstate</code>: a mapping from your resource
+addresses to real object IDs. Without it, Terraform cannot tell "this container does not exist yet"
+from "this container exists and I made it".</p>
+
+<figure>
+<svg viewBox="0 0 700 170" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+  <g fill="none" stroke="var(--accent)" stroke-width="1.4">
+    <rect x="20" y="45" width="170" height="70" rx="8"/>
+    <rect x="265" y="45" width="170" height="70" rx="8"/>
+    <rect x="510" y="45" width="170" height="70" rx="8"/>
+  </g>
+  <g fill="var(--txt)" text-anchor="middle" font-size="12">
+    <text x="105" y="75">.tf files</text><text x="350" y="75">state file</text><text x="595" y="75">real world</text>
+  </g>
+  <g fill="var(--muted)" text-anchor="middle" font-size="10">
+    <text x="105" y="95">desired</text><text x="350" y="95">last known</text><text x="595" y="95">actual</text>
+  </g>
+  <g stroke="var(--accent2)" stroke-width="1.3" marker-end="url(#a4)">
+    <line x1="192" y1="80" x2="261" y2="80"/><line x1="437" y1="80" x2="506" y2="80"/>
+  </g>
+  <defs><marker id="a4" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+    <path d="M0,0 L8,4 L0,8 z" fill="var(--accent2)"/></marker></defs>
+  <g fill="var(--muted)" text-anchor="middle" font-size="10">
+    <text x="350" y="145">plan = diff(desired, refresh(state vs real world))</text>
+  </g>
+</svg>
+<figcaption>Terraform compares three things, not two. State is the memory in the middle.</figcaption>
+</figure>
+
+<div class="box warn">
+<b>Three rules about state</b>
+<ul style="margin:.4em 0 0">
+<li><b>Never commit it.</b> It contains resource attributes including, frequently, secrets in plaintext.
+<code>terraform.tfstate*</code> and <code>.terraform/</code> go in <code>.gitignore</code>.</li>
+<li><b>Never hand-edit it.</b> Use <code>terraform state mv</code> / <code>rm</code> / <code>import</code>.</li>
+<li><b>For teams, use a remote backend with locking</b> (S3 + DynamoDB, Terraform Cloud, GCS).
+Two concurrent applies against local state corrupt it and can duplicate or orphan real infrastructure.</li>
+</ul>
+</div>
+
+<h3>The three commands that rescue you</h3>
+<pre><code><span class="c"># someone created a resource by hand; adopt it into state</span>
+terraform import docker_container.api &lt;container-id&gt;
+
+<span class="c"># stop managing something without destroying it</span>
+terraform state rm docker_container.api
+
+<span class="c"># see what Terraform thinks exists</span>
+terraform state list
+terraform state show docker_container.redis</code></pre>
+
+<h2 id="mod">5.7 Modules and environments</h2>
+<p>A module is just a directory of <code>.tf</code> files you can call with different inputs. It is how
+you avoid copy-pasting staging into production and letting them drift apart.</p>
+
+<pre><code>terraform/
+├── modules/
+│   └── app/
+│       ├── main.tf
+│       ├── variables.tf
+│       └── outputs.tf
+└── envs/
+    ├── dev/main.tf
+    └── prod/main.tf</code></pre>
+
+<pre><code><span class="c"># envs/dev/main.tf</span>
+<span class="k">module</span> <span class="s">"app"</span> {
+  source = <span class="s">"../../modules/app"</span>
+
+  project   = <span class="s">"urlshort-dev"</span>
+  api_port  = 8000
+  api_image = <span class="s">"urlshort:0.1.0"</span>
+  replicas  = 1
+}</code></pre>
+
+<p>Same code, different inputs — so staging is genuinely a smaller copy of production rather than a
+different system that resembles it.</p>
+
+<h2 id="ansible">5.8 Ansible: configuring what exists</h2>
+<p>Ansible connects over SSH and runs <b>modules</b> — small idempotent units like
+<code>apt</code>, <code>copy</code>, <code>service</code>. No agent to install on the target.</p>
+
+
+<figure id="fig-ansible">
+<svg viewBox="0 0 720 198" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <defs><marker id="aa1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent2)"/></marker></defs>
+  <g stroke="var(--accent)" fill="none" stroke-width="1.4"><rect x="8" y="60" width="150" height="66" rx="8"/></g>
+  <text x="83" y="84" fill="var(--accent)" text-anchor="middle" font-size="11">control node</text>
+  <text x="83" y="100" fill="var(--muted)" text-anchor="middle" font-size="9">your laptop / CI</text>
+  <text x="83" y="114" fill="var(--muted)" text-anchor="middle" font-size="9">playbook.yml</text>
+  <g stroke="var(--accent2)" stroke-width="1.3" marker-end="url(#aa1)">
+    <line x1="162" y1="80" x2="316" y2="40"/><line x1="162" y1="93" x2="316" y2="93"/>
+    <line x1="162" y1="106" x2="316" y2="146"/>
+  </g>
+  <text x="238" y="52" fill="var(--accent2)" text-anchor="middle" font-size="9">SSH</text>
+  <text x="238" y="86" fill="var(--accent2)" text-anchor="middle" font-size="9">SSH</text>
+  <g stroke="var(--line)" fill="none" stroke-width="1.2">
+    <rect x="320" y="20" width="180" height="40" rx="6"/>
+    <rect x="320" y="73" width="180" height="40" rx="6"/>
+    <rect x="320" y="126" width="180" height="40" rx="6"/>
+  </g>
+  <g fill="var(--txt)" font-size="10">
+    <text x="334" y="45">web1</text><text x="334" y="98">web2</text><text x="334" y="151">web3</text>
+  </g>
+  <g fill="var(--ok)" font-size="9" text-anchor="end">
+    <text x="490" y="45">changed=4</text><text x="490" y="98">changed=4</text><text x="490" y="151">changed=4</text>
+  </g>
+  <g stroke="var(--ok)" fill="none" stroke-width="1.2"><rect x="520" y="60" width="192" height="66" rx="8"/></g>
+  <text x="616" y="82" fill="var(--ok)" text-anchor="middle" font-size="10">run it again</text>
+  <text x="616" y="100" fill="var(--txt)" text-anchor="middle" font-size="11">changed=0</text>
+  <text x="616" y="116" fill="var(--muted)" text-anchor="middle" font-size="9">that is idempotency</text>
+  <text x="8" y="176" fill="var(--muted)" font-size="10">Agentless: plain SSH, no state kept between runs.</text>
+  <text x="8" y="191" fill="var(--muted)" font-size="10">It inspects each host and acts only where reality differs.</text>
+</svg>
+<figcaption>Agentless push over SSH; the second run should change nothing.</figcaption>
+</figure>
+
+<p><code>ansible/inventory.ini</code> — the machines:</p>
+<pre><code>[web]
+web1 ansible_host=203.0.113.10
+web2 ansible_host=203.0.113.11
+
+[web:vars]
+ansible_user=ubuntu
+ansible_ssh_private_key_file=~/.ssh/id_ed25519
+
+[local]
+localhost ansible_connection=local</code></pre>
+
+<p><code>ansible/playbook.yml</code>:</p>
+<pre><code>- <span class="v">name</span>: Configure application hosts
+  <span class="v">hosts</span>: web
+  <span class="v">become</span>: <span class="k">true</span>
+
+  <span class="v">vars</span>:
+    <span class="v">app_user</span>: urlshort
+    <span class="v">app_dir</span>: /srv/urlshort
+
+  <span class="v">tasks</span>:
+    - <span class="v">name</span>: Install base packages
+      <span class="v">ansible.builtin.apt</span>:
+        <span class="v">name</span>: [ca-certificates, curl, gnupg]
+        <span class="v">state</span>: present
+        <span class="v">update_cache</span>: <span class="k">true</span>
+        <span class="v">cache_valid_time</span>: 3600
+
+    - <span class="v">name</span>: Create the service account
+      <span class="v">ansible.builtin.user</span>:
+        <span class="v">name</span>: <span class="s">"{{ app_user }}"</span>
+        <span class="v">system</span>: <span class="k">true</span>
+        <span class="v">create_home</span>: <span class="k">false</span>
+
+    - <span class="v">name</span>: Create the app directory
+      <span class="v">ansible.builtin.file</span>:
+        <span class="v">path</span>: <span class="s">"{{ app_dir }}"</span>
+        <span class="v">state</span>: directory
+        <span class="v">owner</span>: <span class="s">"{{ app_user }}"</span>
+        <span class="v">mode</span>: <span class="s">"0755"</span>
+
+    - <span class="v">name</span>: Render the compose file
+      <span class="v">ansible.builtin.template</span>:
+        <span class="v">src</span>: compose.yaml.j2
+        <span class="v">dest</span>: <span class="s">"{{ app_dir }}/compose.yaml"</span>
+        <span class="v">owner</span>: <span class="s">"{{ app_user }}"</span>
+        <span class="v">mode</span>: <span class="s">"0644"</span>
+      <span class="v">notify</span>: Restart the stack
+
+    - <span class="v">name</span>: Ensure Docker is enabled and running
+      <span class="v">ansible.builtin.service</span>:
+        <span class="v">name</span>: docker
+        <span class="v">state</span>: started
+        <span class="v">enabled</span>: <span class="k">true</span>
+
+  <span class="v">handlers</span>:
+    - <span class="v">name</span>: Restart the stack
+      <span class="v">ansible.builtin.command</span>:
+        <span class="v">cmd</span>: docker compose up -d
+        <span class="v">chdir</span>: <span class="s">"{{ app_dir }}"</span></code></pre>
+
+<div class="box why">
+<b>Why handlers exist</b>
+A handler runs only if a task reported <code>changed</code>, and only once at the end of the play even
+if ten tasks notified it. So "restart the service" happens exactly when the config actually changed —
+not on every run, and not three times. That is the difference between a playbook you run daily and one
+you are scared to run.
+</div>
+
+<pre><code>ansible -i inventory.ini web -m ping        <span class="c"># connectivity check</span>
+ansible-playbook -i inventory.ini playbook.yml --check --diff   <span class="c"># dry run</span>
+ansible-playbook -i inventory.ini playbook.yml
+ansible-playbook -i inventory.ini playbook.yml --tags config    <span class="c"># subset</span></code></pre>
+
+<h2 id="idem">5.9 Idempotency, concretely</h2>
+<p>Run a playbook twice. The second run should report <code>changed=0</code>. If it does not, some task
+is doing work unconditionally, and you cannot trust the report to tell you what actually changed.</p>
+
+<pre><code>PLAY RECAP
+web1 : ok=6  changed=4  unreachable=0  failed=0    <span class="c"># first run</span>
+web1 : ok=6  changed=0  unreachable=0  failed=0    <span class="c"># second run — correct</span></code></pre>
+
+<div class="box warn">
+<b>The <code>command</code> module is the usual culprit</b>
+<code>command</code> and <code>shell</code> always report changed, because Ansible cannot know what your
+command did. Prefer a real module when one exists; when you must shell out, guard it:
+<pre><code>- <span class="v">name</span>: Initialise the database once
+  <span class="v">ansible.builtin.command</span>: /srv/app/init-db.sh
+  <span class="v">args</span>:
+    <span class="v">creates</span>: /srv/app/.db-initialised   <span class="c"># skip if this file exists</span></code></pre>
+<code>creates</code>/<code>removes</code>, or <code>register</code> + <code>when</code>, or
+<code>changed_when</code> — these turn an imperative escape hatch back into something idempotent.
+</div>
+
+<h2 id="secrets">5.10 Secrets in infrastructure code</h2>
+<p>IaC repositories are where secrets go to leak, because infrastructure genuinely needs credentials
+and the files are genuinely committed.</p>
+
+<pre><code><span class="c"># Ansible Vault: encrypt a file in place</span>
+ansible-vault create group_vars/web/vault.yml
+ansible-vault edit  group_vars/web/vault.yml
+ansible-playbook playbook.yml --ask-vault-pass</code></pre>
+
+<p>For Terraform, mark sensitive values so they are not printed:</p>
+<pre><code><span class="k">variable</span> <span class="s">"db_password"</span> {
+  type      = string
+  sensitive = <span class="k">true</span>
+}
+
+<span class="k">output</span> <span class="s">"connection_string"</span> {
+  value     = <span class="s">"postgres://app:${var.db_password}@db:5432/app"</span>
+  sensitive = <span class="k">true</span>
+}</code></pre>
+
+<div class="box warn">
+<b><code>sensitive = true</code> hides it from output, not from state</b>
+The value is still stored in plaintext in <code>terraform.tfstate</code>. Real protection means an
+encrypted remote backend plus a secrets manager (Vault, AWS Secrets Manager, SOPS) that Terraform reads
+from at apply time rather than storing.
+</div>
+
+<h2 id="lab">Lab: provision and configure, locally</h2>
+<div class="box lab">
+<b>Goal</b>
+Replace the hand-written Compose file with Terraform-managed infrastructure, prove drift detection
+works, then use Ansible to configure the host idempotently.
+</div>
+
+<h3>Step 1 — set up</h3>
+<pre><code>cd ~/devops/urlshort
+mkdir -p terraform ansible
+cd terraform
+
+<span class="c"># append to the repo .gitignore</span>
+cat &gt;&gt; ../.gitignore &lt;&lt;'EOF'
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars
+EOF</code></pre>
+
+<h3>Step 2 — write the config</h3>
+<p>Create <code>main.tf</code>, <code>variables.tf</code> and <code>outputs.tf</code> from section 4.5,
+then add the API container to <code>main.tf</code>:</p>
+
+<pre><code><span class="k">resource</span> <span class="s">"docker_container"</span> <span class="s">"api"</span> {
+  name  = <span class="s">"${var.project}-api"</span>
+  image = var.api_image
+
+  env = [
+    <span class="s">"REDIS_URL=redis://redis:6379/0"</span>,
+  ]
+
+  ports {
+    internal = 8000
+    external = var.api_port
+  }
+
+  networks_advanced {
+    name = docker_network.app.name
+  }
+
+  restart = <span class="s">"unless-stopped"</span>
+  depends_on = [docker_container.redis]
+}</code></pre>
+
+<h3>Step 3 — the loop</h3>
+<pre><code>docker compose down          <span class="c"># clear the Module 3 stack first</span>
+
+terraform init
+terraform fmt
+terraform validate
+terraform plan
+<span class="c"># Plan: 5 to add, 0 to change, 0 to destroy.</span>
+
+terraform apply
+<span class="c"># type: yes</span>
+
+terraform output
+<span class="c"># api_url = "http://localhost:8000"</span>
+
+curl -s localhost:8000/health</code></pre>
+
+<h3>Step 4 — see idempotency</h3>
+<pre><code>terraform apply
+<span class="c"># No changes. Your infrastructure matches the configuration.</span></code></pre>
+
+<h3>Step 5 — cause drift, then detect and correct it</h3>
+<pre><code><span class="c"># change reality behind Terraform's back</span>
+docker rm -f urlshort-api
+
+terraform plan
+<span class="c"># docker_container.api has been deleted</span>
+<span class="c"># Plan: 1 to add, 0 to change, 0 to destroy.</span>
+
+terraform apply -auto-approve
+docker ps --filter name=urlshort</code></pre>
+
+<div class="box why">
+<b>What just happened</b>
+Terraform refreshed state against reality, noticed the container was gone, and reconciled. This is the
+core loop of every IaC tool and every Kubernetes controller: <i>observe actual, compare to desired,
+act on the difference</i>. You will see the identical pattern in Module 6.
+</div>
+
+<h3>Step 6 — a change that forces replacement</h3>
+<pre><code>terraform plan -var 'api_port=8080'
+<span class="c"># ~ update in-place? No:</span>
+<span class="c"># -/+ destroy and then create replacement</span>
+<span class="c">#     ports { external = 8000 -&gt; 8080 } # forces replacement</span>
+
+terraform apply -var 'api_port=8080' -auto-approve
+curl -s localhost:8080/health</code></pre>
+<p>Notice that Terraform told you it would destroy something <i>before</i> doing it. That preview is
+the reason you read plans.</p>
+
+<h3>Step 7 — Ansible against localhost</h3>
+<pre><code>cd ../ansible
+
+cat &gt; inventory.ini &lt;&lt;'EOF'
+[local]
+localhost ansible_connection=local
+EOF
+
+cat &gt; site.yml &lt;&lt;'EOF'
+- name: Prepare the application host
+  hosts: local
+  gather_facts: true
+
+  vars:
+    app_dir: "{{ ansible_env.HOME }}/devops/deployed"
+
+  tasks:
+    - name: Create the deployment directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Render the environment file
+      ansible.builtin.copy:
+        dest: "{{ app_dir }}/.env"
+        mode: "0600"
+        content: |
+          REDIS_URL=redis://redis:6379/0
+          LOG_LEVEL=info
+      notify: Report change
+
+    - name: Check docker is available
+      ansible.builtin.command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Show docker version
+      ansible.builtin.debug:
+        msg: "{{ docker_version.stdout }}"
+
+  handlers:
+    - name: Report change
+      ansible.builtin.debug:
+        msg: "environment file changed - would restart the service here"
+EOF
+
+ansible-playbook -i inventory.ini site.yml</code></pre>
+
+<h3>Step 8 — prove idempotency</h3>
+<pre><code>ansible-playbook -i inventory.ini site.yml
+<span class="c"># PLAY RECAP: changed=0   ← the whole point</span></code></pre>
+<p>Note <code>changed_when: false</code> on the <code>command</code> task. Without it, a read-only
+version check would report a change on every run and the handler would fire pointlessly.</p>
+
+<h3>Step 9 — commit</h3>
+<pre><code>cd ~/devops/urlshort
+git status                   <span class="c"># confirm terraform.tfstate is NOT listed</span>
+git add terraform ansible .gitignore
+git commit -m "feat: manage infrastructure with terraform and ansible"
+git push</code></pre>
+
+<h2 id="ex">Exercises</h2>
+
+<h3>Exercise 1 — parameterise the whole stack</h3>
+<p>Add a <code>redis_version</code> variable and a <code>terraform.tfvars.example</code> file so a new
+engineer can bring the stack up without reading the code.</p>
+<details><summary>Solution</summary>
+<pre><code><span class="c"># variables.tf</span>
+<span class="k">variable</span> <span class="s">"redis_version"</span> {
+  type    = string
+  default = <span class="s">"7-alpine"</span>
+}
+
+<span class="c"># main.tf</span>
+<span class="k">resource</span> <span class="s">"docker_image"</span> <span class="s">"redis"</span> {
+  name = <span class="s">"redis:${var.redis_version}"</span>
+}</code></pre>
+<pre><code><span class="c"># terraform.tfvars.example  (commit THIS, not terraform.tfvars)</span>
+project       = "urlshort"
+api_port      = 8000
+api_image     = "ghcr.io/you/urlshort:sha-abc123"
+redis_version = "7-alpine"</code></pre>
+</details>
+
+<h3>Exercise 2 — terraform in CI</h3>
+<p>Add a workflow that runs <code>fmt -check</code>, <code>validate</code> and <code>plan</code> on
+pull requests, but never <code>apply</code>.</p>
+<details><summary>Solution</summary>
+<pre><code><span class="v">jobs</span>:
+  <span class="v">terraform</span>:
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">defaults</span>: { <span class="v">run</span>: { <span class="v">working-directory</span>: terraform } }
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: actions/checkout@v4
+      - <span class="v">uses</span>: hashicorp/setup-terraform@v3
+      - <span class="v">run</span>: terraform fmt -check -recursive
+      - <span class="v">run</span>: terraform init -backend=false
+      - <span class="v">run</span>: terraform validate</code></pre>
+<p><code>-backend=false</code> lets validation run without credentials or state access — safe on
+untrusted PRs. A real <code>plan</code> needs state and therefore credentials, which is precisely why
+it belongs behind an environment gate rather than on every fork's PR.</p>
+</details>
+
+<h3>Exercise 3 — make a playbook idempotent</h3>
+<p>This task reports changed every run. Fix it two different ways.</p>
+<pre><code>- <span class="v">name</span>: Install docker compose plugin
+  <span class="v">ansible.builtin.shell</span>: curl -fsSL https://example.com/install.sh | sh</code></pre>
+<details><summary>Solution</summary>
+<p><b>Guard on an artefact:</b></p>
+<pre><code>- <span class="v">name</span>: Install docker compose plugin
+  <span class="v">ansible.builtin.shell</span>: curl -fsSL https://example.com/install.sh | sh
+  <span class="v">args</span>:
+    <span class="v">creates</span>: /usr/local/lib/docker/cli-plugins/docker-compose</code></pre>
+<p><b>Or check first and act conditionally:</b></p>
+<pre><code>- <span class="v">name</span>: Check for the plugin
+  <span class="v">ansible.builtin.stat</span>:
+    <span class="v">path</span>: /usr/local/lib/docker/cli-plugins/docker-compose
+  <span class="v">register</span>: compose_bin
+
+- <span class="v">name</span>: Install docker compose plugin
+  <span class="v">ansible.builtin.shell</span>: curl -fsSL https://example.com/install.sh | sh
+  <span class="v">when</span>: <span class="k">not</span> compose_bin.stat.exists</code></pre>
+<p>Best of all: use the <code>ansible.builtin.apt</code> module with the official repository, so
+idempotency is the module's problem rather than yours.</p>
+</details>
+
+<h3>Exercise 4 — adopt an unmanaged resource</h3>
+<p>Create a Docker volume by hand, then bring it under Terraform management without destroying it.</p>
+<details><summary>Solution</summary>
+<pre><code>docker volume create orphan-data
+
+<span class="c"># add to main.tf:</span>
+<span class="c"># resource "docker_volume" "orphan" { name = "orphan-data" }</span>
+
+terraform import docker_volume.orphan orphan-data
+terraform plan
+<span class="c"># No changes — state now matches both the config and reality</span></code></pre>
+<p>This is the standard path for adopting infrastructure that predates your IaC adoption: write the
+resource block to match what exists, import, then confirm the plan is empty. A non-empty plan means
+your block does not yet describe reality accurately.</p>
+</details>
+
+<h2 id="check">Checkpoint</h2>
+
+<div class="quiz" data-answer="b">
+<div class="q">A colleague commits <code>terraform.tfstate</code> to fix a "works on my machine" issue. What is the main risk?</div>
+<button data-opt="a">The repository gets large</button>
+<button data-opt="b">State often contains secrets in plaintext, and concurrent applies corrupt it</button>
+<button data-opt="c">Terraform refuses to read state from a Git repo</button>
+<div class="fb">Both halves matter. The fix is a remote backend with locking — that solves sharing properly, which is the real need behind the instinct to commit it.</div>
+</div>
+
+<div class="quiz" data-answer="c">
+<div class="q"><code>terraform plan</code> shows <code>-/+ destroy and then create replacement</code> on your database. What do you do?</div>
+<button data-opt="a">Apply — Terraform will preserve the data</button>
+<button data-opt="b">Run <code>terraform refresh</code> and apply</button>
+<button data-opt="c">Stop; find which attribute forces replacement and whether it is worth the data loss</button>
+<div class="fb">Replacement destroys the resource. The plan output names the forcing attribute — sometimes it can be avoided, sometimes it needs a backup-and-migrate plan. Either way it is a decision, not an approval.</div>
+</div>
+
+<div class="quiz" data-answer="a">
+<div class="q">Your playbook reports <code>changed=7</code> on every run even though nothing is different. Why does that matter?</div>
+<button data-opt="a">You can no longer tell real changes from noise, and handlers fire needlessly</button>
+<button data-opt="b">Ansible will eventually refuse to run</button>
+<button data-opt="c">It doubles execution time</button>
+<div class="fb">The changed count is your signal. When it is always noisy, you stop reading it — and a genuine unexpected change slips past unnoticed, which is the failure mode idempotency exists to prevent.</div>
+</div>
+
+<div class="card">
+<b>You should now be able to, without notes:</b>
+<ul class="chk">
+<li>Explain configuration drift and why snowflake servers are a liability.</li>
+<li>State the difference between declarative and imperative, and why idempotency follows from it.</li>
+<li>Say which of Terraform and Ansible you reach for, and why they are complementary.</li>
+<li>Run the full Terraform loop and read a plan's <code>+ ~ - -/+</code> symbols correctly.</li>
+<li>Explain what state is, why it is never committed, and what remote backends solve.</li>
+<li>Import an existing resource into management.</li>
+<li>Write an Ansible playbook with variables, handlers and genuine idempotency.</li>
+<li>Handle secrets in IaC without committing them.</li>
+</ul>
+</div>
+
+<div class="pager">
+  <a href="module-4.html">← Module 4</a>
+  <a href="module-6.html">Module 6 · Kubernetes →</a>
+</div>
+
+</main>
+<footer><div class="wrap">Practical DevOps · Module 5</div></footer>
+<script src="assets/course.js"></script>
+</body>
+</html>

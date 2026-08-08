@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Module 3 — Docker &amp; Compose | Practical DevOps</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <a class="brand hm" href="index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="index.html">All modules</a>
+    <a href="module-2.html">← Prev</a>
+    <a href="module-4.html">Next →</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap">
+
+<div class="kicker" style="margin-top:40px">Module 03 · ~6 hours</div>
+<h1>Containers: Docker &amp; Compose</h1>
+<p class="lead">You will build the <code>urlshort</code> app, package it so it runs identically
+anywhere, and bring up the whole system — app plus Redis — with a single command.</p>
+
+<div class="card toc">
+<b>In this module</b>
+<a href="#why">3.1 The problem containers solve</a>
+<a href="#what">3.2 What a container actually is</a>
+<a href="#images">3.3 Images, layers and the cache</a>
+<a href="#cli">3.4 The commands you will use daily</a>
+<a href="#app">3.5 The application</a>
+<a href="#dockerfile">3.6 Writing a Dockerfile — three revisions</a>
+<a href="#data">3.7 Data: volumes and why containers are ephemeral</a>
+<a href="#net">3.8 Networking between containers</a>
+<a href="#compose">3.9 Docker Compose</a>
+<a href="#debug">3.10 Debugging a container that won't start</a>
+<a href="#registry">3.11 Registries and tagging</a>
+<a href="#lab">Lab: containerise urlshort end to end</a>
+<a href="#ex">Exercises</a>
+<a href="#check">Checkpoint</a>
+</div>
+
+<h2 id="why">3.1 The problem containers solve</h2>
+<p>You write an app on Ubuntu with Python 3.12 and Redis 7. Your colleague runs macOS with Python 3.10.
+The server runs Debian with Python 3.9 and a Redis someone upgraded last year. The app behaves
+differently in all three places, and every difference costs a day.</p>
+<p>The instinct — "write better install docs" — does not work, because the documentation describes the
+environment while the environment drifts. Containers invert this: instead of documenting the
+environment, you <b>ship</b> it. The runtime, the libraries, the OS packages and your code travel
+together as one immutable artefact.</p>
+
+<div class="box why">
+<b>Why it exists</b>
+A container turns "an environment you must reproduce" into "a file you can copy". That is the whole
+idea, and everything else — Kubernetes, CI image builds, registries — is infrastructure built on top
+of that one property.
+</div>
+
+<h2 id="what">3.2 What a container actually is</h2>
+<p>A container is <b>not</b> a small virtual machine. A VM boots a full guest kernel on virtualised
+hardware — gigabytes, tens of seconds. A container is just a normal Linux process on the host kernel,
+with two kernel features applied to it:</p>
+<ul>
+<li><b>Namespaces</b> — the process gets its own view of the filesystem, network interfaces, process
+tree and hostname. It cannot see the host's other processes.</li>
+<li><b>cgroups</b> — the kernel caps how much CPU and memory that process may consume.</li>
+</ul>
+
+<figure>
+<svg viewBox="0 0 700 250" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+  <g fill="var(--muted)" text-anchor="middle" font-size="12" font-weight="bold">
+    <text x="175" y="20">Virtual machines</text><text x="525" y="20">Containers</text>
+  </g>
+  <g stroke="var(--line)" fill="none" stroke-width="1.2">
+    <rect x="30" y="150" width="290" height="34" rx="5"/>
+    <rect x="30" y="112" width="290" height="34" rx="5"/>
+    <rect x="30" y="74"  width="290" height="34" rx="5"/>
+    <rect x="380" y="150" width="290" height="34" rx="5"/>
+    <rect x="380" y="112" width="290" height="34" rx="5"/>
+  </g>
+  <g stroke="var(--accent)" fill="none" stroke-width="1.4">
+    <rect x="38"  y="34" width="88" height="34" rx="5"/>
+    <rect x="140" y="34" width="88" height="34" rx="5"/>
+    <rect x="242" y="34" width="70" height="34" rx="5"/>
+    <rect x="388" y="72" width="88" height="34" rx="5"/>
+    <rect x="490" y="72" width="88" height="34" rx="5"/>
+    <rect x="592" y="72" width="70" height="34" rx="5"/>
+  </g>
+  <g fill="var(--txt)" text-anchor="middle">
+    <text x="175" y="171">Host OS + hypervisor</text>
+    <text x="175" y="133">Guest OS  ·  Guest OS  ·  Guest OS</text>
+    <text x="175" y="95">Bins / libs per VM</text>
+    <text x="82"  y="55">App A</text><text x="184" y="55">App B</text><text x="277" y="55">App C</text>
+    <text x="525" y="171">Host OS + kernel</text>
+    <text x="525" y="133">Container runtime (dockerd)</text>
+    <text x="432" y="93">App A</text><text x="534" y="93">App B</text><text x="627" y="93">App C</text>
+  </g>
+  <g fill="var(--muted)" text-anchor="middle" font-size="10">
+    <text x="175" y="212">GBs · boots in ~30s · full kernel each</text>
+    <text x="525" y="212">MBs · starts in ~0.1s · one shared kernel</text>
+  </g>
+</svg>
+<figcaption>Containers share the host kernel; VMs each carry their own.</figcaption>
+</figure>
+
+<p>Two consequences you must internalise: containers start in milliseconds (so restarting one is a
+normal operation, not an emergency), and containers cannot run a different kernel (Linux containers on
+Windows/macOS run inside a hidden Linux VM).</p>
+
+<h2 id="images">3.3 Images, layers and the cache</h2>
+<p>An <b>image</b> is a read-only template. A <b>container</b> is a running instance of it. The
+relationship is exactly class-to-object.</p>
+<p>Images are built in <b>layers</b> — each instruction in a Dockerfile adds one read-only layer.
+Layers are content-addressed and shared: if ten images use the same <code>python:3.12-slim</code> base,
+that base is stored once. When you start a container, Docker adds a thin writable layer on top; when
+the container is deleted, only that layer is lost.</p>
+
+<div class="box why">
+<b>Why layer order dominates build speed</b>
+Docker caches layers. If an instruction and everything before it is unchanged, the cached layer is
+reused. But once one layer is invalidated, <b>every layer after it rebuilds</b>. So put what changes
+rarely (dependency installs) before what changes constantly (your source code). Getting this backwards
+turns a 3-second rebuild into a 3-minute one, on every single commit.
+</div>
+
+<h2 id="cli">3.4 The commands you will use daily</h2>
+<pre><code><span class="c"># run: -d detached, -p host:container port, --name for a stable handle</span>
+docker run -d --name web -p 8080:80 nginx:1.27-alpine
+
+docker ps              <span class="c"># running containers</span>
+docker ps -a           <span class="c"># including stopped ones</span>
+docker logs -f web     <span class="c"># follow stdout/stderr</span>
+docker exec -it web sh <span class="c"># a shell INSIDE the running container</span>
+docker stop web        <span class="c"># SIGTERM, then SIGKILL after 10s</span>
+docker rm web
+docker images
+docker rmi nginx:1.27-alpine
+
+<span class="c"># reclaim disk — this WILL delete unused images and build cache</span>
+docker system df
+docker system prune -a</code></pre>
+
+<div class="box">
+<b>Read <code>-p 8080:80</code> as HOST:CONTAINER</b>
+Traffic arriving on your machine's port 8080 is forwarded to port 80 inside the container.
+Getting this the wrong way round is a rite of passage; <code>docker ps</code> shows the mapping.
+This is precisely the NAT port-forwarding from <a href="module-2.html#private">Module 2.5</a> —
+the container sits on a private network and the publish creates the inbound mapping.
+</div>
+
+<h2 id="app">3.5 The application</h2>
+<p>Create the project and write the app you will carry through the rest of the course.</p>
+
+<pre><code>cd ~/devops/urlshort
+mkdir -p app tests</code></pre>
+
+<p><code>app/main.py</code>:</p>
+<pre><code><span class="k">import</span> os, hashlib
+<span class="k">from</span> fastapi <span class="k">import</span> FastAPI, HTTPException
+<span class="k">from</span> fastapi.responses <span class="k">import</span> RedirectResponse
+<span class="k">from</span> pydantic <span class="k">import</span> BaseModel
+<span class="k">import</span> redis
+
+REDIS_URL = os.getenv(<span class="s">"REDIS_URL"</span>, <span class="s">"redis://localhost:6379/0"</span>)
+r = redis.from_url(REDIS_URL, decode_responses=<span class="k">True</span>)
+app = FastAPI(title=<span class="s">"urlshort"</span>)
+
+<span class="k">class</span> Link(BaseModel):
+    url: str
+
+<span class="v">@app.get</span>(<span class="s">"/health"</span>)
+<span class="k">def</span> health():
+    <span class="k">try</span>:
+        r.ping()
+    <span class="k">except</span> Exception:
+        <span class="k">raise</span> HTTPException(status_code=503, detail=<span class="s">"redis unavailable"</span>)
+    <span class="k">return</span> {<span class="s">"status"</span>: <span class="s">"ok"</span>}
+
+<span class="v">@app.post</span>(<span class="s">"/shorten"</span>)
+<span class="k">def</span> shorten(link: Link):
+    code = hashlib.sha256(link.url.encode()).hexdigest()[:7]
+    r.set(<span class="s">f"url:{code}"</span>, link.url)
+    <span class="k">return</span> {<span class="s">"code"</span>: code, <span class="s">"short_url"</span>: <span class="s">f"/r/{code}"</span>}
+
+<span class="v">@app.get</span>(<span class="s">"/r/{code}"</span>)
+<span class="k">def</span> follow(code: str):
+    url = r.get(<span class="s">f"url:{code}"</span>)
+    <span class="k">if</span> <span class="k">not</span> url:
+        <span class="k">raise</span> HTTPException(status_code=404, detail=<span class="s">"unknown code"</span>)
+    r.incr(<span class="s">f"hits:{code}"</span>)
+    <span class="k">return</span> RedirectResponse(url, status_code=307)
+
+<span class="v">@app.get</span>(<span class="s">"/stats/{code}"</span>)
+<span class="k">def</span> stats(code: str):
+    <span class="k">return</span> {<span class="s">"code"</span>: code, <span class="s">"hits"</span>: int(r.get(<span class="s">f"hits:{code}"</span>) <span class="k">or</span> 0)}</code></pre>
+
+<p><code>requirements.txt</code>:</p>
+<pre><code>fastapi==0.115.0
+uvicorn[standard]==0.30.6
+redis==5.0.8
+pydantic==2.9.2
+pytest==8.3.3
+httpx==0.27.2</code></pre>
+
+<div class="box why">
+<b>Two design choices that matter later</b>
+Redis is reached via an <b>environment variable</b>, not a hardcoded host — that is what lets the same
+image run against localhost, a Compose service and a Kubernetes Service without rebuilding.
+And <code>/health</code> genuinely checks the dependency instead of returning 200 unconditionally,
+which is what makes it useful as a Kubernetes probe in Module 6.
+</div>
+
+<p><code>tests/test_api.py</code>:</p>
+<pre><code><span class="k">import</span> os
+os.environ.setdefault(<span class="s">"REDIS_URL"</span>, <span class="s">"redis://localhost:6379/0"</span>)
+<span class="k">from</span> fastapi.testclient <span class="k">import</span> TestClient
+<span class="k">from</span> app.main <span class="k">import</span> app
+
+client = TestClient(app)
+
+<span class="k">def</span> test_health():
+    <span class="k">assert</span> client.get(<span class="s">"/health"</span>).status_code == 200
+
+<span class="k">def</span> test_shorten_and_follow():
+    res = client.post(<span class="s">"/shorten"</span>, json={<span class="s">"url"</span>: <span class="s">"https://example.com"</span>})
+    <span class="k">assert</span> res.status_code == 200
+    code = res.json()[<span class="s">"code"</span>]
+    <span class="k">assert</span> len(code) == 7
+
+    follow = client.get(<span class="s">f"/r/{code}"</span>, follow_redirects=<span class="k">False</span>)
+    <span class="k">assert</span> follow.status_code == 307
+    <span class="k">assert</span> follow.headers[<span class="s">"location"</span>] == <span class="s">"https://example.com"</span>
+
+<span class="k">def</span> test_unknown_code_is_404():
+    <span class="k">assert</span> client.get(<span class="s">"/r/zzzzzzz"</span>, follow_redirects=<span class="k">False</span>).status_code == 404</code></pre>
+
+<h2 id="dockerfile">3.6 Writing a Dockerfile — three revisions</h2>
+<p>The instructive way to learn Dockerfiles is to write a bad one and fix it.</p>
+
+<h3>Revision 1 — works, and is wrong in four ways</h3>
+<pre><code><span class="k">FROM</span> python:3.12
+<span class="k">COPY</span> . /app
+<span class="k">WORKDIR</span> /app
+<span class="k">RUN</span> pip install -r requirements.txt
+<span class="k">CMD</span> uvicorn app.main:app --host 0.0.0.0</code></pre>
+<ol>
+<li><code>python:3.12</code> is ~1 GB; the <code>-slim</code> variant is ~130 MB.</li>
+<li><code>COPY .</code> before <code>pip install</code> means <b>every source edit reinstalls every dependency</b>.</li>
+<li>It runs as <b>root</b>. A container escape is then a root escape.</li>
+<li><code>CMD</code> in shell form makes your app a child of <code>/bin/sh</code>, so it never receives
+<code>SIGTERM</code> — shutdowns become 10-second kills.</li>
+</ol>
+
+<h3>Revision 2 — fix the ordering, the base, and the user</h3>
+<pre><code><span class="k">FROM</span> python:3.12-slim
+
+<span class="k">ENV</span> PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+
+<span class="k">WORKDIR</span> /app
+
+<span class="c"># dependencies first: this layer is cached until requirements.txt changes</span>
+<span class="k">COPY</span> requirements.txt .
+<span class="k">RUN</span> pip install --no-cache-dir -r requirements.txt
+
+<span class="c"># source last: edits here invalidate only this layer</span>
+<span class="k">COPY</span> app/ ./app/
+
+<span class="k">RUN</span> useradd -m -u 10001 appuser
+<span class="k">USER</span> appuser
+
+<span class="k">EXPOSE</span> 8000
+<span class="k">CMD</span> [<span class="s">"uvicorn"</span>, <span class="s">"app.main:app"</span>, <span class="s">"--host"</span>, <span class="s">"0.0.0.0"</span>, <span class="s">"--port"</span>, <span class="s">"8000"</span>]</code></pre>
+
+<div class="box">
+<b><code>PYTHONUNBUFFERED=1</code> is not cosmetic</b>
+Without it Python buffers stdout, so <code>docker logs</code> shows nothing until the buffer fills —
+and if the container crashes, the buffered lines are lost. You lose exactly the logs explaining the crash.
+</div>
+
+<h3>Revision 3 — multi-stage, for a smaller final image</h3>
+<p>Multi-stage builds let you use a fat image to compile and a thin one to run, copying only the
+artefacts across:</p>
+
+<pre><code><span class="c"># ---- stage 1: build wheels ----</span>
+<span class="k">FROM</span> python:3.12-slim <span class="k">AS</span> builder
+<span class="k">WORKDIR</span> /build
+<span class="k">RUN</span> apt-get update &amp;&amp; apt-get install -y --no-install-recommends gcc \
+ &amp;&amp; rm -rf /var/lib/apt/lists/*
+<span class="k">COPY</span> requirements.txt .
+<span class="k">RUN</span> pip wheel --no-cache-dir --wheel-dir /wheels -r requirements.txt
+
+<span class="c"># ---- stage 2: runtime ----</span>
+<span class="k">FROM</span> python:3.12-slim
+<span class="k">ENV</span> PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+<span class="k">WORKDIR</span> /app
+
+<span class="k">COPY</span> --from=builder /wheels /wheels
+<span class="k">RUN</span> pip install --no-cache-dir --no-index --find-links=/wheels /wheels/* \
+ &amp;&amp; rm -rf /wheels
+
+<span class="k">COPY</span> app/ ./app/
+
+<span class="k">RUN</span> useradd -m -u 10001 appuser &amp;&amp; chown -R appuser:appuser /app
+<span class="k">USER</span> appuser
+
+<span class="k">EXPOSE</span> 8000
+<span class="k">HEALTHCHECK</span> --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').status==200 else 1)"
+<span class="k">CMD</span> [<span class="s">"uvicorn"</span>, <span class="s">"app.main:app"</span>, <span class="s">"--host"</span>, <span class="s">"0.0.0.0"</span>, <span class="s">"--port"</span>, <span class="s">"8000"</span>]</code></pre>
+
+<p>The <code>gcc</code> toolchain exists only in the builder stage and never reaches the final image —
+smaller <i>and</i> less to attack.</p>
+
+
+<figure id="fig-cache">
+<svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <text x="8" y="16" fill="var(--err)" font-size="10">✗ source copied first — one edit rebuilds all</text>
+  <g stroke="var(--line)" stroke-width="1.2" fill="none">
+    <rect x="8" y="28" width="300" height="26" rx="4" fill="color-mix(in srgb,var(--ok) 20%,transparent)"/>
+    <rect x="8" y="58" width="300" height="26" rx="4" fill="color-mix(in srgb,var(--err) 22%,transparent)"/>
+    <rect x="8" y="88" width="300" height="26" rx="4" fill="color-mix(in srgb,var(--err) 22%,transparent)"/>
+    <rect x="8" y="118" width="300" height="26" rx="4" fill="color-mix(in srgb,var(--err) 22%,transparent)"/>
+  </g>
+  <g fill="var(--txt)" font-size="10">
+    <text x="18" y="45">FROM python:3.12-slim</text>
+    <text x="18" y="75">COPY . .</text>
+    <text x="18" y="105">RUN pip install -r requirements.txt</text>
+    <text x="18" y="135">CMD [...]</text>
+  </g>
+  <g fill="var(--muted)" font-size="9" text-anchor="end">
+    <text x="300" y="45">CACHED</text><text x="300" y="75">rebuild</text>
+    <text x="300" y="105">rebuild ~60s</text><text x="300" y="135">rebuild</text>
+  </g>
+  <text x="380" y="16" fill="var(--ok)" font-size="10">✓ dependencies first — only the last rebuilds</text>
+  <g stroke="var(--line)" stroke-width="1.2" fill="none">
+    <rect x="380" y="28" width="332" height="26" rx="4" fill="color-mix(in srgb,var(--ok) 20%,transparent)"/>
+    <rect x="380" y="58" width="332" height="26" rx="4" fill="color-mix(in srgb,var(--ok) 20%,transparent)"/>
+    <rect x="380" y="88" width="332" height="26" rx="4" fill="color-mix(in srgb,var(--ok) 20%,transparent)"/>
+    <rect x="380" y="118" width="332" height="26" rx="4" fill="color-mix(in srgb,var(--err) 22%,transparent)"/>
+  </g>
+  <g fill="var(--txt)" font-size="10">
+    <text x="390" y="45">FROM python:3.12-slim</text>
+    <text x="390" y="75">COPY requirements.txt .</text>
+    <text x="390" y="105">RUN pip install -r requirements.txt</text>
+    <text x="390" y="135">COPY app/ ./app/</text>
+  </g>
+  <g fill="var(--muted)" font-size="9" text-anchor="end">
+    <text x="704" y="45">CACHED</text><text x="704" y="75">CACHED</text>
+    <text x="704" y="105">CACHED</text><text x="704" y="135">rebuild ~2s</text>
+  </g>
+  <text x="8" y="172" fill="var(--muted)" font-size="10">Docker caches layer by layer, top to bottom. The moment one layer changes, every layer below it is invalidated —</text>
+  <text x="8" y="187" fill="var(--muted)" font-size="10">so the ordering rule is simply: put what rarely changes above what changes on every commit.</text>
+  <g stroke="var(--accent)" fill="none" stroke-width="1.2"><rect x="8" y="202" width="704" height="44" rx="6"/></g>
+  <text x="20" y="221" fill="var(--accent)" font-size="10">Same four instructions. Same result. ~30× difference in rebuild time, paid on every single push.</text>
+  <text x="20" y="237" fill="var(--muted)" font-size="10">This is the highest-leverage line-ordering decision you will make in a Dockerfile.</text>
+</svg>
+<figcaption>Layer-cache invalidation cascades downward — so ordering is everything.</figcaption>
+</figure>
+
+<h3>.dockerignore</h3>
+<p>The build context is everything in the directory, sent to the daemon on every build.
+Without this file you upload <code>.git</code> and <code>.venv</code> every time — and risk baking
+<code>.env</code> into the image.</p>
+<pre><code>.git
+.gitignore
+.venv
+__pycache__
+*.pyc
+.env
+tests/
+*.md
+.terraform/</code></pre>
+
+<h2 id="data">3.7 Data: volumes and why containers are ephemeral</h2>
+<p>The container's writable layer dies with the container. This is a feature: it forces you to be
+explicit about what is genuinely state. Anything that must survive goes in a <b>volume</b>.</p>
+
+<pre><code><span class="c"># named volume — Docker manages the location; use this for databases</span>
+docker volume create redis-data
+docker run -d --name redis -v redis-data:/data redis:7-alpine \
+  redis-server --appendonly yes
+
+<span class="c"># bind mount — a host path; use this for live-reloading source in dev</span>
+docker run -d -p 8000:8000 -v "$(pwd)/app:/app/app" urlshort:dev
+
+docker volume ls
+docker volume inspect redis-data</code></pre>
+
+<div class="box warn">
+<b>Bind mounts are a development tool</b>
+They couple the container to a host path that will not exist on a server. Use them for hot-reload
+while coding; never in a production definition.
+</div>
+
+<h2 id="net">3.8 Networking between containers</h2>
+<p>Containers on the same user-defined network reach each other <b>by container name</b>, resolved by
+Docker's built-in DNS. This is why the app can connect to <code>redis://redis:6379</code> without
+knowing any IP address.</p>
+
+<pre><code>docker network create appnet
+docker run -d --name redis --network appnet redis:7-alpine
+docker run -d --name api --network appnet -p 8000:8000 \
+  -e REDIS_URL=redis://redis:6379/0 urlshort:dev
+
+<span class="c"># prove the DNS works, from inside the api container</span>
+docker exec -it api sh -c "getent hosts redis"</code></pre>
+
+
+<figure id="fig-net">
+<svg viewBox="0 0 720 258" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <defs><marker id="ac1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent2)"/></marker></defs>
+  <defs><marker id="ac2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+    <path d="M0,0 L8,4 L0,8 z" fill="var(--ok)"/></marker></defs>
+  <g stroke="var(--accent)" fill="none" stroke-width="1.4" stroke-dasharray="5 4">
+    <rect x="150" y="40" width="430" height="122" rx="10"/>
+  </g>
+  <text x="162" y="60" fill="var(--accent)" font-size="10">network "appnet" — Docker runs a DNS server here</text>
+  <g stroke="var(--accent2)" fill="none" stroke-width="1.4">
+    <rect x="180" y="78" width="155" height="62" rx="8"/>
+    <rect x="405" y="78" width="150" height="62" rx="8"/>
+  </g>
+  <text x="257" y="100" fill="var(--txt)" text-anchor="middle" font-size="11">api</text>
+  <text x="257" y="116" fill="var(--muted)" text-anchor="middle" font-size="9">172.18.0.3:8000</text>
+  <text x="257" y="131" fill="var(--muted)" text-anchor="middle" font-size="9">has its own localhost</text>
+  <text x="480" y="100" fill="var(--txt)" text-anchor="middle" font-size="11">redis</text>
+  <text x="480" y="116" fill="var(--muted)" text-anchor="middle" font-size="9">172.18.0.2:6379</text>
+  <text x="480" y="131" fill="var(--muted)" text-anchor="middle" font-size="9">has its own localhost</text>
+  <g stroke="var(--line)" fill="none" stroke-width="1.3"><rect x="8" y="78" width="112" height="62" rx="8"/></g>
+  <text x="64" y="104" fill="var(--txt)" text-anchor="middle" font-size="10">your host</text>
+  <text x="64" y="120" fill="var(--muted)" text-anchor="middle" font-size="9">:8000</text>
+  <g stroke="var(--accent2)" stroke-width="1.4" marker-end="url(#ac1)"><line x1="122" y1="109" x2="176" y2="109"/></g>
+  <text x="64" y="156" fill="var(--accent2)" text-anchor="middle" font-size="9">-p 8000:8000</text>
+  <g stroke="var(--ok)" stroke-width="1.5" marker-end="url(#ac2)"><line x1="339" y1="109" x2="401" y2="109"/></g>
+  <text x="370" y="102" fill="var(--ok)" text-anchor="middle" font-size="11">✓</text>
+  <g font-size="10">
+    <text x="12" y="192" fill="var(--ok)" font-size="12">✓</text>
+    <text x="30" y="192" fill="var(--txt)">redis://redis:6379</text>
+    <text x="230" y="192" fill="var(--muted)">Docker's DNS answers 172.18.0.2 — works</text>
+    <text x="12" y="216" fill="var(--err)" font-size="12">✗</text>
+    <text x="30" y="216" fill="var(--txt)">redis://localhost:6379</text>
+    <text x="230" y="216" fill="var(--muted)">never leaves api — connection refused</text>
+  </g>
+  <line x1="8" y1="172" x2="712" y2="172" stroke="var(--line)" stroke-width="1"/>
+  <text x="8" y="244" fill="var(--muted)" font-size="10">Each container has its own network namespace, so each has its own localhost.</text>
+</svg>
+<figcaption>Service names resolve; localhost does not cross the container boundary.</figcaption>
+</figure>
+
+<div class="box warn">
+<b>localhost inside a container means the container</b>
+If your app is configured with <code>redis://localhost:6379</code> and Redis is a different container,
+you get "connection refused" — the app is looking at its own network namespace. Use the service name.
+This is the single most common beginner error in this module.
+<br><br>
+Note the error is <i>refused</i> and not <i>timed out</i>: the packet reached a real interface that
+replied "nothing here", exactly as in <a href="module-2.html#why">Module 2.2</a>. And the reason
+<code>redis</code> resolves at all is that Docker runs a DNS server on user-defined networks —
+ordinary DNS (<a href="module-2.html#dns">Module 2.8</a>), just with a different resolver.
+</div>
+
+<h2 id="compose">3.9 Docker Compose</h2>
+<p>Typing those <code>docker run</code> flags by hand is error-prone and unreviewable. Compose puts the
+whole system in one declarative file that you commit to Git.</p>
+
+<p><code>compose.yaml</code>:</p>
+<pre><code><span class="v">services</span>:
+  <span class="v">api</span>:
+    <span class="v">build</span>: .
+    <span class="v">ports</span>:
+      - <span class="s">"8000:8000"</span>
+    <span class="v">environment</span>:
+      <span class="v">REDIS_URL</span>: redis://redis:6379/0
+    <span class="v">depends_on</span>:
+      <span class="v">redis</span>:
+        <span class="v">condition</span>: service_healthy
+    <span class="v">restart</span>: unless-stopped
+
+  <span class="v">redis</span>:
+    <span class="v">image</span>: redis:7-alpine
+    <span class="v">command</span>: [<span class="s">"redis-server"</span>, <span class="s">"--appendonly"</span>, <span class="s">"yes"</span>]
+    <span class="v">volumes</span>:
+      - redis-data:/data
+    <span class="v">healthcheck</span>:
+      <span class="v">test</span>: [<span class="s">"CMD"</span>, <span class="s">"redis-cli"</span>, <span class="s">"ping"</span>]
+      <span class="v">interval</span>: 5s
+      <span class="v">timeout</span>: 3s
+      <span class="v">retries</span>: 5
+    <span class="v">restart</span>: unless-stopped
+
+<span class="v">volumes</span>:
+  <span class="v">redis-data</span>:</code></pre>
+
+<div class="box why">
+<b>Why <code>condition: service_healthy</code> and not plain <code>depends_on</code></b>
+Plain <code>depends_on</code> waits for the container to <i>start</i>, not to be <i>ready</i>. Redis
+takes a moment to accept connections, so the API starts, fails to connect, and crashes. Gating on the
+healthcheck fixes a race you would otherwise spend an hour on.
+</div>
+
+<pre><code>docker compose up -d --build
+docker compose ps
+docker compose logs -f api
+docker compose exec api sh
+docker compose down          <span class="c"># stop + remove containers, KEEP volumes</span>
+docker compose down -v       <span class="c"># ... and delete volumes too (destroys data)</span></code></pre>
+
+<h3>A development override</h3>
+<p>Compose merges <code>compose.override.yaml</code> automatically, so dev-only settings stay out of
+the file you deploy. <code>compose.override.yaml</code>:</p>
+<pre><code><span class="v">services</span>:
+  <span class="v">api</span>:
+    <span class="v">volumes</span>:
+      - ./app:/app/app
+    <span class="v">command</span>: [<span class="s">"uvicorn"</span>, <span class="s">"app.main:app"</span>, <span class="s">"--host"</span>, <span class="s">"0.0.0.0"</span>,
+               <span class="s">"--port"</span>, <span class="s">"8000"</span>, <span class="s">"--reload"</span>]</code></pre>
+
+<h2 id="debug">3.10 Debugging a container that won't start</h2>
+<p>Work down this list in order. It resolves nearly every case:</p>
+
+<table>
+<tr><th>Step</th><th>Command</th><th>What you learn</th></tr>
+<tr><td>1. Did it exit?</td><td><code>docker compose ps -a</code></td><td>Exit code. 137 = OOM-killed. 1 = your app crashed. 127 = command not found.</td></tr>
+<tr><td>2. What did it say?</td><td><code>docker compose logs api</code></td><td>The stack trace. Usually the whole answer.</td></tr>
+<tr><td>3. Is the image right?</td><td><code>docker run --rm -it urlshort sh</code></td><td>Poke around the filesystem; is your code where you think?</td></tr>
+<tr><td>4. Is the env right?</td><td><code>docker compose exec api env</code></td><td>Missing or misspelled variables.</td></tr>
+<tr><td>5. Can it reach its dependency?</td><td><code>docker compose exec api sh -c "getent hosts redis"</code></td><td>DNS/network problem vs. app problem.</td></tr>
+<tr><td>6. Is the port mapped?</td><td><code>docker compose ps</code></td><td>Host:container mapping, and whether it bound at all.</td></tr>
+</table>
+
+<div class="box">
+<b>When the container exits instantly and logs are empty</b>
+Override the entrypoint to get a shell instead of your app:
+<pre><code>docker run --rm -it --entrypoint sh urlshort:dev</code></pre>
+Then run your <code>CMD</code> by hand and read the error directly.
+</div>
+
+<h2 id="registry">3.11 Registries and tagging</h2>
+<p>A registry is where images live so other machines can pull them. You will use GitHub Container
+Registry (GHCR) because it is free for public images and integrates with Actions in Module 4.</p>
+
+<pre><code><span class="c"># create a Personal Access Token with write:packages scope, then:</span>
+echo "$GHCR_TOKEN" | docker login ghcr.io -u &lt;your-username&gt; --password-stdin
+
+docker build -t ghcr.io/&lt;you&gt;/urlshort:0.1.0 .
+docker tag ghcr.io/&lt;you&gt;/urlshort:0.1.0 ghcr.io/&lt;you&gt;/urlshort:latest
+docker push ghcr.io/&lt;you&gt;/urlshort:0.1.0
+docker push ghcr.io/&lt;you&gt;/urlshort:latest</code></pre>
+
+<div class="box warn">
+<b>Never deploy <code>:latest</code></b>
+<code>latest</code> is a mutable label, not a version. Two servers pulling "latest" a minute apart can
+run different code, and you cannot roll back to a tag that has been overwritten. Deploy immutable tags —
+a semantic version or the Git commit SHA. Module 4 tags images with the SHA automatically for exactly
+this reason.
+</div>
+
+<h2 id="lab">Lab: containerise urlshort end to end</h2>
+<div class="box lab">
+<b>Goal</b>
+From the repo you created in Module 1: write the app, build a multi-stage image, run the full stack
+with Compose, prove data survives a restart, and break/fix it deliberately.
+</div>
+
+<h3>Step 1 — files</h3>
+<p>Create <code>app/main.py</code>, <code>requirements.txt</code>, <code>tests/test_api.py</code>,
+<code>Dockerfile</code> (revision 3), <code>.dockerignore</code> and <code>compose.yaml</code> from
+the sections above. Then:</p>
+<pre><code>cd ~/devops/urlshort
+ls -1
+git add . &amp;&amp; git commit -m "feat: urlshort app with multi-stage Dockerfile and compose"</code></pre>
+
+<h3>Step 2 — build and inspect</h3>
+<pre><code>docker build -t urlshort:0.1.0 .
+docker images urlshort
+<span class="c"># note the size. Under ~200MB is a good result.</span>
+
+<span class="c"># see the layers and what each one cost</span>
+docker history urlshort:0.1.0</code></pre>
+
+<h3>Step 3 — prove the layer cache works</h3>
+<pre><code><span class="c"># touch a source file only</span>
+echo "# comment" &gt;&gt; app/main.py
+time docker build -t urlshort:0.1.0 .
+<span class="c"># pip install should say CACHED. Build takes ~2s, not ~60s.</span>
+
+<span class="c"># now touch dependencies</span>
+echo "" &gt;&gt; requirements.txt
+time docker build -t urlshort:0.1.0 .
+<span class="c"># pip install re-runs. THIS is why COPY order matters.</span></code></pre>
+
+<h3>Step 4 — bring up the stack</h3>
+<pre><code>docker compose up -d --build
+docker compose ps
+<span class="c"># both services should show "running"; redis should show "healthy"</span>
+
+curl -s localhost:8000/health
+<span class="c"># {"status":"ok"}</span>
+
+curl -s -X POST localhost:8000/shorten \
+  -H 'content-type: application/json' \
+  -d '{"url":"https://kubernetes.io/docs/home/"}'
+<span class="c"># {"code":"a1b2c3d","short_url":"/r/a1b2c3d"}</span></code></pre>
+
+<h3>Step 5 — verify the redirect and the counter</h3>
+<pre><code>CODE=$(curl -s -X POST localhost:8000/shorten -H 'content-type: application/json' \
+  -d '{"url":"https://example.com"}' | grep -o '"code":"[^"]*"' | cut -d'"' -f4)
+echo "code=$CODE"
+
+curl -si "localhost:8000/r/$CODE" | head -3
+<span class="c"># HTTP/1.1 307 Temporary Redirect ... location: https://example.com</span>
+
+curl -s "localhost:8000/r/$CODE" -o /dev/null
+curl -s "localhost:8000/stats/$CODE"
+<span class="c"># {"code":"...","hits":2}</span></code></pre>
+
+<h3>Step 6 — prove the volume works</h3>
+<pre><code>docker compose restart redis
+sleep 3
+curl -s "localhost:8000/stats/$CODE"
+<span class="c"># hits are STILL there — appendonly + named volume survived the restart</span>
+
+<span class="c"># now destroy the volume and watch the data vanish</span>
+docker compose down -v
+docker compose up -d
+sleep 5
+curl -s "localhost:8000/stats/$CODE"
+<span class="c"># {"code":"...","hits":0}</span></code></pre>
+
+<h3>Step 7 — break it on purpose</h3>
+<pre><code><span class="c"># point the app at localhost instead of the service name</span>
+docker compose down
+REDIS_URL=redis://localhost:6379/0 docker compose up -d
+docker compose logs api | tail -20
+<span class="c"># ConnectionError: Error connecting to localhost:6379</span>
+<span class="c"># Because "localhost" inside the api container IS the api container.</span>
+
+docker compose down &amp;&amp; docker compose up -d   <span class="c"># back to normal</span></code></pre>
+
+<h3>Step 8 — run the tests inside a container</h3>
+<pre><code>docker compose exec api sh -c "pip install pytest httpx -q &amp;&amp; python -m pytest -q"
+<span class="c"># 3 passed</span></code></pre>
+<p>That command is clumsy on purpose — you will replace it with a proper CI job in Module 4.</p>
+
+<h3>Step 9 — publish</h3>
+<pre><code>docker tag urlshort:0.1.0 ghcr.io/&lt;you&gt;/urlshort:0.1.0
+docker push ghcr.io/&lt;you&gt;/urlshort:0.1.0
+git add . &amp;&amp; git commit -m "feat: compose stack with healthchecked redis" &amp;&amp; git push</code></pre>
+
+<h2 id="ex">Exercises</h2>
+
+<h3>Exercise 1 — shrink the image</h3>
+<p>Get the final image under 150 MB without breaking it. Measure before and after.</p>
+<details><summary>Solution</summary>
+<p>Switch the runtime stage to <code>python:3.12-alpine</code>, and prune anything not needed at
+runtime. Verify:</p>
+<pre><code>docker images urlshort --format "{{.Tag}}\t{{.Size}}"</code></pre>
+<p>Caveat worth knowing: Alpine uses musl instead of glibc, so packages with C extensions may need
+compiling. For pure-Python dependencies Alpine is a clear win; when wheels stop resolving,
+<code>slim</code> is the pragmatic choice. Smaller is not automatically better.</p>
+</details>
+
+<h3>Exercise 2 — resource limits</h3>
+<p>Constrain the API to 256 MB of memory and half a CPU in Compose, then confirm the limit is real.</p>
+<details><summary>Solution</summary>
+<pre><code><span class="v">services</span>:
+  <span class="v">api</span>:
+    <span class="v">deploy</span>:
+      <span class="v">resources</span>:
+        <span class="v">limits</span>:
+          <span class="v">cpus</span>: <span class="s">"0.5"</span>
+          <span class="v">memory</span>: 256M</code></pre>
+<pre><code>docker stats --no-stream
+<span class="c"># MEM USAGE / LIMIT shows ... / 256MiB</span></code></pre>
+<p>Exceeding the memory limit gets the container OOM-killed with exit code 137 — worth recognising,
+since it looks like a mysterious crash if you do not know the number.</p>
+</details>
+
+<h3>Exercise 3 — a second app instance</h3>
+<p>Run two API replicas behind Compose and confirm both share the same Redis.</p>
+<details><summary>Solution</summary>
+<pre><code>docker compose up -d --scale api=2
+<span class="c"># fails: both want host port 8000</span></code></pre>
+<p>Remove the <code>ports</code> mapping from <code>api</code> and add an nginx service that
+proxies to <code>api:8000</code> — Docker's DNS round-robins between the replicas. This is the moment
+you feel the limits of Compose, and precisely the problem Kubernetes exists to solve (Module 6).</p>
+</details>
+
+<h3>Exercise 4 — read a Dockerfile critically</h3>
+<p>What are the three problems here?</p>
+<pre><code><span class="k">FROM</span> ubuntu:latest
+<span class="k">RUN</span> apt-get update
+<span class="k">RUN</span> apt-get install -y python3 python3-pip
+<span class="k">COPY</span> . .
+<span class="k">RUN</span> pip3 install -r requirements.txt
+<span class="k">ENV</span> DB_PASSWORD=supersecret
+<span class="k">CMD</span> python3 app.py</code></pre>
+<details><summary>Solution</summary>
+<ol>
+<li><code>update</code> and <code>install</code> in separate layers: a cached <code>update</code> layer
+means <code>install</code> can pull stale or missing packages. Combine them with <code>&amp;&amp;</code>
+and clean <code>/var/lib/apt/lists</code> in the same layer.</li>
+<li><code>ENV DB_PASSWORD</code> bakes a secret into the image permanently — anyone who pulls it can
+read it with <code>docker history</code>. Secrets are injected at runtime, never built in.</li>
+<li><code>COPY . .</code> before dependency install destroys the cache; also <code>ubuntu:latest</code>
+is unpinned, so the same Dockerfile builds differently next month.</li>
+</ol>
+</details>
+
+<h2 id="check">Checkpoint</h2>
+
+<div class="quiz" data-answer="c">
+<div class="q">Your image rebuilds dependencies on every source change. What is wrong?</div>
+<button data-opt="a">You are missing a <code>.dockerignore</code></button>
+<button data-opt="b">The base image is too large</button>
+<button data-opt="c"><code>COPY . .</code> comes before <code>RUN pip install</code></button>
+<div class="fb">Invalidating a layer invalidates everything after it. Copy the dependency manifest, install, then copy the source — the install layer then stays cached until dependencies genuinely change.</div>
+</div>
+
+<div class="quiz" data-answer="b">
+<div class="q">Your API container logs <code>Connection refused to localhost:6379</code>, but the Redis container is healthy. Why?</div>
+<button data-opt="a">Redis needs <code>--protected-mode no</code></button>
+<button data-opt="b"><code>localhost</code> inside a container refers to that container, not to Redis</button>
+<button data-opt="c">The port mapping is backwards</button>
+<div class="fb">Each container has its own network namespace. Use the Compose service name — <code>redis://redis:6379/0</code> — which Docker's DNS resolves for you.</div>
+</div>
+
+<div class="quiz" data-answer="a">
+<div class="q">Why should you not deploy <code>:latest</code>?</div>
+<button data-opt="a">It is mutable, so "latest" means different code at different times and cannot be rolled back to</button>
+<button data-opt="b">It is always larger than a versioned tag</button>
+<button data-opt="c">Registries rate-limit the latest tag</button>
+<div class="fb">Deployments must be reproducible. Immutable tags — a semver or the commit SHA — mean the running version is knowable and a rollback is a real option.</div>
+</div>
+
+<div class="card">
+<b>You should now be able to, without notes:</b>
+<ul class="chk">
+<li>Explain the difference between a container and a VM, and between an image and a container.</li>
+<li>Write a multi-stage Dockerfile with correct layer ordering and a non-root user.</li>
+<li>Explain why <code>PYTHONUNBUFFERED</code> and array-form <code>CMD</code> matter.</li>
+<li>Choose between a named volume and a bind mount, and justify it.</li>
+<li>Connect two services by name on a user-defined network.</li>
+<li>Write a Compose file with a healthcheck and a readiness-gated dependency.</li>
+<li>Debug a non-starting container by exit code, logs, env and DNS — in that order.</li>
+<li>Tag and push an image to a registry with an immutable tag.</li>
+</ul>
+</div>
+
+<div class="pager">
+  <a href="module-2.html">← Module 2 · Networking</a>
+  <a href="module-4.html">Module 4 · CI/CD with GitHub Actions →</a>
+</div>
+
+</main>
+<footer><div class="wrap">Practical DevOps · Module 3</div></footer>
+<script src="assets/course.js"></script>
+</body>
+</html>

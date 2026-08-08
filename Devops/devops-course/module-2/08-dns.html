@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2.8 DNS: how a name becomes an address — Module 2 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-2.html">Module 2 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 02</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">2.1 Why this module comes before Docker</a>
+<a href="02-model.html">2.2 The TCP/IP model: four layers, one journey</a>
+<a href="03-ip.html">2.3 IP addressing</a>
+<a href="04-subnet.html">2.4 Subnets and CIDR</a>
+<a href="05-private.html">2.5 Private ranges, NAT and why your laptop is invisible</a>
+<a href="06-tcp.html">2.6 TCP vs UDP</a>
+<a href="07-ports.html">2.7 Ports and sockets</a>
+<a href="08-dns.html" class="cur">2.8 DNS: how a name becomes an address</a>
+<a href="09-http.html">2.9 HTTP: the request you will read a thousand times</a>
+<a href="10-https.html">2.10 HTTPS and TLS</a>
+<a href="11-fw.html">2.11 Firewalls and the ports that matter</a>
+<a href="12-tools.html">2.12 The troubleshooting toolkit</a>
+<a class="grp">Practice</a>
+<a href="13-lab.html">Lab: trace a request end to end</a>
+<a href="14-ex.html">Exercises</a>
+<a href="15-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-2.html">Networking Basics</a>
+</div>
+<div class="secmeta">Module 02 · Section 8 of 15</div>
+
+<h2 id="dns">2.8 DNS: how a name becomes an address</h2>
+<p>DNS is a distributed lookup from names to records. The resolution order on Linux matters when
+debugging:</p>
+<ol>
+<li><code>/etc/hosts</code> — a local static file, checked first. Overrides everything.</li>
+<li>The resolver configured in <code>/etc/resolv.conf</code> (or systemd-resolved).</li>
+<li>That resolver recurses: root servers → <code>.com</code> → <code>example.com</code>'s
+authoritative nameserver.</li>
+<li>The answer is cached everywhere along the way, for its <b>TTL</b> in seconds.</li>
+</ol>
+
+
+<figure id="fig-dns">
+<svg viewBox="0 0 720 210" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <defs><marker id="ad1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent2)"/></marker></defs>
+  <g stroke="var(--accent)" fill="none" stroke-width="1.3"><rect x="8" y="60" width="108" height="42" rx="6"/></g>
+  <text x="62" y="78" fill="var(--txt)" text-anchor="middle" font-size="10">your app</text>
+  <text x="62" y="92" fill="var(--muted)" text-anchor="middle" font-size="9">curl example.com</text>
+  <g stroke="var(--accent2)" fill="none" stroke-width="1.4"><rect x="160" y="55" width="120" height="52" rx="6"/></g>
+  <text x="220" y="76" fill="var(--accent2)" text-anchor="middle" font-size="10">resolver</text>
+  <text x="220" y="92" fill="var(--muted)" text-anchor="middle" font-size="9">caches by TTL</text>
+  <g stroke="var(--line)" fill="none" stroke-width="1.2">
+    <rect x="340" y="14" width="150" height="34" rx="6"/>
+    <rect x="340" y="64" width="150" height="34" rx="6"/>
+    <rect x="340" y="114" width="150" height="34" rx="6"/>
+  </g>
+  <g fill="var(--txt)" font-size="10">
+    <text x="352" y="35">root servers  (.)</text>
+    <text x="352" y="85">.com servers</text>
+    <text x="352" y="135">example.com NS</text>
+  </g>
+  <g fill="var(--muted)" font-size="9" text-anchor="end">
+    <text x="700" y="35">"ask .com"</text><text x="700" y="85">"ask example.com"</text>
+    <text x="700" y="135" fill="var(--ok)">A 93.184.216.34</text>
+  </g>
+  <g stroke="var(--accent2)" stroke-width="1.3" marker-end="url(#ad1)">
+    <line x1="118" y1="80" x2="156" y2="80"/>
+    <line x1="282" y1="72" x2="336" y2="34"/><line x1="282" y1="80" x2="336" y2="80"/>
+    <line x1="282" y1="92" x2="336" y2="128"/>
+  </g>
+  <text x="300" y="52" fill="var(--muted)" font-size="9">1</text>
+  <text x="304" y="74" fill="var(--muted)" font-size="9">2</text>
+  <text x="300" y="112" fill="var(--muted)" font-size="9">3</text>
+  <g stroke="var(--warn)" fill="none" stroke-width="1.3"><rect x="8" y="130" width="108" height="40" rx="6"/></g>
+  <text x="62" y="147" fill="var(--warn)" text-anchor="middle" font-size="10">/etc/hosts</text>
+  <text x="62" y="161" fill="var(--muted)" text-anchor="middle" font-size="9">checked FIRST</text>
+  <g stroke="var(--warn)" stroke-width="1.2" stroke-dasharray="3 3"><line x1="62" y1="128" x2="62" y2="106"/></g>
+  <text x="8" y="192" fill="var(--muted)" font-size="10">Every hop caches the answer for its TTL — which is why a record you just changed can still serve the old value.</text>
+  <text x="8" y="205" fill="var(--warn)" font-size="10">Lower the TTL a day BEFORE a migration, not at the moment you cut over.</text>
+</svg>
+<figcaption>Recursive resolution, with /etc/hosts short-circuiting the whole thing.</figcaption>
+</figure>
+
+<table>
+<tr><th>Record</th><th>Maps</th><th>Example</th></tr>
+<tr><td><b>A</b></td><td>Name → IPv4</td><td><code>example.com → 93.184.216.34</code></td></tr>
+<tr><td><b>AAAA</b></td><td>Name → IPv6</td><td><code>example.com → 2606:2800:220:1::</code></td></tr>
+<tr><td><b>CNAME</b></td><td>Name → another name</td><td><code>www → example.com</code></td></tr>
+<tr><td><b>MX</b></td><td>Domain → mail server</td><td>Used for email routing</td></tr>
+<tr><td><b>TXT</b></td><td>Arbitrary text</td><td>Domain ownership proofs, SPF</td></tr>
+<tr><td><b>NS</b></td><td>Domain → its nameservers</td><td>Delegation</td></tr>
+</table>
+
+<pre><code>dig example.com +short
+dig example.com A
+dig example.com +trace          <span class="c"># watch the full recursion from the root</span>
+dig @1.1.1.1 example.com        <span class="c"># ask a specific resolver, bypassing yours</span>
+
+<span class="c"># what is my machine using to resolve?</span>
+cat /etc/resolv.conf
+resolvectl status               <span class="c"># on systemd-resolved systems</span></code></pre>
+
+<div class="box warn">
+<b>TTL is why DNS changes "don't work"</b>
+If a record has a TTL of 3600, resolvers worldwide may serve the old value for up to an hour after you
+change it. Before a planned migration, lower the TTL to 60 a day <i>in advance</i>, migrate, then raise
+it again. Lowering it at the moment you migrate does not help — the old, long TTL is already cached.
+</div>
+
+<div class="box why">
+<b>Where this returns in the course</b>
+Docker runs a DNS server on its user-defined networks so <code>redis</code> resolves to the Redis
+container's IP (Module 3). Kubernetes runs CoreDNS so <code>urlshort-redis</code> resolves to a Service
+IP (Module 6). Both are ordinary DNS — the reason names work there and not on the default bridge is
+simply which resolver the container was handed.
+</div>
+
+<div class="pager">
+  <a href="07-ports.html"><span class="sub">← Previous</span>2.7 Ports and sockets</a>
+  <a href="09-http.html" class="nx"><span class="sub">Next →</span>2.9 HTTP: the request you will read a thousand times</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 2 · 2.8 DNS: how a name becomes an address</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

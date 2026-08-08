@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lab: deploy urlshort to Kubernetes — Module 6 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-6.html">Module 6 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 06</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">6.1 What Kubernetes is for (and when not to)</a>
+<a href="02-arch.html">6.2 Architecture and the reconciliation loop</a>
+<a href="03-objects.html">6.3 The objects you need</a>
+<a href="04-cluster.html">6.4 A cluster on your laptop</a>
+<a href="05-pod.html">6.5 Pods and why you never create one directly</a>
+<a href="06-deploy.html">6.6 Deployments: replicas, rollouts, rollbacks</a>
+<a href="07-svc.html">6.7 Services and cluster DNS</a>
+<a href="08-config.html">6.8 ConfigMaps and Secrets</a>
+<a href="09-probes.html">6.9 Probes: the difference that causes outages</a>
+<a href="10-res.html">6.10 Resources, requests and limits</a>
+<a href="11-debug.html">6.11 Debugging a cluster methodically</a>
+<a class="grp">Practice</a>
+<a href="12-lab.html" class="cur">Lab: deploy urlshort to Kubernetes</a>
+<a href="13-ex.html">Exercises</a>
+<a href="14-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-6.html">Kubernetes: Orchestration</a>
+</div>
+<div class="secmeta">Module 06 · Section 12 of 14</div>
+
+<h2 id="lab">Lab: deploy urlshort to Kubernetes</h2>
+<div class="box lab">
+<b>Goal</b>
+Run the app on a real three-node cluster with Redis, config, probes, a rolling update, a rollback,
+and a self-healing demonstration.
+</div>
+
+<h3>Step 1 — cluster and image</h3>
+<pre><code>cd ~/devops/urlshort
+mkdir -p k8s
+<span class="c"># create k8s/kind-config.yaml from section 5.4, then:</span>
+kind create cluster --name devops --config k8s/kind-config.yaml
+
+<span class="c"># kind nodes cannot see your local Docker images — load it explicitly</span>
+docker build -t urlshort:0.1.0 .
+kind load docker-image urlshort:0.1.0 --name devops</code></pre>
+
+<div class="box">
+<b>Forgetting <code>kind load</code> is the #1 error in this lab</b>
+Symptom: <code>ImagePullBackOff</code> on an image that exists locally. The kind nodes are separate
+Docker containers with their own image store. Load it, or push to a registry the cluster can reach.
+</div>
+
+<h3>Step 2 — config and Redis</h3>
+<p><code>k8s/config.yaml</code>:</p>
+<pre><code><span class="v">apiVersion</span>: v1
+<span class="v">kind</span>: ConfigMap
+<span class="v">metadata</span>: { <span class="v">name</span>: urlshort-config }
+<span class="v">data</span>:
+  <span class="v">REDIS_URL</span>: redis://urlshort-redis:6379/0
+  <span class="v">LOG_LEVEL</span>: info</code></pre>
+
+<p><code>k8s/redis.yaml</code>:</p>
+<pre><code><span class="v">apiVersion</span>: apps/v1
+<span class="v">kind</span>: Deployment
+<span class="v">metadata</span>: { <span class="v">name</span>: urlshort-redis }
+<span class="v">spec</span>:
+  <span class="v">replicas</span>: 1
+  <span class="v">selector</span>: { <span class="v">matchLabels</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: redis } }
+  <span class="v">template</span>:
+    <span class="v">metadata</span>: { <span class="v">labels</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: redis } }
+    <span class="v">spec</span>:
+      <span class="v">containers</span>:
+        - <span class="v">name</span>: redis
+          <span class="v">image</span>: redis:7-alpine
+          <span class="v">ports</span>: [{ <span class="v">containerPort</span>: 6379 }]
+          <span class="v">resources</span>:
+            <span class="v">requests</span>: { <span class="v">cpu</span>: 25m, <span class="v">memory</span>: 32Mi }
+            <span class="v">limits</span>:   { <span class="v">cpu</span>: 200m, <span class="v">memory</span>: 128Mi }
+          <span class="v">readinessProbe</span>:
+            <span class="v">exec</span>: { <span class="v">command</span>: [<span class="s">"redis-cli"</span>, <span class="s">"ping"</span>] }
+            <span class="v">initialDelaySeconds</span>: 2
+            <span class="v">periodSeconds</span>: 5
+---
+<span class="v">apiVersion</span>: v1
+<span class="v">kind</span>: Service
+<span class="v">metadata</span>: { <span class="v">name</span>: urlshort-redis }
+<span class="v">spec</span>:
+  <span class="v">selector</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: redis }
+  <span class="v">ports</span>: [{ <span class="v">port</span>: 6379, <span class="v">targetPort</span>: 6379 }]</code></pre>
+
+<h3>Step 3 — the API and its Service</h3>
+<p>Create <code>k8s/deployment.yaml</code> from section 5.6, plus <code>k8s/service.yaml</code>:</p>
+<pre><code><span class="v">apiVersion</span>: v1
+<span class="v">kind</span>: Service
+<span class="v">metadata</span>:
+  <span class="v">name</span>: urlshort-api
+  <span class="v">labels</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: api }   <span class="c"># Module 7's ServiceMonitor selects on these</span>
+<span class="v">spec</span>:
+  <span class="v">type</span>: NodePort
+  <span class="v">selector</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: api }
+  <span class="v">ports</span>:
+    - <span class="v">name</span>: http          <span class="c"># named port — Module 7 scrapes by name</span>
+      <span class="v">port</span>: 80
+      <span class="v">targetPort</span>: 8000
+      <span class="v">nodePort</span>: 30080</code></pre>
+
+<h3>Step 4 — apply and watch</h3>
+<pre><code>kubectl apply -f k8s/config.yaml
+kubectl apply -f k8s/redis.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+
+kubectl get pods -w
+<span class="c"># Ctrl-C once all show Running and READY 1/1</span>
+
+kubectl get svc,endpoints
+curl -s localhost:30080/health
+<span class="c"># {"status":"ok"}</span></code></pre>
+
+<h3>Step 5 — see the load balancing</h3>
+<pre><code>kubectl get pods -l component=api -o name
+<span class="c"># three pods</span>
+
+for i in $(seq 1 10); do
+  curl -s -X POST localhost:30080/shorten \
+    -H 'content-type: application/json' \
+    -d '{"url":"https://example.com"}' &gt; /dev/null
+done
+
+kubectl logs -l component=api --tail=5 --prefix
+<span class="c"># requests spread across all three pods</span></code></pre>
+
+<h3>Step 6 — self-healing</h3>
+<pre><code>POD=$(kubectl get pods -l component=api -o jsonpath='{.items[0].metadata.name}')
+kubectl delete pod "$POD"
+kubectl get pods -l component=api
+<span class="c"># a replacement is already ContainerCreating — you never asked for it</span></code></pre>
+
+<h3>Step 7 — a rolling update with no dropped requests</h3>
+<pre><code><span class="c"># build a "v2"</span>
+docker build -t urlshort:0.2.0 .
+kind load docker-image urlshort:0.2.0 --name devops
+
+<span class="c"># in one terminal, hammer the endpoint:</span>
+while true; do curl -s -o /dev/null -w '%{http_code} ' localhost:30080/health; sleep 0.3; done
+
+<span class="c"># in another, roll:</span>
+kubectl set image deployment/urlshort-api api=urlshort:0.2.0
+kubectl rollout status deployment/urlshort-api</code></pre>
+<p>The first terminal should print an unbroken run of <code>200</code>. That is
+<code>maxUnavailable: 0</code> plus a readiness probe working together.</p>
+
+<h3>Step 8 — a failed rollout, and the rollback</h3>
+<pre><code>kubectl set image deployment/urlshort-api api=urlshort:does-not-exist
+kubectl rollout status deployment/urlshort-api --timeout=60s
+<span class="c"># error: deployment exceeded its progress deadline</span>
+
+kubectl get pods -l component=api
+<span class="c"># 3 old pods Running, 1 new pod ImagePullBackOff — traffic is UNAFFECTED</span>
+
+kubectl rollout undo deployment/urlshort-api
+kubectl rollout status deployment/urlshort-api</code></pre>
+
+<div class="box why">
+<b>Read that again</b>
+You deployed a completely broken image to production and no user noticed. The bad pod never became
+ready, so it never entered the Service, so it never received traffic. That is what the whole
+probe/rollout machinery buys you.
+</div>
+
+<h3>Step 9 — break the Service selector on purpose</h3>
+<pre><code>kubectl patch svc urlshort-api -p '{"spec":{"selector":{"app":"wrong"}}}'
+kubectl get endpoints urlshort-api
+<span class="c"># ENDPOINTS &lt;none&gt;</span>
+curl -s -m 3 localhost:30080/health || echo "no route to any pod"
+
+kubectl patch svc urlshort-api -p '{"spec":{"selector":{"app":"urlshort","component":"api"}}}'
+kubectl get endpoints urlshort-api    <span class="c"># three IPs again</span></code></pre>
+
+<h3>Step 10 — commit, and clean up when done</h3>
+<pre><code>cd ~/devops/urlshort
+git add k8s
+git commit -m "feat: kubernetes manifests with probes and rolling updates"
+git push
+
+<span class="c"># when you are finished for the day:</span>
+kind delete cluster --name devops</code></pre>
+
+<div class="pager">
+  <a href="11-debug.html"><span class="sub">← Previous</span>6.11 Debugging a cluster methodically</a>
+  <a href="13-ex.html" class="nx"><span class="sub">Next →</span>Exercises</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 6 · Lab: deploy urlshort to Kubernetes</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

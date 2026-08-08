@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exercises — Module 7 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-7.html">Module 7 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 07</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">7.1 Monitoring vs observability</a>
+<a href="02-pillars.html">7.2 Metrics, logs, traces</a>
+<a href="03-prom.html">7.3 How Prometheus works</a>
+<a href="04-types.html">7.4 Metric types, and the one everyone misuses</a>
+<a href="05-instr.html">7.5 Instrumenting the application</a>
+<a href="06-promql.html">7.6 PromQL, enough to be useful</a>
+<a href="07-golden.html">7.7 The four golden signals</a>
+<a href="08-grafana.html">7.8 Dashboards worth looking at</a>
+<a href="09-alert.html">7.9 Alerting on symptoms, not causes</a>
+<a href="10-slo.html">7.10 SLIs, SLOs and error budgets</a>
+<a href="11-logs.html">7.11 Logs that are actually searchable</a>
+<a class="grp">Practice</a>
+<a href="12-lab.html">Lab: full observability stack</a>
+<a href="13-ex.html" class="cur">Exercises</a>
+<a href="14-check.html">Checkpoint</a>
+<a href="15-capstone.html">Capstone project</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-7.html">Observability: Prometheus &amp; Grafana</a>
+</div>
+<div class="secmeta">Module 07 · Section 13 of 15</div>
+
+<h2 id="ex">Exercises</h2>
+
+<h3>Exercise 1 — a business metric</h3>
+<p>Add a counter for successful redirects, labelled by whether the code was found. Then chart the
+miss rate.</p>
+<details><summary>Solution</summary>
+<pre><code>REDIRECTS = Counter(<span class="s">"urlshort_redirects_total"</span>, <span class="s">"Redirect attempts"</span>, [<span class="s">"result"</span>])
+
+<span class="c"># in follow():</span>
+<span class="k">if</span> <span class="k">not</span> url:
+    REDIRECTS.labels(<span class="s">"miss"</span>).inc()
+    <span class="k">raise</span> HTTPException(status_code=404, detail=<span class="s">"unknown code"</span>)
+REDIRECTS.labels(<span class="s">"hit"</span>).inc()</code></pre>
+<pre><code>sum(rate(urlshort_redirects_total{result="miss"}[5m]))
+  / sum(rate(urlshort_redirects_total[5m]))</code></pre>
+<p>Note the label has exactly two values. That is what makes it safe — <code>result="hit"|"miss"</code>
+is bounded, whereas labelling by the code itself would be unbounded.</p>
+</details>
+
+<h3>Exercise 2 — predictive disk alert</h3>
+<p>Alert when a disk will fill within four hours, rather than at a fixed percentage.</p>
+<details><summary>Solution</summary>
+<pre><code>- <span class="v">alert</span>: DiskWillFillIn4Hours
+  <span class="v">expr</span>: |
+    predict_linear(node_filesystem_avail_bytes{mountpoint="/"}[6h], 4*3600) &lt; 0
+  <span class="v">for</span>: 15m
+  <span class="v">labels</span>: { <span class="v">severity</span>: page }</code></pre>
+<p><code>predict_linear</code> extrapolates the trend of the last 6 hours forward 4 hours. This is
+strictly better than a static threshold: a disk sitting stably at 85% never pages anyone, while one
+climbing fast from 40% does — which matches what actually requires action.</p>
+</details>
+
+<h3>Exercise 3 — find the cardinality bomb</h3>
+<p>What is wrong, and what breaks?</p>
+<pre><code>REQUESTS = Counter(<span class="s">"http_requests_total"</span>, <span class="s">"..."</span>,
+                   [<span class="s">"method"</span>, <span class="s">"path"</span>, <span class="s">"user_id"</span>, <span class="s">"status"</span>])
+REQUESTS.labels(request.method, request.url.path, user_id, status).inc()</code></pre>
+<details><summary>Solution</summary>
+<p><code>user_id</code> is unbounded — one series per user. <code>request.url.path</code> is also
+unbounded here because <code>/r/{code}</code> expands to a distinct path per short link. With 100k
+users and 1M links the series count is astronomical; Prometheus exhausts memory and is OOM-killed,
+taking your monitoring down at the exact moment you need it.</p>
+<p>Fix: use the templated route, drop <code>user_id</code> entirely. Per-user detail belongs in logs or
+traces, which are designed for high cardinality.</p>
+</details>
+
+<h3>Exercise 4 — an SLO with a burn-rate alert</h3>
+<p>Define a 99% availability SLO over 30 days and alert on fast budget burn.</p>
+<details><summary>Solution</summary>
+<pre><code><span class="c"># burning 14.4x the sustainable rate exhausts a 30d budget in ~2 days</span>
+- <span class="v">alert</span>: ErrorBudgetBurnFast
+  <span class="v">expr</span>: |
+    (
+      sum(rate(http_requests_total{status=~"5.."}[1h]))
+        / sum(rate(http_requests_total[1h]))
+    ) &gt; (14.4 * 0.01)
+  <span class="v">for</span>: 5m
+  <span class="v">labels</span>: { <span class="v">severity</span>: page }</code></pre>
+<p>Burn-rate alerting is better than a fixed error-rate threshold because it scales with your actual
+objective: a brief spike that consumes a negligible slice of budget does not page, while a sustained
+elevation that will blow the month's budget does.</p>
+</details>
+
+<div class="pager">
+  <a href="12-lab.html"><span class="sub">← Previous</span>Lab: full observability stack</a>
+  <a href="14-check.html" class="nx"><span class="sub">Next →</span>Checkpoint</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 7 · Exercises</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

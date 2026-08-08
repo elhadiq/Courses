@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>6.6 Deployments: replicas, rollouts, rollbacks — Module 6 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-6.html">Module 6 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 06</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">6.1 What Kubernetes is for (and when not to)</a>
+<a href="02-arch.html">6.2 Architecture and the reconciliation loop</a>
+<a href="03-objects.html">6.3 The objects you need</a>
+<a href="04-cluster.html">6.4 A cluster on your laptop</a>
+<a href="05-pod.html">6.5 Pods and why you never create one directly</a>
+<a href="06-deploy.html" class="cur">6.6 Deployments: replicas, rollouts, rollbacks</a>
+<a href="07-svc.html">6.7 Services and cluster DNS</a>
+<a href="08-config.html">6.8 ConfigMaps and Secrets</a>
+<a href="09-probes.html">6.9 Probes: the difference that causes outages</a>
+<a href="10-res.html">6.10 Resources, requests and limits</a>
+<a href="11-debug.html">6.11 Debugging a cluster methodically</a>
+<a class="grp">Practice</a>
+<a href="12-lab.html">Lab: deploy urlshort to Kubernetes</a>
+<a href="13-ex.html">Exercises</a>
+<a href="14-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-6.html">Kubernetes: Orchestration</a>
+</div>
+<div class="secmeta">Module 06 · Section 6 of 14</div>
+
+<h2 id="deploy">6.6 Deployments: replicas, rollouts, rollbacks</h2>
+<p><code>k8s/deployment.yaml</code>:</p>
+<pre><code><span class="v">apiVersion</span>: apps/v1
+<span class="v">kind</span>: Deployment
+<span class="v">metadata</span>:
+  <span class="v">name</span>: urlshort-api
+  <span class="v">labels</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: api }
+<span class="v">spec</span>:
+  <span class="v">replicas</span>: 3
+
+  <span class="v">selector</span>:
+    <span class="v">matchLabels</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: api }
+
+  <span class="v">strategy</span>:
+    <span class="v">type</span>: RollingUpdate
+    <span class="v">rollingUpdate</span>:
+      <span class="v">maxSurge</span>: 1          <span class="c"># at most 1 extra pod above replicas during rollout</span>
+      <span class="v">maxUnavailable</span>: 0    <span class="c"># never drop below 3 healthy — true zero downtime</span>
+
+  <span class="v">template</span>:
+    <span class="v">metadata</span>:
+      <span class="v">labels</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: api }
+    <span class="v">spec</span>:
+      <span class="v">securityContext</span>:
+        <span class="v">runAsNonRoot</span>: <span class="k">true</span>
+        <span class="v">runAsUser</span>: 10001
+      <span class="v">containers</span>:
+        - <span class="v">name</span>: api
+          <span class="v">image</span>: urlshort:0.1.0
+          <span class="v">imagePullPolicy</span>: IfNotPresent
+          <span class="v">ports</span>:
+            - <span class="v">containerPort</span>: 8000
+          <span class="v">env</span>:
+            - <span class="v">name</span>: REDIS_URL
+              <span class="v">valueFrom</span>:
+                <span class="v">configMapKeyRef</span>: { <span class="v">name</span>: urlshort-config, <span class="v">key</span>: REDIS_URL }
+          <span class="v">resources</span>:
+            <span class="v">requests</span>: { <span class="v">cpu</span>: 50m, <span class="v">memory</span>: 64Mi }
+            <span class="v">limits</span>:   { <span class="v">cpu</span>: 500m, <span class="v">memory</span>: 256Mi }
+          <span class="v">livenessProbe</span>:
+            <span class="v">httpGet</span>: { <span class="v">path</span>: /health, <span class="v">port</span>: 8000 }
+            <span class="v">initialDelaySeconds</span>: 10
+            <span class="v">periodSeconds</span>: 15
+            <span class="v">failureThreshold</span>: 3
+          <span class="v">readinessProbe</span>:
+            <span class="v">httpGet</span>: { <span class="v">path</span>: /health, <span class="v">port</span>: 8000 }
+            <span class="v">initialDelaySeconds</span>: 3
+            <span class="v">periodSeconds</span>: 5
+            <span class="v">failureThreshold</span>: 2</code></pre>
+
+<div class="box why">
+<b><code>maxUnavailable: 0</code> is the setting people forget</b>
+The default is 25%, meaning a quarter of your capacity can be down mid-rollout. With
+<code>maxUnavailable: 0</code> and <code>maxSurge: 1</code>, Kubernetes starts a new pod, waits for it
+to be <i>ready</i>, then removes an old one. The rollout is slower and genuinely lossless.
+</div>
+
+
+<figure id="fig-owner">
+<svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <defs><marker id="ak1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent2)"/></marker></defs>
+  <g stroke="var(--accent)" fill="none" stroke-width="1.4"><rect x="8" y="20" width="704" height="170" rx="10"/></g>
+  <text x="22" y="40" fill="var(--accent)" font-size="11">Deployment · urlshort-api · "3 replicas of this image should exist"</text>
+  <g stroke="var(--accent2)" fill="none" stroke-width="1.3"><rect x="26" y="52" width="668" height="82" rx="8"/></g>
+  <text x="40" y="70" fill="var(--accent2)" font-size="10">ReplicaSet (rev 2) — owns exactly these pods</text>
+  <g stroke="var(--line)" fill="none" stroke-width="1.2">
+    <rect x="46" y="80" width="200" height="42" rx="6"/>
+    <rect x="262" y="80" width="200" height="42" rx="6"/>
+    <rect x="478" y="80" width="196" height="42" rx="6"/>
+  </g>
+  <g fill="var(--txt)" text-anchor="middle" font-size="10">
+    <text x="146" y="98">Pod api-x7k2</text><text x="362" y="98">Pod api-9fp1</text><text x="576" y="98">Pod api-m3q8</text>
+  </g>
+  <g fill="var(--muted)" text-anchor="middle" font-size="9">
+    <text x="146" y="113">node 1 · Ready</text><text x="362" y="113">node 2 · Ready</text><text x="576" y="113">node 2 · Ready</text>
+  </g>
+  <g stroke="var(--line)" fill="none" stroke-width="1" stroke-dasharray="3 3"><rect x="26" y="142" width="668" height="36" rx="8"/></g>
+  <text x="40" y="164" fill="var(--muted)" font-size="10">ReplicaSet (rev 1) — scaled to 0, kept so `kubectl rollout undo` has something to go back to</text>
+  <text x="8" y="14" fill="var(--muted)" font-size="10">you declare the top box; everything below is created and maintained for you</text>
+</svg>
+<figcaption>Deployment owns ReplicaSets; ReplicaSets own Pods. You only declare the top.</figcaption>
+</figure>
+
+<h3>Rollouts</h3>
+<pre><code>kubectl apply -f k8s/deployment.yaml
+kubectl rollout status deployment/urlshort-api
+
+<span class="c"># trigger a rollout by changing the image</span>
+kubectl set image deployment/urlshort-api api=urlshort:0.2.0
+kubectl rollout status deployment/urlshort-api
+
+kubectl rollout history deployment/urlshort-api
+kubectl rollout undo deployment/urlshort-api               <span class="c"># back one revision</span>
+kubectl rollout undo deployment/urlshort-api --to-revision=1</code></pre>
+
+<div class="box">
+<b>A failed rollout does not take you down</b>
+If new pods never become ready, the rollout stalls with the old pods still serving. That is the
+readiness probe doing its job — which is why probes are not optional decoration.
+</div>
+
+
+<figure id="fig-rollout">
+<svg viewBox="0 0 720 230" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <text x="8" y="16" fill="var(--muted)" font-size="10">maxSurge: 1 · maxUnavailable: 0 — capacity never drops below 3 Ready</text>
+  <g fill="var(--muted)" font-size="9">
+    <text x="8" y="46">step 1</text><text x="8" y="86">step 2</text><text x="8" y="126">step 3</text><text x="8" y="166">step 4</text>
+  </g>
+  <rect x="70" y="32" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="144" y="32" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="218" y="32" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="292" y="32" width="64" height="24" rx="4" fill="var(--warn)" opacity=".85"/><rect x="70" y="72" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="144" y="72" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="218" y="72" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="292" y="72" width="64" height="24" rx="4" fill="var(--ok)" opacity=".85"/><rect x="70" y="112" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="144" y="112" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="218" y="112" width="64" height="24" rx="4" fill="var(--ok)" opacity=".85"/><rect x="292" y="112" width="64" height="24" rx="4" fill="var(--warn)" opacity=".85"/><rect x="70" y="152" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="144" y="152" width="64" height="24" rx="4" fill="var(--ok)" opacity=".85"/><rect x="218" y="152" width="64" height="24" rx="4" fill="var(--ok)" opacity=".85"/><rect x="292" y="152" width="64" height="24" rx="4" fill="var(--ok)" opacity=".85"/>
+  <g fill="var(--muted)" font-size="9">
+    <text x="368" y="48">new pod starting — not Ready, gets no traffic</text>
+    <text x="368" y="88">new pod passes readiness → joins the Service</text>
+    <text x="368" y="128">one old pod removed, next new pod starts</text>
+    <text x="368" y="168">…repeat until all replicas are new</text>
+  </g>
+  <g font-size="9">
+    <rect x="70" y="188" width="12" height="9" fill="var(--accent2)"/><text x="88" y="196" fill="var(--muted)">old, Ready</text>
+    <rect x="180" y="188" width="12" height="9" fill="var(--ok)"/><text x="198" y="196" fill="var(--muted)">new, Ready</text>
+    <rect x="290" y="188" width="12" height="9" fill="var(--warn)"/><text x="308" y="196" fill="var(--muted)">starting, NOT Ready</text>
+  </g>
+  <text x="8" y="220" fill="var(--warn)" font-size="10">Deploy a broken image and step 2 never happens: the rollout stalls with the old pods still serving. Users see nothing.</text>
+</svg>
+<figcaption>A zero-downtime rolling update, gated on the readiness probe.</figcaption>
+</figure>
+
+<div class="pager">
+  <a href="05-pod.html"><span class="sub">← Previous</span>6.5 Pods and why you never create one directly</a>
+  <a href="07-svc.html" class="nx"><span class="sub">Next →</span>6.7 Services and cluster DNS</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 6 · 6.6 Deployments: replicas, rollouts, rollbacks</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

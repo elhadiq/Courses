@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2.9 HTTP: the request you will read a thousand times — Module 2 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-2.html">Module 2 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 02</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">2.1 Why this module comes before Docker</a>
+<a href="02-model.html">2.2 The TCP/IP model: four layers, one journey</a>
+<a href="03-ip.html">2.3 IP addressing</a>
+<a href="04-subnet.html">2.4 Subnets and CIDR</a>
+<a href="05-private.html">2.5 Private ranges, NAT and why your laptop is invisible</a>
+<a href="06-tcp.html">2.6 TCP vs UDP</a>
+<a href="07-ports.html">2.7 Ports and sockets</a>
+<a href="08-dns.html">2.8 DNS: how a name becomes an address</a>
+<a href="09-http.html" class="cur">2.9 HTTP: the request you will read a thousand times</a>
+<a href="10-https.html">2.10 HTTPS and TLS</a>
+<a href="11-fw.html">2.11 Firewalls and the ports that matter</a>
+<a href="12-tools.html">2.12 The troubleshooting toolkit</a>
+<a class="grp">Practice</a>
+<a href="13-lab.html">Lab: trace a request end to end</a>
+<a href="14-ex.html">Exercises</a>
+<a href="15-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-2.html">Networking Basics</a>
+</div>
+<div class="secmeta">Module 02 · Section 9 of 15</div>
+
+<h2 id="http">2.9 HTTP: the request you will read a thousand times</h2>
+<p>HTTP is text over TCP. A request is a method, a path, headers, a blank line, then an optional body:</p>
+<pre><code>POST /shorten HTTP/1.1
+Host: localhost:8000
+Content-Type: application/json
+Content-Length: 30
+
+{"url":"https://example.com"}</code></pre>
+
+<p>And the response is a status line, headers, blank line, body:</p>
+<pre><code>HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 46
+
+{"code":"a1b2c3d","short_url":"/r/a1b2c3d"}</code></pre>
+
+<h3>Status codes by class</h3>
+<table>
+<tr><th>Class</th><th>Meaning</th><th>Whose fault</th><th>Ones that matter here</th></tr>
+<tr><td><b>2xx</b></td><td>Success</td><td>—</td><td>200 OK, 201 Created, 204 No Content</td></tr>
+<tr><td><b>3xx</b></td><td>Redirect</td><td>—</td><td>301 permanent, 302/307 temporary</td></tr>
+<tr><td><b>4xx</b></td><td>Client error</td><td>The caller</td><td>400, 401 unauthenticated, 403 forbidden, 404, 429 rate-limited</td></tr>
+<tr><td><b>5xx</b></td><td>Server error</td><td><b>You</b></td><td>500, 502 bad gateway, 503 unavailable, 504 gateway timeout</td></tr>
+</table>
+
+<div class="box why">
+<b>Why the 4xx/5xx split runs through the rest of the course</b>
+In Module 7 you alert on the 5xx <i>rate</i> and not the 4xx rate. A flood of 404s usually means a
+broken link or a scanner — annoying, not an outage. A flood of 500s means your code is failing.
+Alerting on the wrong one either wakes you needlessly or misses real breakage.
+<br><br>
+The distinction also decodes the gateway codes: <b>502</b> means the proxy reached your app and got
+garbage or a closed connection; <b>503</b> means the proxy had no healthy backend to send to at all —
+exactly what a failing Kubernetes readiness probe produces; <b>504</b> means your app accepted the
+request and was too slow to answer.
+</div>
+
+<h3>Talking HTTP by hand</h3>
+<pre><code>curl -s localhost:8000/health              <span class="c"># body only</span>
+curl -i localhost:8000/health              <span class="c"># headers + body</span>
+curl -I https://example.com                <span class="c"># headers only (HEAD)</span>
+curl -v https://example.com 2&gt;&amp;1 | head -20  <span class="c"># the whole conversation incl. TLS</span>
+
+<span class="c"># POST some JSON</span>
+curl -X POST localhost:8000/shorten \
+  -H 'content-type: application/json' \
+  -d '{"url":"https://example.com"}'
+
+<span class="c"># just the status code — the form used in CI and healthchecks</span>
+curl -s -o /dev/null -w '%{http_code}\n' localhost:8000/health
+
+<span class="c"># do NOT follow redirects (default), or DO follow them</span>
+curl -sI localhost:8000/r/abc123
+curl -sL localhost:8000/r/abc123</code></pre>
+
+<div class="pager">
+  <a href="08-dns.html"><span class="sub">← Previous</span>2.8 DNS: how a name becomes an address</a>
+  <a href="10-https.html" class="nx"><span class="sub">Next →</span>2.10 HTTPS and TLS</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 2 · 2.9 HTTP: the request you will read a thousand times</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

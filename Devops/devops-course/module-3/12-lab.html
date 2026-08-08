@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lab: containerise urlshort end to end — Module 3 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-3.html">Module 3 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 03</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">3.1 The problem containers solve</a>
+<a href="02-what.html">3.2 What a container actually is</a>
+<a href="03-images.html">3.3 Images, layers and the cache</a>
+<a href="04-cli.html">3.4 The commands you will use daily</a>
+<a href="05-app.html">3.5 The application</a>
+<a href="06-dockerfile.html">3.6 Writing a Dockerfile — three revisions</a>
+<a href="07-data.html">3.7 Data: volumes and why containers are ephemeral</a>
+<a href="08-net.html">3.8 Networking between containers</a>
+<a href="09-compose.html">3.9 Docker Compose</a>
+<a href="10-debug.html">3.10 Debugging a container that won't start</a>
+<a href="11-registry.html">3.11 Registries and tagging</a>
+<a class="grp">Practice</a>
+<a href="12-lab.html" class="cur">Lab: containerise urlshort end to end</a>
+<a href="13-ex.html">Exercises</a>
+<a href="14-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-3.html">Containers: Docker &amp; Compose</a>
+</div>
+<div class="secmeta">Module 03 · Section 12 of 14</div>
+
+<h2 id="lab">Lab: containerise urlshort end to end</h2>
+<div class="box lab">
+<b>Goal</b>
+From the repo you created in Module 1: write the app, build a multi-stage image, run the full stack
+with Compose, prove data survives a restart, and break/fix it deliberately.
+</div>
+
+<h3>Step 1 — files</h3>
+<p>Create <code>app/main.py</code>, <code>requirements.txt</code>, <code>tests/test_api.py</code>,
+<code>Dockerfile</code> (revision 3), <code>.dockerignore</code> and <code>compose.yaml</code> from
+the sections above. Then:</p>
+<pre><code>cd ~/devops/urlshort
+ls -1
+git add . &amp;&amp; git commit -m "feat: urlshort app with multi-stage Dockerfile and compose"</code></pre>
+
+<h3>Step 2 — build and inspect</h3>
+<pre><code>docker build -t urlshort:0.1.0 .
+docker images urlshort
+<span class="c"># note the size. Under ~200MB is a good result.</span>
+
+<span class="c"># see the layers and what each one cost</span>
+docker history urlshort:0.1.0</code></pre>
+
+<h3>Step 3 — prove the layer cache works</h3>
+<pre><code><span class="c"># touch a source file only</span>
+echo "# comment" &gt;&gt; app/main.py
+time docker build -t urlshort:0.1.0 .
+<span class="c"># pip install should say CACHED. Build takes ~2s, not ~60s.</span>
+
+<span class="c"># now touch dependencies</span>
+echo "" &gt;&gt; requirements.txt
+time docker build -t urlshort:0.1.0 .
+<span class="c"># pip install re-runs. THIS is why COPY order matters.</span></code></pre>
+
+<h3>Step 4 — bring up the stack</h3>
+<pre><code>docker compose up -d --build
+docker compose ps
+<span class="c"># both services should show "running"; redis should show "healthy"</span>
+
+curl -s localhost:8000/health
+<span class="c"># {"status":"ok"}</span>
+
+curl -s -X POST localhost:8000/shorten \
+  -H 'content-type: application/json' \
+  -d '{"url":"https://kubernetes.io/docs/home/"}'
+<span class="c"># {"code":"a1b2c3d","short_url":"/r/a1b2c3d"}</span></code></pre>
+
+<h3>Step 5 — verify the redirect and the counter</h3>
+<pre><code>CODE=$(curl -s -X POST localhost:8000/shorten -H 'content-type: application/json' \
+  -d '{"url":"https://example.com"}' | grep -o '"code":"[^"]*"' | cut -d'"' -f4)
+echo "code=$CODE"
+
+curl -si "localhost:8000/r/$CODE" | head -3
+<span class="c"># HTTP/1.1 307 Temporary Redirect ... location: https://example.com</span>
+
+curl -s "localhost:8000/r/$CODE" -o /dev/null
+curl -s "localhost:8000/stats/$CODE"
+<span class="c"># {"code":"...","hits":2}</span></code></pre>
+
+<h3>Step 6 — prove the volume works</h3>
+<pre><code>docker compose restart redis
+sleep 3
+curl -s "localhost:8000/stats/$CODE"
+<span class="c"># hits are STILL there — appendonly + named volume survived the restart</span>
+
+<span class="c"># now destroy the volume and watch the data vanish</span>
+docker compose down -v
+docker compose up -d
+sleep 5
+curl -s "localhost:8000/stats/$CODE"
+<span class="c"># {"code":"...","hits":0}</span></code></pre>
+
+<h3>Step 7 — break it on purpose</h3>
+<pre><code><span class="c"># point the app at localhost instead of the service name</span>
+docker compose down
+REDIS_URL=redis://localhost:6379/0 docker compose up -d
+docker compose logs api | tail -20
+<span class="c"># ConnectionError: Error connecting to localhost:6379</span>
+<span class="c"># Because "localhost" inside the api container IS the api container.</span>
+
+docker compose down &amp;&amp; docker compose up -d   <span class="c"># back to normal</span></code></pre>
+
+<h3>Step 8 — run the tests inside a container</h3>
+<pre><code>docker compose exec api sh -c "pip install pytest httpx -q &amp;&amp; python -m pytest -q"
+<span class="c"># 3 passed</span></code></pre>
+<p>That command is clumsy on purpose — you will replace it with a proper CI job in Module 4.</p>
+
+<h3>Step 9 — publish</h3>
+<pre><code>docker tag urlshort:0.1.0 ghcr.io/&lt;you&gt;/urlshort:0.1.0
+docker push ghcr.io/&lt;you&gt;/urlshort:0.1.0
+git add . &amp;&amp; git commit -m "feat: compose stack with healthchecked redis" &amp;&amp; git push</code></pre>
+
+<div class="pager">
+  <a href="11-registry.html"><span class="sub">← Previous</span>3.11 Registries and tagging</a>
+  <a href="13-ex.html" class="nx"><span class="sub">Next →</span>Exercises</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 3 · Lab: containerise urlshort end to end</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

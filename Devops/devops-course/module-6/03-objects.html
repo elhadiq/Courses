@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>6.3 The objects you need — Module 6 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-6.html">Module 6 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 06</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">6.1 What Kubernetes is for (and when not to)</a>
+<a href="02-arch.html">6.2 Architecture and the reconciliation loop</a>
+<a href="03-objects.html" class="cur">6.3 The objects you need</a>
+<a href="04-cluster.html">6.4 A cluster on your laptop</a>
+<a href="05-pod.html">6.5 Pods and why you never create one directly</a>
+<a href="06-deploy.html">6.6 Deployments: replicas, rollouts, rollbacks</a>
+<a href="07-svc.html">6.7 Services and cluster DNS</a>
+<a href="08-config.html">6.8 ConfigMaps and Secrets</a>
+<a href="09-probes.html">6.9 Probes: the difference that causes outages</a>
+<a href="10-res.html">6.10 Resources, requests and limits</a>
+<a href="11-debug.html">6.11 Debugging a cluster methodically</a>
+<a class="grp">Practice</a>
+<a href="12-lab.html">Lab: deploy urlshort to Kubernetes</a>
+<a href="13-ex.html">Exercises</a>
+<a href="14-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-6.html">Kubernetes: Orchestration</a>
+</div>
+<div class="secmeta">Module 06 · Section 3 of 14</div>
+
+<h2 id="objects">6.3 The objects you need</h2>
+<table>
+<tr><th>Object</th><th>What it is</th></tr>
+<tr><td><b>Pod</b></td><td>One or more containers sharing a network namespace and storage. The smallest deployable unit. Ephemeral by design.</td></tr>
+<tr><td><b>Deployment</b></td><td>Manages a ReplicaSet, which manages Pods. Gives you replicas, rolling updates and rollback.</td></tr>
+<tr><td><b>Service</b></td><td>A stable virtual IP and DNS name in front of a changing set of Pods.</td></tr>
+<tr><td><b>ConfigMap</b></td><td>Non-secret configuration, injected as env vars or files.</td></tr>
+<tr><td><b>Secret</b></td><td>Same, for sensitive data. Base64-encoded, not encrypted by default.</td></tr>
+<tr><td><b>Namespace</b></td><td>A logical partition of the cluster for isolation and quotas.</td></tr>
+<tr><td><b>Ingress</b></td><td>HTTP routing from outside the cluster to Services, by host and path.</td></tr>
+<tr><td><b>StatefulSet</b></td><td>Like a Deployment but with stable identities and per-pod storage — for databases.</td></tr>
+<tr><td><b>PersistentVolumeClaim</b></td><td>A request for durable storage that outlives the Pod.</td></tr>
+</table>
+
+<div class="pager">
+  <a href="02-arch.html"><span class="sub">← Previous</span>6.2 Architecture and the reconciliation loop</a>
+  <a href="04-cluster.html" class="nx"><span class="sub">Next →</span>6.4 A cluster on your laptop</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 6 · 6.3 The objects you need</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

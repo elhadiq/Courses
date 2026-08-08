@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>5.4 Terraform: the core loop — Module 5 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-5.html">Module 5 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 05</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">5.1 The problem: snowflake servers and drift</a>
+<a href="02-decl.html">5.2 Declarative vs imperative</a>
+<a href="03-split.html">5.3 Terraform vs Ansible — the division of labour</a>
+<a href="04-tf.html" class="cur">5.4 Terraform: the core loop</a>
+<a href="05-hcl.html">5.5 HCL: variables, outputs, resources, data</a>
+<a href="06-state.html">5.6 State — the concept that trips everyone</a>
+<a href="07-mod.html">5.7 Modules and environments</a>
+<a href="08-ansible.html">5.8 Ansible: configuring what exists</a>
+<a href="09-idem.html">5.9 Idempotency, concretely</a>
+<a href="10-secrets.html">5.10 Secrets in infrastructure code</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html">Lab: provision and configure, locally</a>
+<a href="12-ex.html">Exercises</a>
+<a href="13-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-5.html">Infrastructure as Code: Terraform &amp; Ansible</a>
+</div>
+<div class="secmeta">Module 05 · Section 4 of 13</div>
+
+<h2 id="tf">5.4 Terraform: the core loop</h2>
+<pre><code>terraform init      <span class="c"># download providers, set up the backend. Run once per project/change.</span>
+terraform fmt       <span class="c"># canonical formatting — put this in CI</span>
+terraform validate  <span class="c"># syntax and internal consistency</span>
+terraform plan      <span class="c"># show me what you WOULD change. Read this. Every time.</span>
+terraform apply     <span class="c"># make it so</span>
+terraform destroy   <span class="c"># tear it all down</span></code></pre>
+
+
+<figure id="fig-plan">
+<svg viewBox="0 0 720 170" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <text x="8" y="16" fill="var(--muted)" font-size="10">read these four symbols before you ever type "yes"</text>
+  <g stroke="var(--line)" fill="none" stroke-width="1.2">
+    <rect x="8" y="28" width="172" height="86" rx="7"/><rect x="188" y="28" width="172" height="86" rx="7"/>
+    <rect x="368" y="28" width="172" height="86" rx="7"/><rect x="548" y="28" width="164" height="86" rx="7"/>
+  </g>
+  <g font-size="22" text-anchor="middle">
+    <text x="94" y="60" fill="var(--ok)">+</text><text x="274" y="60" fill="var(--accent2)">~</text>
+    <text x="454" y="60" fill="var(--warn)">-</text><text x="630" y="60" fill="var(--err)">-/+</text>
+  </g>
+  <g fill="var(--txt)" text-anchor="middle" font-size="11">
+    <text x="94" y="84">create</text><text x="274" y="84">update in place</text>
+    <text x="454" y="84">destroy</text><text x="630" y="84">replace</text>
+  </g>
+  <g fill="var(--muted)" text-anchor="middle" font-size="9">
+    <text x="94" y="102">safe</text><text x="274" y="102">usually safe</text>
+    <text x="454" y="102">intended? check</text><text x="630" y="102">destroy THEN create</text>
+  </g>
+  <g stroke="var(--err)" fill="none" stroke-width="1.4"><rect x="548" y="122" width="164" height="38" rx="6"/></g>
+  <text x="630" y="139" fill="var(--err)" text-anchor="middle" font-size="10">data loss lives here</text>
+  <text x="630" y="153" fill="var(--muted)" text-anchor="middle" font-size="9">find the forcing attribute</text>
+  <text x="8" y="134" fill="var(--muted)" font-size="10">Terraform always tells you what it is about to do, before it does it.</text>
+  <text x="8" y="152" fill="var(--warn)" font-size="10">A plan you did not read is an apply you did not authorise.</text>
+</svg>
+<figcaption>The four plan symbols. Only one of them can lose your data.</figcaption>
+</figure>
+
+<div class="box warn">
+<b><code>plan</code> is the safety mechanism, not a formality</b>
+Read the plan symbols before typing yes:
+<code>+</code> create, <code>~</code> update in place, <code>-</code> destroy,
+<code>-/+</code> <b>destroy and recreate</b>. That last one is where production databases die.
+When you see <code>-/+</code> on something stateful, stop and find out which attribute forced it.
+</div>
+
+<div class="pager">
+  <a href="03-split.html"><span class="sub">← Previous</span>5.3 Terraform vs Ansible — the division of labour</a>
+  <a href="05-hcl.html" class="nx"><span class="sub">Next →</span>5.5 HCL: variables, outputs, resources, data</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 5 · 5.4 Terraform: the core loop</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>5.9 Idempotency, concretely — Module 5 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-5.html">Module 5 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 05</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">5.1 The problem: snowflake servers and drift</a>
+<a href="02-decl.html">5.2 Declarative vs imperative</a>
+<a href="03-split.html">5.3 Terraform vs Ansible — the division of labour</a>
+<a href="04-tf.html">5.4 Terraform: the core loop</a>
+<a href="05-hcl.html">5.5 HCL: variables, outputs, resources, data</a>
+<a href="06-state.html">5.6 State — the concept that trips everyone</a>
+<a href="07-mod.html">5.7 Modules and environments</a>
+<a href="08-ansible.html">5.8 Ansible: configuring what exists</a>
+<a href="09-idem.html" class="cur">5.9 Idempotency, concretely</a>
+<a href="10-secrets.html">5.10 Secrets in infrastructure code</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html">Lab: provision and configure, locally</a>
+<a href="12-ex.html">Exercises</a>
+<a href="13-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-5.html">Infrastructure as Code: Terraform &amp; Ansible</a>
+</div>
+<div class="secmeta">Module 05 · Section 9 of 13</div>
+
+<h2 id="idem">5.9 Idempotency, concretely</h2>
+<p>Run a playbook twice. The second run should report <code>changed=0</code>. If it does not, some task
+is doing work unconditionally, and you cannot trust the report to tell you what actually changed.</p>
+
+<pre><code>PLAY RECAP
+web1 : ok=6  changed=4  unreachable=0  failed=0    <span class="c"># first run</span>
+web1 : ok=6  changed=0  unreachable=0  failed=0    <span class="c"># second run — correct</span></code></pre>
+
+<div class="box warn">
+<b>The <code>command</code> module is the usual culprit</b>
+<code>command</code> and <code>shell</code> always report changed, because Ansible cannot know what your
+command did. Prefer a real module when one exists; when you must shell out, guard it:
+<pre><code>- <span class="v">name</span>: Initialise the database once
+  <span class="v">ansible.builtin.command</span>: /srv/app/init-db.sh
+  <span class="v">args</span>:
+    <span class="v">creates</span>: /srv/app/.db-initialised   <span class="c"># skip if this file exists</span></code></pre>
+<code>creates</code>/<code>removes</code>, or <code>register</code> + <code>when</code>, or
+<code>changed_when</code> — these turn an imperative escape hatch back into something idempotent.
+</div>
+
+<div class="pager">
+  <a href="08-ansible.html"><span class="sub">← Previous</span>5.8 Ansible: configuring what exists</a>
+  <a href="10-secrets.html" class="nx"><span class="sub">Next →</span>5.10 Secrets in infrastructure code</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 5 · 5.9 Idempotency, concretely</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

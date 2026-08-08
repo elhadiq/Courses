@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exercises — Module 1 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-1.html">Module 1 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 01</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">1.1 Why the terminal, still</a>
+<a href="02-fs.html">1.2 The filesystem and moving around it</a>
+<a href="03-perm.html">1.3 Permissions, users and sudo</a>
+<a href="04-pipes.html">1.4 Pipes: the idea that makes the shell powerful</a>
+<a href="05-proc.html">1.5 Processes, ports and logs</a>
+<a href="06-script.html">1.6 Writing a real shell script</a>
+<a href="07-ssh.html">1.7 SSH and keys</a>
+<a href="08-git.html">1.8 Git: the mental model</a>
+<a href="09-branch.html">1.9 Branching, merging and the conflict you will hit</a>
+<a href="10-flow.html">1.10 A workflow a team can actually live with</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html">Lab: bootstrap the course repository</a>
+<a href="12-ex.html" class="cur">Exercises</a>
+<a href="13-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-1.html">The Ground Floor: Linux, Shell &amp; Git</a>
+</div>
+<div class="secmeta">Module 01 · Section 12 of 13</div>
+
+<h2 id="ex">Exercises</h2>
+
+<h3>Exercise 1 — log analysis with pipes</h3>
+<p>Given an nginx-style access log, produce a count of requests per HTTP status code, sorted by
+frequency. Generate test data first:</p>
+<pre><code>printf '%s\n' \
+ '10.0.0.1 - - "GET /a" 200' '10.0.0.2 - - "GET /b" 404' \
+ '10.0.0.1 - - "GET /c" 200' '10.0.0.3 - - "GET /d" 500' \
+ '10.0.0.2 - - "GET /e" 404' '10.0.0.1 - - "GET /f" 200' &gt; access.log</code></pre>
+<details><summary>Solution</summary>
+<pre><code>awk '{print $NF}' access.log | sort | uniq -c | sort -rn
+<span class="c">#  3 200</span>
+<span class="c">#  2 404</span>
+<span class="c">#  1 500</span></code></pre>
+<p><code>$NF</code> is awk's "last field", which is more robust than counting columns when the
+request path contains spaces.</p>
+</details>
+
+<h3>Exercise 2 — a disk-space guard</h3>
+<p>Write <code>diskguard.sh</code> that takes a threshold percentage (default 80), checks usage of
+<code>/</code>, prints a warning and exits 1 if usage exceeds it, exits 0 otherwise.</p>
+<details><summary>Solution</summary>
+<pre><code><span class="c">#!/usr/bin/env bash</span>
+<span class="k">set</span> -euo pipefail
+THRESHOLD=<span class="s">"${1:-80}"</span>
+USED=$(df --output=pcent / | tail -1 | tr -dc '0-9')
+
+<span class="k">if</span> (( USED &gt; THRESHOLD )); <span class="k">then</span>
+  <span class="k">echo</span> <span class="s">"WARN: / is ${USED}% full (threshold ${THRESHOLD}%)"</span> &gt;&amp;2
+  <span class="k">exit</span> 1
+<span class="k">fi</span>
+<span class="k">echo</span> <span class="s">"OK: / is ${USED}% full"</span></code></pre>
+<p><code>tr -dc '0-9'</code> strips everything that is not a digit — simpler and safer than parsing
+the <code>%</code> sign out by hand.</p>
+</details>
+
+<h3>Exercise 3 — recover a lost commit</h3>
+<p>Commit something, then run <code>git reset --hard HEAD~1</code> to "lose" it.
+Recover it without having written down the SHA.</p>
+<details><summary>Solution</summary>
+<pre><code>git reflog
+<span class="c"># a1b2c3d HEAD@{1}: commit: the one you thought you lost</span>
+git reset --hard a1b2c3d</code></pre>
+<p><code>reflog</code> records every position HEAD has occupied for ~90 days. Almost nothing committed
+in Git is truly unrecoverable, which is worth knowing before you panic.</p>
+</details>
+
+<h3>Exercise 4 — clean history</h3>
+<p>Make three commits: <code>wip</code>, <code>wip2</code>, <code>fix typo</code>.
+Squash them into one well-named commit before "opening a PR".</p>
+<details><summary>Solution</summary>
+<pre><code>git rebase -i HEAD~3
+<span class="c"># keep the first as "pick", change the other two to "squash" (or "s")</span>
+<span class="c"># save; then write one good message in the editor that appears</span></code></pre>
+<p>Only rebase branches nobody else has pulled. Rewriting shared history is the one Git operation that
+genuinely ruins other people's afternoons.</p>
+</details>
+
+<div class="pager">
+  <a href="11-lab.html"><span class="sub">← Previous</span>Lab: bootstrap the course repository</a>
+  <a href="13-check.html" class="nx"><span class="sub">Next →</span>Checkpoint</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 1 · Exercises</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>7.10 SLIs, SLOs and error budgets — Module 7 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-7.html">Module 7 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 07</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">7.1 Monitoring vs observability</a>
+<a href="02-pillars.html">7.2 Metrics, logs, traces</a>
+<a href="03-prom.html">7.3 How Prometheus works</a>
+<a href="04-types.html">7.4 Metric types, and the one everyone misuses</a>
+<a href="05-instr.html">7.5 Instrumenting the application</a>
+<a href="06-promql.html">7.6 PromQL, enough to be useful</a>
+<a href="07-golden.html">7.7 The four golden signals</a>
+<a href="08-grafana.html">7.8 Dashboards worth looking at</a>
+<a href="09-alert.html">7.9 Alerting on symptoms, not causes</a>
+<a href="10-slo.html" class="cur">7.10 SLIs, SLOs and error budgets</a>
+<a href="11-logs.html">7.11 Logs that are actually searchable</a>
+<a class="grp">Practice</a>
+<a href="12-lab.html">Lab: full observability stack</a>
+<a href="13-ex.html">Exercises</a>
+<a href="14-check.html">Checkpoint</a>
+<a href="15-capstone.html">Capstone project</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-7.html">Observability: Prometheus &amp; Grafana</a>
+</div>
+<div class="secmeta">Module 07 · Section 10 of 15</div>
+
+<h2 id="slo">7.10 SLIs, SLOs and error budgets</h2>
+<ul>
+<li><b>SLI</b> — the measurement. "Proportion of requests served in under 300 ms."</li>
+<li><b>SLO</b> — your target. "99.5% of requests under 300 ms over 30 days."</li>
+<li><b>Error budget</b> — 100% minus the SLO. At 99.5%, you may fail 0.5% of requests: about
+3.6 hours per month.</li>
+</ul>
+<p>The error budget is what makes this operationally useful rather than a slogan. Budget remaining
+means you can ship aggressively. Budget exhausted means you stop feature work and spend on
+reliability. It converts "how fast should we ship?" from an argument into a number.</p>
+
+<div class="box why">
+<b>Why 100% is the wrong target</b>
+Each additional nine costs roughly an order of magnitude more and buys less. Beyond a point your
+users cannot perceive the difference — their own network is less reliable than your service.
+Deliberately choosing a target below 100% is what buys you the freedom to deploy at all.
+</div>
+
+
+<figure id="fig-budget">
+<svg viewBox="0 0 720 230" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <text x="8" y="16" fill="var(--muted)" font-size="10">error budget for a 99.5% / 30-day SLO — you may fail 0.5% of requests (~3.6 h)</text>
+  <g stroke="var(--line)" stroke-width="1"><line x1="52" y1="176" x2="700" y2="176"/><line x1="52" y1="30" x2="52" y2="176"/></g>
+  <g fill="var(--muted)" font-size="9" text-anchor="end">
+    <text x="46" y="36">100%</text><text x="46" y="106">50%</text><text x="46" y="180">0%</text>
+  </g>
+  <g fill="var(--muted)" font-size="9" text-anchor="middle">
+    <text x="52" y="192">day 0</text><text x="376" y="192">day 15</text><text x="700" y="192">day 30</text>
+  </g>
+  <line x1="52" y1="32" x2="700" y2="176" stroke="var(--muted)" stroke-dasharray="4 4" stroke-width="1"/>
+  <text x="250" y="104" fill="var(--muted)" font-size="9">sustainable burn</text>
+  <polyline points="52,32 130,50 200,62 270,70 340,92 380,150 420,158 500,163 580,168 700,172"
+            fill="none" stroke="var(--accent2)" stroke-width="2"/>
+  <circle cx="340" cy="92" r="4" fill="var(--err)"/>
+  <text x="330" y="62" fill="var(--err)" text-anchor="end" font-size="9">bad deploy</text>
+  <g stroke="var(--err)" stroke-width="1.2" stroke-dasharray="3 3"><line x1="380" y1="30" x2="380" y2="176"/></g>
+  <path d="M380 150 H700 V176 H380 Z" fill="color-mix(in srgb,var(--err) 18%,transparent)"/>
+  <text x="596" y="64" fill="var(--err)" text-anchor="middle" font-size="10">budget nearly gone</text>
+  <text x="596" y="78" fill="var(--muted)" text-anchor="middle" font-size="9">freeze features, fix reliability</text>
+  <text x="150" y="120" fill="var(--ok)" font-size="10">budget healthy</text>
+  <text x="150" y="134" fill="var(--muted)" font-size="9">ship aggressively</text>
+  <text x="8" y="212" fill="var(--muted)" font-size="10">The budget turns "how fast should we ship?" from an argument into a number that both sides can read off a chart.</text>
+  <text x="8" y="226" fill="var(--warn)" font-size="10">This is why 100% is the wrong target: a zero budget means you can never deploy anything.</text>
+</svg>
+<figcaption>An error budget makes release pace a measurement rather than an opinion.</figcaption>
+</figure>
+
+<div class="pager">
+  <a href="09-alert.html"><span class="sub">← Previous</span>7.9 Alerting on symptoms, not causes</a>
+  <a href="11-logs.html" class="nx"><span class="sub">Next →</span>7.11 Logs that are actually searchable</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 7 · 7.10 SLIs, SLOs and error budgets</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

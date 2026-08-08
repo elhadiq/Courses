@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4.1 What CI and CD actually mean — Module 4 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-4.html">Module 4 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 04</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html" class="cur">4.1 What CI and CD actually mean</a>
+<a href="02-anatomy.html">4.2 Anatomy of a workflow</a>
+<a href="03-first.html">4.3 Your first pipeline: test on every push</a>
+<a href="04-services.html">4.4 Services: a real Redis for your tests</a>
+<a href="05-cache.html">4.5 Caching, and why pipelines get slow</a>
+<a href="06-quality.html">4.6 Quality gates: lint, format, type, scan</a>
+<a href="07-build.html">4.7 Build and publish the image</a>
+<a href="08-secrets.html">4.8 Secrets, and how pipelines leak them</a>
+<a href="09-deploy.html">4.9 Deployment, environments and approvals</a>
+<a href="10-design.html">4.10 Designing a pipeline people trust</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html">Lab: the full pipeline</a>
+<a href="12-ex.html">Exercises</a>
+<a href="13-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-4.html">CI/CD with GitHub Actions</a>
+</div>
+<div class="secmeta">Module 04 · Section 1 of 13</div>
+
+<h2 id="why">4.1 What CI and CD actually mean</h2>
+<p>The terms are used loosely; the distinctions matter because they imply different amounts of risk.</p>
+
+<table>
+<tr><th>Term</th><th>Means</th><th>The hard part</th></tr>
+<tr><td><b>Continuous Integration</b></td><td>Everyone merges into <code>main</code> at least daily, and every merge is automatically built and tested.</td><td>Not the tooling — the discipline of small, frequent merges and a test suite you actually trust.</td></tr>
+<tr><td><b>Continuous Delivery</b></td><td>Every commit on <code>main</code> produces a deployable artefact. Deploying is a button someone presses.</td><td>Making the artefact genuinely deployable, every time, with no manual steps.</td></tr>
+<tr><td><b>Continuous Deployment</b></td><td>Every green commit on <code>main</code> goes to production automatically.</td><td>Test coverage and observability good enough that nobody needs to look first.</td></tr>
+</table>
+
+<div class="box why">
+<b>Why it exists</b>
+Manual builds are unrepeatable and manual test runs get skipped under pressure — exactly when they
+matter most. A pipeline makes the safe path the only path: you cannot merge without the tests passing,
+so nobody has to remember to run them.
+</div>
+
+<p>The most important property of a pipeline is not speed but <b>trust</b>. A suite that fails randomly
+teaches the team to re-run it and ignore it, which is worse than having no suite at all, because it
+costs time and provides false assurance.</p>
+
+<div class="pager">
+  <a href="../module-3/14-check.html"><span class="sub">← Module 3</span>Checkpoint</a>
+  <a href="02-anatomy.html" class="nx"><span class="sub">Next →</span>4.2 Anatomy of a workflow</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 4 · 4.1 What CI and CD actually mean</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

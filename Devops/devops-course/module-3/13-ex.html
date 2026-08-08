@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exercises — Module 3 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-3.html">Module 3 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 03</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">3.1 The problem containers solve</a>
+<a href="02-what.html">3.2 What a container actually is</a>
+<a href="03-images.html">3.3 Images, layers and the cache</a>
+<a href="04-cli.html">3.4 The commands you will use daily</a>
+<a href="05-app.html">3.5 The application</a>
+<a href="06-dockerfile.html">3.6 Writing a Dockerfile — three revisions</a>
+<a href="07-data.html">3.7 Data: volumes and why containers are ephemeral</a>
+<a href="08-net.html">3.8 Networking between containers</a>
+<a href="09-compose.html">3.9 Docker Compose</a>
+<a href="10-debug.html">3.10 Debugging a container that won't start</a>
+<a href="11-registry.html">3.11 Registries and tagging</a>
+<a class="grp">Practice</a>
+<a href="12-lab.html">Lab: containerise urlshort end to end</a>
+<a href="13-ex.html" class="cur">Exercises</a>
+<a href="14-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-3.html">Containers: Docker &amp; Compose</a>
+</div>
+<div class="secmeta">Module 03 · Section 13 of 14</div>
+
+<h2 id="ex">Exercises</h2>
+
+<h3>Exercise 1 — shrink the image</h3>
+<p>Get the final image under 150 MB without breaking it. Measure before and after.</p>
+<details><summary>Solution</summary>
+<p>Switch the runtime stage to <code>python:3.12-alpine</code>, and prune anything not needed at
+runtime. Verify:</p>
+<pre><code>docker images urlshort --format "{{.Tag}}\t{{.Size}}"</code></pre>
+<p>Caveat worth knowing: Alpine uses musl instead of glibc, so packages with C extensions may need
+compiling. For pure-Python dependencies Alpine is a clear win; when wheels stop resolving,
+<code>slim</code> is the pragmatic choice. Smaller is not automatically better.</p>
+</details>
+
+<h3>Exercise 2 — resource limits</h3>
+<p>Constrain the API to 256 MB of memory and half a CPU in Compose, then confirm the limit is real.</p>
+<details><summary>Solution</summary>
+<pre><code><span class="v">services</span>:
+  <span class="v">api</span>:
+    <span class="v">deploy</span>:
+      <span class="v">resources</span>:
+        <span class="v">limits</span>:
+          <span class="v">cpus</span>: <span class="s">"0.5"</span>
+          <span class="v">memory</span>: 256M</code></pre>
+<pre><code>docker stats --no-stream
+<span class="c"># MEM USAGE / LIMIT shows ... / 256MiB</span></code></pre>
+<p>Exceeding the memory limit gets the container OOM-killed with exit code 137 — worth recognising,
+since it looks like a mysterious crash if you do not know the number.</p>
+</details>
+
+<h3>Exercise 3 — a second app instance</h3>
+<p>Run two API replicas behind Compose and confirm both share the same Redis.</p>
+<details><summary>Solution</summary>
+<pre><code>docker compose up -d --scale api=2
+<span class="c"># fails: both want host port 8000</span></code></pre>
+<p>Remove the <code>ports</code> mapping from <code>api</code> and add an nginx service that
+proxies to <code>api:8000</code> — Docker's DNS round-robins between the replicas. This is the moment
+you feel the limits of Compose, and precisely the problem Kubernetes exists to solve (Module 6).</p>
+</details>
+
+<h3>Exercise 4 — read a Dockerfile critically</h3>
+<p>What are the three problems here?</p>
+<pre><code><span class="k">FROM</span> ubuntu:latest
+<span class="k">RUN</span> apt-get update
+<span class="k">RUN</span> apt-get install -y python3 python3-pip
+<span class="k">COPY</span> . .
+<span class="k">RUN</span> pip3 install -r requirements.txt
+<span class="k">ENV</span> DB_PASSWORD=supersecret
+<span class="k">CMD</span> python3 app.py</code></pre>
+<details><summary>Solution</summary>
+<ol>
+<li><code>update</code> and <code>install</code> in separate layers: a cached <code>update</code> layer
+means <code>install</code> can pull stale or missing packages. Combine them with <code>&amp;&amp;</code>
+and clean <code>/var/lib/apt/lists</code> in the same layer.</li>
+<li><code>ENV DB_PASSWORD</code> bakes a secret into the image permanently — anyone who pulls it can
+read it with <code>docker history</code>. Secrets are injected at runtime, never built in.</li>
+<li><code>COPY . .</code> before dependency install destroys the cache; also <code>ubuntu:latest</code>
+is unpinned, so the same Dockerfile builds differently next month.</li>
+</ol>
+</details>
+
+<div class="pager">
+  <a href="12-lab.html"><span class="sub">← Previous</span>Lab: containerise urlshort end to end</a>
+  <a href="14-check.html" class="nx"><span class="sub">Next →</span>Checkpoint</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 3 · Exercises</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

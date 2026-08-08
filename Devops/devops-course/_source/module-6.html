@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Module 6 — Kubernetes | Practical DevOps</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <a class="brand hm" href="index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="index.html">All modules</a>
+    <a href="module-5.html">← Prev</a>
+    <a href="module-7.html">Next →</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap">
+
+<div class="kicker" style="margin-top:40px">Module 06 · ~6 hours</div>
+<h1>Kubernetes: Orchestration</h1>
+<p class="lead">Compose runs containers on one machine and gives up when that machine dies.
+Kubernetes runs containers across many machines and keeps running when things fail — which is a
+different problem, and the reason it is more complicated.</p>
+
+<div class="card toc">
+<b>In this module</b>
+<a href="#why">6.1 What Kubernetes is for (and when not to)</a>
+<a href="#arch">6.2 Architecture and the reconciliation loop</a>
+<a href="#objects">6.3 The objects you need</a>
+<a href="#cluster">6.4 A cluster on your laptop</a>
+<a href="#pod">6.5 Pods and why you never create one directly</a>
+<a href="#deploy">6.6 Deployments: replicas, rollouts, rollbacks</a>
+<a href="#svc">6.7 Services and cluster DNS</a>
+<a href="#config">6.8 ConfigMaps and Secrets</a>
+<a href="#probes">6.9 Probes: the difference that causes outages</a>
+<a href="#res">6.10 Resources, requests and limits</a>
+<a href="#debug">6.11 Debugging a cluster methodically</a>
+<a href="#lab">Lab: deploy urlshort to Kubernetes</a>
+<a href="#ex">Exercises</a>
+<a href="#check">Checkpoint</a>
+</div>
+
+<h2 id="why">6.1 What Kubernetes is for (and when not to)</h2>
+<p>Kubernetes solves a specific set of problems that appear once you run containers seriously:</p>
+<ul>
+<li><b>Self-healing</b> — a container crashes or a node dies; replacements start elsewhere automatically.</li>
+<li><b>Scaling</b> — go from 2 to 20 replicas with one field, manually or on a metric.</li>
+<li><b>Zero-downtime releases</b> — rolling updates with automatic rollback when the new version fails to become healthy.</li>
+<li><b>Service discovery and load balancing</b> — stable names in front of ephemeral pods.</li>
+<li><b>Declarative configuration</b> — the cluster continuously works to make reality match your YAML.</li>
+</ul>
+
+<div class="box warn">
+<b>When not to use it</b>
+Kubernetes has a real operational cost: control plane upgrades, networking, RBAC, storage classes,
+and a learning curve for everyone on the team. For a single app on a single server with modest traffic,
+Compose plus a good deployment script is often the better engineering decision. Choose Kubernetes when
+you have multiple services, need resilience across machines, or a platform team to own it —
+not because it is on job listings.
+</div>
+
+<h2 id="arch">6.2 Architecture and the reconciliation loop</h2>
+
+<figure>
+<svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="10">
+  <g fill="none" stroke="var(--accent)" stroke-width="1.4"><rect x="15" y="30" width="300" height="200" rx="10"/></g>
+  <text x="30" y="50" fill="var(--accent)" font-size="11">control plane</text>
+  <g fill="none" stroke="var(--line)"><rect x="32" y="60" width="266" height="26" rx="4"/>
+    <rect x="32" y="94" width="266" height="26" rx="4"/><rect x="32" y="128" width="266" height="26" rx="4"/>
+    <rect x="32" y="162" width="266" height="26" rx="4"/></g>
+  <g fill="var(--txt)">
+    <text x="42" y="77">kube-apiserver — the only door in</text>
+    <text x="42" y="111">etcd — desired + observed state</text>
+    <text x="42" y="145">scheduler — picks a node for each pod</text>
+    <text x="42" y="179">controller-manager — reconciles</text>
+  </g>
+
+  <g fill="none" stroke="var(--accent2)" stroke-width="1.4">
+    <rect x="380" y="30" width="325" height="95" rx="10"/><rect x="380" y="135" width="325" height="95" rx="10"/>
+  </g>
+  <g fill="var(--accent2)" font-size="11"><text x="394" y="50">node 1</text><text x="394" y="155">node 2</text></g>
+  <g fill="none" stroke="var(--line)">
+    <rect x="394" y="60" width="140" height="22" rx="4"/><rect x="394" y="90" width="140" height="22" rx="4"/>
+    <rect x="548" y="60" width="145" height="52" rx="4"/>
+    <rect x="394" y="165" width="140" height="22" rx="4"/><rect x="394" y="195" width="140" height="22" rx="4"/>
+    <rect x="548" y="165" width="145" height="52" rx="4"/>
+  </g>
+  <g fill="var(--txt)">
+    <text x="404" y="75">kubelet</text><text x="404" y="105">kube-proxy</text>
+    <text x="404" y="180">kubelet</text><text x="404" y="210">kube-proxy</text>
+  </g>
+  <g fill="var(--muted)"><text x="558" y="82">pods</text><text x="558" y="96">(your containers)</text>
+    <text x="558" y="187">pods</text><text x="558" y="201">(your containers)</text></g>
+  <g stroke="var(--accent)" stroke-width="1.2" stroke-dasharray="4 3">
+    <line x1="317" y1="90" x2="378" y2="70"/><line x1="317" y1="150" x2="378" y2="175"/>
+  </g>
+  <text x="360" y="252" fill="var(--muted)" text-anchor="middle" font-size="10">
+    kubectl talks only to the apiserver; everything else watches and reconciles</text>
+</svg>
+<figcaption>Control plane decides; nodes execute; controllers close the loop.</figcaption>
+</figure>
+
+<p>The single idea underneath all of Kubernetes is the <b>reconciliation loop</b>. You declare desired
+state. Controllers observe actual state. When they differ, controllers act. Forever, continuously.</p>
+
+<div class="box why">
+<b>Why this shape matters in practice</b>
+You never tell Kubernetes to "start a container". You tell it "three replicas of this should exist",
+and something else works out how. Kill a pod and it comes back — not because a script noticed, but
+because the desired state never changed. This is the same observe/compare/act loop as
+<code>terraform apply</code> in Module 5, except it runs every few seconds instead of when you type it.
+</div>
+
+<h2 id="objects">6.3 The objects you need</h2>
+<table>
+<tr><th>Object</th><th>What it is</th></tr>
+<tr><td><b>Pod</b></td><td>One or more containers sharing a network namespace and storage. The smallest deployable unit. Ephemeral by design.</td></tr>
+<tr><td><b>Deployment</b></td><td>Manages a ReplicaSet, which manages Pods. Gives you replicas, rolling updates and rollback.</td></tr>
+<tr><td><b>Service</b></td><td>A stable virtual IP and DNS name in front of a changing set of Pods.</td></tr>
+<tr><td><b>ConfigMap</b></td><td>Non-secret configuration, injected as env vars or files.</td></tr>
+<tr><td><b>Secret</b></td><td>Same, for sensitive data. Base64-encoded, not encrypted by default.</td></tr>
+<tr><td><b>Namespace</b></td><td>A logical partition of the cluster for isolation and quotas.</td></tr>
+<tr><td><b>Ingress</b></td><td>HTTP routing from outside the cluster to Services, by host and path.</td></tr>
+<tr><td><b>StatefulSet</b></td><td>Like a Deployment but with stable identities and per-pod storage — for databases.</td></tr>
+<tr><td><b>PersistentVolumeClaim</b></td><td>A request for durable storage that outlives the Pod.</td></tr>
+</table>
+
+<h2 id="cluster">6.4 A cluster on your laptop</h2>
+<pre><code><span class="c"># kubectl</span>
+curl -LO "https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+<span class="c"># kind: Kubernetes IN Docker</span>
+curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.24.0/kind-linux-amd64
+chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin/kind</code></pre>
+
+<p><code>k8s/kind-config.yaml</code> — one control plane, two workers, port 30080 forwarded to your host:</p>
+<pre><code><span class="v">kind</span>: Cluster
+<span class="v">apiVersion</span>: kind.x-k8s.io/v1alpha4
+<span class="v">nodes</span>:
+  - <span class="v">role</span>: control-plane
+    <span class="v">extraPortMappings</span>:
+      - <span class="v">containerPort</span>: 30080
+        <span class="v">hostPort</span>: 30080
+        <span class="v">protocol</span>: TCP
+  - <span class="v">role</span>: worker
+  - <span class="v">role</span>: worker</code></pre>
+
+<pre><code>kind create cluster --name devops --config k8s/kind-config.yaml
+kubectl cluster-info
+kubectl get nodes
+<span class="c"># NAME                  STATUS   ROLES           AGE   VERSION</span>
+<span class="c"># devops-control-plane  Ready    control-plane   1m    v1.31.x</span>
+<span class="c"># devops-worker         Ready    &lt;none&gt;          1m    v1.31.x</span>
+<span class="c"># devops-worker2        Ready    &lt;none&gt;          1m    v1.31.x</span></code></pre>
+
+<h2 id="pod">6.5 Pods and why you never create one directly</h2>
+<p>A bare Pod has no supervisor. If it dies, nothing brings it back; if its node dies, it is simply
+gone. Pods are the unit Kubernetes schedules, but a controller should always own them.</p>
+
+<pre><code>kubectl run tmp --image=busybox --restart=Never -- sleep 3600
+kubectl get pods
+kubectl delete pod tmp
+kubectl get pods    <span class="c"># gone forever — nothing recreates it</span></code></pre>
+
+<p>Useful in practice for a one-off debugging shell inside the cluster network:</p>
+<pre><code>kubectl run debug --rm -it --image=nicolaka/netshoot --restart=Never -- sh
+<span class="c"># inside: nslookup, curl, dig, tcpdump against cluster services</span></code></pre>
+
+<h2 id="deploy">6.6 Deployments: replicas, rollouts, rollbacks</h2>
+<p><code>k8s/deployment.yaml</code>:</p>
+<pre><code><span class="v">apiVersion</span>: apps/v1
+<span class="v">kind</span>: Deployment
+<span class="v">metadata</span>:
+  <span class="v">name</span>: urlshort-api
+  <span class="v">labels</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: api }
+<span class="v">spec</span>:
+  <span class="v">replicas</span>: 3
+
+  <span class="v">selector</span>:
+    <span class="v">matchLabels</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: api }
+
+  <span class="v">strategy</span>:
+    <span class="v">type</span>: RollingUpdate
+    <span class="v">rollingUpdate</span>:
+      <span class="v">maxSurge</span>: 1          <span class="c"># at most 1 extra pod above replicas during rollout</span>
+      <span class="v">maxUnavailable</span>: 0    <span class="c"># never drop below 3 healthy — true zero downtime</span>
+
+  <span class="v">template</span>:
+    <span class="v">metadata</span>:
+      <span class="v">labels</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: api }
+    <span class="v">spec</span>:
+      <span class="v">securityContext</span>:
+        <span class="v">runAsNonRoot</span>: <span class="k">true</span>
+        <span class="v">runAsUser</span>: 10001
+      <span class="v">containers</span>:
+        - <span class="v">name</span>: api
+          <span class="v">image</span>: urlshort:0.1.0
+          <span class="v">imagePullPolicy</span>: IfNotPresent
+          <span class="v">ports</span>:
+            - <span class="v">containerPort</span>: 8000
+          <span class="v">env</span>:
+            - <span class="v">name</span>: REDIS_URL
+              <span class="v">valueFrom</span>:
+                <span class="v">configMapKeyRef</span>: { <span class="v">name</span>: urlshort-config, <span class="v">key</span>: REDIS_URL }
+          <span class="v">resources</span>:
+            <span class="v">requests</span>: { <span class="v">cpu</span>: 50m, <span class="v">memory</span>: 64Mi }
+            <span class="v">limits</span>:   { <span class="v">cpu</span>: 500m, <span class="v">memory</span>: 256Mi }
+          <span class="v">livenessProbe</span>:
+            <span class="v">httpGet</span>: { <span class="v">path</span>: /health, <span class="v">port</span>: 8000 }
+            <span class="v">initialDelaySeconds</span>: 10
+            <span class="v">periodSeconds</span>: 15
+            <span class="v">failureThreshold</span>: 3
+          <span class="v">readinessProbe</span>:
+            <span class="v">httpGet</span>: { <span class="v">path</span>: /health, <span class="v">port</span>: 8000 }
+            <span class="v">initialDelaySeconds</span>: 3
+            <span class="v">periodSeconds</span>: 5
+            <span class="v">failureThreshold</span>: 2</code></pre>
+
+<div class="box why">
+<b><code>maxUnavailable: 0</code> is the setting people forget</b>
+The default is 25%, meaning a quarter of your capacity can be down mid-rollout. With
+<code>maxUnavailable: 0</code> and <code>maxSurge: 1</code>, Kubernetes starts a new pod, waits for it
+to be <i>ready</i>, then removes an old one. The rollout is slower and genuinely lossless.
+</div>
+
+
+<figure id="fig-owner">
+<svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <defs><marker id="ak1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent2)"/></marker></defs>
+  <g stroke="var(--accent)" fill="none" stroke-width="1.4"><rect x="8" y="20" width="704" height="170" rx="10"/></g>
+  <text x="22" y="40" fill="var(--accent)" font-size="11">Deployment · urlshort-api · "3 replicas of this image should exist"</text>
+  <g stroke="var(--accent2)" fill="none" stroke-width="1.3"><rect x="26" y="52" width="668" height="82" rx="8"/></g>
+  <text x="40" y="70" fill="var(--accent2)" font-size="10">ReplicaSet (rev 2) — owns exactly these pods</text>
+  <g stroke="var(--line)" fill="none" stroke-width="1.2">
+    <rect x="46" y="80" width="200" height="42" rx="6"/>
+    <rect x="262" y="80" width="200" height="42" rx="6"/>
+    <rect x="478" y="80" width="196" height="42" rx="6"/>
+  </g>
+  <g fill="var(--txt)" text-anchor="middle" font-size="10">
+    <text x="146" y="98">Pod api-x7k2</text><text x="362" y="98">Pod api-9fp1</text><text x="576" y="98">Pod api-m3q8</text>
+  </g>
+  <g fill="var(--muted)" text-anchor="middle" font-size="9">
+    <text x="146" y="113">node 1 · Ready</text><text x="362" y="113">node 2 · Ready</text><text x="576" y="113">node 2 · Ready</text>
+  </g>
+  <g stroke="var(--line)" fill="none" stroke-width="1" stroke-dasharray="3 3"><rect x="26" y="142" width="668" height="36" rx="8"/></g>
+  <text x="40" y="164" fill="var(--muted)" font-size="10">ReplicaSet (rev 1) — scaled to 0, kept so `kubectl rollout undo` has something to go back to</text>
+  <text x="8" y="14" fill="var(--muted)" font-size="10">you declare the top box; everything below is created and maintained for you</text>
+</svg>
+<figcaption>Deployment owns ReplicaSets; ReplicaSets own Pods. You only declare the top.</figcaption>
+</figure>
+
+<h3>Rollouts</h3>
+<pre><code>kubectl apply -f k8s/deployment.yaml
+kubectl rollout status deployment/urlshort-api
+
+<span class="c"># trigger a rollout by changing the image</span>
+kubectl set image deployment/urlshort-api api=urlshort:0.2.0
+kubectl rollout status deployment/urlshort-api
+
+kubectl rollout history deployment/urlshort-api
+kubectl rollout undo deployment/urlshort-api               <span class="c"># back one revision</span>
+kubectl rollout undo deployment/urlshort-api --to-revision=1</code></pre>
+
+<div class="box">
+<b>A failed rollout does not take you down</b>
+If new pods never become ready, the rollout stalls with the old pods still serving. That is the
+readiness probe doing its job — which is why probes are not optional decoration.
+</div>
+
+
+<figure id="fig-rollout">
+<svg viewBox="0 0 720 230" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <text x="8" y="16" fill="var(--muted)" font-size="10">maxSurge: 1 · maxUnavailable: 0 — capacity never drops below 3 Ready</text>
+  <g fill="var(--muted)" font-size="9">
+    <text x="8" y="46">step 1</text><text x="8" y="86">step 2</text><text x="8" y="126">step 3</text><text x="8" y="166">step 4</text>
+  </g>
+  <rect x="70" y="32" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="144" y="32" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="218" y="32" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="292" y="32" width="64" height="24" rx="4" fill="var(--warn)" opacity=".85"/><rect x="70" y="72" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="144" y="72" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="218" y="72" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="292" y="72" width="64" height="24" rx="4" fill="var(--ok)" opacity=".85"/><rect x="70" y="112" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="144" y="112" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="218" y="112" width="64" height="24" rx="4" fill="var(--ok)" opacity=".85"/><rect x="292" y="112" width="64" height="24" rx="4" fill="var(--warn)" opacity=".85"/><rect x="70" y="152" width="64" height="24" rx="4" fill="var(--accent2)" opacity=".85"/><rect x="144" y="152" width="64" height="24" rx="4" fill="var(--ok)" opacity=".85"/><rect x="218" y="152" width="64" height="24" rx="4" fill="var(--ok)" opacity=".85"/><rect x="292" y="152" width="64" height="24" rx="4" fill="var(--ok)" opacity=".85"/>
+  <g fill="var(--muted)" font-size="9">
+    <text x="368" y="48">new pod starting — not Ready, gets no traffic</text>
+    <text x="368" y="88">new pod passes readiness → joins the Service</text>
+    <text x="368" y="128">one old pod removed, next new pod starts</text>
+    <text x="368" y="168">…repeat until all replicas are new</text>
+  </g>
+  <g font-size="9">
+    <rect x="70" y="188" width="12" height="9" fill="var(--accent2)"/><text x="88" y="196" fill="var(--muted)">old, Ready</text>
+    <rect x="180" y="188" width="12" height="9" fill="var(--ok)"/><text x="198" y="196" fill="var(--muted)">new, Ready</text>
+    <rect x="290" y="188" width="12" height="9" fill="var(--warn)"/><text x="308" y="196" fill="var(--muted)">starting, NOT Ready</text>
+  </g>
+  <text x="8" y="220" fill="var(--warn)" font-size="10">Deploy a broken image and step 2 never happens: the rollout stalls with the old pods still serving. Users see nothing.</text>
+</svg>
+<figcaption>A zero-downtime rolling update, gated on the readiness probe.</figcaption>
+</figure>
+
+<h2 id="svc">6.7 Services and cluster DNS</h2>
+<p>Pods get new IPs on every restart, so you never address them directly. A Service provides a stable
+virtual IP and a DNS name, selecting pods by <b>label</b>.</p>
+
+<pre><code><span class="v">apiVersion</span>: v1
+<span class="v">kind</span>: Service
+<span class="v">metadata</span>:
+  <span class="v">name</span>: urlshort-api
+<span class="v">spec</span>:
+  <span class="v">type</span>: ClusterIP
+  <span class="v">selector</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: api }
+  <span class="v">ports</span>:
+    - <span class="v">port</span>: 80          <span class="c"># the Service's port</span>
+      <span class="v">targetPort</span>: 8000  <span class="c"># the container's port</span></code></pre>
+
+<table>
+<tr><th>Type</th><th>Reachable from</th><th>Use for</th></tr>
+<tr><td><code>ClusterIP</code></td><td>Inside the cluster only (default)</td><td>Internal services — the common case</td></tr>
+<tr><td><code>NodePort</code></td><td>Any node's IP on a high port (30000–32767)</td><td>Local development, kind clusters</td></tr>
+<tr><td><code>LoadBalancer</code></td><td>An external IP from your cloud provider</td><td>Production entry points in cloud</td></tr>
+</table>
+
+<p>DNS inside the cluster follows a fixed pattern:</p>
+<pre><code>urlshort-api                              <span class="c"># same namespace</span>
+urlshort-api.default                      <span class="c"># explicit namespace</span>
+urlshort-api.default.svc.cluster.local    <span class="c"># fully qualified</span></code></pre>
+
+<div class="box warn">
+<b>The most common Service bug</b>
+The Service <code>selector</code> must match the pod <b>template</b> labels — not the Deployment's own
+labels. If they differ, the Service has zero endpoints and every request fails, while every pod looks
+perfectly healthy. Diagnose with:
+<pre><code>kubectl get endpoints urlshort-api
+<span class="c"># ENDPOINTS &lt;none&gt;   ← selector matches nothing</span></code></pre>
+</div>
+
+<h2 id="config">6.8 ConfigMaps and Secrets</h2>
+<pre><code><span class="v">apiVersion</span>: v1
+<span class="v">kind</span>: ConfigMap
+<span class="v">metadata</span>: { <span class="v">name</span>: urlshort-config }
+<span class="v">data</span>:
+  <span class="v">REDIS_URL</span>: redis://urlshort-redis:6379/0
+  <span class="v">LOG_LEVEL</span>: info
+---
+<span class="v">apiVersion</span>: v1
+<span class="v">kind</span>: Secret
+<span class="v">metadata</span>: { <span class="v">name</span>: urlshort-secret }
+<span class="v">type</span>: Opaque
+<span class="v">stringData</span>:
+  <span class="v">API_TOKEN</span>: replace-me-in-a-real-secret-store</code></pre>
+
+<div class="box warn">
+<b>Kubernetes Secrets are encoded, not encrypted</b>
+<code>kubectl get secret x -o jsonpath='{.data.API_TOKEN}' | base64 -d</code> prints the value, and by
+default they sit in etcd unencrypted. Treat them as "kept out of the manifest", not "protected".
+Real protection means enabling encryption at rest, restricting RBAC, and using an external store
+(External Secrets Operator, Vault, SOPS) — and never committing a Secret manifest with a live value.
+</div>
+
+<p>Note that a pod does <b>not</b> automatically restart when a ConfigMap changes if you consume it as
+environment variables. You must trigger a rollout yourself:</p>
+<pre><code>kubectl rollout restart deployment/urlshort-api</code></pre>
+
+<h2 id="probes">6.9 Probes: the difference that causes outages</h2>
+<table>
+<tr><th>Probe</th><th>Question</th><th>On failure</th></tr>
+<tr><td><b>startup</b></td><td>Has it finished booting?</td><td>Keeps the other probes from running yet. For slow starters.</td></tr>
+<tr><td><b>readiness</b></td><td>Can it serve traffic <i>right now</i>?</td><td>Removed from the Service endpoints. <b>Not restarted.</b></td></tr>
+<tr><td><b>liveness</b></td><td>Is it wedged beyond recovery?</td><td>Container is <b>killed and restarted</b>.</td></tr>
+</table>
+
+<div class="box warn">
+<b>The classic self-inflicted outage</b>
+Your liveness probe checks <code>/health</code>, and <code>/health</code> checks the database.
+The database has a brief hiccup. Every pod fails liveness simultaneously and Kubernetes restarts your
+entire fleet — turning a 10-second database blip into a full outage, and hammering the recovering
+database with reconnects.
+<br><br>
+<b>The rule:</b> liveness checks only whether <i>this process</i> is stuck — usually a trivial endpoint
+returning 200. Readiness checks dependencies. That way a database blip removes pods from rotation
+temporarily and they return automatically, with no restarts.
+</div>
+
+
+<figure id="fig-probes">
+<svg viewBox="0 0 720 235" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <defs><marker id="ap2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent2)"/></marker></defs>
+  <g stroke="var(--line)" fill="none" stroke-width="1.3"><rect x="250" y="16" width="220" height="38" rx="6"/></g>
+  <text x="360" y="40" fill="var(--txt)" text-anchor="middle" font-size="11">probe fails</text>
+  <g stroke="var(--accent2)" stroke-width="1.3" marker-end="url(#ap2)">
+    <line x1="300" y1="58" x2="180" y2="90"/><line x1="420" y1="58" x2="540" y2="90"/>
+  </g>
+  <g stroke="var(--accent2)" fill="none" stroke-width="1.4"><rect x="30" y="94" width="300" height="112" rx="8"/></g>
+  <text x="180" y="116" fill="var(--accent2)" text-anchor="middle" font-size="11">readinessProbe</text>
+  <text x="180" y="134" fill="var(--muted)" text-anchor="middle" font-size="10">"can I serve traffic right now?"</text>
+  <g stroke="var(--ok)" fill="none" stroke-width="1.2"><rect x="46" y="146" width="268" height="48" rx="6"/></g>
+  <text x="180" y="165" fill="var(--ok)" text-anchor="middle" font-size="10">removed from Service endpoints</text>
+  <text x="180" y="182" fill="var(--ok)" text-anchor="middle" font-size="10">NOT restarted · returns by itself</text>
+  <g stroke="var(--err)" fill="none" stroke-width="1.4"><rect x="390" y="94" width="300" height="112" rx="8"/></g>
+  <text x="540" y="116" fill="var(--err)" text-anchor="middle" font-size="11">livenessProbe</text>
+  <text x="540" y="134" fill="var(--muted)" text-anchor="middle" font-size="10">"am I wedged beyond recovery?"</text>
+  <g stroke="var(--err)" fill="none" stroke-width="1.2"><rect x="406" y="146" width="268" height="48" rx="6"/></g>
+  <text x="540" y="165" fill="var(--err)" text-anchor="middle" font-size="10">container KILLED and restarted</text>
+  <text x="540" y="182" fill="var(--err)" text-anchor="middle" font-size="10">restart counter increments</text>
+  <text x="8" y="224" fill="var(--warn)" font-size="10">Put the dependency check in readiness. If liveness checks the database, one DB blip restarts your entire fleet at once.</text>
+</svg>
+<figcaption>Same failing check, opposite consequences. This is the outage most people cause once.</figcaption>
+</figure>
+
+<h2 id="res">6.10 Resources, requests and limits</h2>
+<ul>
+<li><b>requests</b> — what the scheduler reserves. Determines which node a pod lands on.</li>
+<li><b>limits</b> — the hard ceiling. Exceed memory and the container is OOM-killed; exceed CPU and it
+is throttled, not killed.</li>
+</ul>
+<pre><code><span class="v">resources</span>:
+  <span class="v">requests</span>: { <span class="v">cpu</span>: 50m, <span class="v">memory</span>: 64Mi }   <span class="c"># 50m = 0.05 of a core</span>
+  <span class="v">limits</span>:   { <span class="v">cpu</span>: 500m, <span class="v">memory</span>: 256Mi }</code></pre>
+
+<div class="box">
+<b>Pods with no requests are a scheduling hazard</b>
+Without requests the scheduler assumes a pod needs nothing and packs nodes until they are exhausted,
+then evicts things unpredictably under pressure. Always set requests. Memory limits are important
+because memory is incompressible; CPU limits are more debatable, since throttling can hurt latency
+more than the noisy-neighbour problem they prevent.
+</div>
+
+<h2 id="debug">6.11 Debugging a cluster methodically</h2>
+<pre><code>kubectl get pods                          <span class="c"># status and restart count</span>
+kubectl describe pod &lt;name&gt;               <span class="c"># EVENTS at the bottom — read these first</span>
+kubectl logs &lt;pod&gt;
+kubectl logs &lt;pod&gt; --previous             <span class="c"># logs from the container that just crashed</span>
+kubectl get events --sort-by=.lastTimestamp
+kubectl exec -it &lt;pod&gt; -- sh
+kubectl get endpoints &lt;service&gt;           <span class="c"># is the Service wired to anything?</span>
+kubectl port-forward svc/urlshort-api 8080:80</code></pre>
+
+<table>
+<tr><th>Status</th><th>Means</th><th>Look at</th></tr>
+<tr><td><code>ImagePullBackOff</code></td><td>Cannot fetch the image</td><td>Tag typo, private registry without <code>imagePullSecrets</code>, or image not loaded into kind</td></tr>
+<tr><td><code>CrashLoopBackOff</code></td><td>Starts, exits, repeats</td><td><code>kubectl logs --previous</code> — it is almost always your app</td></tr>
+<tr><td><code>Pending</code></td><td>Not scheduled onto any node</td><td><code>describe</code> events: insufficient CPU/memory, or an unbound PVC</td></tr>
+<tr><td><code>Running</code> but not <code>Ready</code></td><td>Readiness probe failing</td><td>Probe path, port, and whether the dependency is up</td></tr>
+<tr><td><code>OOMKilled</code> / exit 137</td><td>Exceeded the memory limit</td><td>Raise the limit or fix the leak</td></tr>
+</table>
+
+<h2 id="lab">Lab: deploy urlshort to Kubernetes</h2>
+<div class="box lab">
+<b>Goal</b>
+Run the app on a real three-node cluster with Redis, config, probes, a rolling update, a rollback,
+and a self-healing demonstration.
+</div>
+
+<h3>Step 1 — cluster and image</h3>
+<pre><code>cd ~/devops/urlshort
+mkdir -p k8s
+<span class="c"># create k8s/kind-config.yaml from section 5.4, then:</span>
+kind create cluster --name devops --config k8s/kind-config.yaml
+
+<span class="c"># kind nodes cannot see your local Docker images — load it explicitly</span>
+docker build -t urlshort:0.1.0 .
+kind load docker-image urlshort:0.1.0 --name devops</code></pre>
+
+<div class="box">
+<b>Forgetting <code>kind load</code> is the #1 error in this lab</b>
+Symptom: <code>ImagePullBackOff</code> on an image that exists locally. The kind nodes are separate
+Docker containers with their own image store. Load it, or push to a registry the cluster can reach.
+</div>
+
+<h3>Step 2 — config and Redis</h3>
+<p><code>k8s/config.yaml</code>:</p>
+<pre><code><span class="v">apiVersion</span>: v1
+<span class="v">kind</span>: ConfigMap
+<span class="v">metadata</span>: { <span class="v">name</span>: urlshort-config }
+<span class="v">data</span>:
+  <span class="v">REDIS_URL</span>: redis://urlshort-redis:6379/0
+  <span class="v">LOG_LEVEL</span>: info</code></pre>
+
+<p><code>k8s/redis.yaml</code>:</p>
+<pre><code><span class="v">apiVersion</span>: apps/v1
+<span class="v">kind</span>: Deployment
+<span class="v">metadata</span>: { <span class="v">name</span>: urlshort-redis }
+<span class="v">spec</span>:
+  <span class="v">replicas</span>: 1
+  <span class="v">selector</span>: { <span class="v">matchLabels</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: redis } }
+  <span class="v">template</span>:
+    <span class="v">metadata</span>: { <span class="v">labels</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: redis } }
+    <span class="v">spec</span>:
+      <span class="v">containers</span>:
+        - <span class="v">name</span>: redis
+          <span class="v">image</span>: redis:7-alpine
+          <span class="v">ports</span>: [{ <span class="v">containerPort</span>: 6379 }]
+          <span class="v">resources</span>:
+            <span class="v">requests</span>: { <span class="v">cpu</span>: 25m, <span class="v">memory</span>: 32Mi }
+            <span class="v">limits</span>:   { <span class="v">cpu</span>: 200m, <span class="v">memory</span>: 128Mi }
+          <span class="v">readinessProbe</span>:
+            <span class="v">exec</span>: { <span class="v">command</span>: [<span class="s">"redis-cli"</span>, <span class="s">"ping"</span>] }
+            <span class="v">initialDelaySeconds</span>: 2
+            <span class="v">periodSeconds</span>: 5
+---
+<span class="v">apiVersion</span>: v1
+<span class="v">kind</span>: Service
+<span class="v">metadata</span>: { <span class="v">name</span>: urlshort-redis }
+<span class="v">spec</span>:
+  <span class="v">selector</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: redis }
+  <span class="v">ports</span>: [{ <span class="v">port</span>: 6379, <span class="v">targetPort</span>: 6379 }]</code></pre>
+
+<h3>Step 3 — the API and its Service</h3>
+<p>Create <code>k8s/deployment.yaml</code> from section 5.6, plus <code>k8s/service.yaml</code>:</p>
+<pre><code><span class="v">apiVersion</span>: v1
+<span class="v">kind</span>: Service
+<span class="v">metadata</span>:
+  <span class="v">name</span>: urlshort-api
+  <span class="v">labels</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: api }   <span class="c"># Module 7's ServiceMonitor selects on these</span>
+<span class="v">spec</span>:
+  <span class="v">type</span>: NodePort
+  <span class="v">selector</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: api }
+  <span class="v">ports</span>:
+    - <span class="v">name</span>: http          <span class="c"># named port — Module 7 scrapes by name</span>
+      <span class="v">port</span>: 80
+      <span class="v">targetPort</span>: 8000
+      <span class="v">nodePort</span>: 30080</code></pre>
+
+<h3>Step 4 — apply and watch</h3>
+<pre><code>kubectl apply -f k8s/config.yaml
+kubectl apply -f k8s/redis.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+
+kubectl get pods -w
+<span class="c"># Ctrl-C once all show Running and READY 1/1</span>
+
+kubectl get svc,endpoints
+curl -s localhost:30080/health
+<span class="c"># {"status":"ok"}</span></code></pre>
+
+<h3>Step 5 — see the load balancing</h3>
+<pre><code>kubectl get pods -l component=api -o name
+<span class="c"># three pods</span>
+
+for i in $(seq 1 10); do
+  curl -s -X POST localhost:30080/shorten \
+    -H 'content-type: application/json' \
+    -d '{"url":"https://example.com"}' &gt; /dev/null
+done
+
+kubectl logs -l component=api --tail=5 --prefix
+<span class="c"># requests spread across all three pods</span></code></pre>
+
+<h3>Step 6 — self-healing</h3>
+<pre><code>POD=$(kubectl get pods -l component=api -o jsonpath='{.items[0].metadata.name}')
+kubectl delete pod "$POD"
+kubectl get pods -l component=api
+<span class="c"># a replacement is already ContainerCreating — you never asked for it</span></code></pre>
+
+<h3>Step 7 — a rolling update with no dropped requests</h3>
+<pre><code><span class="c"># build a "v2"</span>
+docker build -t urlshort:0.2.0 .
+kind load docker-image urlshort:0.2.0 --name devops
+
+<span class="c"># in one terminal, hammer the endpoint:</span>
+while true; do curl -s -o /dev/null -w '%{http_code} ' localhost:30080/health; sleep 0.3; done
+
+<span class="c"># in another, roll:</span>
+kubectl set image deployment/urlshort-api api=urlshort:0.2.0
+kubectl rollout status deployment/urlshort-api</code></pre>
+<p>The first terminal should print an unbroken run of <code>200</code>. That is
+<code>maxUnavailable: 0</code> plus a readiness probe working together.</p>
+
+<h3>Step 8 — a failed rollout, and the rollback</h3>
+<pre><code>kubectl set image deployment/urlshort-api api=urlshort:does-not-exist
+kubectl rollout status deployment/urlshort-api --timeout=60s
+<span class="c"># error: deployment exceeded its progress deadline</span>
+
+kubectl get pods -l component=api
+<span class="c"># 3 old pods Running, 1 new pod ImagePullBackOff — traffic is UNAFFECTED</span>
+
+kubectl rollout undo deployment/urlshort-api
+kubectl rollout status deployment/urlshort-api</code></pre>
+
+<div class="box why">
+<b>Read that again</b>
+You deployed a completely broken image to production and no user noticed. The bad pod never became
+ready, so it never entered the Service, so it never received traffic. That is what the whole
+probe/rollout machinery buys you.
+</div>
+
+<h3>Step 9 — break the Service selector on purpose</h3>
+<pre><code>kubectl patch svc urlshort-api -p '{"spec":{"selector":{"app":"wrong"}}}'
+kubectl get endpoints urlshort-api
+<span class="c"># ENDPOINTS &lt;none&gt;</span>
+curl -s -m 3 localhost:30080/health || echo "no route to any pod"
+
+kubectl patch svc urlshort-api -p '{"spec":{"selector":{"app":"urlshort","component":"api"}}}'
+kubectl get endpoints urlshort-api    <span class="c"># three IPs again</span></code></pre>
+
+<h3>Step 10 — commit, and clean up when done</h3>
+<pre><code>cd ~/devops/urlshort
+git add k8s
+git commit -m "feat: kubernetes manifests with probes and rolling updates"
+git push
+
+<span class="c"># when you are finished for the day:</span>
+kind delete cluster --name devops</code></pre>
+
+<h2 id="ex">Exercises</h2>
+
+<h3>Exercise 1 — persistent Redis</h3>
+<p>Give Redis a PersistentVolumeClaim so data survives pod deletion.</p>
+<details><summary>Solution</summary>
+<pre><code><span class="v">apiVersion</span>: v1
+<span class="v">kind</span>: PersistentVolumeClaim
+<span class="v">metadata</span>: { <span class="v">name</span>: redis-data }
+<span class="v">spec</span>:
+  <span class="v">accessModes</span>: [ReadWriteOnce]
+  <span class="v">resources</span>: { <span class="v">requests</span>: { <span class="v">storage</span>: 1Gi } }</code></pre>
+<pre><code><span class="c"># in the redis pod spec:</span>
+      <span class="v">volumes</span>:
+        - <span class="v">name</span>: data
+          <span class="v">persistentVolumeClaim</span>: { <span class="v">claimName</span>: redis-data }
+      <span class="v">containers</span>:
+        - <span class="v">name</span>: redis
+          <span class="v">command</span>: [<span class="s">"redis-server"</span>, <span class="s">"--appendonly"</span>, <span class="s">"yes"</span>]
+          <span class="v">volumeMounts</span>:
+            - { <span class="v">name</span>: data, <span class="v">mountPath</span>: /data }</code></pre>
+<p>For real databases prefer a StatefulSet: it gives stable network identity and a
+<code>volumeClaimTemplate</code> per replica, which a Deployment cannot.</p>
+</details>
+
+<h3>Exercise 2 — autoscaling</h3>
+<p>Scale the API between 2 and 10 replicas based on CPU.</p>
+<details><summary>Solution</summary>
+<pre><code>kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+<span class="c"># on kind, patch for self-signed kubelet certs:</span>
+kubectl patch deployment metrics-server -n kube-system --type=json \
+  -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
+
+kubectl autoscale deployment urlshort-api --cpu-percent=70 --min=2 --max=10
+kubectl get hpa -w</code></pre>
+<p>HPA requires resource <b>requests</b> to be set — the target percentage is measured against the
+request, so without one it has no denominator and does nothing.</p>
+</details>
+
+<h3>Exercise 3 — namespaces and quotas</h3>
+<p>Move everything into a <code>urlshort</code> namespace and cap its total resource usage.</p>
+<details><summary>Solution</summary>
+<pre><code>kubectl create namespace urlshort
+kubectl apply -f k8s/ -n urlshort
+
+cat &lt;&lt;'EOF' | kubectl apply -n urlshort -f -
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: urlshort-quota
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 2Gi
+    limits.cpu: "4"
+    limits.memory: 4Gi
+    pods: "20"
+EOF
+
+kubectl describe quota -n urlshort</code></pre>
+<p>Once a quota exists, any pod without requests and limits is <b>rejected</b> — which is a useful way
+to enforce the habit across a team.</p>
+</details>
+
+<h3>Exercise 4 — diagnose from symptoms</h3>
+<p>Pods are <code>Running</code> and <code>1/1 Ready</code>, but <code>curl</code> to the Service times
+out. Give the diagnostic sequence.</p>
+<details><summary>Solution</summary>
+<pre><code>kubectl get endpoints urlshort-api      <span class="c"># 1. &lt;none&gt; ⇒ selector mismatch</span>
+kubectl get svc urlshort-api -o yaml    <span class="c"># 2. targetPort vs containerPort</span>
+kubectl port-forward pod/&lt;pod&gt; 8000:8000 &amp;&amp; curl localhost:8000/health
+                                        <span class="c"># 3. bypass the Service: is the pod itself fine?</span>
+kubectl get pod &lt;pod&gt; -o jsonpath='{.spec.containers[0].ports}'</code></pre>
+<p>Work outward from the pod. If port-forward to the pod succeeds but the Service fails, the fault is
+in the Service definition — selector or <code>targetPort</code>, in that order of likelihood.</p>
+</details>
+
+<h2 id="check">Checkpoint</h2>
+
+<div class="quiz" data-answer="c">
+<div class="q">Your liveness probe hits <code>/health</code>, which checks Redis. Redis restarts for 20 seconds. What happens?</div>
+<button data-opt="a">Pods are removed from the Service and return automatically</button>
+<button data-opt="b">Nothing — liveness failures are only logged</button>
+<button data-opt="c">Every pod is killed and restarted, turning a blip into an outage</button>
+<div class="fb">Liveness failure means restart. Dependency checks belong in readiness, which only removes pods from rotation. Liveness should ask "is this process wedged", nothing more.</div>
+</div>
+
+<div class="quiz" data-answer="b">
+<div class="q">All pods are Running and Ready, but the Service returns nothing. First command?</div>
+<button data-opt="a"><code>kubectl logs</code> on each pod</button>
+<button data-opt="b"><code>kubectl get endpoints &lt;service&gt;</code></button>
+<button data-opt="c"><code>kubectl rollout restart</code></button>
+<div class="fb">Empty endpoints instantly tells you the Service selector does not match the pod template labels — a class of bug where everything looks healthy and nothing works.</div>
+</div>
+
+<div class="quiz" data-answer="a">
+<div class="q">Why did deploying a nonexistent image tag cause zero user impact?</div>
+<button data-opt="a">The new pod never passed readiness, so it never joined the Service and old pods kept serving</button>
+<button data-opt="b">Kubernetes validates image tags before applying</button>
+<button data-opt="c">The Deployment rolled back automatically</button>
+<div class="fb">Note it did not auto-roll-back — the rollout simply stalled safely, and you undid it deliberately. Readiness gating is what made a broken deploy a non-event.</div>
+</div>
+
+<div class="card">
+<b>You should now be able to, without notes:</b>
+<ul class="chk">
+<li>Describe the reconciliation loop and say why you declare state rather than issue commands.</li>
+<li>Explain Pod vs Deployment vs Service and why you never create a bare Pod.</li>
+<li>Write a Deployment with probes, resources, a non-root security context and a safe rollout strategy.</li>
+<li>Explain the difference between liveness and readiness, and the outage that confusing them causes.</li>
+<li>Wire a Service to pods by label and debug empty endpoints.</li>
+<li>Inject configuration via ConfigMap and say why Kubernetes Secrets are not really secret.</li>
+<li>Perform a rolling update, recognise a stalled rollout, and roll back.</li>
+<li>Diagnose <code>ImagePullBackOff</code>, <code>CrashLoopBackOff</code>, <code>Pending</code> and <code>OOMKilled</code>.</li>
+</ul>
+</div>
+
+<div class="pager">
+  <a href="module-5.html">← Module 5</a>
+  <a href="module-7.html">Module 7 · Observability →</a>
+</div>
+
+</main>
+<footer><div class="wrap">Practical DevOps · Module 6</div></footer>
+<script src="assets/course.js"></script>
+</body>
+</html>

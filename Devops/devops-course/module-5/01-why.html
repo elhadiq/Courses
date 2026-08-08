@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>5.1 The problem: snowflake servers and drift — Module 5 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-5.html">Module 5 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 05</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html" class="cur">5.1 The problem: snowflake servers and drift</a>
+<a href="02-decl.html">5.2 Declarative vs imperative</a>
+<a href="03-split.html">5.3 Terraform vs Ansible — the division of labour</a>
+<a href="04-tf.html">5.4 Terraform: the core loop</a>
+<a href="05-hcl.html">5.5 HCL: variables, outputs, resources, data</a>
+<a href="06-state.html">5.6 State — the concept that trips everyone</a>
+<a href="07-mod.html">5.7 Modules and environments</a>
+<a href="08-ansible.html">5.8 Ansible: configuring what exists</a>
+<a href="09-idem.html">5.9 Idempotency, concretely</a>
+<a href="10-secrets.html">5.10 Secrets in infrastructure code</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html">Lab: provision and configure, locally</a>
+<a href="12-ex.html">Exercises</a>
+<a href="13-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-5.html">Infrastructure as Code: Terraform &amp; Ansible</a>
+</div>
+<div class="secmeta">Module 05 · Section 1 of 13</div>
+
+<h2 id="why">5.1 The problem: snowflake servers and drift</h2>
+<p>A server is set up by hand in 2023. Someone patches a config in 2024 during an outage. Someone else
+installs a debugging tool and forgets to remove it. By 2026 nobody knows what is on that machine, and
+nobody dares rebuild it because it cannot be reproduced. That is a <b>snowflake</b>: unique, fragile,
+and impossible to replace.</p>
+<p><b>Configuration drift</b> is how you get there — the slow, invisible divergence between what you
+think is deployed and what is actually deployed. Every manual change is a small increment of drift.</p>
+
+<div class="box why">
+<b>Why it exists</b>
+Infrastructure as Code makes infrastructure obey the same rules as application code: it lives in Git,
+it is reviewed in a PR, changes are diffable, and rebuilding from scratch is a routine operation rather
+than a disaster-recovery exercise. The real payoff is that <i>rebuilding becomes boring</i>.
+</div>
+
+<div class="pager">
+  <a href="../module-4/13-check.html"><span class="sub">← Module 4</span>Checkpoint</a>
+  <a href="02-decl.html" class="nx"><span class="sub">Next →</span>5.2 Declarative vs imperative</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 5 · 5.1 The problem: snowflake servers and drift</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

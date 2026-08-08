@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Practical DevOps — A Hands-On Course for Beginners</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <a class="brand hm" href="index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="#curriculum">Curriculum</a>
+    <a href="#setup">Setup</a>
+    <a href="#capstone">Capstone</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap">
+
+<section class="hero">
+  <div class="kicker">Zero to deployment · 7 modules · ~35 hours</div>
+  <h1>Practical DevOps</h1>
+  <p class="lead">A hands-on course that starts from a bare terminal and ends with a real application
+  built, tested, containerised, deployed to Kubernetes and monitored — all by pipelines you wrote yourself.
+  Everything runs on your own laptop. No cloud account, no credit card.</p>
+</section>
+
+<div class="box why">
+  <b>What DevOps actually is</b>
+  DevOps is not a tool and not a job title you buy. It is the practice of shortening the distance
+  between "a developer changed a line of code" and "that change is safely running in production."
+  Every tool in this course exists to remove one manual step from that path.
+</div>
+
+<h2 id="how">How this course works</h2>
+<p>Each module follows the same rhythm, deliberately:</p>
+<table>
+<tr><th style="width:22%">Section</th><th>What it does</th></tr>
+<tr><td><b>Why it exists</b></td><td>The concrete pain this tool solves. You never learn a tool before you feel the problem.</td></tr>
+<tr><td><b>Core concepts</b></td><td>The 5–10 ideas you actually need. No exhaustive reference dumps.</td></tr>
+<tr><td><b>Lab</b></td><td>Commands you type. Real output. It breaks in places on purpose, and you fix it.</td></tr>
+<tr><td><b>Exercises</b></td><td>Unguided tasks. Solutions are collapsed — try first.</td></tr>
+<tr><td><b>Checkpoint</b></td><td>A short quiz + a checklist of what you should now be able to do unaided.</td></tr>
+</table>
+
+<p><b>One idea per page.</b> Each module is split into short pages — one per topic, lab step or exercise set. Open a module to see its contents, then move with <b>Next</b> / <b>Previous</b> at the bottom of each page; the sidebar always shows where you are in the module. Next also carries you across module boundaries, so you can read the whole course front to back without returning here.</p>
+
+<p><b>The running example.</b> From Module 3 onward you work on one small app —
+<code>urlshort</code>, a URL shortener in Python with a Redis backend. It stays with you through
+containers, pipelines, infrastructure code, Kubernetes and dashboards. That continuity is the point:
+DevOps is about a system, not a set of unrelated tools.</p>
+
+<h2 id="curriculum">Curriculum</h2>
+<div class="grid">
+
+  <a class="mod" href="module-1.html">
+    <div class="n">MODULE 01 · ~5h · 13 pages</div>
+    <h3>The Ground Floor: Linux, Shell &amp; Git</h3>
+    <p>Navigating a server with no GUI, writing scripts that automate work, and the branching/merging
+    model every pipeline in this course is triggered by.</p>
+    <div class="tags"><span class="tag">bash</span><span class="tag">ssh</span><span class="tag">git</span><span class="tag">github</span></div>
+  </a>
+
+  <a class="mod" href="module-2.html">
+    <div class="n">MODULE 02 · ~5h · 15 pages</div>
+    <h3>Networking Basics</h3>
+    <p>IP addressing and CIDR, the TCP/IP layers, ports and sockets, DNS, HTTP/HTTPS and TLS, and the
+    firewall rules that keep your database off the internet.</p>
+    <div class="tags"><span class="tag">tcp/ip</span><span class="tag">dns</span><span class="tag">http/s</span><span class="tag">tls</span><span class="tag">firewall</span></div>
+  </a>
+
+  <a class="mod" href="module-3.html">
+    <div class="n">MODULE 03 · ~6h · 14 pages</div>
+    <h3>Containers: Docker &amp; Compose</h3>
+    <p>Why "works on my machine" happens, how images and layers work, writing a good Dockerfile,
+    and running a multi-service app with one command.</p>
+    <div class="tags"><span class="tag">docker</span><span class="tag">dockerfile</span><span class="tag">compose</span><span class="tag">registry</span></div>
+  </a>
+
+  <a class="mod" href="module-4.html">
+    <div class="n">MODULE 04 · ~5h · 13 pages</div>
+    <h3>CI/CD with GitHub Actions</h3>
+    <p>Automated tests on every push, building and publishing images, secrets handling, and the
+    difference between continuous delivery and continuous deployment.</p>
+    <div class="tags"><span class="tag">github actions</span><span class="tag">yaml</span><span class="tag">secrets</span><span class="tag">artifacts</span></div>
+  </a>
+
+  <a class="mod" href="module-5.html">
+    <div class="n">MODULE 05 · ~5h · 13 pages</div>
+    <h3>Infrastructure as Code: Terraform &amp; Ansible</h3>
+    <p>Declaring servers in files instead of clicking consoles. State, plan/apply, idempotency,
+    and configuring machines with Ansible playbooks.</p>
+    <div class="tags"><span class="tag">terraform</span><span class="tag">hcl</span><span class="tag">ansible</span><span class="tag">idempotency</span></div>
+  </a>
+
+  <a class="mod" href="module-6.html">
+    <div class="n">MODULE 06 · ~6h · 14 pages</div>
+    <h3>Kubernetes: Orchestration</h3>
+    <p>Pods, Deployments, Services, ConfigMaps and Secrets. Rolling updates, rollbacks,
+    health probes, and debugging a cluster that won't start your app.</p>
+    <div class="tags"><span class="tag">kubernetes</span><span class="tag">kind</span><span class="tag">kubectl</span><span class="tag">manifests</span></div>
+  </a>
+
+  <a class="mod" href="module-7.html">
+    <div class="n">MODULE 07 · ~4h · 15 pages</div>
+    <h3>Observability: Prometheus &amp; Grafana</h3>
+    <p>Metrics, logs and traces. Instrumenting your app, writing PromQL, building a dashboard,
+    alerting on symptoms rather than causes, and the SLO mindset.</p>
+    <div class="tags"><span class="tag">prometheus</span><span class="tag">promql</span><span class="tag">grafana</span><span class="tag">alerting</span></div>
+  </a>
+
+</div>
+
+<h2 id="setup">Before you start: setup</h2>
+<p>You need a machine with at least <b>8 GB RAM</b> and <b>20 GB free disk</b>. Linux or macOS
+natively; on Windows use <b>WSL2</b> with Ubuntu — every command in this course assumes a Linux shell.</p>
+
+<h3>Windows only: install WSL2 first</h3>
+<pre><code><span class="c"># In PowerShell, as Administrator:</span>
+wsl --install -d Ubuntu
+<span class="c"># Reboot, then open "Ubuntu" from the Start menu.</span>
+<span class="c"># From now on, every command in this course goes in that Ubuntu shell.</span></code></pre>
+
+<h3>Everyone: the toolchain</h3>
+<table>
+<tr><th>Tool</th><th>Used from</th><th>Install</th></tr>
+<tr><td>Git</td><td>Module 1</td><td><code>sudo apt install git</code> / <code>brew install git</code></td></tr>
+<tr><td>Network utilities</td><td>Module 2</td><td><code>sudo apt install iproute2 dnsutils netcat-openbsd curl tcpdump traceroute</code></td></tr>
+<tr><td>Docker Engine + Compose</td><td>Module 3</td><td><a href="https://docs.docker.com/engine/install/">docs.docker.com/engine/install</a></td></tr>
+<tr><td>A GitHub account</td><td>Module 1</td><td>Free tier is enough</td></tr>
+<tr><td>Terraform</td><td>Module 5</td><td><a href="https://developer.hashicorp.com/terraform/install">developer.hashicorp.com/terraform/install</a></td></tr>
+<tr><td>Ansible</td><td>Module 5</td><td><code>pipx install ansible</code></td></tr>
+<tr><td>kind + kubectl</td><td>Module 6</td><td>Installed inside Module 6</td></tr>
+<tr><td>Helm</td><td>Module 7</td><td>Installed inside Module 7</td></tr>
+</table>
+
+<div class="box warn">
+<b>Verify before you begin</b>
+Run this. Every line should print a version, not "command not found". Fix the Module 1–3 tools now;
+the rest are installed when you reach them.
+<pre><code>git --version
+ip -V &amp;&amp; dig -v 2&gt;&amp;1 | head -1 &amp;&amp; curl --version | head -1
+docker --version
+docker compose version
+docker run --rm hello-world</code></pre>
+</div>
+
+<div class="box">
+<b>Add yourself to the docker group (Linux)</b>
+If <code>docker run</code> says <i>permission denied on /var/run/docker.sock</i>:
+<pre><code>sudo usermod -aG docker $USER
+<span class="c"># then log out and back in (or: newgrp docker)</span></code></pre>
+</div>
+
+<h2 id="capstone">The capstone</h2>
+<div class="card">
+<p>After Module 7 you should be able to do the following <b>from an empty directory, without notes</b>.
+This is the real exit test of the course:</p>
+<ul class="chk">
+<li>Initialise a Git repo with a sane branch strategy and a protected <code>main</code>.</li>
+<li>Diagnose a connection failure down the layers — DNS, then host, then port, then HTTP — and say
+whether "refused" or "timed out" points at the service or at a firewall.</li>
+<li>Write a multi-stage Dockerfile that produces an image under 150 MB running as a non-root user.</li>
+<li>Compose the app with Redis, with a healthcheck and a named volume that survives restarts.</li>
+<li>Write a GitHub Actions workflow: lint → test → build → push to GHCR, gated on the tests passing.</li>
+<li>Define the target environment in Terraform and configure it with an idempotent Ansible playbook.</li>
+<li>Write Kubernetes manifests with liveness/readiness probes, resource limits, a ConfigMap and a Secret;
+perform a rolling update and then a rollback.</li>
+<li>Expose <code>/metrics</code>, scrape it with Prometheus, chart p95 latency and error rate in Grafana,
+and write one alert rule that fires on a symptom your users would feel.</li>
+</ul>
+<p style="margin-bottom:0"><b>Do not skip modules.</b> Each one assumes the artefacts built in the previous one.</p>
+</div>
+
+<h2>A note on how to study this</h2>
+<p>Type the commands. Do not copy-paste the whole lab in one go — the errors are where the learning is,
+and you cannot debug a pipeline you never saw fail. When something breaks, read the error message
+completely before searching for it. That single habit is most of what separates people who are
+comfortable with this stack from people who are not.</p>
+
+<div class="pager">
+  <span></span>
+  <a href="module-1.html">Module 1 · Linux, Shell &amp; Git →</a>
+</div>
+
+</main>
+
+<footer><div class="wrap">
+  Practical DevOps · a hands-on course · all labs run locally
+</div></footer>
+
+<script src="assets/course.js"></script>
+</body>
+</html>

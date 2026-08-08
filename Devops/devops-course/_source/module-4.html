@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Module 4 — CI/CD with GitHub Actions | Practical DevOps</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <a class="brand hm" href="index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="index.html">All modules</a>
+    <a href="module-3.html">← Prev</a>
+    <a href="module-5.html">Next →</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap">
+
+<div class="kicker" style="margin-top:40px">Module 04 · ~5 hours</div>
+<h1>CI/CD with GitHub Actions</h1>
+<p class="lead">Every push runs your tests. Every merge to <code>main</code> builds and publishes an
+image tagged with the commit that produced it. You stop being the build server.</p>
+
+<div class="card toc">
+<b>In this module</b>
+<a href="#why">4.1 What CI and CD actually mean</a>
+<a href="#anatomy">4.2 Anatomy of a workflow</a>
+<a href="#first">4.3 Your first pipeline: test on every push</a>
+<a href="#services">4.4 Services: a real Redis for your tests</a>
+<a href="#cache">4.5 Caching, and why pipelines get slow</a>
+<a href="#quality">4.6 Quality gates: lint, format, type, scan</a>
+<a href="#build">4.7 Build and publish the image</a>
+<a href="#secrets">4.8 Secrets, and how pipelines leak them</a>
+<a href="#deploy">4.9 Deployment, environments and approvals</a>
+<a href="#design">4.10 Designing a pipeline people trust</a>
+<a href="#lab">Lab: the full pipeline</a>
+<a href="#ex">Exercises</a>
+<a href="#check">Checkpoint</a>
+</div>
+
+<h2 id="why">4.1 What CI and CD actually mean</h2>
+<p>The terms are used loosely; the distinctions matter because they imply different amounts of risk.</p>
+
+<table>
+<tr><th>Term</th><th>Means</th><th>The hard part</th></tr>
+<tr><td><b>Continuous Integration</b></td><td>Everyone merges into <code>main</code> at least daily, and every merge is automatically built and tested.</td><td>Not the tooling — the discipline of small, frequent merges and a test suite you actually trust.</td></tr>
+<tr><td><b>Continuous Delivery</b></td><td>Every commit on <code>main</code> produces a deployable artefact. Deploying is a button someone presses.</td><td>Making the artefact genuinely deployable, every time, with no manual steps.</td></tr>
+<tr><td><b>Continuous Deployment</b></td><td>Every green commit on <code>main</code> goes to production automatically.</td><td>Test coverage and observability good enough that nobody needs to look first.</td></tr>
+</table>
+
+<div class="box why">
+<b>Why it exists</b>
+Manual builds are unrepeatable and manual test runs get skipped under pressure — exactly when they
+matter most. A pipeline makes the safe path the only path: you cannot merge without the tests passing,
+so nobody has to remember to run them.
+</div>
+
+<p>The most important property of a pipeline is not speed but <b>trust</b>. A suite that fails randomly
+teaches the team to re-run it and ignore it, which is worse than having no suite at all, because it
+costs time and provides false assurance.</p>
+
+<h2 id="anatomy">4.2 Anatomy of a workflow</h2>
+<p>GitHub Actions files live in <code>.github/workflows/*.yml</code>. The hierarchy:</p>
+
+<figure>
+<svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+  <g fill="none" stroke="var(--accent)" stroke-width="1.4"><rect x="15" y="15" width="670" height="210" rx="10"/></g>
+  <text x="30" y="38" fill="var(--accent)" font-size="12">workflow  (one .yml file)  ← triggered by an event</text>
+  <g fill="none" stroke="var(--accent2)" stroke-width="1.3">
+    <rect x="35" y="52" width="200" height="155" rx="8"/>
+    <rect x="253" y="52" width="200" height="155" rx="8"/>
+    <rect x="471" y="52" width="196" height="155" rx="8"/>
+  </g>
+  <g fill="var(--accent2)" font-size="11">
+    <text x="48" y="72">job: test</text><text x="266" y="72">job: build</text><text x="484" y="72">job: deploy</text>
+  </g>
+  <g fill="var(--muted)" font-size="9">
+    <text x="48" y="86">runs-on: ubuntu-latest</text>
+    <text x="266" y="86">needs: test</text>
+    <text x="484" y="86">needs: build · environment</text>
+  </g>
+  <g fill="none" stroke="var(--line)" stroke-width="1">
+    <rect x="48" y="96" width="174" height="24" rx="4"/><rect x="48" y="126" width="174" height="24" rx="4"/>
+    <rect x="48" y="156" width="174" height="24" rx="4"/>
+    <rect x="266" y="96" width="174" height="24" rx="4"/><rect x="266" y="126" width="174" height="24" rx="4"/>
+    <rect x="266" y="156" width="174" height="24" rx="4"/>
+    <rect x="484" y="96" width="170" height="24" rx="4"/><rect x="484" y="126" width="170" height="24" rx="4"/>
+  </g>
+  <g fill="var(--txt)" font-size="10">
+    <text x="58" y="112">step: checkout</text><text x="58" y="142">step: setup-python</text>
+    <text x="58" y="172">step: run pytest</text>
+    <text x="276" y="112">step: login to ghcr</text><text x="276" y="142">step: docker build</text>
+    <text x="276" y="172">step: docker push</text>
+    <text x="494" y="112">step: kubectl apply</text><text x="494" y="142">step: smoke test</text>
+  </g>
+  <g stroke="var(--accent)" stroke-width="1.4" marker-end="url(#ar)">
+    <line x1="237" y1="130" x2="250" y2="130"/><line x1="455" y1="130" x2="468" y2="130"/>
+  </g>
+  <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+    <path d="M0,0 L8,4 L0,8 z" fill="var(--accent)"/></marker></defs>
+</svg>
+<figcaption>Jobs run in parallel by default; <code>needs</code> creates the ordering.</figcaption>
+</figure>
+
+<ul>
+<li><b>Event</b> — what starts it: <code>push</code>, <code>pull_request</code>, <code>schedule</code>,
+<code>workflow_dispatch</code> (a manual button).</li>
+<li><b>Job</b> — runs on a fresh virtual machine. Jobs are parallel unless you declare
+<code>needs</code>.</li>
+<li><b>Step</b> — either <code>run:</code> (a shell command) or <code>uses:</code> (a reusable action).</li>
+<li><b>Runner</b> — the VM. GitHub's hosted <code>ubuntu-latest</code> is free for public repos.</li>
+</ul>
+
+<div class="box warn">
+<b>Every job starts on a clean machine</b>
+Nothing carries over between jobs — not installed packages, not the working directory, not built files.
+If job B needs something job A produced, either put them in the same job or pass it through an
+<b>artifact</b> or a registry. This surprises everyone once.
+</div>
+
+<h2 id="first">4.3 Your first pipeline: test on every push</h2>
+<p><code>.github/workflows/ci.yml</code>:</p>
+
+<pre><code><span class="v">name</span>: CI
+
+<span class="v">on</span>:
+  <span class="v">push</span>:
+    <span class="v">branches</span>: [main]
+  <span class="v">pull_request</span>:
+
+<span class="v">jobs</span>:
+  <span class="v">test</span>:
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: actions/checkout@v4
+
+      - <span class="v">uses</span>: actions/setup-python@v5
+        <span class="v">with</span>:
+          <span class="v">python-version</span>: <span class="s">"3.12"</span>
+          <span class="v">cache</span>: pip
+
+      - <span class="v">name</span>: Install dependencies
+        <span class="v">run</span>: pip install -r requirements.txt
+
+      - <span class="v">name</span>: Run tests
+        <span class="v">run</span>: python -m pytest -q</code></pre>
+
+<p>Commit and push. Open the <b>Actions</b> tab on GitHub and watch it run. It will <b>fail</b> —
+there is no Redis on the runner, so <code>/health</code> returns 503. That failure is the next section.</p>
+
+<h2 id="services">4.4 Services: a real Redis for your tests</h2>
+<p>You have two options, and the choice is a genuine engineering decision rather than a detail.</p>
+
+<h3>Option A — mock Redis</h3>
+<p>Fast, no infrastructure, but you are testing against a fake. Bugs in how you actually use Redis
+(expiry semantics, connection loss, pipelining) go undetected.</p>
+
+<h3>Option B — a service container</h3>
+<p>Actions can start real containers alongside the job. Slower by seconds, but you test the real thing.
+For an app whose entire behaviour depends on Redis, this is the right call:</p>
+
+<pre><code><span class="v">jobs</span>:
+  <span class="v">test</span>:
+    <span class="v">runs-on</span>: ubuntu-latest
+
+    <span class="v">services</span>:
+      <span class="v">redis</span>:
+        <span class="v">image</span>: redis:7-alpine
+        <span class="v">ports</span>: [<span class="s">"6379:6379"</span>]
+        <span class="v">options</span>: &gt;-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+
+    <span class="v">env</span>:
+      <span class="v">REDIS_URL</span>: redis://localhost:6379/0
+
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: actions/checkout@v4
+      - <span class="v">uses</span>: actions/setup-python@v5
+        <span class="v">with</span>: { <span class="v">python-version</span>: <span class="s">"3.12"</span>, <span class="v">cache</span>: pip }
+      - <span class="v">run</span>: pip install -r requirements.txt
+      - <span class="v">run</span>: python -m pytest -q</code></pre>
+
+<div class="box">
+<b>Here <code>localhost</code> is correct</b>
+Opposite of Module 3. Service containers have their ports published onto the runner's network, and
+your test process runs directly on the runner — not in a container. So <code>localhost:6379</code>
+reaches Redis. If you instead run your <i>tests</i> inside a container, you would use the service name.
+The rule underneath both cases is the same: address things by where the client is running —
+which network namespace the process making the call sits in
+(<a href="module-2.html#ports">Module 2.7</a>).
+</div>
+
+<h2 id="cache">4.5 Caching, and why pipelines get slow</h2>
+<p>A pipeline nobody waits for is a pipeline people bypass. Two caches carry most of the win.</p>
+
+<p><b>Dependency cache</b> — <code>cache: pip</code> in <code>setup-python</code> keys on your
+<code>requirements.txt</code> hash and restores the wheel cache. Free, one line.</p>
+
+<p><b>Docker layer cache</b> — by default each run builds from scratch. Buildx can push the cache into
+the registry:</p>
+
+<pre><code>- <span class="v">uses</span>: docker/setup-buildx-action@v3
+
+- <span class="v">uses</span>: docker/build-push-action@v6
+  <span class="v">with</span>:
+    <span class="v">context</span>: .
+    <span class="v">push</span>: <span class="k">true</span>
+    <span class="v">tags</span>: ghcr.io/${{ github.repository }}:${{ github.sha }}
+    <span class="v">cache-from</span>: type=gha
+    <span class="v">cache-to</span>: type=gha,mode=max</code></pre>
+
+<div class="box warn">
+<b>Cache correctness beats cache speed</b>
+A cache keyed too loosely serves stale artefacts and produces a green build of code that does not
+work. Always key on the hash of the file that defines the dependencies. If you ever suspect the cache,
+bump a version prefix in the key rather than debugging it for an hour.
+</div>
+
+<h2 id="quality">4.6 Quality gates: lint, format, type, scan</h2>
+<p>Tests catch broken behaviour. These catch the rest, and — more usefully — they end style arguments
+in code review by making them a machine's decision.</p>
+
+<pre><code>  <span class="v">quality</span>:
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: actions/checkout@v4
+      - <span class="v">uses</span>: actions/setup-python@v5
+        <span class="v">with</span>: { <span class="v">python-version</span>: <span class="s">"3.12"</span> }
+
+      - <span class="v">run</span>: pip install ruff
+      - <span class="v">name</span>: Lint
+        <span class="v">run</span>: ruff check .
+      - <span class="v">name</span>: Format check
+        <span class="v">run</span>: ruff format --check .
+
+      - <span class="v">name</span>: Scan filesystem for vulnerabilities
+        <span class="v">uses</span>: aquasecurity/trivy-action@0.24.0
+        <span class="v">with</span>:
+          <span class="v">scan-type</span>: fs
+          <span class="v">severity</span>: <span class="s">"HIGH,CRITICAL"</span>
+          <span class="v">exit-code</span>: <span class="s">"1"</span></code></pre>
+
+<p><code>quality</code> and <code>test</code> declare no <code>needs</code>, so they run in parallel —
+you get both sets of failures in one run instead of discovering the lint error after waiting for tests.</p>
+
+<div class="box why">
+<b>Shift left</b>
+The cost of a defect grows by roughly an order of magnitude at each stage it survives: caught by a
+linter in your editor (seconds), by CI (minutes), by a reviewer (hours), in production (days, plus
+users). Every gate you add early is buying down that multiplier.
+</div>
+
+
+<figure id="fig-shiftleft">
+<svg viewBox="0 0 720 230" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <text x="8" y="16" fill="var(--muted)" font-size="10">relative cost to fix one defect, by the stage that catches it (log scale)</text>
+  <g stroke="var(--line)" stroke-width="1"><line x1="60" y1="180" x2="700" y2="180"/></g>
+  <g stroke="var(--line)" stroke-dasharray="2 4" stroke-width=".8">
+    <line x1="60" y1="150" x2="700" y2="150"/><line x1="60" y1="110" x2="700" y2="110"/>
+    <line x1="60" y1="70" x2="700" y2="70"/><line x1="60" y1="30" x2="700" y2="30"/>
+  </g>
+  <g fill="var(--muted)" font-size="9" text-anchor="end">
+    <text x="54" y="153">1×</text><text x="54" y="113">10×</text>
+    <text x="54" y="73">100×</text><text x="54" y="33">1000×</text>
+  </g>
+  <g>
+    <rect x="100" y="150" width="90" height="30" rx="3" fill="var(--ok)" opacity=".8"/>
+    <rect x="252" y="110" width="90" height="70" rx="3" fill="var(--accent)" opacity=".8"/>
+    <rect x="404" y="70"  width="90" height="110" rx="3" fill="var(--warn)" opacity=".8"/>
+    <rect x="556" y="30"  width="90" height="150" rx="3" fill="var(--err)" opacity=".8"/>
+  </g>
+  <g fill="var(--txt)" text-anchor="middle" font-size="10">
+    <text x="145" y="198">linter</text><text x="297" y="198">CI</text>
+    <text x="449" y="198">code review</text><text x="601" y="198">production</text>
+  </g>
+  <g fill="var(--muted)" text-anchor="middle" font-size="9">
+    <text x="145" y="211">in your editor</text><text x="297" y="211">minutes later</text>
+    <text x="449" y="211">hours later</text><text x="601" y="211">days later + users</text>
+  </g>
+  <g fill="var(--txt)" text-anchor="middle" font-size="9">
+    <text x="145" y="145">seconds</text><text x="297" y="105">minutes</text>
+    <text x="449" y="65">hours</text><text x="601" y="25">days</text>
+  </g>
+  <text x="8" y="226" fill="var(--warn)" font-size="10">"Shift left" is this chart: every gate you add earlier buys down an order-of-magnitude multiplier.</text>
+</svg>
+<figcaption>The cost of a defect grows roughly tenfold at each stage it survives.</figcaption>
+</figure>
+
+<h2 id="build">4.7 Build and publish the image</h2>
+<p>This job only runs after tests pass, and only on <code>main</code> — pull requests should not
+publish images.</p>
+
+<pre><code>  <span class="v">build</span>:
+    <span class="v">needs</span>: [test, quality]
+    <span class="v">if</span>: github.ref == <span class="s">'refs/heads/main'</span>
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">permissions</span>:
+      <span class="v">contents</span>: read
+      <span class="v">packages</span>: write
+
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: actions/checkout@v4
+      - <span class="v">uses</span>: docker/setup-buildx-action@v3
+
+      - <span class="v">name</span>: Log in to GHCR
+        <span class="v">uses</span>: docker/login-action@v3
+        <span class="v">with</span>:
+          <span class="v">registry</span>: ghcr.io
+          <span class="v">username</span>: ${{ github.actor }}
+          <span class="v">password</span>: ${{ secrets.GITHUB_TOKEN }}
+
+      - <span class="v">name</span>: Derive tags
+        <span class="v">id</span>: meta
+        <span class="v">uses</span>: docker/metadata-action@v5
+        <span class="v">with</span>:
+          <span class="v">images</span>: ghcr.io/${{ github.repository }}
+          <span class="v">tags</span>: |
+            type=sha,format=long
+            type=raw,value=latest
+
+      - <span class="v">name</span>: Build and push
+        <span class="v">uses</span>: docker/build-push-action@v6
+        <span class="v">with</span>:
+          <span class="v">context</span>: .
+          <span class="v">push</span>: <span class="k">true</span>
+          <span class="v">tags</span>: ${{ steps.meta.outputs.tags }}
+          <span class="v">labels</span>: ${{ steps.meta.outputs.labels }}
+          <span class="v">cache-from</span>: type=gha
+          <span class="v">cache-to</span>: type=gha,mode=max</code></pre>
+
+<div class="box why">
+<b>Why tag with the commit SHA</b>
+It makes the running system traceable in both directions: from a container you can find the exact
+commit, and from a commit you can find the exact image. During an incident, "which code is actually
+running right now" becomes a lookup instead of an investigation. <code>latest</code> is published as a
+convenience for humans, never used for deployment.
+</div>
+
+<p><code>secrets.GITHUB_TOKEN</code> is minted automatically per run and expires when the run ends —
+no PAT to create, store or rotate. Note it needs <code>permissions: packages: write</code> declared
+explicitly; the default is read-only, which is the correct default.</p>
+
+<h2 id="secrets">4.8 Secrets, and how pipelines leak them</h2>
+<p>Store secrets in <i>Settings → Secrets and variables → Actions</i>. Reference them as
+<code>${{ secrets.NAME }}</code>. GitHub masks their values in logs.</p>
+
+<pre><code>- <span class="v">name</span>: Deploy
+  <span class="v">env</span>:
+    <span class="v">DEPLOY_KEY</span>: ${{ secrets.DEPLOY_KEY }}
+  <span class="v">run</span>: ./scripts/deploy.sh</code></pre>
+
+<div class="box warn">
+<b>Four real leak paths</b>
+<ul style="margin:.4em 0 0">
+<li><b>Echoing them.</b> Masking is string matching. Base64-encode or split a secret and the mask
+misses it. Never print one, even "temporarily to debug".</li>
+<li><b><code>pull_request_target</code> on untrusted forks.</b> That trigger runs with your secrets
+against a fork's code. A malicious PR can exfiltrate everything. Use plain <code>pull_request</code>
+unless you fully understand the difference.</li>
+<li><b>Unpinned third-party actions.</b> <code>uses: some/action@v1</code> follows a mutable tag; if
+that repo is compromised, your next run executes attacker code with your token. For anything outside
+<code>actions/</code> and vendors you trust, pin to a commit SHA.</li>
+<li><b>Over-broad token permissions.</b> Set <code>permissions:</code> per job at the minimum needed.</li>
+</ul>
+</div>
+
+<h2 id="deploy">4.9 Deployment, environments and approvals</h2>
+<p>GitHub <b>Environments</b> (Settings → Environments) add protection rules to a job: required
+reviewers, wait timers, and branch restrictions. This is what turns continuous delivery into something
+an organisation will actually sign off on.</p>
+
+<pre><code>  <span class="v">deploy-staging</span>:
+    <span class="v">needs</span>: build
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">environment</span>:
+      <span class="v">name</span>: staging
+      <span class="v">url</span>: https://staging.example.com
+    <span class="v">steps</span>:
+      - <span class="v">run</span>: echo "deploying ${{ github.sha }} to staging"
+
+  <span class="v">deploy-production</span>:
+    <span class="v">needs</span>: deploy-staging
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">environment</span>:
+      <span class="v">name</span>: production      <span class="c"># configure "required reviewers" on this env</span>
+      <span class="v">url</span>: https://example.com
+    <span class="v">steps</span>:
+      - <span class="v">run</span>: echo "deploying ${{ github.sha }} to production"</code></pre>
+
+<h3>Deployment strategies, briefly</h3>
+<table>
+<tr><th>Strategy</th><th>How</th><th>Cost / benefit</th></tr>
+<tr><td><b>Recreate</b></td><td>Stop old, start new</td><td>Simple; has downtime. Fine for internal tools.</td></tr>
+<tr><td><b>Rolling</b></td><td>Replace instances a few at a time</td><td>No downtime, but two versions run simultaneously — your API must tolerate that. Kubernetes default (Module 6).</td></tr>
+<tr><td><b>Blue/green</b></td><td>Two full environments, flip the router</td><td>Instant rollback; costs double infrastructure during the switch.</td></tr>
+<tr><td><b>Canary</b></td><td>Send 5% of traffic to the new version, watch metrics, ramp up</td><td>Safest; requires the observability you build in Module 7.</td></tr>
+</table>
+
+
+<figure id="fig-deploystrat">
+<svg viewBox="0 0 720 250" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <g fill="var(--accent)" font-size="11">
+    <text x="8" y="20">rolling</text><text x="8" y="100">blue / green</text><text x="8" y="180">canary</text>
+  </g>
+  <g fill="var(--muted)" font-size="9">
+    <text x="8" y="34">replace a few at a time</text>
+    <text x="8" y="114">flip all traffic at once</text>
+    <text x="8" y="194">ramp by percentage</text>
+  </g>
+  <g font-size="9" fill="var(--muted)" text-anchor="middle">
+    <text x="220" y="14">t0</text><text x="340" y="14">t1</text><text x="460" y="14">t2</text><text x="580" y="14">t3</text>
+  </g>
+  <g stroke="var(--line)" stroke-width="1">
+    <rect x="180" y="22" width="100" height="34" rx="4" fill="none"/><rect x="300" y="22" width="100" height="34" rx="4" fill="none"/><rect x="420" y="22" width="100" height="34" rx="4" fill="none"/><rect x="540" y="22" width="100" height="34" rx="4" fill="none"/><rect x="180" y="102" width="100" height="34" rx="4" fill="none"/><rect x="300" y="102" width="100" height="34" rx="4" fill="none"/><rect x="420" y="102" width="100" height="34" rx="4" fill="none"/><rect x="540" y="102" width="100" height="34" rx="4" fill="none"/><rect x="180" y="182" width="100" height="34" rx="4" fill="none"/><rect x="300" y="182" width="100" height="34" rx="4" fill="none"/><rect x="420" y="182" width="100" height="34" rx="4" fill="none"/><rect x="540" y="182" width="100" height="34" rx="4" fill="none"/>
+  </g>
+  <!-- rolling -->
+  <rect x="186" y="28" width="19" height="22" rx="2" fill="var(--accent2)"/><rect x="209" y="28" width="19" height="22" rx="2" fill="var(--accent2)"/><rect x="232" y="28" width="19" height="22" rx="2" fill="var(--accent2)"/><rect x="255" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="306" y="28" width="19" height="22" rx="2" fill="var(--accent2)"/><rect x="329" y="28" width="19" height="22" rx="2" fill="var(--accent2)"/><rect x="352" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="375" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="426" y="28" width="19" height="22" rx="2" fill="var(--accent2)"/><rect x="449" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="472" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="495" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="546" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="569" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="592" y="28" width="19" height="22" rx="2" fill="var(--ok)"/><rect x="615" y="28" width="19" height="22" rx="2" fill="var(--ok)"/>
+  <!-- blue/green -->
+  <rect x="186" y="108" width="42" height="22" rx="2" fill="var(--accent2)" opacity="1"/><rect x="234" y="108" width="42" height="22" rx="2" fill="var(--ok)" opacity="0.25"/><rect x="306" y="108" width="42" height="22" rx="2" fill="var(--accent2)" opacity="1"/><rect x="354" y="108" width="42" height="22" rx="2" fill="var(--ok)" opacity="0.25"/><rect x="426" y="108" width="42" height="22" rx="2" fill="var(--accent2)" opacity="1"/><rect x="474" y="108" width="42" height="22" rx="2" fill="var(--ok)" opacity="0.25"/><rect x="546" y="108" width="42" height="22" rx="2" fill="var(--accent2)" opacity="0.25"/><rect x="594" y="108" width="42" height="22" rx="2" fill="var(--ok)" opacity="1"/>
+  <!-- canary -->
+  <rect x="186" y="188" width="88" height="22" rx="2" fill="var(--accent2)"/><rect x="274" y="188" width="0" height="22" rx="2" fill="var(--ok)"/><rect x="306" y="188" width="60" height="22" rx="2" fill="var(--accent2)"/><rect x="366" y="188" width="28" height="22" rx="2" fill="var(--ok)"/><rect x="426" y="188" width="32" height="22" rx="2" fill="var(--accent2)"/><rect x="458" y="188" width="56" height="22" rx="2" fill="var(--ok)"/><rect x="546" y="188" width="4" height="22" rx="2" fill="var(--accent2)"/><rect x="550" y="188" width="84" height="22" rx="2" fill="var(--ok)"/>
+  <g fill="var(--muted)" font-size="9" text-anchor="middle">
+    <text x="230" y="70">25% new</text><text x="350" y="70">50%</text><text x="470" y="70">75%</text><text x="590" y="70">100%</text>
+    <text x="230" y="150">idle green</text><text x="350" y="150">warming</text><text x="470" y="150">tested</text><text x="590" y="150">switch!</text>
+    <text x="230" y="230">0%</text><text x="350" y="230">~30%</text><text x="470" y="230">~60%</text><text x="590" y="230">100%</text>
+  </g>
+  <g font-size="9"><rect x="440" y="238" width="12" height="9" fill="var(--accent2)"/><text x="458" y="246" fill="var(--muted)">old version</text>
+  <rect x="540" y="238" width="12" height="9" fill="var(--ok)"/><text x="558" y="246" fill="var(--muted)">new version</text></g>
+</svg>
+<figcaption>Three ways to replace a running version, in increasing order of safety and cost.</figcaption>
+</figure>
+
+<h2 id="design">4.10 Designing a pipeline people trust</h2>
+<ul>
+<li><b>Fast feedback first.</b> Lint before tests, unit before integration. Fail in 30 seconds, not 12 minutes.</li>
+<li><b>Deterministic.</b> No test that depends on wall-clock time, network flakiness or execution order.
+One flaky test poisons the credibility of the whole suite.</li>
+<li><b>Build once, promote the artefact.</b> Never rebuild between staging and production — you would be
+deploying a different artefact than the one you tested.</li>
+<li><b>Every merge to main is releasable.</b> If it is not, the pipeline is decoration.</li>
+<li><b>Under 10 minutes.</b> Beyond that, people context-switch away and stop watching.</li>
+</ul>
+
+<h2 id="lab">Lab: the full pipeline</h2>
+<div class="box lab">
+<b>Goal</b>
+A single workflow that lints, tests against real Redis, builds a SHA-tagged image, pushes it to GHCR,
+and blocks merges when anything fails.
+</div>
+
+<h3>Step 1 — the complete workflow</h3>
+<p>Create <code>.github/workflows/ci.yml</code>:</p>
+
+<pre><code><span class="v">name</span>: CI
+
+<span class="v">on</span>:
+  <span class="v">push</span>:
+    <span class="v">branches</span>: [main]
+  <span class="v">pull_request</span>:
+  <span class="v">workflow_dispatch</span>:
+
+<span class="v">env</span>:
+  <span class="v">IMAGE</span>: ghcr.io/${{ github.repository }}
+
+<span class="v">jobs</span>:
+
+  <span class="v">quality</span>:
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: actions/checkout@v4
+      - <span class="v">uses</span>: actions/setup-python@v5
+        <span class="v">with</span>: { <span class="v">python-version</span>: <span class="s">"3.12"</span>, <span class="v">cache</span>: pip }
+      - <span class="v">run</span>: pip install ruff
+      - <span class="v">run</span>: ruff check .
+      - <span class="v">run</span>: ruff format --check .
+
+  <span class="v">test</span>:
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">services</span>:
+      <span class="v">redis</span>:
+        <span class="v">image</span>: redis:7-alpine
+        <span class="v">ports</span>: [<span class="s">"6379:6379"</span>]
+        <span class="v">options</span>: &gt;-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 5
+    <span class="v">env</span>:
+      <span class="v">REDIS_URL</span>: redis://localhost:6379/0
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: actions/checkout@v4
+      - <span class="v">uses</span>: actions/setup-python@v5
+        <span class="v">with</span>: { <span class="v">python-version</span>: <span class="s">"3.12"</span>, <span class="v">cache</span>: pip }
+      - <span class="v">run</span>: pip install -r requirements.txt
+      - <span class="v">run</span>: python -m pytest -q --junitxml=report.xml
+      - <span class="v">if</span>: always()
+        <span class="v">uses</span>: actions/upload-artifact@v4
+        <span class="v">with</span>:
+          <span class="v">name</span>: test-report
+          <span class="v">path</span>: report.xml
+
+  <span class="v">build</span>:
+    <span class="v">needs</span>: [quality, test]
+    <span class="v">if</span>: github.ref == <span class="s">'refs/heads/main'</span>
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">permissions</span>: { <span class="v">contents</span>: read, <span class="v">packages</span>: write }
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: actions/checkout@v4
+      - <span class="v">uses</span>: docker/setup-buildx-action@v3
+      - <span class="v">uses</span>: docker/login-action@v3
+        <span class="v">with</span>:
+          <span class="v">registry</span>: ghcr.io
+          <span class="v">username</span>: ${{ github.actor }}
+          <span class="v">password</span>: ${{ secrets.GITHUB_TOKEN }}
+      - <span class="v">id</span>: meta
+        <span class="v">uses</span>: docker/metadata-action@v5
+        <span class="v">with</span>:
+          <span class="v">images</span>: ${{ env.IMAGE }}
+          <span class="v">tags</span>: |
+            type=sha,format=long
+            type=raw,value=latest
+      - <span class="v">uses</span>: docker/build-push-action@v6
+        <span class="v">with</span>:
+          <span class="v">context</span>: .
+          <span class="v">push</span>: <span class="k">true</span>
+          <span class="v">tags</span>: ${{ steps.meta.outputs.tags }}
+          <span class="v">cache-from</span>: type=gha
+          <span class="v">cache-to</span>: type=gha,mode=max
+
+  <span class="v">smoke</span>:
+    <span class="v">needs</span>: build
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: actions/checkout@v4
+      - <span class="v">name</span>: Run the published image and probe it
+        <span class="v">run</span>: |
+          docker network create smokenet
+          docker run -d --name redis --network smokenet redis:7-alpine
+          docker run -d --name api --network smokenet -p 8000:8000 \
+            -e REDIS_URL=redis://redis:6379/0 \
+            ghcr.io/${{ github.repository }}:sha-${{ github.sha }}
+          chmod +x healthcheck.sh
+          ./healthcheck.sh http://localhost:8000/health 15
+      - <span class="v">if</span>: failure()
+        <span class="v">run</span>: docker logs api</code></pre>
+
+<div class="box why">
+<b>What the smoke job is really testing</b>
+Unit tests prove your code is correct. The smoke job proves the <i>artefact</i> is correct — that the
+image you are about to deploy actually boots, finds its dependency and serves traffic. Those fail for
+completely different reasons, which is why both jobs exist. Note it reuses <code>healthcheck.sh</code>
+from Module 1, and that <code>if: failure()</code> dumps logs so a red build is diagnosable without
+re-running it.
+</div>
+
+<h3>Step 2 — add ruff config so lint is not noise</h3>
+<pre><code>cat &gt; ruff.toml &lt;&lt;'EOF'
+line-length = 100
+target-version = "py312"
+
+[lint]
+select = ["E", "F", "I", "UP", "B"]
+EOF
+
+pip install ruff
+ruff check . &amp;&amp; ruff format .</code></pre>
+
+<h3>Step 3 — push and watch it fail, then pass</h3>
+<pre><code>git switch -c ci/pipeline
+git add .github ruff.toml
+git commit -m "ci: add lint, test, build and smoke pipeline"
+git push -u origin ci/pipeline</code></pre>
+<p>Open a Pull Request. Watch <code>quality</code> and <code>test</code> run in parallel;
+<code>build</code> is skipped because the ref is not <code>main</code>. Fix whatever ruff complains
+about, push again, and watch it go green.</p>
+
+<h3>Step 4 — make the checks binding</h3>
+<p><i>Settings → Branches → main → Edit</i>. Enable <b>Require status checks to pass before merging</b>
+and select <code>quality</code> and <code>test</code>. Now merging red code is not possible, rather
+than merely discouraged.</p>
+
+<h3>Step 5 — merge and verify the artefact</h3>
+<pre><code><span class="c"># after merging the PR on GitHub:</span>
+git switch main &amp;&amp; git pull
+
+SHA=$(git rev-parse HEAD)
+docker pull ghcr.io/&lt;you&gt;/urlshort:sha-$SHA
+docker run --rm ghcr.io/&lt;you&gt;/urlshort:sha-$SHA python -c "import app.main; print('image ok')"</code></pre>
+
+<h3>Step 6 — prove the gate works</h3>
+<pre><code>git switch -c break/tests
+sed -i 's/assert len(code) == 7/assert len(code) == 99/' tests/test_api.py
+git commit -am "test: deliberately break a test"
+git push -u origin break/tests</code></pre>
+<p>Open a PR. The merge button is now blocked. Revert the change, push, and watch it unblock.
+That transition is the entire point of the module.</p>
+
+<h2 id="ex">Exercises</h2>
+
+<h3>Exercise 1 — matrix builds</h3>
+<p>Run the test job against Python 3.11 and 3.12 simultaneously.</p>
+<details><summary>Solution</summary>
+<pre><code>  <span class="v">test</span>:
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">strategy</span>:
+      <span class="v">fail-fast</span>: <span class="k">false</span>
+      <span class="v">matrix</span>:
+        <span class="v">python</span>: [<span class="s">"3.11"</span>, <span class="s">"3.12"</span>]
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: actions/setup-python@v5
+        <span class="v">with</span>: { <span class="v">python-version</span>: <span class="s">"${{ matrix.python }}"</span> }</code></pre>
+<p><code>fail-fast: false</code> matters: the default cancels all remaining matrix jobs on the first
+failure, which hides whether the problem is version-specific.</p>
+</details>
+
+<h3>Exercise 2 — scheduled dependency scan</h3>
+<p>Scan the published image for CVEs every Monday at 06:00 UTC and fail on HIGH or CRITICAL.</p>
+<details><summary>Solution</summary>
+<pre><code><span class="v">on</span>:
+  <span class="v">schedule</span>:
+    - <span class="v">cron</span>: <span class="s">"0 6 * * 1"</span>
+  <span class="v">workflow_dispatch</span>:
+
+<span class="v">jobs</span>:
+  <span class="v">scan</span>:
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: aquasecurity/trivy-action@0.24.0
+        <span class="v">with</span>:
+          <span class="v">image-ref</span>: ghcr.io/${{ github.repository }}:latest
+          <span class="v">severity</span>: <span class="s">"HIGH,CRITICAL"</span>
+          <span class="v">exit-code</span>: <span class="s">"1"</span></code></pre>
+<p>This runs on a schedule rather than on push because new CVEs are published against code you have
+not touched. An image that was clean at build time is not clean forever.</p>
+</details>
+
+<h3>Exercise 3 — a reusable composite action</h3>
+<p>Three jobs repeat checkout + setup-python + install. Factor that out.</p>
+<details><summary>Solution</summary>
+<p><code>.github/actions/setup/action.yml</code>:</p>
+<pre><code><span class="v">name</span>: Setup Python env
+<span class="v">runs</span>:
+  <span class="v">using</span>: composite
+  <span class="v">steps</span>:
+    - <span class="v">uses</span>: actions/setup-python@v5
+      <span class="v">with</span>: { <span class="v">python-version</span>: <span class="s">"3.12"</span>, <span class="v">cache</span>: pip }
+    - <span class="v">shell</span>: bash
+      <span class="v">run</span>: pip install -r requirements.txt</code></pre>
+<p>Then in each job: <code>- uses: ./.github/actions/setup</code> (after <code>checkout</code>, since
+a local action must be on disk first).</p>
+</details>
+
+<h3>Exercise 4 — read a pipeline critically</h3>
+<p>What is dangerous here?</p>
+<pre><code><span class="v">on</span>: [pull_request_target]
+<span class="v">jobs</span>:
+  <span class="v">deploy</span>:
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: actions/checkout@v4
+        <span class="v">with</span>: { <span class="v">ref</span>: <span class="s">"${{ github.event.pull_request.head.sha }}"</span> }
+      - <span class="v">run</span>: make deploy
+        <span class="v">env</span>: { <span class="v">AWS_KEY</span>: <span class="s">"${{ secrets.AWS_KEY }}"</span> }</code></pre>
+<details><summary>Solution</summary>
+<p><code>pull_request_target</code> runs with full repository secrets, and this workflow explicitly
+checks out the <b>pull request's</b> code. Anyone in the world can open a PR that changes the
+<code>deploy</code> target in the Makefile and have your CI run it with production credentials.
+It also deploys straight from an unreviewed PR with no gate. Use <code>pull_request</code>, deploy only
+from <code>main</code>, and scope the token.</p>
+</details>
+
+<h2 id="check">Checkpoint</h2>
+
+<div class="quiz" data-answer="b">
+<div class="q">Job A installs dependencies; job B runs the tests and fails with "module not found". Why?</div>
+<button data-opt="a">The cache key is wrong</button>
+<button data-opt="b">Each job runs on a fresh runner — nothing installed in A exists in B</button>
+<button data-opt="c">B is missing <code>needs: A</code></button>
+<div class="fb"><code>needs</code> only orders jobs; it shares nothing. Either combine the steps into one job, or pass results explicitly via an artifact or a registry.</div>
+</div>
+
+<div class="quiz" data-answer="c">
+<div class="q">Why build the image once in CI and promote that same image through staging to production?</div>
+<button data-opt="a">It saves registry storage</button>
+<button data-opt="b">Rebuilding invalidates the layer cache</button>
+<button data-opt="c">Rebuilding produces a different artefact than the one you tested</button>
+<div class="fb">Base images move, transitive dependencies shift, timestamps change. A rebuild is a new artefact with new risk — so the thing you tested is not the thing you shipped.</div>
+</div>
+
+<div class="quiz" data-answer="a">
+<div class="q">Which is the most dangerous line in a workflow?</div>
+<button data-opt="a"><code>on: pull_request_target</code> combined with checking out the PR's code</button>
+<button data-opt="b"><code>runs-on: ubuntu-latest</code></button>
+<button data-opt="c"><code>cache-to: type=gha,mode=max</code></button>
+<div class="fb">That combination runs untrusted code from any fork with your repository's secrets in scope — a full credential-exfiltration path from a single opened PR.</div>
+</div>
+
+<div class="card">
+<b>You should now be able to, without notes:</b>
+<ul class="chk">
+<li>Distinguish continuous integration, delivery and deployment, and say what each demands of you.</li>
+<li>Write a workflow with parallel jobs and correct <code>needs</code> ordering.</li>
+<li>Start a service container and explain why <code>localhost</code> is right here but wrong in Compose.</li>
+<li>Cache dependencies and Docker layers, keyed correctly.</li>
+<li>Publish an image tagged with the commit SHA, and say why not <code>latest</code>.</li>
+<li>Name three ways a pipeline leaks secrets and prevent each.</li>
+<li>Make CI checks a blocking requirement on <code>main</code>.</li>
+<li>Explain rolling vs blue/green vs canary and pick one for a given risk tolerance.</li>
+</ul>
+</div>
+
+<div class="pager">
+  <a href="module-3.html">← Module 3</a>
+  <a href="module-5.html">Module 5 · Infrastructure as Code →</a>
+</div>
+
+</main>
+<footer><div class="wrap">Practical DevOps · Module 4</div></footer>
+<script src="assets/course.js"></script>
+</body>
+</html>

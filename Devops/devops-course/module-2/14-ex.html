@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exercises — Module 2 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-2.html">Module 2 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 02</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">2.1 Why this module comes before Docker</a>
+<a href="02-model.html">2.2 The TCP/IP model: four layers, one journey</a>
+<a href="03-ip.html">2.3 IP addressing</a>
+<a href="04-subnet.html">2.4 Subnets and CIDR</a>
+<a href="05-private.html">2.5 Private ranges, NAT and why your laptop is invisible</a>
+<a href="06-tcp.html">2.6 TCP vs UDP</a>
+<a href="07-ports.html">2.7 Ports and sockets</a>
+<a href="08-dns.html">2.8 DNS: how a name becomes an address</a>
+<a href="09-http.html">2.9 HTTP: the request you will read a thousand times</a>
+<a href="10-https.html">2.10 HTTPS and TLS</a>
+<a href="11-fw.html">2.11 Firewalls and the ports that matter</a>
+<a href="12-tools.html">2.12 The troubleshooting toolkit</a>
+<a class="grp">Practice</a>
+<a href="13-lab.html">Lab: trace a request end to end</a>
+<a href="14-ex.html" class="cur">Exercises</a>
+<a href="15-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-2.html">Networking Basics</a>
+</div>
+<div class="secmeta">Module 02 · Section 14 of 15</div>
+
+<h2 id="ex">Exercises</h2>
+
+<h3>Exercise 1 — subnet arithmetic</h3>
+<p>For <code>10.42.7.0/22</code>: how many addresses, how many usable hosts, what is the first and
+last address of the range, and is <code>10.42.9.200</code> inside it?</p>
+<details><summary>Solution</summary>
+<p>A <code>/22</code> leaves 32 − 22 = 10 host bits, so 2<sup>10</sup> = <b>1024 addresses</b>,
+<b>1022 usable</b>.</p>
+<p>A /22 block aligns on multiples of 4 in the third octet (256 × 4 = 1024), so this block runs from
+<b>10.42.4.0</b> to <b>10.42.7.255</b> — note the network address is <i>not</i> 10.42.7.0, which is why
+you check rather than assume.</p>
+<p><code>10.42.9.200</code> is therefore <b>outside</b> it. Verify:</p>
+<pre><code>python3 -c "
+import ipaddress
+n = ipaddress.ip_network('10.42.7.0/22', strict=False)
+print(n, n.num_addresses, n[0], n[-1])
+print(ipaddress.ip_address('10.42.9.200') in n)"
+<span class="c"># 10.42.4.0/22 1024 10.42.4.0 10.42.7.255</span>
+<span class="c"># False</span></code></pre>
+</details>
+
+<h3>Exercise 2 — diagnose from the error alone</h3>
+<p>For each symptom, name the layer and the first command you would run.</p>
+<ol>
+<li><code>curl: (6) Could not resolve host: api.internal</code></li>
+<li><code>curl: (7) Failed to connect to 10.0.1.5 port 5432: Connection refused</code></li>
+<li><code>curl: (28) Connection timed out after 5000 ms</code></li>
+<li><code>curl: (60) SSL certificate problem: certificate has expired</code></li>
+<li>HTTP 502 Bad Gateway from your load balancer</li>
+</ol>
+<details><summary>Solution</summary>
+<table>
+<tr><th>#</th><th>Layer</th><th>Meaning</th><th>First command</th></tr>
+<tr><td>1</td><td>DNS</td><td>Name never resolved; no packet was ever sent</td><td><code>dig +short api.internal</code>, then <code>cat /etc/resolv.conf</code></td></tr>
+<tr><td>2</td><td>TCP</td><td>Host reachable, sent RST — nothing listening</td><td><code>ss -tulpn | grep 5432</code> on the target</td></tr>
+<tr><td>3</td><td>Network/firewall</td><td>Packets silently dropped</td><td><code>traceroute</code>, then check security groups / ufw</td></tr>
+<tr><td>4</td><td>TLS</td><td>Certificate expired</td><td><code>openssl s_client … | openssl x509 -noout -dates</code></td></tr>
+<tr><td>5</td><td>HTTP</td><td>Proxy reached the backend but got an invalid/closed response</td><td>The <b>backend's</b> logs — the LB is reporting, not causing</td></tr>
+</table>
+<p>Note 2 and 3 are the pair from section 2.2, and 5 is the one people misattribute most often: a 502
+is nearly always a broken backend, not a broken load balancer.</p>
+</details>
+
+<h3>Exercise 3 — a certificate expiry monitor</h3>
+<p>Write <code>certcheck.sh &lt;host&gt; [days]</code> that exits non-zero if the certificate expires
+within <code>days</code> (default 30).</p>
+<details><summary>Solution</summary>
+<pre><code><span class="c">#!/usr/bin/env bash</span>
+<span class="k">set</span> -euo pipefail
+
+HOST=<span class="s">"${1:?usage: certcheck.sh &lt;host&gt; [days]}"</span>
+DAYS=<span class="s">"${2:-30}"</span>
+
+end=$(echo | openssl s_client -connect <span class="s">"$HOST:443"</span> -servername <span class="s">"$HOST"</span> 2&gt;/dev/null \
+      | openssl x509 -noout -enddate | cut -d= -f2)
+
+end_epoch=$(date -d <span class="s">"$end"</span> +%s)
+now_epoch=$(date +%s)
+left=$(( (end_epoch - now_epoch) / 86400 ))
+
+<span class="k">if</span> (( left &lt; DAYS )); <span class="k">then</span>
+  <span class="k">echo</span> <span class="s">"WARN: $HOST cert expires in ${left}d (threshold ${DAYS}d)"</span> &gt;&amp;2
+  <span class="k">exit</span> 1
+<span class="k">fi</span>
+<span class="k">echo</span> <span class="s">"OK: $HOST cert valid for ${left}d"</span></code></pre>
+<pre><code>./certcheck.sh example.com 30</code></pre>
+<p>Alerting on <i>days remaining</i> rather than on the expiry itself is the point — by the time the
+certificate has expired you are already in an outage, and this is exactly the "alert on a leading
+indicator" idea that returns in Module 7's <code>predict_linear</code> exercise.</p>
+</details>
+
+<h3>Exercise 4 — the firewall that isn't</h3>
+<p>You set <code>ufw default deny incoming</code> and only allowed 22, 80 and 443. Yet colleagues can
+reach your Redis on 6379. How, and what are two correct fixes?</p>
+<details><summary>Solution</summary>
+<p>Redis is running in a container published with <code>-p 6379:6379</code>. Docker inserts its rules
+into the <code>DOCKER</code> chain, which iptables evaluates <b>before</b> ufw's <code>INPUT</code>
+rules — so the publish bypasses ufw entirely.</p>
+<p><b>Fix 1 — bind the publish to loopback</b> so it is never exposed:</p>
+<pre><code>docker run -d -p 127.0.0.1:6379:6379 redis:7-alpine</code></pre>
+<p><b>Fix 2 — do not publish it at all.</b> Put Redis on a user-defined Docker network and let only the
+app container reach it by name. This is exactly what the Compose file in Module 3 does: the
+<code>redis</code> service has no <code>ports:</code> key, so it is reachable from the API container
+and from nowhere else.</p>
+<p>A third, complementary layer in cloud environments: enforce it in the security group, which sits
+outside the host and cannot be bypassed by anything running on it.</p>
+</details>
+
+<div class="pager">
+  <a href="13-lab.html"><span class="sub">← Previous</span>Lab: trace a request end to end</a>
+  <a href="15-check.html" class="nx"><span class="sub">Next →</span>Checkpoint</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 2 · Exercises</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lab: bootstrap the course repository — Module 1 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-1.html">Module 1 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 01</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">1.1 Why the terminal, still</a>
+<a href="02-fs.html">1.2 The filesystem and moving around it</a>
+<a href="03-perm.html">1.3 Permissions, users and sudo</a>
+<a href="04-pipes.html">1.4 Pipes: the idea that makes the shell powerful</a>
+<a href="05-proc.html">1.5 Processes, ports and logs</a>
+<a href="06-script.html">1.6 Writing a real shell script</a>
+<a href="07-ssh.html">1.7 SSH and keys</a>
+<a href="08-git.html">1.8 Git: the mental model</a>
+<a href="09-branch.html">1.9 Branching, merging and the conflict you will hit</a>
+<a href="10-flow.html">1.10 A workflow a team can actually live with</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html" class="cur">Lab: bootstrap the course repository</a>
+<a href="12-ex.html">Exercises</a>
+<a href="13-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-1.html">The Ground Floor: Linux, Shell &amp; Git</a>
+</div>
+<div class="secmeta">Module 01 · Section 11 of 13</div>
+
+<h2 id="lab">Lab: bootstrap the course repository</h2>
+<div class="box lab">
+<b>Goal</b>
+Create the repo you will use for the rest of the course, with a working script, a sane
+<code>.gitignore</code>, a branch, a merge and a deliberate conflict you resolve.
+</div>
+
+<h3>Step 1 — create the repo</h3>
+<pre><code>mkdir -p ~/devops/urlshort &amp;&amp; cd ~/devops/urlshort
+git init -b main
+git config user.name  <span class="s">"Your Name"</span>
+git config user.email <span class="s">"you@example.com"</span></code></pre>
+
+<h3>Step 2 — a script that does something</h3>
+<pre><code>cat &gt; healthcheck.sh &lt;&lt;'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+URL="${1:-http://localhost:8000/health}"
+TRIES="${2:-5}"
+
+for i in $(seq 1 "$TRIES"); do
+  code=$(curl -s -o /dev/null -w '%{http_code}' "$URL") || code=000
+  if [[ "$code" == "200" ]]; then
+    echo "OK  $URL responded 200 on attempt $i"
+    exit 0
+  fi
+  echo "... attempt $i/$TRIES got $code, retrying in 2s"
+  sleep 2
+done
+
+echo "FAIL $URL never returned 200" >&2
+exit 1
+EOF
+
+chmod +x healthcheck.sh
+./healthcheck.sh https://example.com</code></pre>
+
+<p>That last line should print <code>OK</code>. Now watch it fail correctly — this is the important half:</p>
+<pre><code>./healthcheck.sh http://localhost:9999/nope 2
+echo "exit code was: $?"
+<span class="c"># exit code was: 1</span></code></pre>
+
+<div class="box why">
+<b>Why this script is shaped this way</b>
+It retries (services take time to start), it takes arguments instead of hardcoding, it writes failures
+to stderr, and it exits non-zero on failure. Those four properties are exactly what a CI system and a
+Kubernetes probe need. You will reuse this file in Modules 4 and 6.
+</div>
+
+<h3>Step 3 — ignore, commit</h3>
+<pre><code>printf '%s\n' '__pycache__/' '.venv/' '.env' '*.log' &gt; .gitignore
+
+echo "SECRET_KEY=hunter2" &gt; .env          <span class="c"># deliberately untracked</span>
+git status                                <span class="c"># .env must NOT appear</span>
+
+git add .
+git commit -m "chore: add healthcheck script and gitignore"
+git log --oneline</code></pre>
+
+<h3>Step 4 — branch, change, merge</h3>
+<pre><code>git switch -c feat/configurable-timeout
+sed -i 's/sleep 2/sleep "${DELAY:-2}"/' healthcheck.sh
+git commit -am "feat: make retry delay configurable via DELAY"
+
+git switch main
+git merge feat/configurable-timeout
+git branch -d feat/configurable-timeout</code></pre>
+
+<h3>Step 5 — create a conflict on purpose, then resolve it</h3>
+<pre><code>git switch -c fix/tries-10
+sed -i 's/TRIES="${2:-5}"/TRIES="${2:-10}"/' healthcheck.sh
+git commit -am "fix: default to 10 retries"
+
+git switch main
+sed -i 's/TRIES="${2:-5}"/TRIES="${2:-3}"/' healthcheck.sh
+git commit -am "fix: default to 3 retries"
+
+git merge fix/tries-10
+<span class="c"># CONFLICT (content): Merge conflict in healthcheck.sh</span></code></pre>
+
+<p>Open <code>healthcheck.sh</code>, choose the value you want, delete the
+<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> / <code>=======</code> / <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> lines, then:</p>
+<pre><code>git add healthcheck.sh
+git commit -m "merge: resolve retry-count conflict, settle on 5"
+git log --oneline --graph --all</code></pre>
+
+<h3>Step 6 — push to GitHub</h3>
+<p>Create an empty repo named <code>urlshort</code> on GitHub (no README, no .gitignore), then:</p>
+<pre><code>git remote add origin git@github.com:&lt;you&gt;/urlshort.git
+git push -u origin main</code></pre>
+
+<h3>Step 7 — protect main</h3>
+<p>On GitHub: <i>Settings → Branches → Add branch protection rule</i> for <code>main</code>.
+Enable <b>Require a pull request before merging</b>. In Module 4 you will add
+<b>Require status checks to pass</b> once your CI exists.</p>
+
+<div class="pager">
+  <a href="10-flow.html"><span class="sub">← Previous</span>1.10 A workflow a team can actually live with</a>
+  <a href="12-ex.html" class="nx"><span class="sub">Next →</span>Exercises</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 1 · Lab: bootstrap the course repository</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

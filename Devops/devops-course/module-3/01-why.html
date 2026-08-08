@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3.1 The problem containers solve — Module 3 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-3.html">Module 3 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 03</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html" class="cur">3.1 The problem containers solve</a>
+<a href="02-what.html">3.2 What a container actually is</a>
+<a href="03-images.html">3.3 Images, layers and the cache</a>
+<a href="04-cli.html">3.4 The commands you will use daily</a>
+<a href="05-app.html">3.5 The application</a>
+<a href="06-dockerfile.html">3.6 Writing a Dockerfile — three revisions</a>
+<a href="07-data.html">3.7 Data: volumes and why containers are ephemeral</a>
+<a href="08-net.html">3.8 Networking between containers</a>
+<a href="09-compose.html">3.9 Docker Compose</a>
+<a href="10-debug.html">3.10 Debugging a container that won't start</a>
+<a href="11-registry.html">3.11 Registries and tagging</a>
+<a class="grp">Practice</a>
+<a href="12-lab.html">Lab: containerise urlshort end to end</a>
+<a href="13-ex.html">Exercises</a>
+<a href="14-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-3.html">Containers: Docker &amp; Compose</a>
+</div>
+<div class="secmeta">Module 03 · Section 1 of 14</div>
+
+<h2 id="why">3.1 The problem containers solve</h2>
+<p>You write an app on Ubuntu with Python 3.12 and Redis 7. Your colleague runs macOS with Python 3.10.
+The server runs Debian with Python 3.9 and a Redis someone upgraded last year. The app behaves
+differently in all three places, and every difference costs a day.</p>
+<p>The instinct — "write better install docs" — does not work, because the documentation describes the
+environment while the environment drifts. Containers invert this: instead of documenting the
+environment, you <b>ship</b> it. The runtime, the libraries, the OS packages and your code travel
+together as one immutable artefact.</p>
+
+<div class="box why">
+<b>Why it exists</b>
+A container turns "an environment you must reproduce" into "a file you can copy". That is the whole
+idea, and everything else — Kubernetes, CI image builds, registries — is infrastructure built on top
+of that one property.
+</div>
+
+<div class="pager">
+  <a href="../module-2/15-check.html"><span class="sub">← Module 2</span>Checkpoint</a>
+  <a href="02-what.html" class="nx"><span class="sub">Next →</span>3.2 What a container actually is</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 3 · 3.1 The problem containers solve</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

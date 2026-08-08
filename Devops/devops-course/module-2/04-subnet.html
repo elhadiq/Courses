@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2.4 Subnets and CIDR — Module 2 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-2.html">Module 2 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 02</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">2.1 Why this module comes before Docker</a>
+<a href="02-model.html">2.2 The TCP/IP model: four layers, one journey</a>
+<a href="03-ip.html">2.3 IP addressing</a>
+<a href="04-subnet.html" class="cur">2.4 Subnets and CIDR</a>
+<a href="05-private.html">2.5 Private ranges, NAT and why your laptop is invisible</a>
+<a href="06-tcp.html">2.6 TCP vs UDP</a>
+<a href="07-ports.html">2.7 Ports and sockets</a>
+<a href="08-dns.html">2.8 DNS: how a name becomes an address</a>
+<a href="09-http.html">2.9 HTTP: the request you will read a thousand times</a>
+<a href="10-https.html">2.10 HTTPS and TLS</a>
+<a href="11-fw.html">2.11 Firewalls and the ports that matter</a>
+<a href="12-tools.html">2.12 The troubleshooting toolkit</a>
+<a class="grp">Practice</a>
+<a href="13-lab.html">Lab: trace a request end to end</a>
+<a href="14-ex.html">Exercises</a>
+<a href="15-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-2.html">Networking Basics</a>
+</div>
+<div class="secmeta">Module 02 · Section 4 of 15</div>
+
+<h2 id="subnet">2.4 Subnets and CIDR</h2>
+<p>An address is split into a <b>network part</b> and a <b>host part</b>. CIDR notation says how many
+leading bits are the network part: <code>192.168.1.0/24</code> means the first 24 bits are the network,
+leaving 8 bits — 256 addresses — for hosts.</p>
+
+<table>
+<tr><th>CIDR</th><th>Netmask</th><th>Total addresses</th><th>Usable hosts</th><th>Typical use</th></tr>
+<tr><td><code>/32</code></td><td>255.255.255.255</td><td>1</td><td>1</td><td>A single host, e.g. a firewall rule</td></tr>
+<tr><td><code>/30</code></td><td>255.255.255.252</td><td>4</td><td>2</td><td>Point-to-point link</td></tr>
+<tr><td><code>/24</code></td><td>255.255.255.0</td><td>256</td><td>254</td><td>A small LAN, a cloud subnet</td></tr>
+<tr><td><code>/16</code></td><td>255.255.0.0</td><td>65,536</td><td>65,534</td><td>A VPC or a large private network</td></tr>
+<tr><td><code>/8</code></td><td>255.0.0.0</td><td>16,777,216</td><td>—</td><td><code>10.0.0.0/8</code>, the big private block</td></tr>
+<tr><td><code>/0</code></td><td>0.0.0.0</td><td>everything</td><td>—</td><td>"Any address" — the default route</td></tr>
+</table>
+
+
+<figure id="fig-cidr">
+<svg viewBox="0 0 720 190" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <text x="8" y="16" fill="var(--muted)" font-size="10">192.168.1.34/24 — the /24 says: the first 24 bits identify the NETWORK, the rest identify the HOST</text>
+  <g stroke="var(--line)" stroke-width="1">
+    <rect x="8.0" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="29.5" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="51.0" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="72.5" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="94.0" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="115.5" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="137.0" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="158.5" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="180.0" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="201.5" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="223.0" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="244.5" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="266.0" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="287.5" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="309.0" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="330.5" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="352.0" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="373.5" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="395.0" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="416.5" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="438.0" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="459.5" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="481.0" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="502.5" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="524.0" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent2) 30%,transparent)"/><rect x="545.5" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent2) 30%,transparent)"/><rect x="567.0" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent2) 30%,transparent)"/><rect x="588.5" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent2) 30%,transparent)"/><rect x="610.0" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent2) 30%,transparent)"/><rect x="631.5" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent2) 30%,transparent)"/><rect x="653.0" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent2) 30%,transparent)"/><rect x="674.5" y="30" width="20" height="26" fill="color-mix(in srgb,var(--accent2) 30%,transparent)"/>
+  </g>
+  <g fill="var(--txt)" font-size="9" text-anchor="middle">
+    <text x="18.0" y="47">1</text><text x="39.5" y="47">1</text><text x="61.0" y="47">0</text><text x="82.5" y="47">0</text><text x="104.0" y="47">0</text><text x="125.5" y="47">0</text><text x="147.0" y="47">0</text><text x="168.5" y="47">0</text><text x="190.0" y="47">1</text><text x="211.5" y="47">0</text><text x="233.0" y="47">1</text><text x="254.5" y="47">0</text><text x="276.0" y="47">1</text><text x="297.5" y="47">0</text><text x="319.0" y="47">0</text><text x="340.5" y="47">0</text><text x="362.0" y="47">0</text><text x="383.5" y="47">0</text><text x="405.0" y="47">0</text><text x="426.5" y="47">0</text><text x="448.0" y="47">0</text><text x="469.5" y="47">0</text><text x="491.0" y="47">0</text><text x="512.5" y="47">1</text><text x="534.0" y="47">0</text><text x="555.5" y="47">0</text><text x="577.0" y="47">1</text><text x="598.5" y="47">0</text><text x="620.0" y="47">0</text><text x="641.5" y="47">0</text><text x="663.0" y="47">1</text><text x="684.5" y="47">0</text>
+  </g>
+  <g stroke="var(--accent)" stroke-width="1.5" fill="none"><path d="M8 64 V72 H524 V64"/></g>
+  <g stroke="var(--accent2)" stroke-width="1.5" fill="none"><path d="M532 64 V72 H700 V64"/></g>
+  <text x="266" y="87" fill="var(--accent)" text-anchor="middle" font-size="11">network · 24 bits · fixed</text>
+  <text x="616" y="87" fill="var(--accent2)" text-anchor="middle" font-size="11">host · 8 bits</text>
+  <text x="616" y="101" fill="var(--muted)" text-anchor="middle" font-size="10">2⁸ = 256 addresses</text>
+  <g fill="var(--muted)" font-size="10">
+    <text x="8" y="127">192 . 168 . 1 .</text>
+    <text x="120" y="127" fill="var(--accent2)">0</text>
+    <text x="140" y="127">← network address, reserved</text>
+    <text x="8" y="145">192 . 168 . 1 .</text>
+    <text x="120" y="145" fill="var(--ok)">1 – 254</text>
+    <text x="180" y="145">← the 254 usable hosts</text>
+    <text x="8" y="163">192 . 168 . 1 .</text>
+    <text x="120" y="163" fill="var(--accent2)">255</text>
+    <text x="150" y="163">← broadcast, reserved</text>
+    <text x="8" y="182" fill="var(--warn)">Bigger prefix = smaller network. /25 halves it to 128; /23 doubles it to 512.</text>
+  </g>
+</svg>
+<figcaption>CIDR splits the 32 bits into a network part and a host part.</figcaption>
+</figure>
+
+<p>Two addresses in every subnet are reserved: the lowest is the <b>network address</b> and the highest
+is the <b>broadcast address</b>. That is why a <code>/24</code> holds 256 addresses but only 254 hosts.</p>
+
+<pre><code><span class="c"># 192.168.1.0/24</span>
+192.168.1.0     <span class="c"># network address — not assignable</span>
+192.168.1.1     <span class="c"># conventionally the router/gateway</span>
+192.168.1.2 ... 192.168.1.254   <span class="c"># usable hosts</span>
+192.168.1.255   <span class="c"># broadcast — not assignable</span></code></pre>
+
+<div class="box">
+<b>The two CIDR blocks you will type most</b>
+<code>0.0.0.0/0</code> means "any IPv4 address anywhere". In a firewall rule it means <i>the entire
+internet</i> — correct for a public web port, alarming for a database port. Separately, binding a
+service to <code>0.0.0.0</code> means "listen on all interfaces", which is why every Dockerfile in this
+course runs uvicorn with <code>--host 0.0.0.0</code>: bound to <code>127.0.0.1</code> the service would
+be unreachable from outside its own container.
+</div>
+
+<div class="pager">
+  <a href="03-ip.html"><span class="sub">← Previous</span>2.3 IP addressing</a>
+  <a href="05-private.html" class="nx"><span class="sub">Next →</span>2.5 Private ranges, NAT and why your laptop is invisible</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 2 · 2.4 Subnets and CIDR</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

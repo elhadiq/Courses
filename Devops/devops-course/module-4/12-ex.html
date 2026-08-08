@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exercises — Module 4 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-4.html">Module 4 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 04</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">4.1 What CI and CD actually mean</a>
+<a href="02-anatomy.html">4.2 Anatomy of a workflow</a>
+<a href="03-first.html">4.3 Your first pipeline: test on every push</a>
+<a href="04-services.html">4.4 Services: a real Redis for your tests</a>
+<a href="05-cache.html">4.5 Caching, and why pipelines get slow</a>
+<a href="06-quality.html">4.6 Quality gates: lint, format, type, scan</a>
+<a href="07-build.html">4.7 Build and publish the image</a>
+<a href="08-secrets.html">4.8 Secrets, and how pipelines leak them</a>
+<a href="09-deploy.html">4.9 Deployment, environments and approvals</a>
+<a href="10-design.html">4.10 Designing a pipeline people trust</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html">Lab: the full pipeline</a>
+<a href="12-ex.html" class="cur">Exercises</a>
+<a href="13-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-4.html">CI/CD with GitHub Actions</a>
+</div>
+<div class="secmeta">Module 04 · Section 12 of 13</div>
+
+<h2 id="ex">Exercises</h2>
+
+<h3>Exercise 1 — matrix builds</h3>
+<p>Run the test job against Python 3.11 and 3.12 simultaneously.</p>
+<details><summary>Solution</summary>
+<pre><code>  <span class="v">test</span>:
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">strategy</span>:
+      <span class="v">fail-fast</span>: <span class="k">false</span>
+      <span class="v">matrix</span>:
+        <span class="v">python</span>: [<span class="s">"3.11"</span>, <span class="s">"3.12"</span>]
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: actions/setup-python@v5
+        <span class="v">with</span>: { <span class="v">python-version</span>: <span class="s">"${{ matrix.python }}"</span> }</code></pre>
+<p><code>fail-fast: false</code> matters: the default cancels all remaining matrix jobs on the first
+failure, which hides whether the problem is version-specific.</p>
+</details>
+
+<h3>Exercise 2 — scheduled dependency scan</h3>
+<p>Scan the published image for CVEs every Monday at 06:00 UTC and fail on HIGH or CRITICAL.</p>
+<details><summary>Solution</summary>
+<pre><code><span class="v">on</span>:
+  <span class="v">schedule</span>:
+    - <span class="v">cron</span>: <span class="s">"0 6 * * 1"</span>
+  <span class="v">workflow_dispatch</span>:
+
+<span class="v">jobs</span>:
+  <span class="v">scan</span>:
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: aquasecurity/trivy-action@0.24.0
+        <span class="v">with</span>:
+          <span class="v">image-ref</span>: ghcr.io/${{ github.repository }}:latest
+          <span class="v">severity</span>: <span class="s">"HIGH,CRITICAL"</span>
+          <span class="v">exit-code</span>: <span class="s">"1"</span></code></pre>
+<p>This runs on a schedule rather than on push because new CVEs are published against code you have
+not touched. An image that was clean at build time is not clean forever.</p>
+</details>
+
+<h3>Exercise 3 — a reusable composite action</h3>
+<p>Three jobs repeat checkout + setup-python + install. Factor that out.</p>
+<details><summary>Solution</summary>
+<p><code>.github/actions/setup/action.yml</code>:</p>
+<pre><code><span class="v">name</span>: Setup Python env
+<span class="v">runs</span>:
+  <span class="v">using</span>: composite
+  <span class="v">steps</span>:
+    - <span class="v">uses</span>: actions/setup-python@v5
+      <span class="v">with</span>: { <span class="v">python-version</span>: <span class="s">"3.12"</span>, <span class="v">cache</span>: pip }
+    - <span class="v">shell</span>: bash
+      <span class="v">run</span>: pip install -r requirements.txt</code></pre>
+<p>Then in each job: <code>- uses: ./.github/actions/setup</code> (after <code>checkout</code>, since
+a local action must be on disk first).</p>
+</details>
+
+<h3>Exercise 4 — read a pipeline critically</h3>
+<p>What is dangerous here?</p>
+<pre><code><span class="v">on</span>: [pull_request_target]
+<span class="v">jobs</span>:
+  <span class="v">deploy</span>:
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: actions/checkout@v4
+        <span class="v">with</span>: { <span class="v">ref</span>: <span class="s">"${{ github.event.pull_request.head.sha }}"</span> }
+      - <span class="v">run</span>: make deploy
+        <span class="v">env</span>: { <span class="v">AWS_KEY</span>: <span class="s">"${{ secrets.AWS_KEY }}"</span> }</code></pre>
+<details><summary>Solution</summary>
+<p><code>pull_request_target</code> runs with full repository secrets, and this workflow explicitly
+checks out the <b>pull request's</b> code. Anyone in the world can open a PR that changes the
+<code>deploy</code> target in the Makefile and have your CI run it with production credentials.
+It also deploys straight from an unreviewed PR with no gate. Use <code>pull_request</code>, deploy only
+from <code>main</code>, and scope the token.</p>
+</details>
+
+<div class="pager">
+  <a href="11-lab.html"><span class="sub">← Previous</span>Lab: the full pipeline</a>
+  <a href="13-check.html" class="nx"><span class="sub">Next →</span>Checkpoint</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 4 · Exercises</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

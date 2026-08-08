@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>1.3 Permissions, users and sudo — Module 1 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-1.html">Module 1 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 01</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">1.1 Why the terminal, still</a>
+<a href="02-fs.html">1.2 The filesystem and moving around it</a>
+<a href="03-perm.html" class="cur">1.3 Permissions, users and sudo</a>
+<a href="04-pipes.html">1.4 Pipes: the idea that makes the shell powerful</a>
+<a href="05-proc.html">1.5 Processes, ports and logs</a>
+<a href="06-script.html">1.6 Writing a real shell script</a>
+<a href="07-ssh.html">1.7 SSH and keys</a>
+<a href="08-git.html">1.8 Git: the mental model</a>
+<a href="09-branch.html">1.9 Branching, merging and the conflict you will hit</a>
+<a href="10-flow.html">1.10 A workflow a team can actually live with</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html">Lab: bootstrap the course repository</a>
+<a href="12-ex.html">Exercises</a>
+<a href="13-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-1.html">The Ground Floor: Linux, Shell &amp; Git</a>
+</div>
+<div class="secmeta">Module 01 · Section 3 of 13</div>
+
+<h2 id="perm">1.3 Permissions, users and sudo</h2>
+<p>Every file has an owner, a group, and three permission triplets: owner / group / everyone else.
+<code>ls -l</code> shows them:</p>
+
+<pre><code>-rwxr-xr--  1 zouhair devs  2048 Aug  8 10:22 deploy.sh
+<span class="c">│└┬┘└┬┘└┬┘    └──┬──┘ └─┬┘</span>
+<span class="c">│ │  │  │        │     └── group</span>
+<span class="c">│ │  │  └─ others: read only        </span>
+<span class="c">│ │  └──── group:  read + execute   </span>
+<span class="c">│ └─────── owner:  read+write+exec  </span>
+<span class="c">└───────── type: - file, d directory, l symlink</span></code></pre>
+
+<p>Numerically, read=4, write=2, execute=1. So <code>755</code> = owner 7 (rwx), group 5 (r-x),
+others 5 (r-x). The two you will use in practice:</p>
+
+<pre><code>chmod +x deploy.sh        <span class="c"># make a script runnable</span>
+chmod 600 ~/.ssh/id_ed25519  <span class="c"># private key: owner only, or SSH refuses it</span>
+chown -R app:app /srv/app <span class="c"># give a service account ownership</span></code></pre>
+
+<p><b>sudo</b> runs one command as root. Use it for system changes; never for your own project files —
+if you find yourself typing <code>sudo</code> to edit code you wrote, ownership is wrong somewhere.</p>
+
+<div class="pager">
+  <a href="02-fs.html"><span class="sub">← Previous</span>1.2 The filesystem and moving around it</a>
+  <a href="04-pipes.html" class="nx"><span class="sub">Next →</span>1.4 Pipes: the idea that makes the shell powerful</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 1 · 1.3 Permissions, users and sudo</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

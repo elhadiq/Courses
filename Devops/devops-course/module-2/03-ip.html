@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2.3 IP addressing — Module 2 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-2.html">Module 2 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 02</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">2.1 Why this module comes before Docker</a>
+<a href="02-model.html">2.2 The TCP/IP model: four layers, one journey</a>
+<a href="03-ip.html" class="cur">2.3 IP addressing</a>
+<a href="04-subnet.html">2.4 Subnets and CIDR</a>
+<a href="05-private.html">2.5 Private ranges, NAT and why your laptop is invisible</a>
+<a href="06-tcp.html">2.6 TCP vs UDP</a>
+<a href="07-ports.html">2.7 Ports and sockets</a>
+<a href="08-dns.html">2.8 DNS: how a name becomes an address</a>
+<a href="09-http.html">2.9 HTTP: the request you will read a thousand times</a>
+<a href="10-https.html">2.10 HTTPS and TLS</a>
+<a href="11-fw.html">2.11 Firewalls and the ports that matter</a>
+<a href="12-tools.html">2.12 The troubleshooting toolkit</a>
+<a class="grp">Practice</a>
+<a href="13-lab.html">Lab: trace a request end to end</a>
+<a href="14-ex.html">Exercises</a>
+<a href="15-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-2.html">Networking Basics</a>
+</div>
+<div class="secmeta">Module 02 · Section 3 of 15</div>
+
+<h2 id="ip">2.3 IP addressing</h2>
+<p>An IP address identifies a network interface. IPv4 is four bytes, written as four decimal numbers
+0–255: <code>192.168.1.34</code>. That is about 4.3 billion addresses, which ran out — hence NAT
+(section 2.5) and IPv6.</p>
+
+<p>IPv6 is eight groups of four hex digits, with <code>::</code> collapsing one run of zeros:</p>
+<pre><code>2001:0db8:0000:0000:0000:ff00:0042:8329
+2001:db8::ff00:42:8329        <span class="c"># same address, compressed</span>
+::1                           <span class="c"># IPv6 loopback (IPv4: 127.0.0.1)</span></code></pre>
+
+<pre><code><span class="c"># your addresses (modern command)</span>
+ip addr show
+ip -4 addr show scope global    <span class="c"># just the routable IPv4 ones</span>
+
+<span class="c"># which interface and gateway will traffic to an address use?</span>
+ip route
+ip route get 1.1.1.1
+<span class="c"># 1.1.1.1 via 192.168.1.1 dev wlan0 src 192.168.1.34</span></code></pre>
+
+<p>Read that last line as the answer to three questions at once: the <b>gateway</b> (next hop),
+the <b>interface</b> traffic leaves by, and the <b>source address</b> it will appear to come from.</p>
+
+<div class="pager">
+  <a href="02-model.html"><span class="sub">← Previous</span>2.2 The TCP/IP model: four layers, one journey</a>
+  <a href="04-subnet.html" class="nx"><span class="sub">Next →</span>2.4 Subnets and CIDR</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 2 · 2.3 IP addressing</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

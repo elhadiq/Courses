@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lab: full observability stack — Module 7 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-7.html">Module 7 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 07</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">7.1 Monitoring vs observability</a>
+<a href="02-pillars.html">7.2 Metrics, logs, traces</a>
+<a href="03-prom.html">7.3 How Prometheus works</a>
+<a href="04-types.html">7.4 Metric types, and the one everyone misuses</a>
+<a href="05-instr.html">7.5 Instrumenting the application</a>
+<a href="06-promql.html">7.6 PromQL, enough to be useful</a>
+<a href="07-golden.html">7.7 The four golden signals</a>
+<a href="08-grafana.html">7.8 Dashboards worth looking at</a>
+<a href="09-alert.html">7.9 Alerting on symptoms, not causes</a>
+<a href="10-slo.html">7.10 SLIs, SLOs and error budgets</a>
+<a href="11-logs.html">7.11 Logs that are actually searchable</a>
+<a class="grp">Practice</a>
+<a href="12-lab.html" class="cur">Lab: full observability stack</a>
+<a href="13-ex.html">Exercises</a>
+<a href="14-check.html">Checkpoint</a>
+<a href="15-capstone.html">Capstone project</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-7.html">Observability: Prometheus &amp; Grafana</a>
+</div>
+<div class="secmeta">Module 07 · Section 12 of 15</div>
+
+<h2 id="lab">Lab: full observability stack</h2>
+<div class="box lab">
+<b>Goal</b>
+Instrument the app, deploy Prometheus and Grafana into the Module 6 cluster, build a golden-signals
+dashboard, then trigger an alert by breaking the app on purpose.
+</div>
+
+<h3>Step 1 — instrument and rebuild</h3>
+<pre><code>cd ~/devops/urlshort
+<span class="c"># add prometheus-client to requirements.txt and the code from 6.5 to app/main.py</span>
+
+docker build -t urlshort:0.3.0 .
+kind load docker-image urlshort:0.3.0 --name devops
+kubectl set image deployment/urlshort-api api=urlshort:0.3.0
+kubectl rollout status deployment/urlshort-api
+
+kubectl port-forward svc/urlshort-api 8080:80 &amp;
+curl -s localhost:8080/metrics | head -20</code></pre>
+
+<h3>Step 2 — install the monitoring stack</h3>
+<pre><code>curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+kubectl create namespace monitoring
+
+helm install kps prometheus-community/kube-prometheus-stack \
+  -n monitoring \
+  --set grafana.service.type=NodePort \
+  --set grafana.service.nodePort=30300 \
+  --set grafana.adminPassword=admin \
+  --wait
+
+kubectl get pods -n monitoring</code></pre>
+
+<h3>Step 3 — tell Prometheus to scrape your app</h3>
+<p>The stack installs the Prometheus Operator, so you declare scraping with a custom resource.
+<code>k8s/servicemonitor.yaml</code>:</p>
+<pre><code><span class="v">apiVersion</span>: monitoring.coreos.com/v1
+<span class="v">kind</span>: ServiceMonitor
+<span class="v">metadata</span>:
+  <span class="v">name</span>: urlshort-api
+  <span class="v">labels</span>:
+    <span class="v">release</span>: kps          <span class="c"># must match the helm release, or it is ignored</span>
+<span class="v">spec</span>:
+  <span class="v">selector</span>:
+    <span class="v">matchLabels</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: api }
+  <span class="v">endpoints</span>:
+    - <span class="v">port</span>: http
+      <span class="v">path</span>: /metrics
+      <span class="v">interval</span>: 15s</code></pre>
+
+<p>Two things must already be true of the Service, both of which you set in Module 6: its metadata carries
+the labels <code>app: urlshort, component: api</code> (that is what <code>selector.matchLabels</code>
+above matches — it selects the <b>Service</b>, not the pods), and its port is <b>named</b>
+<code>http</code>. Confirm, then apply:</p>
+<pre><code>kubectl get svc urlshort-api -o jsonpath='{.metadata.labels}{"\n"}{.spec.ports}{"\n"}'
+
+<span class="c"># if the port has no name, add it:</span>
+kubectl patch svc urlshort-api --type=json \
+  -p='[{"op":"add","path":"/spec/ports/0/name","value":"http"}]'
+
+kubectl apply -f k8s/servicemonitor.yaml</code></pre>
+
+<h3>Step 4 — verify the target is up</h3>
+<pre><code>kubectl port-forward -n monitoring svc/kps-kube-prometheus-stack-prometheus 9090:9090 &amp;
+<span class="c"># open http://localhost:9090/targets — urlshort-api should be UP</span></code></pre>
+
+<div class="box warn">
+<b>If the target does not appear</b>
+Three causes, in order of likelihood: (1) the ServiceMonitor's <code>release</code> label does not
+match the Helm release name; (2) the Service port has no <code>name</code>; (3) the
+<code>matchLabels</code> selector does not match the Service's labels. Check with
+<code>kubectl get servicemonitor -o yaml</code> and <code>kubectl get svc urlshort-api -o yaml</code>.
+</div>
+
+<h3>Step 5 — generate traffic</h3>
+<pre><code>kubectl port-forward svc/urlshort-api 8080:80 &amp;
+
+<span class="c"># steady successful traffic</span>
+for i in $(seq 1 300); do
+  curl -s -o /dev/null -X POST localhost:8080/shorten \
+    -H 'content-type: application/json' -d '{"url":"https://example.com"}'
+  curl -s -o /dev/null localhost:8080/health
+  sleep 0.2
+done &amp;
+
+<span class="c"># and some 404s for contrast</span>
+for i in $(seq 1 60); do curl -s -o /dev/null localhost:8080/r/nothere; sleep 0.5; done &amp;</code></pre>
+
+<h3>Step 6 — query in Prometheus</h3>
+<p>At <code>http://localhost:9090/graph</code>, try each of these:</p>
+<pre><code>sum by (route) (rate(http_requests_total[5m]))
+
+sum(rate(http_requests_total{status=~"4.."}[5m])) / sum(rate(http_requests_total[5m]))
+
+histogram_quantile(0.95,
+  sum by (le, route) (rate(http_request_duration_seconds_bucket[5m])))
+
+urlshort_links_stored</code></pre>
+
+<h3>Step 7 — build the dashboard</h3>
+<p>Open Grafana at <code>http://localhost:30300</code> (admin / admin). New dashboard, four panels:</p>
+<table>
+<tr><th>Panel</th><th>Query</th><th>Viz</th></tr>
+<tr><td>Traffic (req/s)</td><td><code>sum by (route) (rate(http_requests_total[5m]))</code></td><td>Time series</td></tr>
+<tr><td>Error ratio</td><td><code>sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m]))</code></td><td>Stat, unit: percent (0-1)</td></tr>
+<tr><td>p95 latency</td><td><code>histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))</code></td><td>Time series, unit: seconds</td></tr>
+<tr><td>Memory vs limit</td><td><code>container_memory_working_set_bytes{pod=~"urlshort-api.*"}</code></td><td>Time series, unit: bytes</td></tr>
+</table>
+<p>Save it, then export the JSON and commit it — dashboards are code too:</p>
+<pre><code>mkdir -p grafana
+<span class="c"># Dashboard settings → JSON Model → copy into grafana/urlshort.json</span>
+git add grafana &amp;&amp; git commit -m "feat: golden signals dashboard"</code></pre>
+
+<h3>Step 8 — an alert rule</h3>
+<p><code>k8s/alerts.yaml</code>:</p>
+<pre><code><span class="v">apiVersion</span>: monitoring.coreos.com/v1
+<span class="v">kind</span>: PrometheusRule
+<span class="v">metadata</span>:
+  <span class="v">name</span>: urlshort-alerts
+  <span class="v">labels</span>: { <span class="v">release</span>: kps }
+<span class="v">spec</span>:
+  <span class="v">groups</span>:
+    - <span class="v">name</span>: urlshort
+      <span class="v">rules</span>:
+        - <span class="v">alert</span>: UrlshortDown
+          <span class="v">expr</span>: up{job="urlshort-api"} == 0
+          <span class="v">for</span>: 1m
+          <span class="v">labels</span>: { <span class="v">severity</span>: page }
+          <span class="v">annotations</span>:
+            <span class="v">summary</span>: <span class="s">"urlshort-api target is down"</span>
+
+        - <span class="v">alert</span>: UrlshortHighErrorRate
+          <span class="v">expr</span>: |
+            sum(rate(http_requests_total{status=~"5.."}[2m]))
+              / sum(rate(http_requests_total[2m])) &gt; 0.05
+          <span class="v">for</span>: 2m
+          <span class="v">labels</span>: { <span class="v">severity</span>: page }
+          <span class="v">annotations</span>:
+            <span class="v">summary</span>: <span class="s">"5xx rate above 5%"</span></code></pre>
+
+<pre><code>kubectl apply -f k8s/alerts.yaml
+<span class="c"># http://localhost:9090/alerts — both should be listed as Inactive</span></code></pre>
+
+<h3>Step 9 — break it and watch the alert fire</h3>
+<pre><code><span class="c"># delete Redis: /health now returns 503, and 5xx rate spikes</span>
+kubectl scale deployment urlshort-redis --replicas=0
+
+<span class="c"># keep traffic flowing</span>
+for i in $(seq 1 200); do curl -s -o /dev/null localhost:8080/health; sleep 0.3; done &amp;
+
+<span class="c"># watch: Inactive -&gt; Pending (for: 2m) -&gt; Firing</span>
+<span class="c"># http://localhost:9090/alerts</span></code></pre>
+
+<p>Now observe what Kubernetes does simultaneously: readiness probes fail, pods leave the Service
+endpoints — but they are <b>not</b> restarted, because liveness is a separate concern.</p>
+<pre><code>kubectl get pods -l component=api
+<span class="c"># READY 0/3, STATUS Running, RESTARTS 0  ← exactly right</span>
+kubectl get endpoints urlshort-api</code></pre>
+
+<pre><code><span class="c"># restore</span>
+kubectl scale deployment urlshort-redis --replicas=1
+kubectl get pods -l app=urlshort -w
+<span class="c"># pods become Ready again on their own; the alert resolves</span></code></pre>
+
+<div class="box why">
+<b>What that exercise demonstrated</b>
+One dependency failure produced three coordinated behaviours you built across three modules:
+Kubernetes removed unhealthy pods from rotation without restarting them (Module 6), the app kept
+reporting accurate metrics throughout (Module 7), and recovery required no human action. That is what
+the whole course has been assembling.
+</div>
+
+<h3>Step 10 — commit and tidy up</h3>
+<pre><code>git add k8s grafana requirements.txt app/main.py
+git commit -m "feat: prometheus metrics, dashboard and alert rules"
+git push
+
+<span class="c"># when finished</span>
+kind delete cluster --name devops</code></pre>
+
+<div class="pager">
+  <a href="11-logs.html"><span class="sub">← Previous</span>7.11 Logs that are actually searchable</a>
+  <a href="13-ex.html" class="nx"><span class="sub">Next →</span>Exercises</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 7 · Lab: full observability stack</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

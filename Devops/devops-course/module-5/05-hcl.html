@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>5.5 HCL: variables, outputs, resources, data — Module 5 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-5.html">Module 5 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 05</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">5.1 The problem: snowflake servers and drift</a>
+<a href="02-decl.html">5.2 Declarative vs imperative</a>
+<a href="03-split.html">5.3 Terraform vs Ansible — the division of labour</a>
+<a href="04-tf.html">5.4 Terraform: the core loop</a>
+<a href="05-hcl.html" class="cur">5.5 HCL: variables, outputs, resources, data</a>
+<a href="06-state.html">5.6 State — the concept that trips everyone</a>
+<a href="07-mod.html">5.7 Modules and environments</a>
+<a href="08-ansible.html">5.8 Ansible: configuring what exists</a>
+<a href="09-idem.html">5.9 Idempotency, concretely</a>
+<a href="10-secrets.html">5.10 Secrets in infrastructure code</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html">Lab: provision and configure, locally</a>
+<a href="12-ex.html">Exercises</a>
+<a href="13-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-5.html">Infrastructure as Code: Terraform &amp; Ansible</a>
+</div>
+<div class="secmeta">Module 05 · Section 5 of 13</div>
+
+<h2 id="hcl">5.5 HCL: variables, outputs, resources, data</h2>
+<p>This course uses the <b>Docker provider</b> so everything runs locally with no cloud bill — the
+concepts are identical to AWS or Azure providers, only the resource names change.</p>
+
+<p><code>terraform/main.tf</code>:</p>
+<pre><code><span class="k">terraform</span> {
+  required_version = <span class="s">"&gt;= 1.6"</span>
+  required_providers {
+    docker = {
+      source  = <span class="s">"kreuzwerker/docker"</span>
+      version = <span class="s">"~&gt; 3.0"</span>
+    }
+  }
+}
+
+<span class="k">provider</span> <span class="s">"docker"</span> {}
+
+<span class="c"># a network, so containers can find each other by name</span>
+<span class="k">resource</span> <span class="s">"docker_network"</span> <span class="s">"app"</span> {
+  name = <span class="s">"${var.project}-net"</span>
+}
+
+<span class="c"># a named volume for redis persistence</span>
+<span class="k">resource</span> <span class="s">"docker_volume"</span> <span class="s">"redis_data"</span> {
+  name = <span class="s">"${var.project}-redis-data"</span>
+}
+
+<span class="c"># pull the image (data-like resource: describes something external)</span>
+<span class="k">resource</span> <span class="s">"docker_image"</span> <span class="s">"redis"</span> {
+  name         = <span class="s">"redis:7-alpine"</span>
+  keep_locally = <span class="k">true</span>
+}
+
+<span class="k">resource</span> <span class="s">"docker_container"</span> <span class="s">"redis"</span> {
+  name  = <span class="s">"${var.project}-redis"</span>
+  image = docker_image.redis.image_id
+
+  command = [<span class="s">"redis-server"</span>, <span class="s">"--appendonly"</span>, <span class="s">"yes"</span>]
+
+  networks_advanced {
+    name    = docker_network.app.name
+    aliases = [<span class="s">"redis"</span>]
+  }
+
+  volumes {
+    volume_name    = docker_volume.redis_data.name
+    container_path = <span class="s">"/data"</span>
+  }
+
+  restart = <span class="s">"unless-stopped"</span>
+}</code></pre>
+
+<p><code>terraform/variables.tf</code>:</p>
+<pre><code><span class="k">variable</span> <span class="s">"project"</span> {
+  description = <span class="s">"Name prefix for all resources"</span>
+  type        = string
+  default     = <span class="s">"urlshort"</span>
+}
+
+<span class="k">variable</span> <span class="s">"api_port"</span> {
+  description = <span class="s">"Host port to expose the API on"</span>
+  type        = number
+  default     = 8000
+
+  validation {
+    condition     = var.api_port &gt; 1024 &amp;&amp; var.api_port &lt; 65536
+    error_message = <span class="s">"api_port must be an unprivileged port."</span>
+  }
+}
+
+<span class="k">variable</span> <span class="s">"api_image"</span> {
+  description = <span class="s">"Fully qualified image, ideally tagged with a commit SHA"</span>
+  type        = string
+  default     = <span class="s">"urlshort:0.1.0"</span>
+}</code></pre>
+
+<p><code>terraform/outputs.tf</code> — outputs are how Terraform hands facts to the next tool:</p>
+<pre><code><span class="k">output</span> <span class="s">"api_url"</span> {
+  description = <span class="s">"Where the API is reachable"</span>
+  value       = <span class="s">"http://localhost:${var.api_port}"</span>
+}
+
+<span class="k">output</span> <span class="s">"network_name"</span> {
+  value = docker_network.app.name
+}</code></pre>
+
+<h3>Dependencies are inferred, not declared</h3>
+<p>Because <code>docker_container.redis</code> references <code>docker_network.app.name</code>,
+Terraform knows the network must exist first. You almost never write explicit ordering —
+it builds a dependency graph from the references and parallelises everything unrelated.
+Use <code>depends_on</code> only for dependencies that exist in reality but not in the code.</p>
+
+<div class="pager">
+  <a href="04-tf.html"><span class="sub">← Previous</span>5.4 Terraform: the core loop</a>
+  <a href="06-state.html" class="nx"><span class="sub">Next →</span>5.6 State — the concept that trips everyone</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 5 · 5.5 HCL: variables, outputs, resources, data</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

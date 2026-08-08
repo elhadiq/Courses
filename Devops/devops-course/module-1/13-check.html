@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Checkpoint — Module 1 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-1.html">Module 1 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 01</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">1.1 Why the terminal, still</a>
+<a href="02-fs.html">1.2 The filesystem and moving around it</a>
+<a href="03-perm.html">1.3 Permissions, users and sudo</a>
+<a href="04-pipes.html">1.4 Pipes: the idea that makes the shell powerful</a>
+<a href="05-proc.html">1.5 Processes, ports and logs</a>
+<a href="06-script.html">1.6 Writing a real shell script</a>
+<a href="07-ssh.html">1.7 SSH and keys</a>
+<a href="08-git.html">1.8 Git: the mental model</a>
+<a href="09-branch.html">1.9 Branching, merging and the conflict you will hit</a>
+<a href="10-flow.html">1.10 A workflow a team can actually live with</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html">Lab: bootstrap the course repository</a>
+<a href="12-ex.html">Exercises</a>
+<a href="13-check.html" class="cur">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-1.html">The Ground Floor: Linux, Shell &amp; Git</a>
+</div>
+<div class="secmeta">Module 01 · Section 13 of 13</div>
+
+<h2 id="check">Checkpoint</h2>
+
+<div class="quiz" data-answer="b">
+<div class="q">Your script runs <code>curl … | grep 200</code> and the curl fails, but the script keeps going. Why?</div>
+<button data-opt="a">Because <code>set -e</code> does not apply to scripts, only to interactive shells</button>
+<button data-opt="b">Because a pipeline's exit code is its <i>last</i> command's — you need <code>set -o pipefail</code></button>
+<button data-opt="c">Because grep swallows errors from stdin</button>
+<div class="fb">Without <code>pipefail</code>, bash reports only the final stage's status. <code>set -euo pipefail</code> at the top of every script prevents this whole class of silent failure.</div>
+</div>
+
+<div class="quiz" data-answer="c">
+<div class="q">You accidentally pushed a commit to <code>main</code> containing an API key. What is the correct first action?</div>
+<button data-opt="a">Add the file to <code>.gitignore</code> and push again</button>
+<button data-opt="b">Run <code>git reset --hard</code> and force-push</button>
+<button data-opt="c">Rotate the key at the provider immediately, then clean the history</button>
+<div class="fb">The key is already public the moment it is pushed — cleaning history does not un-leak it, and bots scrape public repos within minutes. Revocation first, cleanup second.</div>
+</div>
+
+<div class="quiz" data-answer="a">
+<div class="q">Why does the course insist branches live hours, not weeks?</div>
+<button data-opt="a">Merge difficulty grows with how far two branches diverge</button>
+<button data-opt="b">Git stores long branches less efficiently</button>
+<button data-opt="c">GitHub charges for stale branches</button>
+<div class="fb">It is a mechanical property, not a preference. Small, frequent integrations mean small, tractable conflicts — which is why continuous integration is called that.</div>
+</div>
+
+<div class="card">
+<b>You should now be able to, without notes:</b>
+<ul class="chk">
+<li>Navigate a server, find a config file in <code>/etc</code> and follow a log with <code>tail -f</code>.</li>
+<li>Chain <code>grep</code>/<code>awk</code>/<code>sort</code>/<code>uniq</code> to answer a question about a log file.</li>
+<li>Find which process holds a port and stop it.</li>
+<li>Write a script with strict mode, arguments, stderr output and correct exit codes.</li>
+<li>Generate an SSH key pair and authenticate to GitHub with it.</li>
+<li>Explain the four states of a change and pick the right undo command for each.</li>
+<li>Create a branch, merge it, and resolve a conflict without panic.</li>
+</ul>
+</div>
+
+<div class="pager">
+  <a href="12-ex.html"><span class="sub">← Previous</span>Exercises</a>
+  <a href="../module-2/01-why.html" class="nx"><span class="sub">Module 2 →</span>2.1 Why this module comes before Docker</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 1 · Checkpoint</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

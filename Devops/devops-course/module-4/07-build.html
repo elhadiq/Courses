@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4.7 Build and publish the image — Module 4 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-4.html">Module 4 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 04</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">4.1 What CI and CD actually mean</a>
+<a href="02-anatomy.html">4.2 Anatomy of a workflow</a>
+<a href="03-first.html">4.3 Your first pipeline: test on every push</a>
+<a href="04-services.html">4.4 Services: a real Redis for your tests</a>
+<a href="05-cache.html">4.5 Caching, and why pipelines get slow</a>
+<a href="06-quality.html">4.6 Quality gates: lint, format, type, scan</a>
+<a href="07-build.html" class="cur">4.7 Build and publish the image</a>
+<a href="08-secrets.html">4.8 Secrets, and how pipelines leak them</a>
+<a href="09-deploy.html">4.9 Deployment, environments and approvals</a>
+<a href="10-design.html">4.10 Designing a pipeline people trust</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html">Lab: the full pipeline</a>
+<a href="12-ex.html">Exercises</a>
+<a href="13-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-4.html">CI/CD with GitHub Actions</a>
+</div>
+<div class="secmeta">Module 04 · Section 7 of 13</div>
+
+<h2 id="build">4.7 Build and publish the image</h2>
+<p>This job only runs after tests pass, and only on <code>main</code> — pull requests should not
+publish images.</p>
+
+<pre><code>  <span class="v">build</span>:
+    <span class="v">needs</span>: [test, quality]
+    <span class="v">if</span>: github.ref == <span class="s">'refs/heads/main'</span>
+    <span class="v">runs-on</span>: ubuntu-latest
+    <span class="v">permissions</span>:
+      <span class="v">contents</span>: read
+      <span class="v">packages</span>: write
+
+    <span class="v">steps</span>:
+      - <span class="v">uses</span>: actions/checkout@v4
+      - <span class="v">uses</span>: docker/setup-buildx-action@v3
+
+      - <span class="v">name</span>: Log in to GHCR
+        <span class="v">uses</span>: docker/login-action@v3
+        <span class="v">with</span>:
+          <span class="v">registry</span>: ghcr.io
+          <span class="v">username</span>: ${{ github.actor }}
+          <span class="v">password</span>: ${{ secrets.GITHUB_TOKEN }}
+
+      - <span class="v">name</span>: Derive tags
+        <span class="v">id</span>: meta
+        <span class="v">uses</span>: docker/metadata-action@v5
+        <span class="v">with</span>:
+          <span class="v">images</span>: ghcr.io/${{ github.repository }}
+          <span class="v">tags</span>: |
+            type=sha,format=long
+            type=raw,value=latest
+
+      - <span class="v">name</span>: Build and push
+        <span class="v">uses</span>: docker/build-push-action@v6
+        <span class="v">with</span>:
+          <span class="v">context</span>: .
+          <span class="v">push</span>: <span class="k">true</span>
+          <span class="v">tags</span>: ${{ steps.meta.outputs.tags }}
+          <span class="v">labels</span>: ${{ steps.meta.outputs.labels }}
+          <span class="v">cache-from</span>: type=gha
+          <span class="v">cache-to</span>: type=gha,mode=max</code></pre>
+
+<div class="box why">
+<b>Why tag with the commit SHA</b>
+It makes the running system traceable in both directions: from a container you can find the exact
+commit, and from a commit you can find the exact image. During an incident, "which code is actually
+running right now" becomes a lookup instead of an investigation. <code>latest</code> is published as a
+convenience for humans, never used for deployment.
+</div>
+
+<p><code>secrets.GITHUB_TOKEN</code> is minted automatically per run and expires when the run ends —
+no PAT to create, store or rotate. Note it needs <code>permissions: packages: write</code> declared
+explicitly; the default is read-only, which is the correct default.</p>
+
+<div class="pager">
+  <a href="06-quality.html"><span class="sub">← Previous</span>4.6 Quality gates: lint, format, type, scan</a>
+  <a href="08-secrets.html" class="nx"><span class="sub">Next →</span>4.8 Secrets, and how pipelines leak them</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 4 · 4.7 Build and publish the image</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

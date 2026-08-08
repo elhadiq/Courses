@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Module 7 — Observability | Practical DevOps</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <a class="brand hm" href="index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="index.html">All modules</a>
+    <a href="module-6.html">← Prev</a>
+    <a href="#capstone">Capstone</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap">
+
+<div class="kicker" style="margin-top:40px">Module 07 · ~4 hours</div>
+<h1>Observability: Prometheus &amp; Grafana</h1>
+<p class="lead">You can now ship code automatically. This module is about knowing whether shipping it
+was a good idea — and finding out before your users tell you.</p>
+
+<div class="card toc">
+<b>In this module</b>
+<a href="#why">7.1 Monitoring vs observability</a>
+<a href="#pillars">7.2 Metrics, logs, traces</a>
+<a href="#prom">7.3 How Prometheus works</a>
+<a href="#types">7.4 Metric types, and the one everyone misuses</a>
+<a href="#instr">7.5 Instrumenting the application</a>
+<a href="#promql">7.6 PromQL, enough to be useful</a>
+<a href="#golden">7.7 The four golden signals</a>
+<a href="#grafana">7.8 Dashboards worth looking at</a>
+<a href="#alert">7.9 Alerting on symptoms, not causes</a>
+<a href="#slo">7.10 SLIs, SLOs and error budgets</a>
+<a href="#logs">7.11 Logs that are actually searchable</a>
+<a href="#lab">Lab: full observability stack</a>
+<a href="#ex">Exercises</a>
+<a href="#check">Checkpoint</a>
+<a href="#capstone">Capstone project</a>
+</div>
+
+<h2 id="why">7.1 Monitoring vs observability</h2>
+<p><b>Monitoring</b> answers questions you thought of in advance: is CPU above 80%, is the disk full,
+is the process alive. <b>Observability</b> is the property of a system that lets you answer questions
+you did <i>not</i> anticipate, from its outputs alone — "why are only Moroccan users on Android seeing
+slow checkouts since Tuesday?"</p>
+<p>You need both. Monitoring catches known failure modes cheaply. Observability is what you rely on
+during a novel incident, which by definition is the situation you did not plan for.</p>
+
+<div class="box why">
+<b>Why it exists</b>
+Deploying frequently is only safe if you can detect a bad deploy quickly. Without observability,
+continuous deployment is just continuously shipping unverified changes — the pipeline from Module 4
+becomes a faster way to break things.
+</div>
+
+<h2 id="pillars">7.2 Metrics, logs, traces</h2>
+<table>
+<tr><th></th><th>Metrics</th><th>Logs</th><th>Traces</th></tr>
+<tr><td>What</td><td>Numbers over time</td><td>Discrete events with detail</td><td>One request's path across services</td></tr>
+<tr><td>Answers</td><td><i>Is something wrong?</i></td><td><i>What exactly happened?</i></td><td><i>Where did the time go?</i></td></tr>
+<tr><td>Cost</td><td>Cheap, bounded</td><td>Expensive at volume</td><td>Moderate, usually sampled</td></tr>
+<tr><td>Cardinality</td><td>Must stay low</td><td>Unbounded is fine</td><td>Per-request</td></tr>
+<tr><td>Tool here</td><td>Prometheus</td><td>Loki / ELK</td><td>Jaeger / Tempo</td></tr>
+</table>
+<p>The usual workflow: a metric alerts you, a dashboard narrows the scope, logs or traces explain the
+individual failure. Metrics tell you <i>that</i>; logs and traces tell you <i>why</i>.</p>
+
+<h2 id="prom">7.3 How Prometheus works</h2>
+<p>Prometheus <b>pulls</b>. It periodically scrapes an HTTP endpoint — conventionally
+<code>/metrics</code> — on each target and stores the numbers as a time series. It does not receive
+pushes (except via a gateway for batch jobs).</p>
+
+<figure>
+<svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="10">
+  <g fill="none" stroke="var(--accent2)" stroke-width="1.3">
+    <rect x="20" y="20" width="130" height="34" rx="6"/>
+    <rect x="20" y="66" width="130" height="34" rx="6"/>
+    <rect x="20" y="112" width="130" height="34" rx="6"/>
+  </g>
+  <g fill="var(--txt)"><text x="34" y="41">api pod 1 /metrics</text><text x="34" y="87">api pod 2 /metrics</text>
+    <text x="34" y="133">redis-exporter</text></g>
+  <g fill="none" stroke="var(--accent)" stroke-width="1.4"><rect x="270" y="55" width="150" height="60" rx="8"/></g>
+  <text x="345" y="80" fill="var(--accent)" text-anchor="middle" font-size="12">Prometheus</text>
+  <text x="345" y="98" fill="var(--muted)" text-anchor="middle">TSDB + scraper + rules</text>
+  <g stroke="var(--accent2)" stroke-width="1.2" marker-end="url(#a6)">
+    <line x1="153" y1="37" x2="266" y2="70"/><line x1="153" y1="83" x2="266" y2="85"/>
+    <line x1="153" y1="129" x2="266" y2="100"/>
+  </g>
+  <g fill="none" stroke="var(--warn)" stroke-width="1.3">
+    <rect x="530" y="20" width="150" height="34" rx="6"/><rect x="530" y="66" width="150" height="34" rx="6"/>
+    <rect x="530" y="112" width="150" height="34" rx="6"/>
+  </g>
+  <g fill="var(--txt)"><text x="546" y="41">Grafana (dashboards)</text><text x="546" y="87">Alertmanager</text>
+    <text x="546" y="133">ad-hoc PromQL</text></g>
+  <g stroke="var(--warn)" stroke-width="1.2" marker-end="url(#a6b)">
+    <line x1="423" y1="70" x2="526" y2="37"/><line x1="423" y1="85" x2="526" y2="83"/>
+    <line x1="423" y1="100" x2="526" y2="129"/>
+  </g>
+  <defs>
+    <marker id="a6" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent2)"/></marker>
+    <marker id="a6b" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--warn)"/></marker>
+  </defs>
+  <text x="200" y="170" fill="var(--muted)" font-size="10">Prometheus scrapes targets on an interval — targets never push</text>
+</svg>
+<figcaption>Pull-based collection. Prometheus discovers targets and scrapes them.</figcaption>
+</figure>
+
+<p>Why pull is a deliberate choice: Prometheus always knows whether a target is reachable (a failed
+scrape is itself a signal), targets need no configuration about where to send data, and you can curl
+<code>/metrics</code> by hand to debug — which you will do constantly.</p>
+
+<p>A time series is a metric name plus labels:</p>
+<pre><code>http_requests_total{method="POST", path="/shorten", status="200"}  1547</code></pre>
+
+<div class="box warn">
+<b>Cardinality will kill your Prometheus</b>
+Each unique label combination is a separate series stored in memory. A label like
+<code>user_id</code> or <code>url</code> creates one series per distinct value — millions of them, and
+the server falls over. <b>Never</b> put unbounded values in labels: no IDs, no emails, no raw paths, no
+timestamps. Use <code>/r/{code}</code> as a templated route label, not the actual code.
+</div>
+
+<h2 id="types">7.4 Metric types, and the one everyone misuses</h2>
+<table>
+<tr><th>Type</th><th>Behaviour</th><th>Use for</th></tr>
+<tr><td><b>Counter</b></td><td>Only increases (resets to 0 on restart)</td><td>Requests, errors, bytes. Always query with <code>rate()</code>.</td></tr>
+<tr><td><b>Gauge</b></td><td>Goes up and down</td><td>Memory in use, queue depth, active connections, temperature.</td></tr>
+<tr><td><b>Histogram</b></td><td>Counts observations into buckets</td><td>Latency, payload sizes. Enables percentiles.</td></tr>
+<tr><td><b>Summary</b></td><td>Client-side quantiles</td><td>Rarely what you want — cannot be aggregated across instances.</td></tr>
+</table>
+
+
+<figure id="fig-mtypes">
+<svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <g stroke="var(--line)" fill="none" stroke-width="1">
+    <rect x="8" y="26" width="225" height="120" rx="7"/>
+    <rect x="247" y="26" width="225" height="120" rx="7"/>
+    <rect x="486" y="26" width="226" height="120" rx="7"/>
+  </g>
+  <g text-anchor="middle" font-size="11" fill="var(--accent)">
+    <text x="120" y="18">counter</text><text x="359" y="18">gauge</text><text x="599" y="18">histogram</text>
+  </g>
+  <polyline points="24,132 50,120 76,106 102,92 128,78 128,132 154,120 180,106 206,94"
+            fill="none" stroke="var(--accent2)" stroke-width="1.8"/>
+  <text x="120" y="162" fill="var(--muted)" text-anchor="middle" font-size="9">only goes up · resets on restart</text>
+  <text x="120" y="177" fill="var(--warn)" text-anchor="middle" font-size="9">always wrap in rate()</text>
+  <polyline points="263,100 289,78 315,112 341,66 367,94 393,72 419,118 445,88"
+            fill="none" stroke="var(--accent2)" stroke-width="1.8"/>
+  <text x="359" y="162" fill="var(--muted)" text-anchor="middle" font-size="9">up and down</text>
+  <text x="359" y="177" fill="var(--muted)" text-anchor="middle" font-size="9">memory · queue depth · replicas</text>
+  <g fill="var(--accent2)" opacity=".85">
+    <rect x="502" y="112" width="22" height="26"/><rect x="528" y="88" width="22" height="50"/>
+    <rect x="554" y="60" width="22" height="78"/><rect x="580" y="76" width="22" height="62"/>
+    <rect x="606" y="100" width="22" height="38"/><rect x="632" y="118" width="22" height="20"/>
+    <rect x="658" y="128" width="22" height="10"/>
+  </g>
+  <text x="599" y="162" fill="var(--muted)" text-anchor="middle" font-size="9">observations bucketed</text>
+  <text x="599" y="177" fill="var(--muted)" text-anchor="middle" font-size="9">gives you percentiles</text>
+  <text x="8" y="196" fill="var(--muted)" font-size="10">"how often?" → counter · "how much now?" → gauge · "how slow, for whom?" → histogram</text>
+</svg>
+<figcaption>The three metric types you will actually use, and their shapes.</figcaption>
+</figure>
+
+<div class="box">
+<b>Never graph a counter directly</b>
+A counter's raw value is a meaningless ever-growing line that resets to zero on restart. What you want
+is its rate of change: <code>rate(http_requests_total[5m])</code> gives requests per second, and
+<code>rate()</code> handles the resets correctly. This is the most common beginner mistake in PromQL.
+</div>
+
+<h2 id="instr">7.5 Instrumenting the application</h2>
+<p>Add to <code>requirements.txt</code>:</p>
+<pre><code>prometheus-client==0.21.0</code></pre>
+
+<p>Add to <code>app/main.py</code>:</p>
+<pre><code><span class="k">import</span> time
+<span class="k">from</span> fastapi <span class="k">import</span> Request
+<span class="k">from</span> fastapi.responses <span class="k">import</span> Response
+<span class="k">from</span> prometheus_client <span class="k">import</span> (
+    Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
+)
+
+REQUESTS = Counter(
+    <span class="s">"http_requests_total"</span>,
+    <span class="s">"Total HTTP requests"</span>,
+    [<span class="s">"method"</span>, <span class="s">"route"</span>, <span class="s">"status"</span>],
+)
+
+LATENCY = Histogram(
+    <span class="s">"http_request_duration_seconds"</span>,
+    <span class="s">"Request latency in seconds"</span>,
+    [<span class="s">"method"</span>, <span class="s">"route"</span>],
+    buckets=(0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0),
+)
+
+LINKS = Gauge(<span class="s">"urlshort_links_stored"</span>, <span class="s">"Number of short links in redis"</span>)
+
+<span class="v">@app.middleware</span>(<span class="s">"http"</span>)
+<span class="k">async</span> <span class="k">def</span> observe(request: Request, call_next):
+    start = time.perf_counter()
+    response = <span class="k">await</span> call_next(request)
+    elapsed = time.perf_counter() - start
+
+    <span class="c"># IMPORTANT: the templated route, not the concrete path.</span>
+    <span class="c"># "/r/{code}" is one series; "/r/abc1234" would be one series PER LINK.</span>
+    route = request.scope.get(<span class="s">"route"</span>)
+    route_label = getattr(route, <span class="s">"path"</span>, <span class="s">"unmatched"</span>)
+
+    REQUESTS.labels(request.method, route_label, response.status_code).inc()
+    LATENCY.labels(request.method, route_label).observe(elapsed)
+    <span class="k">return</span> response
+
+<span class="v">@app.get</span>(<span class="s">"/metrics"</span>)
+<span class="k">def</span> metrics():
+    <span class="k">try</span>:
+        LINKS.set(len(r.keys(<span class="s">"url:*"</span>)))
+    <span class="k">except</span> Exception:
+        <span class="k">pass</span>
+    <span class="k">return</span> Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)</code></pre>
+
+<pre><code>curl -s localhost:8000/metrics | grep http_requests_total
+<span class="c"># http_requests_total{method="GET",route="/health",status="200"} 4.0</span></code></pre>
+
+<div class="box warn">
+<b>The <code>LINKS</code> gauge above is a teaching example, not production code</b>
+<code>KEYS *</code> scans the entire Redis keyspace and blocks the server — fine with 50 keys,
+catastrophic with 50 million. In production use a counter incremented on write, or Redis's own
+<code>dbsize</code>. Cheap-looking instrumentation that degrades under load is a classic own goal.
+</div>
+
+<h2 id="promql">7.6 PromQL, enough to be useful</h2>
+<pre><code><span class="c"># requests per second over the last 5 minutes, by route</span>
+sum by (route) (rate(http_requests_total[5m]))
+
+<span class="c"># error ratio (0..1) — the numerator/denominator pattern you will reuse constantly</span>
+sum(rate(http_requests_total{status=~"5.."}[5m]))
+  /
+sum(rate(http_requests_total[5m]))
+
+<span class="c"># 95th percentile latency from a histogram</span>
+histogram_quantile(
+  0.95,
+  sum by (le, route) (rate(http_request_duration_seconds_bucket[5m]))
+)
+
+<span class="c"># is anything down? (up is a synthetic metric Prometheus generates per target)</span>
+up{job="urlshort-api"} == 0
+
+<span class="c"># memory per pod</span>
+container_memory_working_set_bytes{pod=~"urlshort-.*"}</code></pre>
+
+<div class="box">
+<b>Two rules that prevent most PromQL confusion</b>
+<ul style="margin:.4em 0 0">
+<li><code>rate()</code> before <code>sum()</code>, never the reverse. Summing counters across
+instances first produces nonsense when one instance restarts and resets.</li>
+<li>The range in <code>[5m]</code> must cover at least four scrape intervals, or
+<code>rate()</code> gets too few samples and returns nothing.</li>
+</ul>
+</div>
+
+<h2 id="golden">7.7 The four golden signals</h2>
+<p>From Google's SRE practice — if you instrument only four things, instrument these:</p>
+<table>
+<tr><th>Signal</th><th>Question</th><th>PromQL</th></tr>
+<tr><td><b>Latency</b></td><td>How slow, especially for the unlucky?</td><td><code>histogram_quantile(0.95, …)</code></td></tr>
+<tr><td><b>Traffic</b></td><td>How much demand?</td><td><code>sum(rate(http_requests_total[5m]))</code></td></tr>
+<tr><td><b>Errors</b></td><td>What fraction is failing?</td><td><code>rate(…{status=~"5.."}[5m]) / rate(…[5m])</code></td></tr>
+<tr><td><b>Saturation</b></td><td>How close to a limit?</td><td>memory used ÷ memory limit, queue depth</td></tr>
+</table>
+<div class="box why">
+<b>Why percentiles instead of averages</b>
+Average latency hides your worst experiences. If 95% of requests take 50 ms and 5% take 10 seconds,
+the average is a comfortable 550 ms while one user in twenty is having a terrible time. Always look at
+p95 and p99 — those are real users, and often your most active ones.
+</div>
+
+
+<figure id="fig-p95">
+<svg viewBox="0 0 720 242" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <text x="8" y="16" fill="var(--muted)" font-size="10">distribution of request latency — why the average is a comforting lie</text>
+  <g stroke="var(--line)" stroke-width="1"><line x1="50" y1="170" x2="700" y2="170"/></g>
+  <path d="M50,170 C110,170 120,60 175,58 C230,56 245,140 300,156 C360,172 420,166 470,164
+           C540,162 600,163 700,163"
+        fill="color-mix(in srgb,var(--accent2) 22%,transparent)" stroke="var(--accent2)" stroke-width="1.6"/>
+  <g stroke="var(--ok)" stroke-width="1.6" stroke-dasharray="5 3"><line x1="205" y1="40" x2="205" y2="170"/></g>
+  <text x="205" y="34" fill="var(--ok)" text-anchor="middle" font-size="10">average 55 ms</text>
+  <text x="205" y="186" fill="var(--muted)" text-anchor="middle" font-size="9">"everything is fine"</text>
+  <g stroke="var(--warn)" stroke-width="1.6" stroke-dasharray="5 3"><line x1="470" y1="40" x2="470" y2="170"/></g>
+  <text x="470" y="34" fill="var(--warn)" text-anchor="middle" font-size="10">p95 = 1.2 s</text>
+  <g stroke="var(--err)" stroke-width="1.6" stroke-dasharray="5 3"><line x1="620" y1="40" x2="620" y2="170"/></g>
+  <text x="620" y="34" fill="var(--err)" text-anchor="middle" font-size="10">p99 = 4 s</text>
+  <path d="M470 150 H700 V170 H470 Z" fill="color-mix(in srgb,var(--err) 30%,transparent)"/>
+  <text x="585" y="186" fill="var(--err)" text-anchor="middle" font-size="9">the tail — 1 user in 20 lives here</text>
+  <g fill="var(--muted)" font-size="9" text-anchor="middle">
+    <text x="120" y="186">fast</text><text x="300" y="186">typical</text>
+  </g>
+  <text x="8" y="208" fill="var(--muted)" font-size="10">95% at 50 ms and 5% at 10 s averages to a healthy-looking 550 ms —</text>
+  <text x="8" y="220" fill="var(--muted)" font-size="10">while one user in twenty is having a terrible time.</text>
+  <text x="8" y="233" fill="var(--warn)" font-size="10">Alert on p95/p99. Those are real people, and often your heaviest users.</text>
+</svg>
+<figcaption>Averages hide the tail. Percentiles are where user pain actually shows up.</figcaption>
+</figure>
+
+<h2 id="grafana">7.8 Dashboards worth looking at</h2>
+<p>Most dashboards fail by showing everything. A useful one answers a specific question fast.</p>
+<ul>
+<li><b>Top row: the four golden signals.</b> If those are green, you are probably fine.</li>
+<li><b>One dashboard per service</b>, plus one overview across services.</li>
+<li><b>Annotate deploys.</b> Half of all incidents correlate with a release; a vertical line at each
+deploy turns a mystery into an obvious answer.</li>
+<li><b>Fewer panels.</b> A dashboard with 40 graphs is one nobody reads under pressure.</li>
+</ul>
+
+<h2 id="alert">7.9 Alerting on symptoms, not causes</h2>
+<p>Alert on what users experience, not on every internal condition that <i>might</i> cause a problem.</p>
+
+<table>
+<tr><th>Bad alert</th><th>Why</th><th>Better</th></tr>
+<tr><td>CPU &gt; 80%</td><td>High CPU is often just work being done. Users may be perfectly happy.</td><td>p95 latency &gt; 1s for 10 minutes</td></tr>
+<tr><td>A pod restarted</td><td>Kubernetes restarts pods routinely; that is the design working.</td><td>Error rate &gt; 5% for 5 minutes</td></tr>
+<tr><td>Disk 70% full</td><td>Fires for weeks with no action possible.</td><td>Disk will be full in &lt; 4 hours (predict_linear)</td></tr>
+</table>
+
+<pre><code><span class="v">groups</span>:
+  - <span class="v">name</span>: urlshort
+    <span class="v">rules</span>:
+      - <span class="v">alert</span>: HighErrorRate
+        <span class="v">expr</span>: |
+          sum(rate(http_requests_total{status=~"5.."}[5m]))
+            / sum(rate(http_requests_total[5m])) &gt; 0.05
+        <span class="v">for</span>: 5m
+        <span class="v">labels</span>: { <span class="v">severity</span>: page }
+        <span class="v">annotations</span>:
+          <span class="v">summary</span>: <span class="s">"5xx rate above 5% for 5 minutes"</span>
+          <span class="v">description</span>: <span class="s">"Currently {{ $value | humanizePercentage }}."</span>
+          <span class="v">runbook</span>: <span class="s">"https://wiki/runbooks/urlshort-high-error-rate"</span>
+
+      - <span class="v">alert</span>: HighLatency
+        <span class="v">expr</span>: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(http_request_duration_seconds_bucket[5m]))) &gt; 1
+        <span class="v">for</span>: 10m
+        <span class="v">labels</span>: { <span class="v">severity</span>: ticket }
+
+      - <span class="v">alert</span>: ServiceDown
+        <span class="v">expr</span>: up{job="urlshort-api"} == 0
+        <span class="v">for</span>: 2m
+        <span class="v">labels</span>: { <span class="v">severity</span>: page }</code></pre>
+
+<div class="box warn">
+<b><code>for:</code> is what stops pager fatigue</b>
+It requires the condition to hold continuously before firing, so a 30-second blip never wakes anyone.
+Every alert that pages a human should meet three tests: it is <b>urgent</b> (needs action now),
+<b>actionable</b> (a human can do something), and it points to a <b>runbook</b>. If it fails any of
+those, make it a ticket or delete it. Alerts people learn to ignore are worse than no alerts.
+</div>
+
+
+<figure id="fig-alertstate">
+<svg viewBox="0 0 720 165" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <defs><marker id="as1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent2)"/></marker></defs>
+  <g stroke="var(--ok)" fill="none" stroke-width="1.4"><rect x="8" y="46" width="150" height="52" rx="8"/></g>
+  <text x="83" y="68" fill="var(--ok)" text-anchor="middle" font-size="11">Inactive</text>
+  <text x="83" y="84" fill="var(--muted)" text-anchor="middle" font-size="9">expr is false</text>
+  <g stroke="var(--warn)" fill="none" stroke-width="1.4"><rect x="248" y="46" width="150" height="52" rx="8"/></g>
+  <text x="323" y="68" fill="var(--warn)" text-anchor="middle" font-size="11">Pending</text>
+  <text x="323" y="84" fill="var(--muted)" text-anchor="middle" font-size="9">true, but not yet for 5m</text>
+  <g stroke="var(--err)" fill="none" stroke-width="1.4"><rect x="488" y="46" width="150" height="52" rx="8"/></g>
+  <text x="563" y="68" fill="var(--err)" text-anchor="middle" font-size="11">Firing</text>
+  <text x="563" y="84" fill="var(--muted)" text-anchor="middle" font-size="9">pages a human</text>
+  <g stroke="var(--accent2)" stroke-width="1.4" marker-end="url(#as1)">
+    <line x1="162" y1="72" x2="244" y2="72"/><line x1="402" y1="72" x2="484" y2="72"/>
+  </g>
+  <g fill="var(--accent2)" text-anchor="middle" font-size="9">
+    <text x="203" y="64">expr true</text><text x="443" y="64">held for: 5m</text>
+  </g>
+  <path d="M323 100 C323 124 83 124 83 102" stroke="var(--ok)" fill="none" stroke-width="1.3" marker-end="url(#as1)"/>
+  <text x="203" y="142" fill="var(--ok)" text-anchor="middle" font-size="9">resolved before 5m — nobody woken</text>
+  <text x="8" y="26" fill="var(--muted)" font-size="10">the <tspan fill="var(--txt)">for:</tspan> clause is what stands between a 30-second blip and a 3 a.m. phone call</text>
+  <text x="8" y="158" fill="var(--warn)" font-size="10">Every paging alert must be urgent, actionable, and carry a runbook. If it fails any one of those, make it a ticket.</text>
+</svg>
+<figcaption>The for: clause filters transient spikes out of your pager.</figcaption>
+</figure>
+
+<h2 id="slo">7.10 SLIs, SLOs and error budgets</h2>
+<ul>
+<li><b>SLI</b> — the measurement. "Proportion of requests served in under 300 ms."</li>
+<li><b>SLO</b> — your target. "99.5% of requests under 300 ms over 30 days."</li>
+<li><b>Error budget</b> — 100% minus the SLO. At 99.5%, you may fail 0.5% of requests: about
+3.6 hours per month.</li>
+</ul>
+<p>The error budget is what makes this operationally useful rather than a slogan. Budget remaining
+means you can ship aggressively. Budget exhausted means you stop feature work and spend on
+reliability. It converts "how fast should we ship?" from an argument into a number.</p>
+
+<div class="box why">
+<b>Why 100% is the wrong target</b>
+Each additional nine costs roughly an order of magnitude more and buys less. Beyond a point your
+users cannot perceive the difference — their own network is less reliable than your service.
+Deliberately choosing a target below 100% is what buys you the freedom to deploy at all.
+</div>
+
+
+<figure id="fig-budget">
+<svg viewBox="0 0 720 230" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <text x="8" y="16" fill="var(--muted)" font-size="10">error budget for a 99.5% / 30-day SLO — you may fail 0.5% of requests (~3.6 h)</text>
+  <g stroke="var(--line)" stroke-width="1"><line x1="52" y1="176" x2="700" y2="176"/><line x1="52" y1="30" x2="52" y2="176"/></g>
+  <g fill="var(--muted)" font-size="9" text-anchor="end">
+    <text x="46" y="36">100%</text><text x="46" y="106">50%</text><text x="46" y="180">0%</text>
+  </g>
+  <g fill="var(--muted)" font-size="9" text-anchor="middle">
+    <text x="52" y="192">day 0</text><text x="376" y="192">day 15</text><text x="700" y="192">day 30</text>
+  </g>
+  <line x1="52" y1="32" x2="700" y2="176" stroke="var(--muted)" stroke-dasharray="4 4" stroke-width="1"/>
+  <text x="250" y="104" fill="var(--muted)" font-size="9">sustainable burn</text>
+  <polyline points="52,32 130,50 200,62 270,70 340,92 380,150 420,158 500,163 580,168 700,172"
+            fill="none" stroke="var(--accent2)" stroke-width="2"/>
+  <circle cx="340" cy="92" r="4" fill="var(--err)"/>
+  <text x="330" y="62" fill="var(--err)" text-anchor="end" font-size="9">bad deploy</text>
+  <g stroke="var(--err)" stroke-width="1.2" stroke-dasharray="3 3"><line x1="380" y1="30" x2="380" y2="176"/></g>
+  <path d="M380 150 H700 V176 H380 Z" fill="color-mix(in srgb,var(--err) 18%,transparent)"/>
+  <text x="596" y="64" fill="var(--err)" text-anchor="middle" font-size="10">budget nearly gone</text>
+  <text x="596" y="78" fill="var(--muted)" text-anchor="middle" font-size="9">freeze features, fix reliability</text>
+  <text x="150" y="120" fill="var(--ok)" font-size="10">budget healthy</text>
+  <text x="150" y="134" fill="var(--muted)" font-size="9">ship aggressively</text>
+  <text x="8" y="212" fill="var(--muted)" font-size="10">The budget turns "how fast should we ship?" from an argument into a number that both sides can read off a chart.</text>
+  <text x="8" y="226" fill="var(--warn)" font-size="10">This is why 100% is the wrong target: a zero budget means you can never deploy anything.</text>
+</svg>
+<figcaption>An error budget makes release pace a measurement rather than an opinion.</figcaption>
+</figure>
+
+<h2 id="logs">7.11 Logs that are actually searchable</h2>
+<p>Structured logs — one JSON object per line — are greppable <i>and</i> queryable:</p>
+<pre><code><span class="k">import</span> json, logging, sys
+
+<span class="k">class</span> JsonFormatter(logging.Formatter):
+    <span class="k">def</span> format(self, record):
+        <span class="k">return</span> json.dumps({
+            <span class="s">"ts"</span>: self.formatTime(record),
+            <span class="s">"level"</span>: record.levelname,
+            <span class="s">"msg"</span>: record.getMessage(),
+            <span class="s">"logger"</span>: record.name,
+            **getattr(record, <span class="s">"extra_fields"</span>, {}),
+        })
+
+handler = logging.StreamHandler(sys.stdout)   <span class="c"># stdout, always</span>
+handler.setFormatter(JsonFormatter())
+logging.basicConfig(handlers=[handler], level=logging.INFO)</code></pre>
+
+<p>Three rules that matter more than the format:</p>
+<ol>
+<li><b>Log to stdout.</b> The container runtime collects it. A log file inside a container is lost when
+the pod dies — exactly when you need it.</li>
+<li><b>Include a request ID</b> and propagate it across services, so one user's journey is one query.</li>
+<li><b>Never log secrets or personal data.</b> Logs are widely readable and retained for a long time;
+this is a compliance problem as much as a security one.</li>
+</ol>
+
+<h2 id="lab">Lab: full observability stack</h2>
+<div class="box lab">
+<b>Goal</b>
+Instrument the app, deploy Prometheus and Grafana into the Module 6 cluster, build a golden-signals
+dashboard, then trigger an alert by breaking the app on purpose.
+</div>
+
+<h3>Step 1 — instrument and rebuild</h3>
+<pre><code>cd ~/devops/urlshort
+<span class="c"># add prometheus-client to requirements.txt and the code from 6.5 to app/main.py</span>
+
+docker build -t urlshort:0.3.0 .
+kind load docker-image urlshort:0.3.0 --name devops
+kubectl set image deployment/urlshort-api api=urlshort:0.3.0
+kubectl rollout status deployment/urlshort-api
+
+kubectl port-forward svc/urlshort-api 8080:80 &amp;
+curl -s localhost:8080/metrics | head -20</code></pre>
+
+<h3>Step 2 — install the monitoring stack</h3>
+<pre><code>curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+kubectl create namespace monitoring
+
+helm install kps prometheus-community/kube-prometheus-stack \
+  -n monitoring \
+  --set grafana.service.type=NodePort \
+  --set grafana.service.nodePort=30300 \
+  --set grafana.adminPassword=admin \
+  --wait
+
+kubectl get pods -n monitoring</code></pre>
+
+<h3>Step 3 — tell Prometheus to scrape your app</h3>
+<p>The stack installs the Prometheus Operator, so you declare scraping with a custom resource.
+<code>k8s/servicemonitor.yaml</code>:</p>
+<pre><code><span class="v">apiVersion</span>: monitoring.coreos.com/v1
+<span class="v">kind</span>: ServiceMonitor
+<span class="v">metadata</span>:
+  <span class="v">name</span>: urlshort-api
+  <span class="v">labels</span>:
+    <span class="v">release</span>: kps          <span class="c"># must match the helm release, or it is ignored</span>
+<span class="v">spec</span>:
+  <span class="v">selector</span>:
+    <span class="v">matchLabels</span>: { <span class="v">app</span>: urlshort, <span class="v">component</span>: api }
+  <span class="v">endpoints</span>:
+    - <span class="v">port</span>: http
+      <span class="v">path</span>: /metrics
+      <span class="v">interval</span>: 15s</code></pre>
+
+<p>Two things must already be true of the Service, both of which you set in Module 6: its metadata carries
+the labels <code>app: urlshort, component: api</code> (that is what <code>selector.matchLabels</code>
+above matches — it selects the <b>Service</b>, not the pods), and its port is <b>named</b>
+<code>http</code>. Confirm, then apply:</p>
+<pre><code>kubectl get svc urlshort-api -o jsonpath='{.metadata.labels}{"\n"}{.spec.ports}{"\n"}'
+
+<span class="c"># if the port has no name, add it:</span>
+kubectl patch svc urlshort-api --type=json \
+  -p='[{"op":"add","path":"/spec/ports/0/name","value":"http"}]'
+
+kubectl apply -f k8s/servicemonitor.yaml</code></pre>
+
+<h3>Step 4 — verify the target is up</h3>
+<pre><code>kubectl port-forward -n monitoring svc/kps-kube-prometheus-stack-prometheus 9090:9090 &amp;
+<span class="c"># open http://localhost:9090/targets — urlshort-api should be UP</span></code></pre>
+
+<div class="box warn">
+<b>If the target does not appear</b>
+Three causes, in order of likelihood: (1) the ServiceMonitor's <code>release</code> label does not
+match the Helm release name; (2) the Service port has no <code>name</code>; (3) the
+<code>matchLabels</code> selector does not match the Service's labels. Check with
+<code>kubectl get servicemonitor -o yaml</code> and <code>kubectl get svc urlshort-api -o yaml</code>.
+</div>
+
+<h3>Step 5 — generate traffic</h3>
+<pre><code>kubectl port-forward svc/urlshort-api 8080:80 &amp;
+
+<span class="c"># steady successful traffic</span>
+for i in $(seq 1 300); do
+  curl -s -o /dev/null -X POST localhost:8080/shorten \
+    -H 'content-type: application/json' -d '{"url":"https://example.com"}'
+  curl -s -o /dev/null localhost:8080/health
+  sleep 0.2
+done &amp;
+
+<span class="c"># and some 404s for contrast</span>
+for i in $(seq 1 60); do curl -s -o /dev/null localhost:8080/r/nothere; sleep 0.5; done &amp;</code></pre>
+
+<h3>Step 6 — query in Prometheus</h3>
+<p>At <code>http://localhost:9090/graph</code>, try each of these:</p>
+<pre><code>sum by (route) (rate(http_requests_total[5m]))
+
+sum(rate(http_requests_total{status=~"4.."}[5m])) / sum(rate(http_requests_total[5m]))
+
+histogram_quantile(0.95,
+  sum by (le, route) (rate(http_request_duration_seconds_bucket[5m])))
+
+urlshort_links_stored</code></pre>
+
+<h3>Step 7 — build the dashboard</h3>
+<p>Open Grafana at <code>http://localhost:30300</code> (admin / admin). New dashboard, four panels:</p>
+<table>
+<tr><th>Panel</th><th>Query</th><th>Viz</th></tr>
+<tr><td>Traffic (req/s)</td><td><code>sum by (route) (rate(http_requests_total[5m]))</code></td><td>Time series</td></tr>
+<tr><td>Error ratio</td><td><code>sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m]))</code></td><td>Stat, unit: percent (0-1)</td></tr>
+<tr><td>p95 latency</td><td><code>histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))</code></td><td>Time series, unit: seconds</td></tr>
+<tr><td>Memory vs limit</td><td><code>container_memory_working_set_bytes{pod=~"urlshort-api.*"}</code></td><td>Time series, unit: bytes</td></tr>
+</table>
+<p>Save it, then export the JSON and commit it — dashboards are code too:</p>
+<pre><code>mkdir -p grafana
+<span class="c"># Dashboard settings → JSON Model → copy into grafana/urlshort.json</span>
+git add grafana &amp;&amp; git commit -m "feat: golden signals dashboard"</code></pre>
+
+<h3>Step 8 — an alert rule</h3>
+<p><code>k8s/alerts.yaml</code>:</p>
+<pre><code><span class="v">apiVersion</span>: monitoring.coreos.com/v1
+<span class="v">kind</span>: PrometheusRule
+<span class="v">metadata</span>:
+  <span class="v">name</span>: urlshort-alerts
+  <span class="v">labels</span>: { <span class="v">release</span>: kps }
+<span class="v">spec</span>:
+  <span class="v">groups</span>:
+    - <span class="v">name</span>: urlshort
+      <span class="v">rules</span>:
+        - <span class="v">alert</span>: UrlshortDown
+          <span class="v">expr</span>: up{job="urlshort-api"} == 0
+          <span class="v">for</span>: 1m
+          <span class="v">labels</span>: { <span class="v">severity</span>: page }
+          <span class="v">annotations</span>:
+            <span class="v">summary</span>: <span class="s">"urlshort-api target is down"</span>
+
+        - <span class="v">alert</span>: UrlshortHighErrorRate
+          <span class="v">expr</span>: |
+            sum(rate(http_requests_total{status=~"5.."}[2m]))
+              / sum(rate(http_requests_total[2m])) &gt; 0.05
+          <span class="v">for</span>: 2m
+          <span class="v">labels</span>: { <span class="v">severity</span>: page }
+          <span class="v">annotations</span>:
+            <span class="v">summary</span>: <span class="s">"5xx rate above 5%"</span></code></pre>
+
+<pre><code>kubectl apply -f k8s/alerts.yaml
+<span class="c"># http://localhost:9090/alerts — both should be listed as Inactive</span></code></pre>
+
+<h3>Step 9 — break it and watch the alert fire</h3>
+<pre><code><span class="c"># delete Redis: /health now returns 503, and 5xx rate spikes</span>
+kubectl scale deployment urlshort-redis --replicas=0
+
+<span class="c"># keep traffic flowing</span>
+for i in $(seq 1 200); do curl -s -o /dev/null localhost:8080/health; sleep 0.3; done &amp;
+
+<span class="c"># watch: Inactive -&gt; Pending (for: 2m) -&gt; Firing</span>
+<span class="c"># http://localhost:9090/alerts</span></code></pre>
+
+<p>Now observe what Kubernetes does simultaneously: readiness probes fail, pods leave the Service
+endpoints — but they are <b>not</b> restarted, because liveness is a separate concern.</p>
+<pre><code>kubectl get pods -l component=api
+<span class="c"># READY 0/3, STATUS Running, RESTARTS 0  ← exactly right</span>
+kubectl get endpoints urlshort-api</code></pre>
+
+<pre><code><span class="c"># restore</span>
+kubectl scale deployment urlshort-redis --replicas=1
+kubectl get pods -l app=urlshort -w
+<span class="c"># pods become Ready again on their own; the alert resolves</span></code></pre>
+
+<div class="box why">
+<b>What that exercise demonstrated</b>
+One dependency failure produced three coordinated behaviours you built across three modules:
+Kubernetes removed unhealthy pods from rotation without restarting them (Module 6), the app kept
+reporting accurate metrics throughout (Module 7), and recovery required no human action. That is what
+the whole course has been assembling.
+</div>
+
+<h3>Step 10 — commit and tidy up</h3>
+<pre><code>git add k8s grafana requirements.txt app/main.py
+git commit -m "feat: prometheus metrics, dashboard and alert rules"
+git push
+
+<span class="c"># when finished</span>
+kind delete cluster --name devops</code></pre>
+
+<h2 id="ex">Exercises</h2>
+
+<h3>Exercise 1 — a business metric</h3>
+<p>Add a counter for successful redirects, labelled by whether the code was found. Then chart the
+miss rate.</p>
+<details><summary>Solution</summary>
+<pre><code>REDIRECTS = Counter(<span class="s">"urlshort_redirects_total"</span>, <span class="s">"Redirect attempts"</span>, [<span class="s">"result"</span>])
+
+<span class="c"># in follow():</span>
+<span class="k">if</span> <span class="k">not</span> url:
+    REDIRECTS.labels(<span class="s">"miss"</span>).inc()
+    <span class="k">raise</span> HTTPException(status_code=404, detail=<span class="s">"unknown code"</span>)
+REDIRECTS.labels(<span class="s">"hit"</span>).inc()</code></pre>
+<pre><code>sum(rate(urlshort_redirects_total{result="miss"}[5m]))
+  / sum(rate(urlshort_redirects_total[5m]))</code></pre>
+<p>Note the label has exactly two values. That is what makes it safe — <code>result="hit"|"miss"</code>
+is bounded, whereas labelling by the code itself would be unbounded.</p>
+</details>
+
+<h3>Exercise 2 — predictive disk alert</h3>
+<p>Alert when a disk will fill within four hours, rather than at a fixed percentage.</p>
+<details><summary>Solution</summary>
+<pre><code>- <span class="v">alert</span>: DiskWillFillIn4Hours
+  <span class="v">expr</span>: |
+    predict_linear(node_filesystem_avail_bytes{mountpoint="/"}[6h], 4*3600) &lt; 0
+  <span class="v">for</span>: 15m
+  <span class="v">labels</span>: { <span class="v">severity</span>: page }</code></pre>
+<p><code>predict_linear</code> extrapolates the trend of the last 6 hours forward 4 hours. This is
+strictly better than a static threshold: a disk sitting stably at 85% never pages anyone, while one
+climbing fast from 40% does — which matches what actually requires action.</p>
+</details>
+
+<h3>Exercise 3 — find the cardinality bomb</h3>
+<p>What is wrong, and what breaks?</p>
+<pre><code>REQUESTS = Counter(<span class="s">"http_requests_total"</span>, <span class="s">"..."</span>,
+                   [<span class="s">"method"</span>, <span class="s">"path"</span>, <span class="s">"user_id"</span>, <span class="s">"status"</span>])
+REQUESTS.labels(request.method, request.url.path, user_id, status).inc()</code></pre>
+<details><summary>Solution</summary>
+<p><code>user_id</code> is unbounded — one series per user. <code>request.url.path</code> is also
+unbounded here because <code>/r/{code}</code> expands to a distinct path per short link. With 100k
+users and 1M links the series count is astronomical; Prometheus exhausts memory and is OOM-killed,
+taking your monitoring down at the exact moment you need it.</p>
+<p>Fix: use the templated route, drop <code>user_id</code> entirely. Per-user detail belongs in logs or
+traces, which are designed for high cardinality.</p>
+</details>
+
+<h3>Exercise 4 — an SLO with a burn-rate alert</h3>
+<p>Define a 99% availability SLO over 30 days and alert on fast budget burn.</p>
+<details><summary>Solution</summary>
+<pre><code><span class="c"># burning 14.4x the sustainable rate exhausts a 30d budget in ~2 days</span>
+- <span class="v">alert</span>: ErrorBudgetBurnFast
+  <span class="v">expr</span>: |
+    (
+      sum(rate(http_requests_total{status=~"5.."}[1h]))
+        / sum(rate(http_requests_total[1h]))
+    ) &gt; (14.4 * 0.01)
+  <span class="v">for</span>: 5m
+  <span class="v">labels</span>: { <span class="v">severity</span>: page }</code></pre>
+<p>Burn-rate alerting is better than a fixed error-rate threshold because it scales with your actual
+objective: a brief spike that consumes a negligible slice of budget does not page, while a sustained
+elevation that will blow the month's budget does.</p>
+</details>
+
+<h2 id="check">Checkpoint</h2>
+
+<div class="quiz" data-answer="b">
+<div class="q">You add a <code>user_email</code> label to a counter. Prometheus starts OOM-killing. Why?</div>
+<button data-opt="a">Labels must be numeric</button>
+<button data-opt="b">Each unique label combination is a separate in-memory time series</button>
+<button data-opt="c">Email addresses break the exposition format</button>
+<div class="fb">Cardinality is the primary scaling constraint of Prometheus. High-cardinality detail belongs in logs or traces, never in metric labels.</div>
+</div>
+
+<div class="quiz" data-answer="c">
+<div class="q">Why alert on p95 latency instead of average latency?</div>
+<button data-opt="a">Averages are more expensive to compute</button>
+<button data-opt="b">Prometheus cannot calculate averages</button>
+<button data-opt="c">Averages hide the tail — a small fraction of users having a terrible time</button>
+<div class="fb">If 95% of requests take 50 ms and 5% take 10 s, the average looks acceptable while one user in twenty is suffering. Tail latency is where real user pain lives.</div>
+</div>
+
+<div class="quiz" data-answer="a">
+<div class="q">Which alert should page a human at 3 a.m.?</div>
+<button data-opt="a">5xx error rate above 5% for 5 minutes</button>
+<button data-opt="b">CPU above 80% for 2 minutes</button>
+<button data-opt="c">A pod restarted</button>
+<div class="fb">Page on symptoms users feel, and only when the alert is urgent, actionable and has a runbook. High CPU and routine restarts are normal operation; waking someone for them trains them to ignore the pager.</div>
+</div>
+
+<div class="card">
+<b>You should now be able to, without notes:</b>
+<ul class="chk">
+<li>Distinguish monitoring from observability, and metrics from logs from traces.</li>
+<li>Explain Prometheus's pull model and why a failed scrape is itself a signal.</li>
+<li>Pick the right metric type and explain why counters are always wrapped in <code>rate()</code>.</li>
+<li>Instrument an app with a counter, a histogram and a gauge without creating a cardinality bomb.</li>
+<li>Write PromQL for each of the four golden signals.</li>
+<li>Build a dashboard that answers a question rather than showing everything.</li>
+<li>Write an alert that is urgent, actionable and symptom-based, with a sensible <code>for:</code>.</li>
+<li>Explain SLIs, SLOs and error budgets, and why 100% is the wrong target.</li>
+</ul>
+</div>
+
+<h2 id="capstone">Capstone project</h2>
+<div class="card">
+<p><b>Build a new service end to end, from an empty directory, using nothing but the docs.</b>
+Pick something small with a datastore — a paste bin, a feature-flag API, a webhook receiver.</p>
+
+<h3>Deliverables</h3>
+<ul class="chk">
+<li>A Git repository with protected <code>main</code> and short-lived feature branches.</li>
+<li>A multi-stage Dockerfile: non-root, correct layer ordering, under 150 MB.</li>
+<li>A Compose file for local development, with a healthcheck-gated dependency.</li>
+<li>A GitHub Actions pipeline: lint → test (against a real service container) → build → push a
+SHA-tagged image to GHCR → smoke test the published image.</li>
+<li>Terraform describing the environment, with variables, outputs and a clean plan.</li>
+<li>An idempotent Ansible playbook (second run: <code>changed=0</code>).</li>
+<li>Kubernetes manifests: probes that distinguish liveness from readiness, resource requests and
+limits, ConfigMap and Secret, <code>maxUnavailable: 0</code>.</li>
+<li>Prometheus instrumentation for all four golden signals, a Grafana dashboard committed as JSON,
+and at least two symptom-based alerts.</li>
+<li>A <code>README.md</code> that a stranger can follow from clone to running system.</li>
+</ul>
+
+<h3>The demonstration</h3>
+<p>Record or perform these four things live. They are what an interviewer would ask for:</p>
+<ol>
+<li>Push a commit that breaks a test; show the merge being blocked.</li>
+<li>Perform a rolling update under continuous traffic with zero non-200 responses.</li>
+<li>Deploy a broken image; show that users are unaffected; roll back.</li>
+<li>Kill the datastore; show the alert firing, pods leaving rotation without restarting, and automatic
+recovery when it returns.</li>
+</ol>
+
+<h3>Where to go next</h3>
+<ul>
+<li><b>GitOps</b> — Argo CD or Flux: the cluster pulls its desired state from Git instead of CI pushing to it.</li>
+<li><b>Helm</b> — package your manifests so environments differ by values, not by copies.</li>
+<li><b>Distributed tracing</b> — OpenTelemetry and Jaeger, once you have more than one service.</li>
+<li><b>Policy and supply chain</b> — OPA/Kyverno for admission control, cosign for image signing, SBOMs.</li>
+<li><b>Cloud</b> — take this exact stack to EKS or GKE; the Terraform providers change, the concepts do not.</li>
+</ul>
+</div>
+
+<div class="pager">
+  <a href="module-6.html">← Module 6</a>
+  <a href="index.html">Back to the course index →</a>
+</div>
+
+</main>
+<footer><div class="wrap">Practical DevOps · Module 7 · end of course</div></footer>
+<script src="assets/course.js"></script>
+</body>
+</html>

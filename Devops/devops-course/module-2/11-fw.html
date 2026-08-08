@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2.11 Firewalls and the ports that matter — Module 2 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-2.html">Module 2 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 02</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">2.1 Why this module comes before Docker</a>
+<a href="02-model.html">2.2 The TCP/IP model: four layers, one journey</a>
+<a href="03-ip.html">2.3 IP addressing</a>
+<a href="04-subnet.html">2.4 Subnets and CIDR</a>
+<a href="05-private.html">2.5 Private ranges, NAT and why your laptop is invisible</a>
+<a href="06-tcp.html">2.6 TCP vs UDP</a>
+<a href="07-ports.html">2.7 Ports and sockets</a>
+<a href="08-dns.html">2.8 DNS: how a name becomes an address</a>
+<a href="09-http.html">2.9 HTTP: the request you will read a thousand times</a>
+<a href="10-https.html">2.10 HTTPS and TLS</a>
+<a href="11-fw.html" class="cur">2.11 Firewalls and the ports that matter</a>
+<a href="12-tools.html">2.12 The troubleshooting toolkit</a>
+<a class="grp">Practice</a>
+<a href="13-lab.html">Lab: trace a request end to end</a>
+<a href="14-ex.html">Exercises</a>
+<a href="15-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-2.html">Networking Basics</a>
+</div>
+<div class="secmeta">Module 02 · Section 11 of 15</div>
+
+<h2 id="fw">2.11 Firewalls and the ports that matter</h2>
+<p>A firewall filters traffic by address, port and direction. The rule that matters most is the
+<b>default</b>: deny everything inbound, then allow only what you deliberately need.</p>
+
+<table>
+<tr><th>Port</th><th>Protocol</th><th>Service</th><th>Expose to the internet?</th></tr>
+<tr><td>22</td><td>TCP</td><td>SSH</td><td>Restrict to known IPs or a VPN</td></tr>
+<tr><td>53</td><td>UDP/TCP</td><td>DNS</td><td>Only if you run a public resolver</td></tr>
+<tr><td>80</td><td>TCP</td><td>HTTP</td><td>Yes — usually just to redirect to 443</td></tr>
+<tr><td>443</td><td>TCP</td><td>HTTPS</td><td>Yes</td></tr>
+<tr><td>3306</td><td>TCP</td><td>MySQL</td><td><b>Never</b></td></tr>
+<tr><td>5432</td><td>TCP</td><td>PostgreSQL</td><td><b>Never</b></td></tr>
+<tr><td>6379</td><td>TCP</td><td>Redis</td><td><b>Never</b> — no auth by default</td></tr>
+<tr><td>8000 / 8080</td><td>TCP</td><td>App servers</td><td>No — put a proxy in front</td></tr>
+<tr><td>9090 / 3000</td><td>TCP</td><td>Prometheus / Grafana</td><td>No — authenticate first</td></tr>
+<tr><td>6443</td><td>TCP</td><td>Kubernetes API</td><td>Restrict tightly</td></tr>
+</table>
+
+<div class="box warn">
+<b>Redis on 6379 has no password by default</b>
+An open Redis is not "a database someone might find" — it is remote code execution in many
+configurations, and internet-wide scanners find a new one within minutes. The same is true of exposed
+Docker daemons (2375) and unauthenticated Kubernetes API servers. Databases belong on a private
+network, reachable only from the app.
+</div>
+
+<pre><code><span class="c"># ufw (Ubuntu's friendly front end to iptables)</span>
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 22/tcp
+sudo ufw allow 80,443/tcp
+sudo ufw enable
+sudo ufw status verbose
+
+<span class="c"># restrict SSH to one source network</span>
+sudo ufw allow from 203.0.113.0/24 to any port 22 proto tcp</code></pre>
+
+<div class="box">
+<b>Docker publishes past your firewall</b>
+<code>docker run -p 8080:80</code> writes its own iptables rules, which are evaluated <i>before</i>
+ufw's. So a port you believed ufw was blocking can still be open to the world. Either bind the
+publish to loopback — <code>-p 127.0.0.1:8080:80</code> — or filter at the cloud security-group level,
+which sits outside the host entirely. This surprises a lot of people in production.
+</div>
+
+<div class="pager">
+  <a href="10-https.html"><span class="sub">← Previous</span>2.10 HTTPS and TLS</a>
+  <a href="12-tools.html" class="nx"><span class="sub">Next →</span>2.12 The troubleshooting toolkit</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 2 · 2.11 Firewalls and the ports that matter</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

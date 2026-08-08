@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2.7 Ports and sockets — Module 2 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-2.html">Module 2 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 02</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">2.1 Why this module comes before Docker</a>
+<a href="02-model.html">2.2 The TCP/IP model: four layers, one journey</a>
+<a href="03-ip.html">2.3 IP addressing</a>
+<a href="04-subnet.html">2.4 Subnets and CIDR</a>
+<a href="05-private.html">2.5 Private ranges, NAT and why your laptop is invisible</a>
+<a href="06-tcp.html">2.6 TCP vs UDP</a>
+<a href="07-ports.html" class="cur">2.7 Ports and sockets</a>
+<a href="08-dns.html">2.8 DNS: how a name becomes an address</a>
+<a href="09-http.html">2.9 HTTP: the request you will read a thousand times</a>
+<a href="10-https.html">2.10 HTTPS and TLS</a>
+<a href="11-fw.html">2.11 Firewalls and the ports that matter</a>
+<a href="12-tools.html">2.12 The troubleshooting toolkit</a>
+<a class="grp">Practice</a>
+<a href="13-lab.html">Lab: trace a request end to end</a>
+<a href="14-ex.html">Exercises</a>
+<a href="15-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-2.html">Networking Basics</a>
+</div>
+<div class="secmeta">Module 02 · Section 7 of 15</div>
+
+<h2 id="ports">2.7 Ports and sockets</h2>
+<p>An IP address gets you to a machine; a <b>port</b> gets you to a program on it. Ports are 16-bit,
+so 1–65535.</p>
+<ul>
+<li><b>0–1023 — well-known.</b> Binding these requires root. This is why containers running as a
+non-root user (Module 3) listen on 8000 rather than 80.</li>
+<li><b>1024–49151 — registered.</b> Where most application services live: 3000, 5432, 6379, 8000, 8080.</li>
+<li><b>49152–65535 — ephemeral.</b> Your <i>client</i> gets a random one of these for each outbound
+connection.</li>
+</ul>
+
+
+<figure id="fig-ports">
+<svg viewBox="0 0 720 170" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,monospace" font-size="11">
+
+  <text x="8" y="16" fill="var(--muted)" font-size="10">the 16-bit port space — 1 to 65535</text>
+  <g stroke="var(--line)" stroke-width="1">
+    <rect x="8"   y="28" width="106" height="34" rx="4" fill="color-mix(in srgb,var(--warn) 26%,transparent)"/>
+    <rect x="116" y="28" width="330" height="34" rx="4" fill="color-mix(in srgb,var(--accent) 26%,transparent)"/>
+    <rect x="448" y="28" width="264" height="34" rx="4" fill="color-mix(in srgb,var(--accent2) 26%,transparent)"/>
+  </g>
+  <g fill="var(--txt)" text-anchor="middle" font-size="10">
+    <text x="61"  y="49">0 – 1023</text><text x="281" y="49">1024 – 49151</text><text x="580" y="49">49152 – 65535</text>
+  </g>
+  <g text-anchor="middle" font-size="10">
+    <text x="61"  y="78" fill="var(--warn)">well-known</text>
+    <text x="281" y="78" fill="var(--accent)">registered</text>
+    <text x="580" y="78" fill="var(--accent2)">ephemeral</text>
+  </g>
+  <g fill="var(--muted)" text-anchor="middle" font-size="9">
+    <text x="61"  y="93">root to bind</text>
+    <text x="281" y="93">where your services live</text>
+    <text x="580" y="93">your CLIENT gets one of these</text>
+    <text x="61"  y="106">22 · 80 · 443</text>
+    <text x="281" y="106">3000 · 5432 · 6379 · 8000</text>
+    <text x="580" y="106">picked at random per connection</text>
+  </g>
+  <text x="8" y="132" fill="var(--txt)" font-size="10">One connection = (src IP, src port, dst IP, dst port):</text>
+  <text x="8" y="150" fill="var(--accent2)" font-size="11">(192.168.1.34, <tspan fill="var(--accent2)">51234</tspan>, 93.184.216.34, <tspan fill="var(--warn)">443</tspan>)</text>
+  <text x="8" y="164" fill="var(--muted)" font-size="9">Thousands of clients share port 443 because the source port differs — that is what makes the tuple unique.</text>
+</svg>
+<figcaption>Port ranges, and the four-tuple that identifies a connection.</figcaption>
+</figure>
+
+<p>A connection is uniquely identified by a four-tuple, which is why thousands of clients can all talk
+to port 443 on one server without ambiguity:</p>
+<pre><code>(source IP, source port, destination IP, destination port)
+(192.168.1.34, 51234, 93.184.216.34, 443)</code></pre>
+
+<pre><code><span class="c"># what is listening on this machine?</span>
+ss -tulpn
+<span class="c">#  t=tcp  u=udp  l=listening  p=process  n=numeric (don't resolve names)</span>
+
+<span class="c"># is anything on 8000?</span>
+ss -tulpn | grep :8000
+
+<span class="c"># established connections</span>
+ss -tn state established</code></pre>
+
+<div class="box warn">
+<b>Read the bind address, not just the port</b>
+<pre><code>127.0.0.1:8000   <span class="c"># loopback only — unreachable from anywhere else</span>
+0.0.0.0:8000     <span class="c"># all IPv4 interfaces — reachable from the network</span>
+[::]:8000        <span class="c"># all IPv6 interfaces</span></code></pre>
+A service bound to <code>127.0.0.1</code> inside a container is unreachable even with
+<code>-p</code> published, because the port forward delivers to the container's external interface and
+nothing is listening there. This is one of the most common Docker bugs, and it looks identical to
+"the container is broken".
+</div>
+
+<div class="pager">
+  <a href="06-tcp.html"><span class="sub">← Previous</span>2.6 TCP vs UDP</a>
+  <a href="08-dns.html" class="nx"><span class="sub">Next →</span>2.8 DNS: how a name becomes an address</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 2 · 2.7 Ports and sockets</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>

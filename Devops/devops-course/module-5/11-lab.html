@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lab: provision and configure, locally — Module 5 | Practical DevOps</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap wide">
+  <a class="brand hm" href="../index.html">Practical <span>DevOps</span></a>
+  <nav>
+    <a href="../index.html">All modules</a>
+    <a href="../module-5.html">Module 5 contents</a>
+    <button class="theme" onclick="toggleTheme()">◐ theme</button>
+  </nav>
+</div></header>
+
+<main class="wrap wide">
+<div class="layout">
+<nav class="sidenav">
+<p class="lbl">Module 05</p>
+<a class="grp">Concepts</a>
+<a href="01-why.html">5.1 The problem: snowflake servers and drift</a>
+<a href="02-decl.html">5.2 Declarative vs imperative</a>
+<a href="03-split.html">5.3 Terraform vs Ansible — the division of labour</a>
+<a href="04-tf.html">5.4 Terraform: the core loop</a>
+<a href="05-hcl.html">5.5 HCL: variables, outputs, resources, data</a>
+<a href="06-state.html">5.6 State — the concept that trips everyone</a>
+<a href="07-mod.html">5.7 Modules and environments</a>
+<a href="08-ansible.html">5.8 Ansible: configuring what exists</a>
+<a href="09-idem.html">5.9 Idempotency, concretely</a>
+<a href="10-secrets.html">5.10 Secrets in infrastructure code</a>
+<a class="grp">Practice</a>
+<a href="11-lab.html" class="cur">Lab: provision and configure, locally</a>
+<a href="12-ex.html">Exercises</a>
+<a href="13-check.html">Checkpoint</a>
+</nav>
+<div class="content">
+
+<div class="crumb">
+  <a href="../index.html">Course</a><span class="sep">/</span>
+  <a href="../module-5.html">Infrastructure as Code: Terraform &amp; Ansible</a>
+</div>
+<div class="secmeta">Module 05 · Section 11 of 13</div>
+
+<h2 id="lab">Lab: provision and configure, locally</h2>
+<div class="box lab">
+<b>Goal</b>
+Replace the hand-written Compose file with Terraform-managed infrastructure, prove drift detection
+works, then use Ansible to configure the host idempotently.
+</div>
+
+<h3>Step 1 — set up</h3>
+<pre><code>cd ~/devops/urlshort
+mkdir -p terraform ansible
+cd terraform
+
+<span class="c"># append to the repo .gitignore</span>
+cat &gt;&gt; ../.gitignore &lt;&lt;'EOF'
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars
+EOF</code></pre>
+
+<h3>Step 2 — write the config</h3>
+<p>Create <code>main.tf</code>, <code>variables.tf</code> and <code>outputs.tf</code> from section 4.5,
+then add the API container to <code>main.tf</code>:</p>
+
+<pre><code><span class="k">resource</span> <span class="s">"docker_container"</span> <span class="s">"api"</span> {
+  name  = <span class="s">"${var.project}-api"</span>
+  image = var.api_image
+
+  env = [
+    <span class="s">"REDIS_URL=redis://redis:6379/0"</span>,
+  ]
+
+  ports {
+    internal = 8000
+    external = var.api_port
+  }
+
+  networks_advanced {
+    name = docker_network.app.name
+  }
+
+  restart = <span class="s">"unless-stopped"</span>
+  depends_on = [docker_container.redis]
+}</code></pre>
+
+<h3>Step 3 — the loop</h3>
+<pre><code>docker compose down          <span class="c"># clear the Module 3 stack first</span>
+
+terraform init
+terraform fmt
+terraform validate
+terraform plan
+<span class="c"># Plan: 5 to add, 0 to change, 0 to destroy.</span>
+
+terraform apply
+<span class="c"># type: yes</span>
+
+terraform output
+<span class="c"># api_url = "http://localhost:8000"</span>
+
+curl -s localhost:8000/health</code></pre>
+
+<h3>Step 4 — see idempotency</h3>
+<pre><code>terraform apply
+<span class="c"># No changes. Your infrastructure matches the configuration.</span></code></pre>
+
+<h3>Step 5 — cause drift, then detect and correct it</h3>
+<pre><code><span class="c"># change reality behind Terraform's back</span>
+docker rm -f urlshort-api
+
+terraform plan
+<span class="c"># docker_container.api has been deleted</span>
+<span class="c"># Plan: 1 to add, 0 to change, 0 to destroy.</span>
+
+terraform apply -auto-approve
+docker ps --filter name=urlshort</code></pre>
+
+<div class="box why">
+<b>What just happened</b>
+Terraform refreshed state against reality, noticed the container was gone, and reconciled. This is the
+core loop of every IaC tool and every Kubernetes controller: <i>observe actual, compare to desired,
+act on the difference</i>. You will see the identical pattern in Module 6.
+</div>
+
+<h3>Step 6 — a change that forces replacement</h3>
+<pre><code>terraform plan -var 'api_port=8080'
+<span class="c"># ~ update in-place? No:</span>
+<span class="c"># -/+ destroy and then create replacement</span>
+<span class="c">#     ports { external = 8000 -&gt; 8080 } # forces replacement</span>
+
+terraform apply -var 'api_port=8080' -auto-approve
+curl -s localhost:8080/health</code></pre>
+<p>Notice that Terraform told you it would destroy something <i>before</i> doing it. That preview is
+the reason you read plans.</p>
+
+<h3>Step 7 — Ansible against localhost</h3>
+<pre><code>cd ../ansible
+
+cat &gt; inventory.ini &lt;&lt;'EOF'
+[local]
+localhost ansible_connection=local
+EOF
+
+cat &gt; site.yml &lt;&lt;'EOF'
+- name: Prepare the application host
+  hosts: local
+  gather_facts: true
+
+  vars:
+    app_dir: "{{ ansible_env.HOME }}/devops/deployed"
+
+  tasks:
+    - name: Create the deployment directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Render the environment file
+      ansible.builtin.copy:
+        dest: "{{ app_dir }}/.env"
+        mode: "0600"
+        content: |
+          REDIS_URL=redis://redis:6379/0
+          LOG_LEVEL=info
+      notify: Report change
+
+    - name: Check docker is available
+      ansible.builtin.command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Show docker version
+      ansible.builtin.debug:
+        msg: "{{ docker_version.stdout }}"
+
+  handlers:
+    - name: Report change
+      ansible.builtin.debug:
+        msg: "environment file changed - would restart the service here"
+EOF
+
+ansible-playbook -i inventory.ini site.yml</code></pre>
+
+<h3>Step 8 — prove idempotency</h3>
+<pre><code>ansible-playbook -i inventory.ini site.yml
+<span class="c"># PLAY RECAP: changed=0   ← the whole point</span></code></pre>
+<p>Note <code>changed_when: false</code> on the <code>command</code> task. Without it, a read-only
+version check would report a change on every run and the handler would fire pointlessly.</p>
+
+<h3>Step 9 — commit</h3>
+<pre><code>cd ~/devops/urlshort
+git status                   <span class="c"># confirm terraform.tfstate is NOT listed</span>
+git add terraform ansible .gitignore
+git commit -m "feat: manage infrastructure with terraform and ansible"
+git push</code></pre>
+
+<div class="pager">
+  <a href="10-secrets.html"><span class="sub">← Previous</span>5.10 Secrets in infrastructure code</a>
+  <a href="12-ex.html" class="nx"><span class="sub">Next →</span>Exercises</a>
+</div>
+
+</div>
+</div>
+</main>
+<footer><div class="wrap wide">Practical DevOps · Module 5 · Lab: provision and configure, locally</div></footer>
+<script src="../assets/course.js"></script>
+</body>
+</html>
