@@ -1,0 +1,46 @@
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{french.ldf}{\usepackage[french]{babel}}{\usepackage[english]{babel}}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}\geometry{margin=2.3cm}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lmodern}
+\usepackage{titlesec}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, urlcolor=[RGB]{2,101,115}, linkcolor=black}
+
+\definecolor{codebg}{RGB}{247,249,251}
+\definecolor{kw}{RGB}{175,45,45}
+\definecolor{cmt}{RGB}{110,120,130}
+\definecolor{str}{RGB}{20,110,60}
+\definecolor{cnc}{RGB}{2,101,115}
+\lstset{
+  language=Python, backgroundcolor=\color{codebg}, basicstyle=\ttfamily\small,
+  keywordstyle=\color{kw}\bfseries, commentstyle=\color{cmt}\itshape, stringstyle=\color{str},
+  numbers=left, numberstyle=\tiny\color{cmt}, numbersep=8pt, frame=single, rulecolor=\color{gray!40},
+  showstringspaces=false, breaklines=true, columns=fullflexible, extendedchars=true, inputencoding=utf8,
+  literate={é}{{\'e}}1 {è}{{\`e}}1 {à}{{\`a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ç}{{\c c}}1 {ù}{{\`u}}1 {ô}{{\^o}}1 {û}{{\^u}}1 {'}{{'}}1
+}
+
+\newcounter{qcnt}
+\newcommand{\Q}{\medskip\par\stepcounter{qcnt}\noindent\textbf{Question~\theqcnt.}~}
+\newcommand{\code}[1]{\lstinline!#1!}
+\newcommand{\hh}[1]{h(#1)}
+
+\newtheorem{lemme}{Lemme}
+\newtheorem{theoreme}{Théorème}
+\theoremstyle{definition}
+\newtheorem{defi}{Définition}
+
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Préparation au CNC --- Informatique MP}
+\rhead{\small Casper the Friendly Finality Gadget}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\titleformat*{\section}{\large\bfseries\scshape\color{cnc}}
+\titleformat*{\subsection}{\bfseries\color{cnc}}

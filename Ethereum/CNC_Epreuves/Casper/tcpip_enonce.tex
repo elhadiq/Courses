@@ -1,0 +1,534 @@
+\documentclass[11pt,a4paper]{article}
+\input{tcpip_preambule}
+\begin{document}
+\input{tcpip_titre}
+
+\section*{Présentation générale}
+
+Lorsqu'un navigateur affiche une page, une longue chaîne de mécanismes s'est mise en marche~:
+l'adresse de destination a été comparée à une table de routage, chaque paquet a été muni
+d'une somme de contrôle, un protocole de transport a garanti que rien n'a été perdu ni
+dupliqué, un texte a été analysé syntaxiquement, un cache a évité de retélécharger ce qui
+était déjà connu, et un échange cryptographique a établi un secret partagé.
+
+Ce problème étudie \textbf{algorithmiquement} chacun de ces mécanismes. Il ne suppose
+\emph{aucune} connaissance en réseaux~: tous les objets manipulés sont définis dans le
+sujet, et chaque partie se réduit à un problème d'algorithmique, d'arithmétique, de graphes,
+de probabilités ou de bases de données.
+
+Le sujet comporte \textbf{cinq parties largement indépendantes}, de difficulté croissante.
+Les fonctions écrites dans une question peuvent être librement réutilisées ensuite.
+
+\subsection*{Notations et conventions}
+
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt]
+\item Tous les entiers manipulés sont des entiers Python (précision arbitraire). Les
+opérateurs binaires \code{&} (et), \code{|} (ou), \code{^} (ou exclusif), \code{<<} et
+\code{>>} (décalages) sont autorisés et supposés en $O(1)$ sur les entiers du sujet.
+\item Une \textbf{adresse IPv4} est un entier de $32$ bits, noté aussi sous forme
+\emph{décimale pointée} $\texttt{a.b.c.d}$ où $a,b,c,d\in[\![0,255]\!]$, représentant
+l'entier $a\cdot 2^{24}+b\cdot 2^{16}+c\cdot 2^{8}+d$.
+\item On note $[\![m,n]\!]$ l'ensemble des entiers $k$ tels que $m\le k\le n$.
+\item En Python, seules les constructions du programme officiel sont autorisées~: types de
+base, listes, tuples, dictionnaires, ensembles, boucles, fonctions, récursivité, classes
+simples, ainsi que les modules \code{math}, \code{random} et \code{heapq}. Les fonctions
+\code{sorted} et \code{sort} sont autorisées~; on admettra qu'elles trient $m$ éléments en
+$O(m\log m)$.
+\item On admet que les opérations élémentaires sur un dictionnaire ou un ensemble
+(lecture, écriture, test d'appartenance) s'effectuent en $O(1)$ \emph{en moyenne}.
+\item Sauf mention contraire, les complexités demandées sont des complexités \emph{en
+temps} dans le pire des cas.
+\end{itemize}
+
+\bigskip
+\noindent\emph{Le sujet comporte 5 parties et 60 questions. Les parties sont largement
+indépendantes~; à l'intérieur d'une partie, les questions s'enchaînent.}
+
+\newpage
+
+%=======================================================================
+\section*{Partie I --- Adressage IPv4 et agrégation CIDR}
+%=======================================================================
+
+\emph{Références~: \rfc{791} (\emph{Internet Protocol}, 1981), \rfc{4632} (\emph{Classless
+Inter-domain Routing}, 2006).}
+
+\medskip
+Un \textbf{préfixe} CIDR est un couple $(p,n)$, noté $p/n$, où $n\in[\![0,32]\!]$ est la
+\emph{longueur} du préfixe et $p$ une adresse dont les $32-n$ bits de poids faible sont
+nuls. Il désigne l'ensemble
+\[ \mathcal{A}(p/n) \;=\; \{\,a\in[\![0,2^{32}-1]\!] \ :\ \text{$a$ et $p$ ont les mêmes
+$n$ bits de poids fort}\,\}. \]
+Par exemple $\texttt{192.168.1.0/24}$ désigne les $256$ adresses de
+$\texttt{192.168.1.0}$ à $\texttt{192.168.1.255}$.
+
+\Q Écrire deux fonctions \code{ip_vers_entier(s)} et \code{entier_vers_ip(x)} qui convertissent
+une chaîne en décimale pointée en l'entier correspondant, et réciproquement. Préciser leur
+complexité.
+
+\Q Écrire une fonction \code{masque(n)} renvoyant, \textbf{sans boucle}, l'entier dont les
+$n$ bits de poids fort valent $1$ et les autres $0$. Démontrer que
+$\texttt{masque}(n)=2^{32}-2^{32-n}$.
+
+\Q Écrire \code{adresse_reseau(a, n)} et \code{diffusion(a, n)} renvoyant respectivement la
+plus petite et la plus grande adresse du préfixe de longueur $n$ contenant $a$. Démontrer
+que $\texttt{diffusion}(a,n)=\texttt{adresse\_reseau}(a,n)+2^{32-n}-1$.
+
+\Q Dans un réseau IPv4, l'adresse de réseau et l'adresse de diffusion ne sont pas
+attribuables à une machine. En déduire le nombre d'adresses utilisables dans un préfixe de
+longueur $n\le 30$, et démontrer la formule. Que se passe-t-il pour $n=31$ et $n=32$~?
+Commenter.
+
+\Q Écrire \code{dans_prefixe(a, p, n)} testant si $a\in\mathcal{A}(p/n)$, en utilisant
+\textbf{un seul} décalage et \textbf{un seul} ou exclusif. Démontrer l'équivalence
+\[ a\in\mathcal{A}(p/n) \iff (a \oplus p)\ \texttt{>>}\ (32-n) = 0 \qquad (n\ge 1), \]
+où $\oplus$ désigne le ou exclusif bit à bit.
+
+\Q \textbf{(Agrégation.)} Soient $p/n$ et $q/n$ deux préfixes distincts de même longueur
+$n\ge 1$. Démontrer qu'il existe un préfixe $r/(n-1)$ tel que
+$\mathcal{A}(r/(n-1))=\mathcal{A}(p/n)\cup\mathcal{A}(q/n)$ \emph{si et seulement si} $p$ et
+$q$ ne diffèrent que par le bit de rang $32-n$. Expliquer en une phrase l'intérêt de ce
+résultat pour la taille des tables de routage.
+
+\Q \textbf{(Famille laminaire.)} Démontrer que deux préfixes CIDR quelconques $p/n$ et $q/m$
+vérifient exactement l'une des trois propriétés suivantes~: $\mathcal{A}(p/n)\subseteq
+\mathcal{A}(q/m)$, ou $\mathcal{A}(q/m)\subseteq\mathcal{A}(p/n)$, ou
+$\mathcal{A}(p/n)\cap\mathcal{A}(q/m)=\varnothing$. \emph{(Ce résultat est utilisé en
+partie~III.)}
+
+\Q Applications numériques. Déterminer, en justifiant~:
+\begin{enumerate}[label=(\alph*),leftmargin=2em,itemsep=1pt]
+\item le masque de $\texttt{/12}$ en décimale pointée~;
+\item l'adresse de réseau de $\texttt{172.16.35.7/12}$~;
+\item l'adresse de réseau, l'adresse de diffusion et le nombre d'adresses utilisables de
+$\texttt{192.168.1.130/26}$.
+\end{enumerate}
+
+%=======================================================================
+\section*{Partie II --- La somme de contrôle Internet}
+%=======================================================================
+
+\emph{Références~: \rfc{1071} (\emph{Computing the Internet Checksum}, 1988), \rfc{1624}
+(\emph{Computation of the Internet Checksum via Incremental Update}, 1994).}
+
+\medskip
+Les protocoles IP, TCP et UDP protègent leurs en-têtes par une \textbf{somme de contrôle}
+de $16$ bits reposant sur l'\emph{addition en complément à un}. On note
+$N=2^{16}=65536$ et l'on travaille sur $[\![0,N-1]\!]$.
+
+\begin{defi}
+L'\textbf{addition en complément à un} de $a,b\in[\![0,N-1]\!]$, notée $a\oplus' b$, est
+obtenue en additionnant $a$ et $b$ puis en \emph{réinjectant la retenue} dans les bits de
+poids faible (\emph{end-around carry})~:
+\[ a\oplus' b \;=\; \big((a+b)\bmod N\big) \;+\; \big\lfloor (a+b)/N \big\rfloor . \]
+Le \textbf{complément} de $x$ est $\overline{x}=x\oplus \texttt{0xFFFF}$ (ou exclusif), soit
+$N-1-x$.
+\end{defi}
+
+\Q Écrire une fonction \code{add16(a, b)} calculant $a\oplus' b$ en une ligne. Démontrer que
+le résultat appartient bien à $[\![0,N-1]\!]$ (on prendra garde au cas où la réinjection
+provoque à son tour une retenue).
+
+\Q Démontrer que pour tous $a,b\in[\![0,N-1]\!]$ on a $a\oplus' b\equiv a+b \pmod{N-1}$.
+En déduire que $\oplus'$ est \textbf{commutative} et \textbf{associative}, et que $0$ en est
+un élément neutre. Que vaut $x\oplus'\overline{x}$~? Commenter l'existence de \emph{deux}
+représentations de zéro, $\texttt{0x0000}$ et $\texttt{0xFFFF}$.
+
+\Q Le calcul de la somme de contrôle d'une suite d'octets se fait en trois temps, que l'on
+demande de programmer séparément.
+
+\begin{enumerate}[label=(\alph*),leftmargin=2em,itemsep=4pt]
+\item \textbf{Découpage en mots.} Les octets sont regroupés \emph{deux par deux dans l'ordre
+de lecture}, le premier octet de chaque paire étant celui de \emph{poids fort}~: la paire
+d'octets $(u,v)$ donne le mot $256\,u+v$. Si le nombre d'octets est impair, on complète par
+un octet nul \emph{à droite} (ce bourrage sert uniquement au calcul et ne fait pas partie du
+paquet transmis).
+
+Écrire \code{mots16(octets)} renvoyant la liste des mots obtenus. Vérifier que
+\code{mots16([0x45, 0x00, 0x00, 0x73])} vaut \code{[0x4500, 0x0073]}.
+
+\item \textbf{Somme.} Écrire \code{somme_un(mots)} renvoyant l'addition en complément à un de
+tous les mots de la liste, effectuée de gauche à droite en partant de $0$~:
+\[ \texttt{somme\_un}([m_0,\dots,m_{\ell-1}]) \;=\;
+   \big(\cdots\big((0\oplus' m_0)\oplus' m_1\big)\cdots\big)\oplus' m_{\ell-1}. \]
+La question 10 assure que le résultat ne dépend ni du parenthésage ni de l'ordre des mots~;
+on ne demande pas de le rejustifier.
+
+\item \textbf{Complément.} Écrire \code{checksum(octets)} renvoyant le complément de la somme
+précédente, c'est-à-dire
+$\overline{\texttt{somme\_un}(\texttt{mots16}(\texttt{octets}))}$. Vérifier sur la liste de
+quatre octets ci-dessus que l'on obtient \code{0xBA8C}.
+\end{enumerate}
+
+Donner, pour chacune de ces trois fonctions, la complexité en temps \emph{et} en espace en
+fonction du nombre $k$ d'octets. Indiquer enfin comment fusionner \code{mots16} et
+\code{somme_un} en une seule boucle afin de ramener l'espace auxiliaire à $O(1)$, et écrire
+la fonction correspondante.
+
+\Q Le champ « somme de contrôle » est mis à zéro pour le calcul, puis remplacé par la valeur
+obtenue. Démontrer que le récepteur, en calculant \code{somme_un} sur le paquet
+\emph{complet} (champ de contrôle inclus), doit trouver $\texttt{0xFFFF}$. Écrire la fonction
+\code{verifie(octets)} correspondante.
+
+\Q \textbf{(Indépendance de l'ordre des octets, \rfc{1071} §2.B.)} On note
+$\sigma(x)$ le mot obtenu en échangeant les deux octets de $x$. Démontrer que
+\[ \sigma(x_1)\oplus'\cdots\oplus'\sigma(x_k) \;=\; \sigma\big(x_1\oplus'\cdots\oplus'
+x_k\big). \]
+Quelle conséquence pratique cela a-t-il pour une machine dont l'ordre des octets natif
+diffère de celui du réseau~?
+
+\Q Démontrer qu'une erreur de transmission portant sur \textbf{un seul bit} est toujours
+détectée.
+
+\Q Montrer en revanche que la permutation de deux mots de $16$ bits n'est \emph{jamais}
+détectée, et exhiber une erreur portant sur \emph{deux} bits qui passe inaperçue. Quelle
+propriété de $\oplus'$ est en cause~? Comparer brièvement avec un code polynomial de type
+CRC.
+
+\Q \textbf{(Mise à jour incrémentale.)} Un routeur qui décrémente le champ « durée de vie »
+d'un paquet n'a pas besoin de recalculer toute la somme. On note $HC$ l'ancienne somme de
+contrôle, $m$ l'ancienne valeur du mot modifié, $m'$ la nouvelle, et $HC'$ la nouvelle somme.
+\begin{enumerate}[label=(\alph*),leftmargin=2em,itemsep=1pt]
+\item La \rfc{1141} proposait $HC' = HC\oplus' m\oplus'\overline{m'}$. Implémenter cette
+formule dans une fonction \code{maj_1141(HC, m, mp)}.
+\item La \rfc{1624} la corrige en $HC' = \overline{\ \overline{HC}\oplus'\overline{m}\oplus'
+m'\ }$. Implémenter \code{maj_1624(HC, m, mp)}.
+\item On suppose que la somme en complément à un de tous les \emph{autres} mots de l'en-tête
+vaut $C_{\text{autres}}=\texttt{0xCD7A}$, que $m=\texttt{0x5555}$ et
+$m'=\texttt{0x3285}$. Calculer $HC$, puis $HC'$ par recalcul complet, puis par chacune des
+deux formules. Conclure.
+\item Expliquer précisément \emph{pourquoi} la formule de la \rfc{1141} échoue. \emph{On
+pourra invoquer la réponse à la question 10.}
+\end{enumerate}
+
+\Q Application numérique. On considère l'en-tête IPv4 suivant, donné en hexadécimal, dont le
+champ de contrôle (octets d'indices $10$ et $11$) a été mis à zéro~:
+\begin{center}\ttfamily\small
+45 00 00 73 00 00 40 00 40 11 00 00 c0 a8 00 01 c0 a8 00 c7
+\end{center}
+Calculer la somme de contrôle à y inscrire. Vérifier ensuite que le paquet complet satisfait
+bien le test de la question 12.
+
+%=======================================================================
+\section*{Partie III --- Routage : plus long préfixe et plus courts chemins}
+%=======================================================================
+
+\emph{Références~: \rfc{4632} (CIDR), \rfc{2328} (OSPF, algorithme à état de liens),
+\rfc{2453} (RIP, algorithme à vecteur de distance).}
+
+\subsection*{III.1 --- Recherche du plus long préfixe correspondant}
+
+Une \textbf{table de routage} est une liste de triplets $(p,n,\texttt{saut})$. Pour router
+une adresse $a$, le routeur retient le préfixe \emph{le plus long} parmi ceux qui contiennent
+$a$, et transmet le paquet au saut associé. Le préfixe $\texttt{0.0.0.0/0}$, présent dans
+toute table, joue le rôle de route par défaut.
+
+\Q Écrire \code{plus_long_prefixe(table, a)} par parcours exhaustif de la table. Donner sa
+complexité en fonction du nombre $k$ d'entrées.
+
+\Q Démontrer, à l'aide de la question 7, que le préfixe le plus long contenant $a$ est
+\textbf{unique} dès lors que la table ne contient pas deux entrées de même préfixe.
+
+\Q On représente maintenant la table par un \textbf{arbre binaire de préfixes} (ou
+\emph{trie})~: un n\oe ud à la profondeur $d$ représente une suite de $d$ bits~; son fils
+gauche (resp. droit) représente cette suite suivie du bit $0$ (resp. $1$). Un n\oe ud porte
+un saut si et seulement si la suite de bits correspondante est un préfixe de la table.
+Écrire une méthode \code{inserer(p, n, saut)}. Donner la complexité en temps d'une insertion
+et la complexité en espace de la structure pour $k$ entrées.
+
+\Q Écrire la méthode \code{chercher(a)} qui descend dans l'arbre en suivant les bits de $a$
+et renvoie le saut du \emph{dernier} n\oe ud rencontré qui en porte un. Énoncer l'invariant
+de la boucle et démontrer la correction.
+
+\Q Donner la complexité de \code{chercher}. Comparer avec la question 18 et commenter la
+pertinence de cette structure pour un routeur de c\oe ur de réseau, dont la table comporte
+aujourd'hui environ $10^6$ entrées.
+
+\subsection*{III.2 --- Plus courts chemins dans le graphe du réseau}
+
+On modélise le réseau par un graphe non orienté pondéré $G=(S,A)$~: les sommets sont les
+routeurs, numérotés de $0$ à $V-1$, et le poids d'une arête est le \emph{coût} du lien
+(entier strictement positif). On note $E=|A|$.
+
+\Q Écrire \code{dijkstra(V, adj, s)} calculant les distances de $s$ à tous les sommets, où
+\code{adj[u]} est la liste des couples $(v,w)$. On utilisera le module \code{heapq}. Donner
+la complexité.
+
+\Q Démontrer la correction de l'algorithme de Dijkstra en énonçant l'invariant vérifié à
+chaque extraction du tas. Où l'hypothèse « poids positifs » est-elle utilisée~?
+
+\Q Écrire \code{bellman_ford(V, aretes, s)}, où \code{aretes} est la liste des arcs
+$(u,v,w)$. La fonction renverra \code{None} si le graphe contient un circuit de poids
+strictement négatif. Donner la complexité.
+
+\Q Démontrer, par récurrence sur $i$, qu'après $i$ tours de la boucle externe,
+$\texttt{d[v]}$ est majoré par le poids du plus court chemin de $s$ à $v$ \emph{utilisant au
+plus $i$ arêtes}. En déduire la correction et justifier le nombre $V-1$ de tours.
+
+\Q \textbf{(Comptage à l'infini.)} Le protocole RIP est un algorithme à vecteur de distance~:
+chaque routeur ne connaît que les distances annoncées par ses voisins. Sur le graphe réduit
+à trois routeurs $A - B - C$ en ligne (arêtes de poids $1$), décrire ce qui se produit
+lorsque le lien $B-C$ tombe, et expliquer pourquoi les distances annoncées croissent
+indéfiniment. Quelle contre-mesure élémentaire RIP adopte-t-il~? Commenter son coût.
+
+\Q Application numérique. On considère le graphe non orienté à $6$ sommets d'arêtes
+\[ (0,1,7)\ (0,2,9)\ (0,5,14)\ (1,2,10)\ (1,3,15)\ (2,3,11)\ (2,5,2)\ (3,4,6)\ (4,5,9). \]
+Calculer, en détaillant les étapes de Dijkstra, les distances depuis le sommet $0$, ainsi
+qu'un plus court chemin de $0$ à $4$.
+
+%=======================================================================
+\section*{Partie IV --- TCP : fiabilité, temporisateur et congestion}
+%=======================================================================
+
+\emph{Références~: \rfc{9293} (TCP), \rfc{6298} (\emph{Computing TCP's Retransmission
+Timer}, 2011), \rfc{5681} (\emph{TCP Congestion Control}, 2009), V.~Jacobson,
+\emph{Congestion Avoidance and Control}, SIGCOMM~1988~; M.~Mathis, J.~Semke, J.~Mahdavi,
+T.~Ott, \emph{The Macroscopic Behavior of the TCP Congestion Avoidance Algorithm},
+ACM~CCR~27(3), 1997.}
+
+\subsection*{IV.1 --- Numéros de séquence circulaires}
+
+TCP numérote les octets par un compteur de $32$ bits qui \emph{boucle}~: on travaille dans
+$\mathbb{Z}/M\mathbb{Z}$ avec $M=2^{32}$. On veut décider si un numéro $a$ « précède » un
+numéro $b$.
+
+\Q On pose $\texttt{avant}(a,b) = \big[(b-a)\bmod M < 2^{31}\ \text{et}\ a\ne b\big]$.
+Écrire la fonction. Démontrer que si tous les numéros en circulation à un instant donné
+appartiennent à une fenêtre de largeur $W$, alors \code{avant} rend le verdict correct dès
+que $W<2^{31}$, et exhiber une ambiguïté lorsque $W=2^{31}$.
+
+\subsection*{IV.2 --- Réassemblage des segments}
+
+Un segment reçu couvre l'intervalle d'octets $[\,d,f\,[$. Les segments arrivent dans le
+désordre et peuvent se chevaucher. Le récepteur doit maintenir la liste des zones
+effectivement reçues.
+
+\Q Écrire \code{fusionner(segments)} qui, à partir d'une liste de couples $(d,f)$, renvoie la
+liste des intervalles maximaux couverts, triée par début croissant. Donner la complexité en
+fonction du nombre $k$ de segments.
+
+\Q Démontrer la correction de \code{fusionner}~: la réunion des intervalles renvoyés est
+égale à celle des intervalles fournis, et les intervalles renvoyés sont deux à deux disjoints
+et \emph{non adjacents}. On énoncera un invariant de boucle.
+
+\subsection*{IV.3 --- Estimation du temporisateur de retransmission}
+
+Le \rfc{6298} prescrit l'algorithme suivant, dû à Jacobson et Karels. À la première mesure
+de temps d'aller-retour $R$~:
+\[ \mathrm{SRTT}\leftarrow R,\qquad \mathrm{RTTVAR}\leftarrow R/2, \]
+puis, à chaque mesure ultérieure $R'$, \emph{dans cet ordre}~:
+\[ \mathrm{RTTVAR}\leftarrow(1-\beta)\,\mathrm{RTTVAR}+\beta\,|\mathrm{SRTT}-R'|,\qquad
+   \mathrm{SRTT}\leftarrow(1-\alpha)\,\mathrm{SRTT}+\alpha\,R', \]
+avec $\alpha=1/8$ et $\beta=1/4$~; enfin
+$\mathrm{RTO}\leftarrow\max\big(1,\ \mathrm{SRTT}+4\,\mathrm{RTTVAR}\big)$ (en secondes).
+
+\Q Écrire deux fonctions \code{rto_initial(R)} et \code{rto_suivant(SRTT, RTTVAR, R)}
+implémentant ces règles. Pourquoi l'ordre des deux affectations est-il important~?
+
+\Q On note $R_0$ la première mesure et $R_1,\dots,R_n$ les suivantes, et $S_n$ la valeur de
+$\mathrm{SRTT}$ après la $n$-ième mise à jour. Démontrer par récurrence que
+\[ S_n \;=\; (1-\alpha)^n R_0 \;+\; \alpha\sum_{i=1}^{n}(1-\alpha)^{\,n-i}R_i . \]
+Vérifier que la somme des coefficients vaut exactement $1$.
+
+\Q On appelle \emph{mémoire effective} de l'estimateur le nombre $\mu=\sum_{j\ge 0}(j+1)\,
+\alpha(1-\alpha)^j$ d'échantillons « équivalents » qu'il retient. Calculer $\mu$ en fonction
+de $\alpha$, puis sa valeur pour $\alpha=1/8$. Déterminer également le plus petit entier $j$
+tel que le poids $\alpha(1-\alpha)^j$ soit inférieur au dixième du poids le plus récent.
+Interpréter.
+
+\Q \textbf{(Algorithme de Karn et repli exponentiel.)} Lorsqu'un segment est retransmis, on
+ne peut pas savoir si l'accusé de réception répond à la première ou à la seconde émission.
+Expliquer en quoi mesurer $R$ dans ce cas biaiserait l'estimateur, et dans quel sens. Le
+\rfc{6298} impose de plus $\mathrm{RTO}\leftarrow 2\,\mathrm{RTO}$ à chaque expiration.
+Calculer le temps d'attente cumulé après $n$ expirations successives à partir d'un
+$\mathrm{RTO}$ initial $T_0$, et donner sa valeur pour $T_0=1$~s et $n=5$.
+
+\Q On suppose que chaque transmission d'un segment échoue indépendamment avec probabilité
+$p\in\,]0,1[$. Soit $N$ le nombre total de transmissions nécessaires. Reconnaître la loi de
+$N$, donner $\mathbb{P}(N=k)$, $\mathbb{P}(N>k)$ et $\mathbb{E}[N]$. Démontrer que la
+transmission aboutit \textbf{presque sûrement}. Application numérique pour $p=0{,}1$.
+
+\subsection*{IV.4 --- Contrôle de congestion : le débit d'une connexion TCP}
+
+TCP règle son débit par une \emph{fenêtre de congestion} $W$ (en segments). En régime
+d'évitement de congestion (\rfc{5681}), $W$ augmente de $1$ à chaque aller-retour~; à chaque
+perte, $W$ est divisée par $2$. C'est le schéma dit \textbf{AIMD} (\emph{additive increase,
+multiplicative decrease}). On suppose le régime périodique~: $W$ croît de $W_{\max}/2$ à
+$W_{\max}$, une perte survient, et le cycle recommence. On note $\mathrm{RTT}$ la durée d'un
+aller-retour, supposée constante, et $W_{\max}$ pair.
+
+\Q Démontrer que le nombre de segments émis pendant un cycle vaut exactement
+\[ N_{\text{cycle}} \;=\; \frac{3W_{\max}^{2}}{8}-\frac{W_{\max}}{4}, \]
+et que la fenêtre moyenne sur un cycle vaut $\overline{W}=\dfrac{3W_{\max}-2}{4}$.
+
+\Q On suppose qu'exactement une perte se produit par cycle, et l'on note $p$ la probabilité
+de perte d'un segment, de sorte que $p=1/N_{\text{cycle}}$. En négligeant les termes
+d'ordre~$1$ devant les termes d'ordre~$2$, démontrer la \textbf{formule de Mathis}~:
+\[ W_{\max}\approx\sqrt{\frac{8}{3p}}\,,\qquad\text{d'où}\qquad
+   \text{débit}\;\approx\;\frac{\mathrm{MSS}}{\mathrm{RTT}}\sqrt{\frac{3}{2p}}
+   \;\approx\;\frac{1{,}22\ \mathrm{MSS}}{\mathrm{RTT}\sqrt{p}}\quad\text{(octets/s)}, \]
+où $\mathrm{MSS}$ est la taille d'un segment en octets.
+
+\Q Application numérique~: $\mathrm{MSS}=1460$ octets, $\mathrm{RTT}=100$~ms. Calculer le
+débit prévu et la fenêtre $W_{\max}$ pour $p=10^{-2}$ puis pour $p=10^{-4}$.
+
+\Q Commenter la formule de Mathis. En particulier~: (a) quel est l'effet d'une division par
+$4$ du taux de perte~? (b) deux connexions partageant le même lien mais de $\mathrm{RTT}$
+différents obtiennent-elles la même part du débit~? Quelle conséquence pour l'équité~?
+
+%=======================================================================
+\section*{Partie V --- HTTP, cache et HTTPS}
+%=======================================================================
+
+\emph{Références~: \rfc{9110} et \rfc{9112} (HTTP/1.1, 2022), \rfc{9111} (cache HTTP),
+\rfc{8446} (TLS~1.3, 2018)~; W.~Diffie et M.~Hellman, \emph{New Directions in Cryptography},
+IEEE~IT-22(6), 1976.}
+
+\subsection*{V.1 --- Analyse d'une requête HTTP}
+
+Une requête HTTP/1.1 est un texte de la forme
+\begin{center}\ttfamily\small
+\begin{tabular}{l}
+GET /index.html?p=1 HTTP/1.1\textbackslash r\textbackslash n\\
+Host: cpgeacademy.org\textbackslash r\textbackslash n\\
+Content-Length: 5\textbackslash r\textbackslash n\\
+\textbackslash r\textbackslash n\\
+HELLO
+\end{tabular}
+\end{center}
+La première ligne (\emph{ligne de requête}) contient trois champs séparés par une espace.
+Suivent des \emph{en-têtes} de la forme \code{Nom: valeur}, un par ligne. Une ligne vide,
+c'est-à-dire la séquence $\texttt{CRLF}\,\texttt{CRLF}$ (soit
+\code{"\\r\\n\\r\\n"}), sépare l'en-tête du corps.
+
+\Q Écrire \code{analyser_requete(texte)} renvoyant le quintuplet
+\[ \big(\text{méthode},\ \text{cible},\ \text{version},\
+   \text{dictionnaire des en-têtes},\ \text{corps}\big), \]
+les noms d'en-têtes étant mis en minuscules. Donner la complexité.
+
+\Q Un serveur lit le flux \emph{caractère par caractère} et doit détecter la fin de l'en-tête
+sans jamais revenir en arrière. Construire un \textbf{automate fini déterministe} à quatre
+états reconnaissant la première occurrence de $\texttt{CRLFCRLF}$. Donner sa table de
+transition, puis écrire la fonction \code{fin_entete(flux)} renvoyant l'indice suivant la fin
+de l'en-tête, ou $-1$.
+
+\Q Démontrer la correction de cet automate en énonçant l'invariant~: \emph{à chaque instant,
+l'état courant est la longueur du plus long suffixe du texte déjà lu qui soit un préfixe de}
+$\texttt{CRLFCRLF}$. En déduire que l'analyse est linéaire en la longueur du flux et ne
+nécessite aucun retour en arrière. Vérifier l'invariant sur l'entrée
+\code{"\\r\\n\\r\\r\\n\\r\\n"}.
+
+\Q Lorsque la taille du corps n'est pas connue à l'avance, HTTP/1.1 utilise le codage
+\emph{par morceaux}~: le corps est une suite de blocs, chacun précédé de sa taille écrite en
+hexadécimal et suivi de $\texttt{CRLF}$~; un bloc de taille nulle termine le corps. Écrire
+\code{decoder_chunked(s)}. Exhiber un variant de boucle et en déduire la terminaison. Donner
+la complexité.
+
+\subsection*{V.2 --- Le cache}
+
+\Q Un cache de capacité $C$ objets applique la politique \textbf{LRU} (\emph{least recently
+used})~: en cas de saturation, l'objet dont le dernier accès est le plus ancien est évincé.
+Proposer une structure de données permettant de traiter un accès en $O(1)$ \emph{en moyenne},
+et écrire la classe correspondante avec une méthode \code{acceder(cle)} renvoyant \code{True}
+en cas de succès. Justifier la complexité et énoncer l'invariant reliant la structure à
+l'ordre des derniers accès.
+
+\Q Dérouler la politique LRU de capacité $3$ sur la suite d'accès
+\[ a,\ b,\ c,\ a,\ d,\ b,\ a,\ c,\ d,\ a \]
+en indiquant à chaque étape le contenu du cache, et donner le nombre de succès.
+
+\subsection*{V.3 --- Choix optimal du contenu d'un cache (programmation dynamique)}
+
+Un serveur dispose de $n$ objets~; l'objet $i$ occupe $t_i$ octets et est demandé $f_i$ fois
+par heure. On veut choisir un sous-ensemble $S$ d'objets à placer en mémoire, de taille
+totale au plus $C$, maximisant le nombre de requêtes servies depuis le cache~:
+\[ \mu(t,f,C) \;=\; \max\Big\{\textstyle\sum_{i\in S}f_i \ :\ S\subseteq\{0,\dots,n-1\},\
+\sum_{i\in S}t_i\le C\Big\}. \]
+
+\Q On pose, pour $0\le i\le n$ et $0\le j\le C$, $m_i(j)$ le nombre maximal de requêtes
+servies par un sous-ensemble de $\{0,\dots,i-1\}$ de taille totale au plus $j$. Donner
+$m_0$, puis établir la relation de récurrence exprimant $m_{i+1}$ en fonction de $m_i$.
+
+\Q Écrire \code{cache_optimal(t, f, C)} implémentant cette récurrence avec un \textbf{unique}
+tableau de taille $C+1$ mis à jour en place. Justifier précisément le \textbf{sens de
+parcours} de $j$, et montrer sur un exemple explicite ce que renverrait l'algorithme si l'on
+parcourait dans l'autre sens.
+
+\Q Démontrer la correction en énonçant et en prouvant, par récurrence sur le nombre $i$
+d'objets traités, l'\textbf{invariant} vérifié par le tableau à la fin de la $i$-ième
+itération de la boucle externe. Justifier la terminaison.
+
+\Q Donner la complexité en temps et en espace. Le problème de décision associé est
+\textsc{Sac-à-Dos}, connu NP-complet~; montrer qu'il appartient à NP en explicitant un
+certificat et un vérificateur. Expliquer pourquoi l'algorithme précédent ne contredit pas
+cette NP-complétude, et ce qui se produit si les tailles sont exprimées en octets et
+$C=10$~Go.
+
+\Q Application numérique. On prend $t=[3,4,5,9,4]$, $f=[60,50,70,90,30]$ (tailles en Mo) et
+$C=10$. Calculer $\mu$ et donner un sous-ensemble optimal. Détailler le contenu du tableau à
+la fin de chaque itération pour la version réduite $t=[3,4,5]$, $f=[60,50,70]$, $C=8$.
+
+\subsection*{V.4 --- Analyse des journaux du serveur (SQL)}
+
+Le serveur enregistre ses requêtes dans une base relationnelle de schéma~:
+\begin{center}\ttfamily\small
+\begin{tabular}{l}
+journal(\underline{id}, ip, horodatage, methode, chemin, statut, octets, duree\_ms)\\
+client(\underline{ip}, pays, organisation)
+\end{tabular}
+\end{center}
+où \code{horodatage} est une chaîne au format \code{'AAAA-MM-JJ HH:MM:SS'} et \code{statut}
+le code de réponse HTTP ($2xx$~: succès, $3xx$~: redirection ou contenu inchangé, $4xx$~:
+erreur du client, $5xx$~: erreur du serveur). On rappelle que \code{substr(s, i, k)} extrait
+$k$ caractères de $s$ à partir de la position $i$ (comptée à partir de $1$).
+
+\Q Écrire une requête SQL donnant, pour chaque méthode, le nombre de requêtes et le volume
+total d'octets transmis, par nombre de requêtes décroissant.
+
+\Q Écrire une requête donnant les trois chemins les plus demandés, avec leur nombre de
+requêtes.
+
+\Q Écrire une requête donnant, pour chaque heure de la journée, le nombre total de requêtes,
+le nombre de réponses $5xx$ et le taux d'erreur en pourcentage arrondi au dixième.
+
+\Q Écrire une requête donnant les adresses IP ayant provoqué au moins trois réponses $4xx$,
+avec le nombre correspondant.
+
+\Q Écrire une requête donnant, par pays, le nombre de requêtes et le volume d'octets. Écrire
+enfin une requête donnant la liste des chemins qui n'ont \emph{jamais} été servis avec le
+statut $200$.
+
+\subsection*{V.5 --- HTTPS : l'établissement du secret partagé}
+
+TLS~1.3 (\rfc{8446}) établit un secret partagé par un échange de Diffie--Hellman. On se
+donne un nombre premier $p$ et un entier $g\in[\![2,p-2]\!]$, tous deux publics.
+
+\Q Écrire une fonction \code{puissance_mod(a, e, n)} calculant $a^{e}\bmod n$ par
+exponentiation rapide, \textbf{sans} utiliser \code{pow(a, e, n)}. Exhiber un variant de
+boucle et en déduire la terminaison. Démontrer la correction en énonçant l'invariant
+$r\cdot a^{e}\equiv a_0^{e_0}\pmod n$. Démontrer que le nombre de multiplications modulaires
+est au plus $2\lfloor\log_2 e\rfloor+2$.
+
+\Q Le client tire $x$ au hasard et envoie $A=g^{x}\bmod p$~; le serveur tire $y$ et envoie
+$B=g^{y}\bmod p$. Chacun calcule alors une clé. Écrire les deux calculs et démontrer qu'ils
+donnent le même résultat. Application numérique~: $p=23$, $g=5$, $x=6$, $y=15$~; calculer
+$A$, $B$ et la clé partagée.
+
+\Q Un attaquant qui observe le réseau connaît $p$, $g$, $A$ et $B$. Le retrouver $x$ est le
+problème du \textbf{logarithme discret}. Décrire un algorithme naïf et donner sa complexité.
+Décrire ensuite le principe de l'algorithme « pas de bébé, pas de géant » en $O(\sqrt{p})$
+opérations et $O(\sqrt{p})$ en espace. Pour $p$ de $2048$ bits, comparer les deux coûts au
+nombre d'opérations réalisables en un an par une machine effectuant $10^{9}$ opérations par
+seconde. Conclure.
+
+\Q \textbf{Question de synthèse (à traiter en quelques lignes).} TLS~1.3 impose que $x$ et
+$y$ soient \emph{éphémères}, c'est-à-dire tirés à nouveau pour chaque connexion et effacés
+ensuite, et a supprimé la possibilité d'un échange de clés reposant sur le chiffrement par la
+clé publique du serveur. Expliquer ce que l'on gagne ainsi si la clé privée du serveur est
+compromise \emph{après} l'interception et l'enregistrement d'une session. En quoi la partie~II
+(intégrité) et cette partie~V (confidentialité) répondent-elles à des menaces de nature
+différente~?
+
+\vfill
+\begin{center}\small\textsc{Fin de l'épreuve}\end{center}
+\end{document}

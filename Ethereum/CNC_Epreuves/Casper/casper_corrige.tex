@@ -1,0 +1,1099 @@
+\documentclass[11pt,a4paper]{article}
+\input{casper_preambule}
+\rhead{\small Casper --- Corrigé}
+\renewcommand{\Q}{\medskip\par\stepcounter{qcnt}\noindent\textbf{\color{cnc}Question~\theqcnt.}~}
+\begin{document}
+\begin{center}
+{\large\bfseries Préparation au Concours National Commun --- Informatique MP}\\[8pt]
+\rule{0.9\linewidth}{0.5pt}\\[6pt]
+{\Large\bfseries Corrigé détaillé}\\[4pt]
+{\bfseries Filière MP --- Durée : 4 heures}\\[6pt]
+{\itshape Finalité dans les chaînes de blocs : le protocole Casper}\\[2pt]
+{\small d'après V.~Buterin et V.~Griffith, \emph{Casper the Friendly Finality Gadget}, \\ Ethereum Foundation, arXiv:1710.09437v4 (2019)}\\[6pt]
+\rule{0.9\linewidth}{0.5pt}\\[8pt]
+{\small Auteur~: \href{https://orcid.org/0000-0002-6108-7176}{\textbf{Pr Agrégé El Hadiq Zouhair}}}\\[3pt]
+{\small \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}} \quad---\quad Tous droits réservés \textcopyright\ cpgeacademy.org}
+\end{center}
+\medskip
+\begin{center}
+\fcolorbox{gray}{gray!5}{\begin{minipage}{0.93\linewidth}\small
+\textbf{Avis important.} Ce document est une \textbf{initiative personnelle} du professeur,
+à but strictement pédagogique. Il ne s'agit \textbf{pas} d'un sujet officiel du Concours
+National Commun~; il s'en inspire uniquement par la forme et l'esprit.
+\smallskip
+
+\textbf{Pour aller plus loin.} Les élèves peuvent traiter une \textbf{nouvelle version} de
+ce problème dotée d'un \textbf{autocorrecteur des réponses}, et suivre un \textbf{cours
+complet}, sur \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}}.
+\smallskip
+
+\textbf{Note.} L'intégralité du code Python de ce corrigé a été exécutée et validée~; les
+fonctions de la partie IV et la programmation dynamique de la partie V ont en outre été
+confrontées à une recherche exhaustive sur plusieurs milliers de jeux d'essai aléatoires.
+\end{minipage}}
+\end{center}
+\medskip
+
+%=======================================================================
+\section*{Partie I --- Points de contrôle, dépôts et fuite d'inactivité}
+%=======================================================================
+
+\Q Les deux fonctions se réduisent à une opération arithmétique.
+\begin{lstlisting}
+def est_checkpoint(n):
+    return n % 100 == 0
+
+def hauteur_bloc(n):
+    return n // 100
+\end{lstlisting}
+Chacune effectue une unique division euclidienne~: la complexité est $O(1)$ (en supposant,
+comme d'usage, le coût des opérations arithmétiques sur les entiers manipulés constant).
+
+\Q On remonte les liens de parenté jusqu'à la racine.
+\begin{lstlisting}
+def hauteur(parent, c):
+    h = 0
+    x = c
+    while parent[x] != -1:
+        x = parent[x]
+        h = h + 1
+    return h
+\end{lstlisting}
+\textbf{Terminaison.} Posons $V = x$ (la valeur courante de la variable \texttt{x}). C'est un
+entier naturel. À chaque tour de boucle, $x$ est remplacé par \texttt{parent[x]}~; or
+l'hypothèse $0\le\texttt{parent[c]}<c$ garantit $\texttt{parent[x]}<x$. Le variant $V$ est
+donc un entier naturel \emph{strictement décroissant}~: la boucle effectue un nombre fini de
+tours. \hfill$\square$
+
+\textbf{Complexité.} À chaque tour, la hauteur de $x$ diminue exactement de $1$~; partant de
+$h(c)$, la boucle effectue exactement $h(c)$ tours, chacun en $O(1)$. La complexité est donc
+$\Theta\big(h(c)\big)$, soit $O(n)$ dans le pire des cas (arbre réduit à un chemin).
+
+\Q L'hypothèse $\texttt{parent[c]}<c$ signifie que les n\oe uds sont numérotés dans un ordre
+compatible avec la relation de descendance~: le père est toujours \emph{déjà} traité.
+\begin{lstlisting}
+def toutes_hauteurs(parent):
+    n = len(parent)
+    h = [0] * n
+    for c in range(n):
+        if parent[c] == -1:
+            h[c] = 0
+        else:
+            h[c] = h[parent[c]] + 1
+    return h
+\end{lstlisting}
+\textbf{Invariant.} \emph{Au début de l'itération d'indice $c$, pour tout $c'<c$ on a
+$\texttt{h[c']}=h(c')$.}
+
+\emph{Initialisation.} Pour $c=0$ l'ensemble des indices $c'<0$ est vide~: l'invariant est
+trivialement vrai.
+
+\emph{Hérédité.} Supposons l'invariant vrai au début de l'itération $c$. Si $c=0$, alors
+$c$ est la racine et $h(0)=0$~: l'affectation est correcte. Sinon, $p=\texttt{parent[c]}$
+vérifie $0\le p<c$, donc par hypothèse d'induction $\texttt{h[p]}=h(p)$~; comme le chemin de
+$c$ à la racine est le chemin de $p$ à la racine augmenté de l'arête $c\to p$, on a
+$h(c)=h(p)+1$, ce qu'affecte l'algorithme. L'invariant est vrai au début de l'itération
+$c+1$. \hfill$\square$
+
+\emph{Conclusion.} Après la dernière itération, $\texttt{h[c']}=h(c')$ pour tout $c'<n$.
+
+C'est \emph{exactement ici} que l'hypothèse $\texttt{parent[c]}<c$ est indispensable~: sans
+elle, \texttt{h[parent[c]]} pourrait ne pas encore avoir été calculée et vaudrait la valeur
+d'initialisation $0$, produisant un résultat faux.
+
+\textbf{Complexité.} $\Theta(n)$ en temps et $\Theta(n)$ en espace. À comparer aux
+$O(n\cdot h)$ qu'aurait coûté $n$ appels à \texttt{hauteur}.
+
+\Q Avec $\texttt{parent} = [-1,0,1,2,1,4,0,6]$~:
+\[
+\begin{array}{c|cccccccc}
+c & 0&1&2&3&4&5&6&7\\\hline
+\texttt{parent[c]} & -1&0&1&2&1&4&0&6\\
+h(c) & 0&1&2&3&2&3&1&2
+\end{array}
+\]
+On retrouve bien $h=[0,1,2,3,2,3,1,2]$.
+
+\Q Le point délicat est d'éviter tout flottant.
+\begin{lstlisting}
+def poids(depots, E):
+    s = 0
+    for v in E:
+        s = s + depots[v]
+    return s
+
+def est_supermajorite(depots, E, T):
+    return 3 * poids(depots, E) >= 2 * T
+\end{lstlisting}
+\textbf{Justification.} Comme $3>0$, on a l'équivalence
+$w(E)\ge \tfrac{2}{3}T \iff 3\,w(E)\ge 2\,T$. Les deux membres de droite sont des
+\emph{entiers}~: le test est exact, alors qu'un test \code{w >= 2*T/3} en flottants pourrait
+renvoyer un résultat erroné par arrondi (typiquement lorsque $2T$ n'est pas divisible par
+$3$, ou pour des dépôts de l'ordre de $10^{18}$ dépassant la précision des \emph{doubles}).
+Complexité~: $O(|E|)$.
+
+\Q $T = 30+30+20+20 = 100$, donc $2T = 200$.
+\begin{itemize}[leftmargin=1.4em,itemsep=1pt]
+\item $\{a,b\}$~: $w=60$, $3w=180<200$ $\Rightarrow$ \textbf{pas} une supermajorité.
+\item $\{a,b,c\}$~: $w=80$, $3w=240\ge 200$ $\Rightarrow$ supermajorité.
+\item $\{a,c,d\}$~: $w=70$, $3w=210\ge 200$ $\Rightarrow$ supermajorité.
+\end{itemize}
+
+\Q \textbf{(Lemme d'intersection.)} Soient $E_1,E_2$ deux supermajorités.
+
+Le dépôt étant additif sur les ensembles disjoints, la formule d'inclusion-exclusion donne
+\[ w(E_1\cup E_2)\;=\;w(E_1)+w(E_2)-w(E_1\cap E_2). \]
+Or $E_1\cup E_2$ est inclus dans l'ensemble de tous les validateurs et les dépôts sont
+strictement positifs, donc $w(E_1\cup E_2)\le T$. Il vient
+\[ w(E_1\cap E_2)\;=\;w(E_1)+w(E_2)-w(E_1\cup E_2)\;\ge\;\frac{2}{3}T+\frac{2}{3}T-T
+\;=\;\frac{T}{3}. \]
+\hfill$\square$
+
+\emph{Interprétation.} Deux supermajorités quelconques se recoupent toujours sur au moins un
+tiers du dépôt total. C'est ce tiers qui sera détruit en cas d'attaque~: toute la sûreté de
+Casper repose sur ce calcul élémentaire.
+
+\Q À chaque époque le dépôt est multiplié par $1-p$, donc, par récurrence immédiate,
+\[ D_k \;=\; D\,(1-p)^k. \]
+La perte subie à l'époque $k$ vaut $p\,D_k$. Comme $0<1-p<1$, la série géométrique converge
+et
+\[ \sum_{k=0}^{+\infty} p\,D_k \;=\; p\,D\sum_{k=0}^{+\infty}(1-p)^k
+\;=\; \frac{p\,D}{1-(1-p)} \;=\; D. \]
+\textbf{Interprétation.} La somme des pertes cumulées converge exactement vers le dépôt
+initial~: la fuite d'inactivité finit par confisquer la \emph{totalité} du dépôt d'un
+validateur définitivement inactif, mais jamais en temps fini (il en reste toujours une
+fraction $(1-p)^k>0$). Le mécanisme est donc « doux »~: il ne punit pas brutalement une
+absence passagère, mais élimine asymptotiquement les validateurs absents, jusqu'à ce que les
+validateurs restants redeviennent une supermajorité.
+
+\Q Comme $0<1-p<1$, on a $(1-p)^k\xrightarrow[k\to+\infty]{}0$, donc il existe $k$ tel que
+$D(1-p)^k\le S$~: l'ensemble considéré est une partie non vide de $\mathbb{N}$, il admet un
+plus petit élément. Pour $k\in\mathbb{N}$~:
+\[ D_k\le S \iff (1-p)^k\le \frac{S}{D}
+\iff k\,\ln(1-p)\le \ln\!\Big(\frac{S}{D}\Big)
+\iff k\ \ge\ \frac{\ln(S/D)}{\ln(1-p)}, \]
+la dernière équivalence provenant de $\ln(1-p)<0$ (le sens de l'inégalité s'inverse). Comme
+$0<S<D$, le quotient $x=\ln(S/D)/\ln(1-p)$ est strictement positif. L'ensemble des entiers
+$k\ge x$ a pour plus petit élément $\lceil x\rceil$, d'où
+$k^{\star}=\big\lceil \ln(S/D)/\ln(1-p)\big\rceil$. \hfill$\square$
+
+\Q
+\begin{lstlisting}
+def nb_epoques(D, p, S):
+    k = 0
+    d = D
+    while d > S:
+        d = d * (1 - p)
+        k = k + 1
+    return k
+\end{lstlisting}
+\textbf{Terminaison.} D'après la question 9, l'entier $k^{\star}$ existe. Posons
+$V = k^{\star}-k$. Tant que la boucle continue on a $d=D_k>S$, donc $k<k^{\star}$ (par
+minimalité de $k^{\star}$ et décroissance de $k\mapsto D_k$), donc $V\ge 1>0$~; et $V$
+décroît strictement de $1$ à chaque tour. C'est un variant entier positif~: la boucle
+termine, et elle s'arrête précisément lorsque $k=k^{\star}$. \hfill$\square$
+
+\textbf{Complexité.} Le nombre de tours est $k^{\star}=\big\lceil
+\ln(D/S)/\ln\!\big(\tfrac{1}{1-p}\big)\big\rceil$. À $p$ fixé, $1/\ln\frac{1}{1-p}$ est une
+constante, donc $k^\star = O\!\big(\log(D/S)\big)$, chaque tour coûtant $O(1)$.
+
+\Q Pour $D=1000$, $p=0{,}05$, $S=500$~:
+$x = \dfrac{\ln(0{,}5)}{\ln(0{,}95)} = \dfrac{-0{,}693147}{-0{,}051293} \approx 13{,}513$,
+donc $k^{\star}=\lceil 13{,}513\rceil = \mathbf{14}$.
+
+\emph{Vérification.} $D_{13}=1000\times0{,}95^{13}\approx 513{,}3>500$ et
+$D_{14}=1000\times0{,}95^{14}\approx 487{,}7\le 500$. Il faut donc $14$ époques pour qu'un
+validateur inactif perde la moitié de son dépôt.
+
+%=======================================================================
+\section*{Partie II --- Arbre de points de contrôle et sérialisation des votes}
+%=======================================================================
+
+\Q
+\begin{lstlisting}
+def est_ancetre(parent, a, b):
+    x = b
+    while x != -1:
+        if x == a:
+            return True
+        x = parent[x]
+    return False
+\end{lstlisting}
+\textbf{Terminaison.} Le variant est $V=x+1\in\mathbb{N}$~: en effet $x\ge -1$ et, à chaque
+tour, $x$ est remplacé par $\texttt{parent[x]}<x$. $V$ est un entier naturel strictement
+décroissant. \hfill$\square$
+
+\textbf{Complexité.} La boucle parcourt le chemin de $b$ à la racine, soit au plus
+$h(b)+1$ n\oe uds~: la complexité est $O\big(h(b)\big)$, donc $O(n)$ au pire.
+
+\Q
+\begin{lstlisting}
+def conflit(parent, a, b):
+    return not est_ancetre(parent, a, b) and not est_ancetre(parent, b, a)
+\end{lstlisting}
+Sur l'arbre $A_0$~:
+\begin{itemize}[leftmargin=1.4em,itemsep=1pt]
+\item $(2,4)$~: le chemin de $4$ à la racine est $4,1,0$ (ne contient pas $2$) et celui de
+$2$ est $2,1,0$ (ne contient pas $4$)~: \textbf{en conflit}.
+\item $(3,5)$~: chemins $3,2,1,0$ et $5,4,1,0$~: \textbf{en conflit}.
+\item $(1,3)$~: le chemin de $3$ à la racine est $3,2,1,0$ et contient $1$~: $1$ est ancêtre
+de $3$, donc \textbf{pas} de conflit.
+\end{itemize}
+
+\Q
+\begin{lstlisting}
+def ancetre_commun(parent, a, b, h):
+    x, y = a, b
+    while h[x] > h[y]:      # on remonte le plus profond des deux
+        x = parent[x]
+    while h[y] > h[x]:
+        y = parent[y]
+    while x != y:           # meme hauteur : on remonte ensemble
+        x = parent[x]
+        y = parent[y]
+    return x
+\end{lstlisting}
+\textbf{Complexité.} Les deux premières boucles effectuent respectivement au plus $h(a)$ et
+$h(b)$ tours, la troisième au plus $\min\big(h(a),h(b)\big)$ tours. Le total est
+$O\big(h(a)+h(b)\big)$, soit $O(n)$ au pire.
+
+\Q \textbf{Lemme admis (énoncé précis).} \emph{Si $x$ et $y$ sont deux ancêtres d'un même
+n\oe ud $z$ et si $h(x)=h(y)$, alors $x=y$.} (En effet, les ancêtres de $z$ forment le
+chemin de $z$ à la racine, sur lequel la hauteur prend chaque valeur de $0$ à $h(z)$
+exactement une fois.)
+
+\textbf{Correction des deux premières boucles.} Elles préservent l'énoncé « $x$ est un
+ancêtre de $a$ et $y$ un ancêtre de $b$ », puisqu'on ne fait que remonter des liens de
+parenté~; elles préservent aussi « tout ancêtre commun de $a$ et $b$ est un ancêtre de $x$
+et de $y$ ». Justifions ce second point pour la première boucle~: si $h(x)>h(y)$ et si $u$
+est un ancêtre commun de $a$ et $b$, alors $h(u)\le h(y)<h(x)$, donc $u\ne x$~; comme $u$ et
+$x$ sont tous deux ancêtres de $a$, $u$ est un ancêtre de $x$ distinct de $x$, donc un
+ancêtre de \texttt{parent[x]}. À la sortie, $h(x)=h(y)$.
+
+\textbf{Invariant de la troisième boucle.}
+\begin{quote}\itshape
+$x$ est un ancêtre de $a$, $y$ est un ancêtre de $b$, $h(x)=h(y)$, et tout ancêtre commun de
+$a$ et $b$ est un ancêtre à la fois de $x$ et de $y$.
+\end{quote}
+\emph{Initialisation.} Vrai à l'entrée d'après ce qui précède.
+
+\emph{Hérédité.} Si $x\ne y$, soit $u$ un ancêtre commun de $a$ et $b$~; par invariant $u$
+est un ancêtre de $x$ et de $y$. Si l'on avait $u=x$, alors $u$ serait un ancêtre de $y$ de
+même hauteur que $y$, donc $u=y$ par le lemme, d'où $x=y$~: contradiction. Donc $u\ne x$ et
+de même $u\ne y$, si bien que $u$ est un ancêtre de \texttt{parent[x]} et de
+\texttt{parent[y]}. Les hauteurs restent égales. L'invariant est préservé.
+
+\emph{Terminaison.} $h(x)$ est un entier naturel qui décroît strictement à chaque tour~;
+lorsque $h(x)=0$ on a $x=y=r$ et la boucle s'arrête (au plus tard).
+
+\emph{Conclusion.} À la sortie $x=y$ est un ancêtre commun de $a$ et $b$, et tout ancêtre
+commun de $a$ et $b$ est un ancêtre de $x$, donc de hauteur $\le h(x)$. C'est bien le plus
+proche ancêtre commun. \hfill$\square$
+
+\Q Notons $\ell=\texttt{ancetre\_commun}(a,b)$.
+
+$(\Leftarrow)$ Par contraposée. Si $a$ et $b$ ne sont pas en conflit, l'un est ancêtre de
+l'autre~; disons $a$ ancêtre de $b$. Alors $a$ est un ancêtre commun de $a$ et $b$, donc
+$h(a)\le h(\ell)$~; mais $\ell$ est un ancêtre de $a$, donc $h(\ell)\le h(a)$. D'où
+$h(\ell)=h(a)$ et, $\ell$ et $a$ étant deux ancêtres de $a$ de même hauteur, $\ell=a$ par le
+lemme. Donc $\ell\in\{a,b\}$.
+
+$(\Rightarrow)$ Par contraposée également. Si $\ell=a$, alors $a=\ell$ est un ancêtre de
+$b$, donc $a$ et $b$ ne sont pas en conflit~; de même si $\ell=b$. \hfill$\square$
+
+\Q
+\begin{lstlisting}
+def vote_valide(parent, depots, vote):
+    v, s, t = vote
+    return (v in depots) and (s != t) and est_ancetre(parent, s, t)
+\end{lstlisting}
+Complexité~: $O\big(h(t)\big)$ en moyenne (le test \code{v in depots} est en $O(1)$ moyen).
+
+\Q
+\begin{lstlisting}
+def encode(n):
+    octets = []
+    while True:
+        b = n % 128
+        n = n // 128
+        if n > 0:
+            octets.append(b + 128)
+        else:
+            octets.append(b)
+            return octets
+\end{lstlisting}
+\[
+\texttt{encode(0)} = [0],\quad
+\texttt{encode(127)} = [127],\quad
+\texttt{encode(128)} = [128,\,1],\quad
+\texttt{encode(300)} = [172,\,2].
+\]
+\emph{Détail pour $300$~:} $300 = 2\times 128 + 44$, donc $a_0=44$, $a_1=2$, et le codage est
+$[44+128,\,2]=[172,\,2]$.
+
+\Q Notons $n_0=n$ et $n_{k+1}=\lfloor n_k/128\rfloor$ la valeur de la variable \code{n}
+après $k+1$ tours. Une récurrence immédiate donne $n_k=\lfloor n/128^k\rfloor$. La boucle
+s'arrête au premier tour où $n_{k}=0$, c'est-à-dire produit exactement
+\[ \ell = \min\{k\ge 1 \ :\ \lfloor n/128^{k}\rfloor = 0\}
+     = \min\{k\ge 1 \ :\ n<128^{k}\} \]
+octets. Si $n=0$ alors $\ell=1$. Si $n\ge 1$, $n<128^k \iff \log_{128} n < k$, et le plus
+petit entier $k\ge1$ strictement supérieur à $\log_{128}n$ est
+$\lfloor \log_{128} n\rfloor+1$. D'où
+\[ \ell = \lfloor \log_{128} n\rfloor + 1 = O(\log n). \]
+\textbf{Variant.} La suite $(n_k)$ est une suite d'entiers naturels~; tant que la boucle
+continue on a $n_k\ge 1$ donc $n_{k+1}=\lfloor n_k/128\rfloor < n_k$. Le variant $n_k$ est
+un entier naturel strictement décroissant~: terminaison. \hfill$\square$
+
+\Q
+\begin{lstlisting}
+def decode(octets):
+    n = 0
+    p = 1
+    for b in octets:
+        n = n + (b % 128) * p
+        p = p * 128
+    return n
+\end{lstlisting}
+Complexité $\Theta(\ell)$ où $\ell$ est la longueur de la liste.
+
+\Q On utilise d'abord la propriété suivante, immédiate d'après le code~: pour tout octet
+$b_0$ et toute liste $L$,
+\begin{equation}\label{eq:dec}
+\texttt{decode}([b_0]+L) \;=\; (b_0 \bmod 128) \;+\; 128\times \texttt{decode}(L).
+\end{equation}
+
+\textbf{Récurrence sur $\ell$}, le nombre d'octets de \code{encode(n)}.
+
+\emph{Cas $\ell=1$.} Cela équivaut à $n<128$ (question 19). Alors $\texttt{encode}(n)=[n]$ et
+$\texttt{decode}([n]) = n \bmod 128 = n$.
+
+\emph{Hérédité.} Soit $\ell\ge 2$ et supposons la propriété vraie pour tous les entiers dont
+le codage a $\ell-1$ octets. Soit $n$ tel que $\texttt{encode}(n)$ ait $\ell$ octets, donc
+$n\ge 128$. Posons $q=\lfloor n/128\rfloor\ge 1$ et $b=n\bmod 128$. Le premier tour de boucle
+empile $b+128$ (car $q>0$) puis poursuit avec $q$~: par définition de l'algorithme,
+\[ \texttt{encode}(n) \;=\; [\,b+128\,] \;+\; \texttt{encode}(q), \]
+et $\texttt{encode}(q)$ a $\ell-1$ octets. En appliquant \eqref{eq:dec} puis l'hypothèse de
+récurrence~:
+\[ \texttt{decode}(\texttt{encode}(n)) = \big((b+128)\bmod 128\big) + 128\times
+\texttt{decode}(\texttt{encode}(q)) = b + 128\,q = n, \]
+la dernière égalité étant la division euclidienne de $n$ par $128$. \hfill$\square$
+
+\Q On a $128^4 = 2^{28} = 268\,435\,456 < 10^9$ et $128^5 = 2^{35} = 34\,359\,738\,368
+> 10^9$. D'après la question 19, le codage d'une hauteur $h\le 10^9$ occupe donc au plus
+$\lfloor\log_{128}10^9\rfloor+1 = \mathbf{5}$ octets.
+
+\textbf{Commentaire.} Un codage sur $8$ octets (entier $64$ bits) consommerait toujours $8$
+octets. En pratique les hauteurs de points de contrôle réelles se comptent en milliers~:
+$1000<128^2=16\,384$, donc $2$ octets suffisent, soit un gain de $75\,\%$. Un vote contenant
+deux hauteurs, l'économie est de $12$ octets par vote~; avec plusieurs dizaines de milliers
+de validateurs votant à chaque époque, cela représente plusieurs centaines de kilo-octets
+économisés par époque sur la bande passante du réseau et sur le stockage définitif dans la
+chaîne. Le prix à payer est un décodage légèrement plus coûteux et la nécessité de connaître
+la longueur du codage \emph{a posteriori} (d'où le bit de continuation).
+
+%=======================================================================
+\section*{Partie III --- Justification et finalisation}
+%=======================================================================
+
+\Q On agrège les dépôts par couple $(s,t)$, en dédoublonnant au préalable les votes.
+\begin{lstlisting}
+def liens_supermajorite(votes, depots):
+    T = 0
+    for v in depots:
+        T = T + depots[v]
+    poids_lien = {}
+    vus = set()
+    for (v, s, t) in votes:
+        if (v, s, t) not in vus:          # un validateur ne compte qu'une fois
+            vus.add((v, s, t))
+            if (s, t) in poids_lien:
+                poids_lien[(s, t)] = poids_lien[(s, t)] + depots[v]
+            else:
+                poids_lien[(s, t)] = depots[v]
+    L = set()
+    for st in poids_lien:
+        if 3 * poids_lien[st] >= 2 * T:
+            L.add(st)
+    return L
+\end{lstlisting}
+\textbf{Correction.} L'ensemble \code{vus} garantit qu'un même triplet $(\nu,s,t)$ répété
+n'est comptabilisé qu'une fois~; ainsi $\texttt{poids\_lien[(s,t)]} = w(E_{s\to t})$ où
+$E_{s\to t}$ est l'ensemble des validateurs ayant voté $s\to t$. Le test final est celui de
+la question 5.
+
+\textbf{Complexité.} $O(m)$ en moyenne pour la boucle principale ($m$ = nombre de votes,
+opérations de dictionnaire et d'ensemble en $O(1)$ moyen), plus $O(|L'|)$ pour la boucle
+finale où $|L'|\le m$ est le nombre de couples distincts, plus $O(N)$ pour le calcul de $T$.
+Total~: $O(m+N)$ en moyenne.
+
+\Q
+\begin{lstlisting}
+def enfants_de(parent):
+    E = [[] for _ in range(len(parent))]
+    for c in range(len(parent)):
+        if parent[c] != -1:
+            E[parent[c]].append(c)
+    return E
+\end{lstlisting}
+Complexité $\Theta(n)$ en temps et en espace (la somme des longueurs des listes vaut $n-1$).
+
+\emph{Remarque.} On écrira \code{[[] for _ in range(n)]} et surtout \emph{pas}
+\code{[[]] * n}, qui créerait $n$ références vers une \textbf{même} liste.
+
+\Q
+\begin{lstlisting}
+def sous_arbre(E, c):
+    r = [c]
+    for f in E[c]:
+        r = r + sous_arbre(E, f)
+    return r
+\end{lstlisting}
+\textbf{Nombre d'appels.} Notons $A(c)$ le nombre total d'appels engendrés par
+\code{sous_arbre(E, c)} (lui compris). On a $A(c) = 1+\sum_{f\in E[c]} A(f)$. Par récurrence
+sur la hauteur du sous-arbre, $A(c)$ est le nombre de descendants de $c$. Comme chaque
+n\oe ud $\ne r$ figure dans la liste des fils d'exactement un n\oe ud (son père, unique), le
+parcours atteint chaque n\oe ud une et une seule fois~: $A(0)=n$. \hfill$\square$
+
+\textbf{Coût des concaténations.} L'opérateur \code{+} sur les listes recopie ses deux
+opérandes. Sur un arbre réduit à un \emph{chemin} ($\texttt{parent[c]}=c-1$), le sous-arbre
+de $c$ a $n-c$ éléments et l'appel de rang $c$ recopie $n-c$ éléments~: le coût total est
+\[ \sum_{c=0}^{n-1}(n-c) \;=\; \frac{n(n+1)}{2} \;=\; \Theta(n^2). \]
+
+\textbf{Variante linéaire.} On accumule dans une même liste, sans jamais recopier.
+\begin{lstlisting}
+def sous_arbre_acc(E, c, acc=None):
+    if acc is None:
+        acc = []
+    acc.append(c)
+    for f in E[c]:
+        sous_arbre_acc(E, f, acc)
+    return acc
+\end{lstlisting}
+Chaque n\oe ud donne lieu à exactement un \code{append} en $O(1)$ amorti~: la complexité est
+$\Theta(n)$ en temps. L'espace de pile est $O(h)$ où $h$ est la hauteur de l'arbre.
+
+\Q La justification est la \emph{clôture} de $\{r\}$ par les liens de supermajorité~: c'est
+l'ensemble des sommets accessibles depuis $r$ dans le graphe orienté $(\,\text{n\oe uds},\,L\,)$.
+\begin{lstlisting}
+def justifies(parent, liens, racine=0):
+    succ = {}                       # liste d'adjacence du graphe des liens
+    for (s, t) in liens:
+        if s in succ:
+            succ[s].append(t)
+        else:
+            succ[s] = [t]
+    J = {racine}
+    pile = [racine]
+    while pile:
+        c = pile.pop()
+        if c in succ:
+            for t in succ[c]:
+                if t not in J:
+                    J.add(t)
+                    pile.append(t)
+    return J
+\end{lstlisting}
+\textbf{Complexité.} Construction de \code{succ} en $O(|L|)$~; chaque sommet est empilé au
+plus une fois (il est ajouté à \code{J} au moment où il est empilé) et chaque arc est examiné
+au plus une fois. Total~: $O(n+|L|)$ en moyenne.
+
+\Q Notons $J$ l'ensemble renvoyé et $\mathcal{J}$ l'ensemble des points de contrôle
+justifiés au sens de la définition.
+
+$\boxed{J\subseteq\mathcal{J}}$ Montrons par récurrence sur l'ordre d'insertion dans $J$ que
+tout élément inséré est justifié. Le premier inséré est $r$, justifié par définition.
+Supposons les $k$ premiers insérés justifiés et soit $t$ le $(k+1)$-ème~: il a été inséré
+lors du traitement d'un sommet $c$ dépilé, donc déjà inséré, donc justifié par hypothèse de
+récurrence, et $(c,t)\in L$, c'est-à-dire $c\to t$. Par définition, $t$ est justifié.
+
+$\boxed{\mathcal{J}\subseteq J}$ Soit $c\in\mathcal{J}$. Par définition, il existe une chaîne
+$r=b_0\to b_1\to\dots\to b_k=c$ de liens de supermajorité (chaque $b_{i}$ justifiant
+$b_{i+1}$). Montrons par récurrence sur $k$ que $c\in J$. Si $k=0$, $c=r\in J$ par
+initialisation. Si $k\ge 1$, par hypothèse de récurrence $b_{k-1}\in J$~; or tout sommet
+inséré dans $J$ est empilé, donc dépilé (la boucle ne s'arrête que lorsque la pile est vide,
+et elle s'arrête car chaque sommet est empilé au plus une fois). Au moment où $b_{k-1}$ est
+dépilé, l'arc $(b_{k-1},c)$ est examiné~: soit $c$ est déjà dans $J$, soit il y est ajouté.
+Dans les deux cas $c\in J$. \hfill$\square$
+
+\Q On parcourt directement les liens plutôt que le produit $J\times L$.
+\begin{lstlisting}
+def finalises(parent, liens, J, h, racine=0):
+    F = {racine}
+    for (s, t) in liens:
+        if s in J and parent[t] == s and h[t] == h[s] + 1:
+            F.add(s)
+    return F
+\end{lstlisting}
+\emph{Remarque.} Le test \code{parent[t] == s} implique déjà \code{h[t] == h[s] + 1}~; on
+conserve les deux pour coller littéralement à la définition.
+
+\textbf{Complexité.} $O(|L|)$ en moyenne. (La version naïve parcourant $J\times L$ coûterait
+$O(|J|\cdot|L|)$.)
+
+\Q Soit $c\ne r$ finalisé. Par définition, $c$ est justifié et il existe un lien $c\to c'$
+où $c'$ est un fils direct de $c$. Or la définition de la justification stipule qu'un point
+de contrôle $x$ est justifié dès qu'il existe un point justifié $y$ avec $y\to x$. En prenant
+$y=c$ (justifié) et $x=c'$, on conclut que $c'$ est justifié. \hfill$\square$
+
+\emph{Conséquence.} Finaliser $c$, c'est justifier deux points de contrôle
+\textbf{consécutifs} $c$ et $c'$ avec $h(c')=h(c)+1$~: c'est cette « double justification
+contiguë » qui rend impossible tout emboîtement ultérieur, et donc toute révision de $c$.
+
+\Q Le dépôt total vaut $T=100$ et $2T=200$.
+
+\textbf{Liens.} Chacun des couples $(0,1)$, $(1,2)$, $(2,3)$ est voté par $\{a,b,c\}$, de
+poids $30+30+20=80$~; or $3\times 80 = 240 \ge 200$. Les trois couples sont donc des liens
+de supermajorité, et ce sont les seuls~:
+\[ L = \{(0,1),\,(1,2),\,(2,3)\}. \]
+
+\textbf{Justifiés.} $0=r$ est justifié~; $0\to 1$ donne $1$~; $1\to 2$ donne $2$~; $2\to 3$
+donne $3$. Aucun autre n\oe ud n'est cible d'un lien. Donc
+$J=\{0,1,2,3\}$.
+
+\textbf{Finalisés.} $0=r$ est finalisé par définition. Pour $1$~: il est justifié, le lien
+$1\to 2$ existe et $\texttt{parent[2]}=1$ avec $h(2)=h(1)+1=2$ $\Rightarrow$ finalisé. Pour
+$2$~: justifié, lien $2\to 3$, $\texttt{parent[3]}=2$, $h(3)=3=h(2)+1$ $\Rightarrow$
+finalisé. Pour $3$~: il est justifié mais aucun lien ne part de $3$ $\Rightarrow$ non
+finalisé. Donc
+\[ F=\{0,1,2\}. \]
+
+\Q
+\begin{lstlisting}
+def choix_fourche(J, h):
+    meilleur = None
+    for c in J:
+        if meilleur is None or h[c] > h[meilleur]:
+            meilleur = c
+    return meilleur
+\end{lstlisting}
+Complexité $\Theta(|J|)$, soit $O(n)$. (L'ensemble $J$ est non vide car il contient toujours
+la racine.)
+
+\Q \textbf{(a)} Soit $c$ justifié. Si $c=r$ la chaîne est réduite à $b_0=r$. Sinon, la
+définition fournit un justifié $b_{k-1}$ avec $b_{k-1}\to c$~; en itérant le raisonnement sur
+$b_{k-1}$, on construit une suite finie $r=b_0\to b_1\to\dots\to b_k=c$ de justifiés (le
+procédé termine car, un lien $s\to t$ n'existant que si $s$ est un ancêtre \emph{strict} de
+$t$, la suite des hauteurs $h(b_i)$ est strictement décroissante quand on remonte, donc
+atteint $0$, c'est-à-dire la racine, en un nombre fini d'étapes).
+
+Par définition d'un vote valide, tout lien $s\to t$ vérifie « $s$ ancêtre strict de $t$ »~;
+donc chaque $b_i$ est un ancêtre strict de $b_{i+1}$, et $h(b_i)<h(b_{i+1})$~: la suite des
+hauteurs est strictement croissante. En particulier tout justifié est un descendant de $r$.
+
+\textbf{(b)} Soit $H=\max\{h(c) : c\in J\}$ (le maximum existe, $J$ étant fini non vide).
+Supposons deux justifiés $c_1\ne c_2$ tels que $h(c_1)=h(c_2)=H$. C'est exactement la
+situation exclue par la propriété (iv) admise. Donc le maximum est atteint en un unique
+n\oe ud, et la valeur renvoyée par \code{choix_fourche} ne dépend pas de l'ordre de parcours
+de l'ensemble $J$~: la règle de choix de fourche est bien définie. \hfill$\square$
+
+\emph{Commentaire.} Cette règle est dite \emph{correcte par construction}~: le théorème de
+vivacité plausible (non démontré ici) assure qu'il est \emph{toujours} possible de finaliser
+un nouveau point de contrôle au-dessus du justifié de plus grande hauteur, sans qu'aucun
+validateur honnête n'ait à enfreindre un commandement.
+
+%=======================================================================
+\section*{Partie IV --- Détection des infractions et sûreté responsable}
+%=======================================================================
+
+\Q On regroupe les votes par validateur, puis on indexe par hauteur de cible.
+\begin{lstlisting}
+def infraction_I(votes, h):
+    par_val = {}
+    for (v, s, t) in votes:
+        if v in par_val:
+            par_val[v].append((s, t))
+        else:
+            par_val[v] = [(s, t)]
+    for v in par_val:
+        vus = {}                      # hauteur de cible -> cible deja vue
+        for (s, t) in par_val[v]:
+            ht = h[t]
+            if ht in vus and vus[ht] != t:
+                return (v, vus[ht], t)
+            vus[ht] = t
+    return None
+\end{lstlisting}
+\textbf{Correction.} Le dictionnaire \code{vus} mémorise, pour chaque hauteur déjà
+rencontrée, la cible correspondante. Une infraction à (I) est exactement l'existence de deux
+votes \emph{distincts} d'un même validateur avec $h(t_1)=h(t_2)$~; si les cibles sont égales
+($t_1=t_2$) mais les sources différentes, il s'agit d'une infraction à (I) également au sens
+strict de l'énoncé du protocole. On a choisi ici de ne signaler que le cas $t_1\ne t_2$, qui
+est celui qui met en péril la sûreté (deux branches concurrentes)~; le cas $t_1=t_2$,
+$s_1\ne s_2$ se détecterait de la même façon en indexant par $t$.
+
+\textbf{Complexité.} Chaque vote est traité une fois, avec un nombre constant d'opérations de
+dictionnaire~: $O(m)$ en moyenne, $O(m)$ en espace.
+
+\Q
+\begin{lstlisting}
+def infraction_II_naif(votes, h):
+    par_val = {}
+    for (v, s, t) in votes:
+        if v in par_val:
+            par_val[v].append((s, t))
+        else:
+            par_val[v] = [(s, t)]
+    for v in par_val:
+        L = par_val[v]
+        for (s1, t1) in L:
+            for (s2, t2) in L:
+                if h[s1] < h[s2] and h[s2] < h[t2] and h[t2] < h[t1]:
+                    return (v, (s1, t1), (s2, t2))
+    return None
+\end{lstlisting}
+\textbf{Complexité.} Pour un validateur $\nu$ possédant $m_\nu$ votes, la double boucle coûte
+$\Theta(m_\nu^2)$. Le coût total est $\sum_\nu m_\nu^2 \le \big(\sum_\nu m_\nu\big)^2 = m^2$,
+avec égalité lorsque tous les votes proviennent d'un même validateur~: la complexité est
+$O(m^2)$, atteinte dans le pire des cas.
+
+\Q Fixons un validateur $\nu$ et notons $L$ la liste de ses votes.
+
+$(\Rightarrow)$ Supposons que $\nu$ enfreigne (II)~: il existe $(s_1,t_1)$ et $(s_2,t_2)$
+dans $L$ avec $h(s_1)<h(s_2)<h(t_2)<h(t_1)$. Alors $(s_1,t_1)$ appartient à l'ensemble
+$\{(s,t)\in L : h(s)<h(s_2)\}$, qui est donc non vide, et le maximum des $h(t)$ sur cet
+ensemble est $\ge h(t_1) > h(t_2)$. Le vote $(s_2,t_2)$ convient.
+
+$(\Leftarrow)$ Réciproquement, supposons qu'il existe $(s_2,t_2)\in L$ tel que
+\[ M \;=\; \max\{h(t_1) : (s_1,t_1)\in L,\ h(s_1)<h(s_2)\} \;>\; h(t_2). \]
+Soit $(s_1,t_1)$ un vote réalisant ce maximum. On a alors
+$h(s_1)<h(s_2)$ (appartenance à l'ensemble), $h(s_2)<h(t_2)$ (car le vote $(s_2,t_2)$ est
+\emph{valide}~: $s_2$ est un ancêtre strict de $t_2$), et $h(t_2)<M=h(t_1)$. Les quatre
+inégalités $h(s_1)<h(s_2)<h(t_2)<h(t_1)$ sont donc satisfaites, et les deux votes sont
+distincts (leurs sources n'ont pas la même hauteur). Le commandement (II) est enfreint.
+\hfill$\square$
+
+C'est ici qu'intervient de façon décisive l'hypothèse de validité des votes~: sans elle, la
+condition intermédiaire $h(s_2)<h(t_2)$ devrait être testée explicitement.
+
+\Q L'équivalence précédente suggère de trier par $h(s)$ croissant et de maintenir le maximum
+courant des $h(t)$. Il faut traiter les votes de \textbf{même} hauteur de source par
+\emph{groupes}, car l'inégalité $h(s_1)<h(s_2)$ est stricte.
+\begin{lstlisting}
+def infraction_II(votes, h):
+    par_val = {}
+    for (v, s, t) in votes:
+        if v in par_val:
+            par_val[v].append((s, t))
+        else:
+            par_val[v] = [(s, t)]
+    for v in par_val:
+        L = sorted(par_val[v], key=lambda st: h[st[0]])
+        n = len(L)
+        M = -1           # max des h(t) sur les votes de source STRICTEMENT plus basse
+        temoin = None    # un vote realisant ce maximum
+        i = 0
+        while i < n:
+            j = i                              # [i, j[ = groupe de meme h(s)
+            while j < n and h[L[j][0]] == h[L[i][0]]:
+                j = j + 1
+            for k in range(i, j):              # (s2, t2) candidats
+                if M > h[L[k][1]]:
+                    return (v, temoin, L[k])
+            for k in range(i, j):              # on integre le groupe courant
+                if h[L[k][1]] > M:
+                    M = h[L[k][1]]
+                    temoin = L[k]
+            i = j
+    return None
+\end{lstlisting}
+\textbf{Invariant de la boucle principale.}
+\begin{quote}\itshape
+Au début de chaque itération (d'indice $i$), $M$ est le maximum des $h(t_1)$ sur les votes
+$(s_1,t_1)$ de $L$ tels que $h(s_1)<h(L[i]_{\text{source}})$, avec la convention
+$M=-1$ si cet ensemble est vide, et \code{temoin} est un vote réalisant ce maximum.
+\end{quote}
+\emph{Initialisation.} Pour $i=0$, aucun vote n'a de source de hauteur strictement inférieure
+à la plus petite~: l'ensemble est vide et $M=-1$.
+
+\emph{Hérédité.} La liste étant triée par $h(s)$ croissant, les votes d'indice $<i$ sont
+exactement ceux dont la hauteur de source est $\le h(L[i]_{\text{source}})$~; la tranche
+$[i,j[$ regroupe tous ceux de hauteur de source \emph{égale}. Après l'exécution de la seconde
+boucle interne, $M$ intègre donc précisément les votes de hauteur de source
+$\le h(L[i]_{\text{source}})$, c'est-à-dire strictement inférieure à
+$h(L[j]_{\text{source}})$~: l'invariant est rétabli pour $i\leftarrow j$.
+
+\emph{Correction.} Grâce à l'invariant, le test \code{M > h[L[k][1]]} de la première boucle
+interne est exactement la condition de la question 35 pour le vote candidat $L[k]$. La
+fonction renvoie donc un témoin si et seulement si $\nu$ enfreint (II).
+
+\emph{Terminaison.} La quantité $n-i$ est un entier naturel qui décroît strictement à chaque
+tour, car $j>i$ (le groupe est non vide).
+
+\textbf{Complexité.} Le regroupement par validateur coûte $O(m)$ en moyenne. Pour chaque
+validateur, le tri coûte $O(m_\nu\log m_\nu)$ et le double parcours $O(m_\nu)$. Comme
+$\sum_\nu m_\nu\log m_\nu \le m\log m$, la complexité totale est
+\[ \boxed{O(m\log m)} \]
+contre $O(m^2)$ pour la version naïve. L'espace supplémentaire est $O(m)$.
+
+\emph{Vérification expérimentale.} Cette fonction et \code{infraction_II_naif} ont été
+comparées sur $20\,000$ jeux de votes valides tirés au hasard~: elles concordent toujours, et
+le témoin renvoyé vérifie bien $h(s_1)<h(s_2)<h(t_2)<h(t_1)$.
+
+\Q Sur $A_0$, $h=[0,1,2,3,2,3,1,2]$.
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt]
+\item Votes $(0,3)$ et $(1,2)$~: $h(0)=0$, $h(1)=1$, $h(2)=2$, $h(3)=3$, d'où
+$0<1<2<3$, c'est-à-dire $h(s_1)<h(s_2)<h(t_2)<h(t_1)$ avec $(s_1,t_1)=(0,3)$ et
+$(s_2,t_2)=(1,2)$~: le validateur enfreint le \textbf{commandement (II)} (vote emboîté).
+\item Votes $(0,2)$ et $(0,4)$~: $h(2)=h(4)=2$ et $2\ne 4$~: deux votes distincts pour une
+même hauteur de cible, le validateur enfreint le \textbf{commandement (I)}. Notons que $2$ et
+$4$ sont précisément en conflit (question 13)~: ce validateur soutient simultanément deux
+branches concurrentes.
+\end{itemize}
+
+\Q On suppose que l'ensemble $\mathcal{F}$ des validateurs fautifs vérifie
+$w(\mathcal{F})<T/3$.
+
+\textbf{(i)} Soient $s_1\to t_1$ et $s_2\to t_2$ deux liens de supermajorité \emph{distincts}
+(c'est-à-dire $(s_1,t_1)\ne(s_2,t_2)$) et supposons $h(t_1)=h(t_2)$. Notons $E_1$ et $E_2$
+les ensembles de validateurs ayant respectivement voté $s_1\to t_1$ et $s_2\to t_2$~: ce sont
+deux supermajorités. D'après le lemme d'intersection (question 7),
+$w(E_1\cap E_2)\ge T/3$. Or tout $\nu\in E_1\cap E_2$ a publié les deux votes distincts
+$\langle\nu,s_1,t_1\rangle$ et $\langle\nu,s_2,t_2\rangle$ avec $h(t_1)=h(t_2)$~: il enfreint
+le commandement (I), donc $\nu\in\mathcal{F}$. Ainsi
+$T/3\le w(E_1\cap E_2)\le w(\mathcal{F})<T/3$~: contradiction. Donc $h(t_1)\ne h(t_2)$.
+\hfill$\square$
+
+\textbf{(ii)} Même raisonnement. Si $h(s_1)<h(s_2)<h(t_2)<h(t_1)$, les deux liens sont
+nécessairement distincts, et tout $\nu\in E_1\cap E_2$ a publié deux votes réalisant
+exactement la configuration interdite par le commandement (II). On obtient de nouveau
+$w(\mathcal{F})\ge T/3$, contradiction. \hfill$\square$
+
+\Q \textbf{(iii)} Supposons deux liens de supermajorité $s_1\to t_1$ et $s_2\to t_2$ avec
+$h(t_1)=h(t_2)=n$. S'ils sont distincts, (i) est contredit. Ils sont donc égaux~: il existe
+au plus un lien de supermajorité de hauteur de cible $n$. \hfill$\square$
+
+\textbf{(iv)} Si $n=0$, le seul point de contrôle de hauteur $0$ est la racine. Si $n\ge 1$,
+soient $c_1$ et $c_2$ deux justifiés de hauteur $n$. Comme $n\ge 1$, aucun n'est la racine,
+donc il existe des liens $c_1'\to c_1$ et $c_2'\to c_2$. Leurs cibles ont même hauteur $n$~;
+par (iii) ces deux liens sont égaux, donc en particulier $c_1=c_2$. Il existe donc au plus un
+point de contrôle justifié de hauteur $n$. \hfill$\square$
+
+\Q \textbf{(Théorème de sûreté responsable.)} Soient $a_m$ et $b_n$ deux points de contrôle
+finalisés en conflit, de fils directs justifiés $a_{m+1}$ et $b_{n+1}$, avec
+$h(a_{m+1})=h(a_m)+1$ et $h(b_{n+1})=h(b_n)+1$. Supposons, comme le permet la symétrie,
+$h(a_m)<h(b_n)$ (le cas d'égalité est traité à la question suivante), et raisonnons par
+l'absurde en supposant $w(\mathcal{F})<T/3$, de sorte que (i)--(iv) s'appliquent.
+
+D'après la question 32(a), il existe une chaîne de justification
+\[ r = b_{i_0}\to b_{i_1}\to\dots\to b_{i_k}=b_n \]
+dont tous les termes sont justifiés et dont les hauteurs sont strictement croissantes.
+Notons pour alléger $\beta_0=r,\ \beta_1,\dots,\beta_k=b_n$ ces points de contrôle.
+
+\emph{Étape 1.} Aucune hauteur $h(\beta_p)$ ne vaut $h(a_m)$ ni $h(a_{m+1})$. En effet,
+$\beta_p$ est justifié~; $a_m$ et $a_{m+1}$ le sont aussi ($a_m$ car finalisé, $a_{m+1}$ par
+la question 29). Si $h(\beta_p)=h(a_m)$, la propriété (iv) impose $\beta_p=a_m$, donc $a_m$
+serait un ancêtre de $b_n$ (les $\beta$ formant une chaîne d'ancêtres de $b_n$), ce qui
+contredit le conflit entre $a_m$ et $b_n$. Même argument pour $a_{m+1}$, dont $a_m$ est un
+ancêtre.
+
+\emph{Étape 2.} Comme $h(\beta_0)=0\le h(a_m)$ (et $h(\beta_0)\ne h(a_{m+1})$) tandis que
+$h(\beta_k)=h(b_n)>h(a_m)$, l'ensemble $\{p : h(\beta_p)>h(a_{m+1})\}$ est non vide dès que
+$h(b_n)>h(a_{m+1})$~; c'est le cas, car $h(b_n)>h(a_m)$ et $h(b_n)\ne h(a_{m+1})$ par
+l'étape 1. Soit $j$ le plus petit tel indice. Alors $j\ge 1$ et, par minimalité,
+$h(\beta_{j-1})<h(a_{m+1})$~; l'étape 1 interdit l'égalité, donc
+$h(\beta_{j-1})<h(a_{m+1})$, et même $h(\beta_{j-1})<h(a_m)$ puisque $h(\beta_{j-1})$ ne peut
+valoir ni $h(a_m)$ ni $h(a_{m+1})$ et que $h(a_{m+1})=h(a_m)+1$.
+
+\emph{Étape 3.} On dispose donc du lien de supermajorité $\beta_{j-1}\to\beta_j$ avec
+\[ h(\beta_{j-1})\;<\;h(a_m)\;<\;h(a_{m+1})\;<\;h(\beta_j), \]
+et du lien de supermajorité $a_m\to a_{m+1}$ (qui existe puisque $a_m$ est finalisé). C'est
+exactement la configuration interdite par la propriété (ii), avec $(s_1,t_1)=(\beta_{j-1},
+\beta_j)$ et $(s_2,t_2)=(a_m,a_{m+1})$~: contradiction.
+
+\emph{Conclusion.} L'hypothèse $w(\mathcal{F})<T/3$ est absurde. Autrement dit, si deux
+points de contrôle en conflit sont tous deux finalisés, alors
+\[ w(\mathcal{F})\ \ge\ \frac{T}{3}\,, \]
+c'est-à-dire qu'au moins un tiers du dépôt total est détruit, et l'on sait \emph{quels}
+validateurs punir~: c'est la \textbf{sûreté responsable} (\emph{accountable safety}).
+\hfill$\square$
+
+\emph{Commentaire.} Cette propriété est plus forte que la sûreté des algorithmes BFT
+classiques~: non seulement une attaque est impossible tant que moins d'un tiers des
+participants trichent, mais si elle a lieu, elle est \emph{prouvable} et \emph{sanctionnable}
+sur la chaîne. C'est ce qui résout le problème du \emph{nothing at stake} propre à la preuve
+d'enjeu.
+
+\Q Si $h(a_m)=h(b_n)$ avec $a_m\ne b_n$ (ils sont en conflit donc distincts), on a deux
+points de contrôle justifiés distincts de même hauteur, ce qui contredit directement (iv). En
+remontant à la source, ce sont les deux liens $a_{m-1}'\to a_m$ et $b_{n-1}'\to b_n$ dont les
+cibles ont même hauteur~: les validateurs de l'intersection (de poids $\ge T/3$) ont publié
+deux votes distincts de même hauteur de cible et enfreignent donc le \textbf{commandement
+(I)}.
+
+\Q Les tirages sont indépendants, uniformes et avec remise~: à chaque tirage, la probabilité
+que le validateur obtenu soit fautif vaut $q$ (proportion de fautifs), indépendamment des
+tirages précédents. La variable $X$ compte le rang du premier succès dans une suite d'épreuves
+de Bernoulli indépendantes de paramètre $q$~: c'est par définition une \textbf{loi géométrique}
+de paramètre $q$, à valeurs dans $\mathbb{N}^*$. Pour $k\ge 1$~:
+\[ P(X=k) = (1-q)^{k-1}q,\qquad
+   P(X>k) = \sum_{i>k}(1-q)^{i-1}q = (1-q)^{k},\qquad
+   \mathbb{E}[X] = \frac{1}{q}. \]
+(Le calcul de $P(X>k)$ s'obtient plus simplement en remarquant que $X>k$ signifie que les $k$
+premiers tirages sont des échecs, événements indépendants de probabilité $1-q$ chacun.)
+
+\Q L'événement $\{X=+\infty\}$ (l'algorithme ne s'arrête jamais) est l'intersection
+décroissante des événements $\{X>k\}$, donc par continuité décroissante de la probabilité
+\[ P(X=+\infty) = \lim_{k\to+\infty} P(X>k) = \lim_{k\to+\infty}(1-q)^{k} = 0, \]
+puisque $0<1-q<1$. L'algorithme termine donc \textbf{presque sûrement}. \hfill$\square$
+
+\Q
+\begin{lstlisting}
+import random
+
+def recherche_fautif(validateurs, est_fautif):
+    N = len(validateurs)
+    n_essais = 0
+    while True:
+        i = random.randrange(N)
+        n_essais = n_essais + 1
+        if est_fautif(validateurs[i]):
+            return (validateurs[i], n_essais)
+\end{lstlisting}
+\textbf{Espérance.} Le nombre d'appels à \code{est_fautif} est exactement $X$. Pour
+$q=\tfrac13$, $\mathbb{E}[X]=1/q=\mathbf{3}$~: en moyenne trois vérifications suffisent, quel
+que soit le nombre $N$ de validateurs. C'est ce qui rend la vérification par échantillonnage
+praticable pour un client léger.
+
+\textbf{Pire des cas.} Il n'existe \emph{aucune} borne~: pour tout $k$, $P(X>k)=(1-q)^k>0$.
+L'algorithme est de type \emph{Las Vegas}~: son résultat est toujours correct, mais son temps
+d'exécution n'est borné qu'en espérance. On ne peut donc parler que de complexité
+\emph{en moyenne}, ici $\Theta(1/q)$ appels.
+
+%=======================================================================
+\section*{Partie V --- Coût minimal d'une attaque (programmation dynamique)}
+%=======================================================================
+
+\Q Les dépôts étant entiers, $w(E)$ est un entier. Pour un entier $w$~:
+\[ w\ \ge\ \frac{2T}{3} \iff w\ \ge\ \left\lceil \frac{2T}{3}\right\rceil, \]
+car le plus petit entier supérieur ou égal à un réel $x$ est $\lceil x\rceil$. Donc
+$C=\lceil 2T/3\rceil$ convient, et c'est bien le plus petit tel entier (pour $C'<C$, l'entier
+$w=C'$ vérifierait $w\ge C'$ sans être une supermajorité, dès lors que $C'$ est atteignable).
+En Python, avec des divisions entières uniquement~:
+\begin{lstlisting}
+C = (2 * T + 2) // 3        # ou, de facon equivalente : C = -((-2 * T) // 3)
+\end{lstlisting}
+\emph{Vérification~:} $T=60\Rightarrow C=40$~; $T=100\Rightarrow C=67$~; $T=101\Rightarrow
+C=68$.
+
+\Q \textbf{Appartenance à NP.} Un \emph{certificat} pour l'instance $(d,C)$ est la liste des
+indices d'un sous-ensemble $S\subseteq\{0,\dots,n-1\}$. Sa taille est $O(n\log n)$ bits, donc
+polynomiale en la taille de l'entrée. Le \emph{vérificateur} calcule $\sum_{i\in S}d_i$ par
+$|S|-1\le n-1$ additions d'entiers de taille au plus celle de l'entrée, puis compare à $C$~:
+c'est un calcul en temps polynomial. Le problème est donc dans \textbf{NP}. \hfill$\square$
+
+\textbf{Conséquence pour \textsc{Coût-Attaque}.} Un algorithme calculant $\mu(d,C)$ en temps
+polynomial résoudrait \textsc{Somme-de-Sous-Ensemble} en temps polynomial~: il suffit de
+tester si $\mu(d,C)=C$. En effet, $\mu(d,C)$ est la plus petite somme $\ge C$~; elle vaut
+exactement $C$ si et seulement s'il existe un sous-ensemble de somme exactement $C$. Comme
+\textsc{Somme-de-Sous-Ensemble} est NP-complet, un tel algorithme entraînerait
+$\mathrm{P}=\mathrm{NP}$. Sous l'hypothèse $\mathrm{P}\ne\mathrm{NP}$, il n'existe donc
+\textbf{pas} d'algorithme polynomial pour \textsc{Coût-Attaque}.
+
+\Q \textbf{Initialisation.} Pour $i=0$ le seul sous-ensemble de $\varnothing$ est
+$\varnothing$, de somme $0$~:
+\[ m_0(0)=0 \quad\text{et}\quad m_0(j)=+\infty \ \text{ pour } 1\le j\le C. \]
+
+\textbf{Récurrence.} Un sous-ensemble $S\subseteq\{0,\dots,i\}$ contient ou non l'indice $i$.
+En notant $\pi(x)=\min(C,x)$ l'écrêtage, on obtient pour tout $0\le j\le C$~:
+\[ m_{i+1}(j) \;=\; \min\Big(\ m_i(j)\ ,\
+\min\big\{\,m_i(j')+d_i \ :\ 0\le j'\le C,\ \pi(j'+d_i)=j\,\big\}\ \Big), \]
+avec la convention $\min\varnothing=+\infty$. En pratique on implémente cette relation
+« en avant »~: pour chaque $j'$ tel que $m_i(j')<+\infty$, on met à jour l'entrée d'indice
+$\pi(j'+d_i)$ avec la valeur candidate $m_i(j')+d_i$.
+
+\textbf{Rôle de l'écrêtage.} Sans écrêtage, l'indice $j$ devrait parcourir $[\![0,\sum d_i]\!]$,
+tableau dont la taille dépend des données et non du seuil. L'écrêtage borne la taille à $C+1$.
+Il ne fait perdre aucune solution optimale~: toutes les sommes $\ge C$ sont regroupées dans la
+case $C$, mais on y conserve le \emph{minimum} des valeurs réelles correspondantes, et c'est
+précisément ce minimum que l'on cherche. Aucune information utile n'est donc perdue.
+
+\emph{Remarque.} Pour $j<C$ la définition impose $\pi(\sum_{k\in S}d_k)=j$ avec $j<C$, donc
+$\sum_{k\in S}d_k = j$~: ainsi $m_i(j)\in\{j,+\infty\}$. Le tableau se comporte comme un
+simple test d'atteignabilité pour $j<C$, et seule la case $C$ porte réellement une
+optimisation.
+
+\Q Par définition, $\mu(d,C)$ est le minimum des sommes $\ge C$ sur les sous-ensembles de
+$\{0,\dots,n-1\}$~; ce sont exactement les sous-ensembles dont la somme écrêtée vaut $C$
+(pour $C\ge 1$). Donc
+\[ \boxed{\ \mu(d,C) \;=\; m_n(C)\ } \]
+(avec la convention $\mu=+\infty$ si $m_n(C)=+\infty$~; et si $C=0$, $\mu=0$).
+
+\Q
+\begin{lstlisting}
+def cout_min_attaque(d, C):
+    INF = float('inf')
+    m = [INF] * (C + 1)
+    m[0] = 0
+    for i in range(len(d)):
+        for j in range(C, -1, -1):        # parcours DECROISSANT : indispensable
+            if m[j] < INF:
+                jp = min(C, j + d[i])
+                if m[j] + d[i] < m[jp]:
+                    m[jp] = m[j] + d[i]
+    return m[C]
+\end{lstlisting}
+\textbf{Sens de parcours.} Comme $d_i\ge 1$, l'indice cible $j'=\min(C,j+d_i)$ vérifie
+$j'>j$, sauf lorsque $j=C$ (où $j'=C$, mais l'affectation est alors sans effet puisque
+$m[C]+d_i>m[C]$). En parcourant $j$ de $C$ vers $0$, toute écriture se fait à un indice
+$j'>j$ \emph{déjà traité} lors de cette itération~: la valeur écrite ne pourra plus servir de
+source dans la même itération. Chaque dépôt est donc utilisé \textbf{au plus une fois}, ce
+qui est exactement la sémantique voulue (chaque validateur ne peut être recruté qu'une fois).
+
+\textbf{Contre-exemple en parcours croissant.} Prenons $d=[3]$ et $C=8$. En parcourant $j$ de
+$0$ vers $C$~: $j=0$ donne $m[3]=3$~; puis, dans la \emph{même} itération, $j=3$ (dont la
+valeur vient d'être écrite) donne $m[6]=6$~; puis $j=6$ donne $m[8]=9$. L'algorithme
+renverrait $9$ en utilisant \emph{trois fois} le dépôt $3$, alors que la réponse correcte est
+$+\infty$ (un seul dépôt de $3$ ne peut pas atteindre $8$).
+
+\Q \textbf{Invariant.}
+\begin{quote}\itshape
+À la fin de la $i$-ème itération de la boucle externe ($1\le i\le n$), pour tout
+$0\le j\le C$~: $\texttt{m[j]} = m_i(j)$, c'est-à-dire la plus petite somme réalisable à
+l'aide d'un sous-ensemble de $\{0,\dots,i-1\}$ dont la somme écrêtée à $C$ vaut exactement
+$j$ ($+\infty$ si aucun).
+\end{quote}
+\emph{Initialisation.} Avant la première itération, $\texttt{m}=[0,+\infty,\dots,+\infty]$,
+c'est bien $m_0$.
+
+\emph{Hérédité.} Supposons $\texttt{m}=m_i$ au début de l'itération $i+1$ (indice \code{i}
+dans le code). Notons $\texttt{m}^{\text{fin}}$ le tableau à la fin de cette itération.
+
+$(\le)$ Toute valeur écrite dans $\texttt{m}^{\text{fin}}[j']$ est de la forme
+$m_i(j)+d_i$ avec $\pi(j+d_i)=j'$, donc réalisable par un sous-ensemble de
+$\{0,\dots,i-1\}$ auquel on ajoute $i$ (l'indice $i$ n'était pas dans ce sous-ensemble par
+hypothèse de récurrence). Les valeurs conservées sont les $m_i(j)$, réalisables sans $i$.
+Donc $\texttt{m}^{\text{fin}}[j']\ge m_{i+1}(j')$ ne peut être violé~: toute valeur du tableau
+est réalisable, d'où $\texttt{m}^{\text{fin}}[j']\ge m_{i+1}(j')$.
+
+$(\ge)$ Réciproquement, soit $S\subseteq\{0,\dots,i\}$ réalisant $m_{i+1}(j')$. Si $i\notin
+S$, alors $S\subseteq\{0,\dots,i-1\}$ et $m_i(j')\le\sum_{k\in S}d_k$~; comme la case $j'$
+n'est jamais \emph{augmentée}, $\texttt{m}^{\text{fin}}[j']\le m_i(j')\le\sum_{k\in S}d_k$.
+Si $i\in S$, posons $S'=S\setminus\{i\}$ et $j=\pi\big(\sum_{k\in S'}d_k\big)$. Alors
+$m_i(j)\le\sum_{k\in S'}d_k$, et l'itération considère le couple $(j,j'')$ avec
+$j''=\pi(j+d_i)$. Deux cas~: si $\sum_{k\in S'}d_k<C$ alors $j=\sum_{k\in S'}d_k$ et
+$j''=\pi\big(\sum_{k\in S}d_k\big)=j'$~; si $\sum_{k\in S'}d_k\ge C$ alors $j=C$ et
+$j''=C=j'$. Dans les deux cas la mise à jour porte sur la case $j'$ avec la valeur
+$m_i(j)+d_i\le \sum_{k\in S}d_k$, d'où $\texttt{m}^{\text{fin}}[j']\le\sum_{k\in S}d_k =
+m_{i+1}(j')$.
+
+Enfin, le parcours décroissant garantit (voir question 49) qu'aucune case écrite au cours de
+cette itération n'est réutilisée comme source, donc l'indice $i$ n'est jamais compté deux
+fois~: les valeurs produites sont bien réalisables sans répétition. L'invariant est établi.
+\hfill$\square$
+
+\emph{Conclusion.} À la fin, $\texttt{m[C]}=m_n(C)=\mu(d,C)$ d'après la question 48.
+
+\emph{Terminaison.} Les deux boucles sont des boucles \code{for} sur des intervalles finis~:
+la terminaison est immédiate. Le nombre total d'itérations est exactement $n(C+1)$.
+
+\Q \textbf{Complexité.} Temps~: $\Theta\big(n\,C\big)$ (deux boucles imbriquées, corps en
+$O(1)$). Espace~: $\Theta(C)$ auxiliaire (un unique tableau de taille $C+1$), contre
+$\Theta(nC)$ pour une version conservant tous les $m_i$.
+
+\textbf{Pseudo-polynomialité.} La taille de l'entrée n'est pas $C$ mais le nombre de
+\emph{bits} nécessaires pour l'écrire, soit $\Theta(\log C)$. La complexité $\Theta(nC) =
+\Theta\big(n\,2^{\log_2 C}\big)$ est donc \emph{exponentielle} en la taille de l'entrée~: on
+parle d'algorithme \textbf{pseudo-polynomial}, polynomial en la \emph{valeur} des données mais
+non en leur \emph{taille}. Il n'y a donc aucune contradiction avec la NP-complétude établie à
+la question 46.
+
+\textbf{Passage aux wei.} Si les dépôts sont exprimés en wei, $C$ est multiplié par $10^{18}$.
+La complexité devient de l'ordre de $n\times 10^{18}\times(\text{seuil en ether})$~: le
+calcul est totalement irréalisable, et le tableau ne tiendrait pas en mémoire. En pratique on
+change d'unité (par exemple le \emph{gwei}, ou mieux le PGCD des dépôts) ou l'on renonce à
+l'optimum exact au profit d'une heuristique gloutonne (trier les dépôts par ordre décroissant
+et recruter jusqu'à atteindre $C$), qui donne ici une $2$-approximation.
+
+\Q Avec $d=[12,\,7,\,20,\,5,\,16]$~:
+\[ T = 12+7+20+5+16 = 60,\qquad C = \left\lceil \frac{2\times 60}{3}\right\rceil = 40. \]
+On trouve $\mu(d,40)=\mathbf{40}$, atteint par le sous-ensemble
+\[ S^\star=\{12,\ 7,\ 5,\ 16\},\qquad 12+7+5+16=40. \]
+(C'est le seul sous-ensemble de somme exactement $40$.) L'attaquant doit donc contrôler
+quatre validateurs sur cinq, mais peut se dispenser du plus gros dépôt.
+
+\textbf{Déroulé du tableau} pour la version réduite $d=[3,5,7]$ et $C=8$ (on note
+$\infty$ pour $+\infty$)~:
+\[
+\begin{array}{l|ccccccccc}
+j & 0&1&2&3&4&5&6&7&8\\\hline
+\text{initialisation} & 0&\infty&\infty&\infty&\infty&\infty&\infty&\infty&\infty\\
+\text{après } d_0=3 & 0&\infty&\infty&3&\infty&\infty&\infty&\infty&\infty\\
+\text{après } d_1=5 & 0&\infty&\infty&3&\infty&5&\infty&\infty&8\\
+\text{après } d_2=7 & 0&\infty&\infty&3&\infty&5&\infty&7&8
+\end{array}
+\]
+D'où $\mu([3,5,7],8) = m_3(8) = \mathbf{8}$, réalisé par $\{3,5\}$. On vérifie au passage la
+remarque de la question 47~: pour $j<8$, chaque case vaut $j$ ou $\infty$~; seule la case
+$j=8$ agrège plusieurs sommes ($8$, $10$, $12$, $15$) et n'en garde que le minimum $8$.
+Noter aussi que la case $j=8$ passe de $\infty$ à $8$ dès le traitement de $d_1=5$ (via
+$3+5$) et n'est plus améliorée ensuite.
+
+\Q Sur l'exemple, $\mu(d,C)=40=C$~: l'attaquant atteint \emph{exactement} le seuil.
+
+\textbf{Ce n'est pas toujours possible.} Prenons $d=[1,\,100]$. Alors $T=101$ et
+$C=\lceil 202/3\rceil = 68$. Les sommes réalisables sont $0$, $1$, $100$ et $101$~; les
+seules $\ge 68$ sont $100$ et $101$, donc
+\[ \mu(d,C) = 100 \;>\; 68 = C. \]
+La granularité des dépôts empêche d'atteindre le seuil~: pour réunir une supermajorité,
+l'attaquant est contraint de mobiliser $100$, soit près de $99\,\%$ du dépôt total, alors que
+$67{,}3\,\%$ auraient « suffi » en théorie. Un système où quelques validateurs concentrent
+l'essentiel du dépôt rend donc l'attaque \emph{plus chère en valeur absolue}, mais aussi
+beaucoup plus facile à monter en pratique (il suffit de corrompre un seul acteur)~: la
+métrique pertinente pour la sécurité réelle est le nombre d'acteurs à corrompre autant que le
+capital à mobiliser.
+
+\textbf{Lien avec la question 7.} Il faut distinguer deux quantités~:
+\begin{itemize}[leftmargin=1.4em,itemsep=1pt]
+\item le dépôt \emph{mobilisé} pour former une supermajorité, au moins
+$C=\lceil 2T/3\rceil$ (ici $40$, soit $\tfrac23 T$)~;
+\item le dépôt effectivement \emph{détruit} lors d'une violation de la sûreté, au moins
+$T/3$ (ici $20$) d'après le lemme d'intersection.
+\end{itemize}
+Un attaquant qui contrôle $2T/3$ et finalise deux points de contrôle en conflit perd donc au
+minimum la moitié de ce qu'il a mobilisé. C'est ce ratio, et non la seule difficulté
+algorithmique, qui constitue la véritable barrière économique de Casper.
+
+\Q \textbf{Synthèse.} Les parties III et IV établissent la \emph{sûreté responsable}~: sous
+l'hypothèse que moins d'un tiers du dépôt triche, deux points de contrôle en conflit ne
+peuvent être finalisés, et si l'hypothèse tombe, les coupables sont identifiables et punis
+(partie IV, question 40). Cette garantie est \emph{inconditionnelle vis-à-vis du réseau}~:
+elle ne suppose aucune borne sur la latence.
+
+En revanche elle ne dit rien de la \emph{vivacité}. Si plus d'un tiers des validateurs
+cessent de voter — panne massive, partition réseau, censure — plus aucune supermajorité ne
+peut se former~: aucun lien de supermajorité n'apparaît, l'ensemble $J$ de la question 26
+cesse de croître, et la chaîne ne finalise plus rien. Le protocole est bloqué sans que
+personne n'ait triché.
+
+C'est exactement le rôle de la \textbf{fuite d'inactivité} de la partie I~: en faisant
+décroître géométriquement le dépôt des absents (question 8), elle diminue le dépôt total $T$
+et donc le seuil $C=\lceil 2T/3\rceil$, jusqu'à ce que les validateurs restés actifs
+redeviennent, à eux seuls, une supermajorité. Le nombre d'époques nécessaires est le
+$k^\star$ de la question 9, logarithmique en le rapport des dépôts~: la reprise est
+relativement rapide. La vivacité est ainsi restaurée.
+
+Mais ce mécanisme a un prix. La démonstration de la question 40 repose sur le fait que les
+deux supermajorités en cause sont mesurées \emph{avec le même} dépôt total $T$~; c'est ce qui
+autorise le lemme d'intersection. Si le réseau se scinde en deux partitions $\mathcal{V}_A$ et
+$\mathcal{V}_B$, chacune voit l'autre comme inactive et lui applique la fuite~: sur la chaîne
+$A$ le dépôt de $\mathcal{V}_B$ fond, et réciproquement. Au bout d'un certain temps,
+$\mathcal{V}_A$ est une supermajorité \emph{selon les comptes de la chaîne $A$} et
+$\mathcal{V}_B$ une supermajorité \emph{selon ceux de la chaîne $B$}~: deux points de contrôle
+en conflit sont finalisés sans qu'aucun validateur n'ait enfreint le moindre commandement,
+donc \textbf{sans qu'aucun dépôt ne soit détruit}. L'hypothèse du lemme d'intersection est
+violée, non par malveillance, mais parce que les deux supermajorités ne se rapportent plus au
+même $T$.
+
+Casper échange donc une garantie de sûreté \emph{absolue} contre une garantie de sûreté
+\emph{sous hypothèse de synchronie faible}, assortie d'une garantie de vivacité. C'est un
+compromis classique et inévitable~: le théorème CAP, comme l'impossibilité FLP, interdit
+d'obtenir simultanément la sûreté et la vivacité dans un réseau asynchrone sujet aux
+partitions. Le protocole prescrit alors une règle simple et purement locale~: \emph{chaque
+validateur retient le premier point de contrôle finalisé qu'il a vu}, et l'arbitrage entre les
+deux branches est renvoyé hors du protocole, à un embranchement logiciel décidé par la
+communauté.
+
+\vfill
+\begin{center}\small\textsc{Fin du corrigé} \quad---\quad
+\href{https://cpgeacademy.org}{cpgeacademy.org}\end{center}
+\end{document}

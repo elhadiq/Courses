@@ -1,0 +1,463 @@
+\documentclass[11pt,a4paper]{article}
+\input{casper_preambule}
+\begin{document}
+\input{casper_titre}
+
+\section*{Présentation générale}
+
+Une \emph{chaîne de blocs} (\emph{blockchain}) est une structure de données répartie dans
+laquelle des blocs sont ajoutés les uns à la suite des autres. En cas de latence du réseau
+ou d'attaque, plusieurs blocs peuvent être proposés comme successeurs d'un même bloc~: la
+structure obtenue n'est plus une liste mais un \textbf{arbre de blocs}, dont la racine est
+le \emph{bloc génésis}.
+
+Le protocole \textbf{Casper} (Buterin et Griffith, 2019) est une surcouche de
+\emph{finalisation} qui sélectionne, dans cet arbre, une unique chaîne canonique. Pour des
+raisons d'efficacité, Casper ne raisonne pas sur l'arbre complet mais sur le sous-arbre des
+\textbf{points de contrôle} (\emph{checkpoints})~: le bloc génésis est un point de contrôle,
+et tout bloc dont le numéro dans l'arbre est un multiple exact de $100$ en est un également.
+
+Un ensemble de \textbf{validateurs} possédant chacun un \emph{dépôt} (une somme immobilisée)
+émettent des \textbf{votes}. Lorsqu'une proportion suffisante du dépôt total soutient un
+même vote, un \emph{lien de supermajorité} est créé~; de proche en proche, des points de
+contrôle deviennent \emph{justifiés} puis \emph{finalisés}. Deux règles, appelées
+\textbf{commandements de Casper}, interdisent certains votes~; tout validateur qui les
+enfreint perd la totalité de son dépôt (\emph{slashing}).
+
+Ce problème étudie, de manière algorithmique et mathématique, les objets et les propriétés
+de ce protocole. Il comporte \textbf{cinq parties largement indépendantes}, de difficulté
+croissante. Les fonctions écrites dans une question peuvent être librement réutilisées dans
+les questions suivantes.
+
+\subsection*{Notations et conventions}
+
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt]
+\item L'arbre des points de contrôle possède $n$ n\oe uds numérotés de $0$ à $n-1$. Le
+n\oe ud $0$ est la \textbf{racine} $r$ (le bloc génésis).
+\item L'arbre est représenté par une liste Python \code{parent} de longueur $n$ telle que
+\code{parent[0] == -1} et, pour tout $c\ge 1$, \code{parent[c]} est le numéro du père de
+$c$. On suppose toujours~: \[\forall c\ge 1,\qquad 0\le \texttt{parent[c]} < c .\]
+\item La \textbf{hauteur} $h(c)$ d'un point de contrôle $c$ est le nombre d'arêtes du
+chemin de $c$ à la racine. Ainsi $h(r)=0$.
+\item Un point de contrôle $a$ est un \textbf{ancêtre} de $b$ si $a$ appartient au chemin
+de $b$ à la racine (donc $b$ est ancêtre de lui-même). Deux points de contrôle $a$ et $b$
+sont dits \textbf{en conflit} lorsque aucun des deux n'est ancêtre de l'autre.
+\item Les validateurs sont identifiés par des clés. Les dépôts sont donnés par un
+dictionnaire Python \code{depots} associant à chaque validateur un entier
+\emph{strictement positif}. On note $T=\sum_{\nu} d_\nu$ le
+\textbf{dépôt total} et, pour un ensemble $E$ de validateurs, $w(E)=\sum_{\nu\in E} d_\nu$.
+\item Un ensemble $E$ de validateurs est une \textbf{supermajorité} lorsque
+$w(E)\ \ge\ \tfrac{2}{3}\,T$.
+\item Un \textbf{vote} est un triplet Python \code{(v, s, t)} où \code{v} est un
+validateur, \code{s} la \emph{source} et \code{t} la \emph{cible}. Le vote est
+\textbf{valide} si \code{v} appartient au jeu de validateurs et si \code{s} est un ancêtre
+\emph{strict} de \code{t}. Sauf mention contraire, tous les votes manipulés sont valides~;
+en particulier $h(s)<h(t)$.
+\item En Python, seules les constructions du programme officiel sont autorisées~: types de
+base, listes, tuples, dictionnaires, ensembles, boucles, fonctions, récursivité, ainsi que
+les modules \code{math} et \code{random}. Les fonctions \code{sorted} et \code{sort} sont
+autorisées et l'on admettra qu'elles trient une liste de $m$ éléments en $O(m\log m)$.
+\item On admet que les opérations élémentaires sur un dictionnaire (lecture, écriture,
+test d'appartenance) s'effectuent en $O(1)$ en moyenne.
+\item Toutes les complexités demandées sont des complexités \emph{en temps} dans le pire
+des cas, sauf indication explicite.
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, every node/.style={draw, rounded corners, minimum width=8mm,
+ minimum height=5.5mm, inner sep=2pt, font=\small}, level distance=13mm, sibling distance=17mm]
+\node (r) {$r{=}0$}
+  child {node (c1) {$1$}
+    child {node (c2) {$2$}
+      child {node (c3) {$3$}}}
+    child {node (c4) {$4$}
+      child {node (c5) {$5$}}}}
+  child {node (c6) {$6$}
+    child {node (c7) {$7$}}};
+\node[draw=none, right=22mm of r, font=\footnotesize, align=left]
+ {\code{parent = [-1, 0, 1, 2, 1, 4, 0, 6]}\\[2pt]
+  $h = [0,\,1,\,2,\,3,\,2,\,3,\,1,\,2]$};
+\end{tikzpicture}
+
+\emph{Figure 1 --- L'arbre de points de contrôle $A_0$ utilisé comme exemple dans tout le
+sujet.}
+\end{center}
+
+\bigskip
+\noindent\emph{Le sujet comporte 5 parties et 54 questions. Il est vivement conseillé de
+traiter les parties dans l'ordre, mais elles restent largement indépendantes.}
+
+\newpage
+
+%=======================================================================
+\section*{Partie I --- Points de contrôle, dépôts et fuite d'inactivité}
+%=======================================================================
+
+\subsection*{I.1 --- Hauteurs}
+
+Un bloc de numéro $n$ (entier naturel) est un point de contrôle si et seulement si $n$ est
+un multiple de $100$~; sa hauteur de point de contrôle vaut alors $n/100$.
+
+\Q Écrire deux fonctions \texttt{est\_checkpoint(n)} et \texttt{hauteur\_bloc(n)} qui prennent en
+argument un entier naturel \texttt{n} et renvoient respectivement le booléen indiquant si le
+bloc $n$ est un point de contrôle, et l'entier $n/100$ (on supposera dans le second cas que
+$n$ est bien un multiple de $100$). Préciser leur complexité.
+
+\Q Écrire une fonction \texttt{hauteur(parent, c)} qui calcule $h(c)$ en remontant les liens
+de parenté. Exhiber un \textbf{variant de boucle} entier et positif, et en déduire la
+terminaison de la fonction. Donner sa complexité en fonction de $h(c)$.
+
+\Q On souhaite calculer d'un seul coup les hauteurs de \emph{tous} les points de contrôle.
+Écrire une fonction \texttt{toutes\_hauteurs(parent)} qui renvoie la liste \texttt{h} telle que
+\texttt{h[c]} vaut $h(c)$, en une \textbf{unique} boucle de $c=0$ à $n-1$. Justifier la
+correction de l'algorithme en énonçant un invariant de boucle, et préciser à quel endroit
+l'hypothèse $\texttt{parent[c]}<c$ est indispensable. Donner la complexité.
+
+\Q Vérifier sur l'arbre $A_0$ de la Figure~1 que \texttt{toutes\_hauteurs} renvoie bien la
+liste $h$ indiquée.
+
+\subsection*{I.2 --- Dépôts et supermajorités}
+
+\Q Écrire une fonction \texttt{poids(depots, E)} qui renvoie $w(E)$, puis une fonction
+\texttt{est\_supermajorite(depots, E, T)} qui renvoie \texttt{True} si et seulement si $E$ est
+une supermajorité. On exige que le test soit effectué \textbf{sans aucun calcul en virgule
+flottante}~; justifier l'équivalence utilisée.
+
+\Q On considère les dépôts $\texttt{depots} = \{a:30,\ b:30,\ c:20,\ d:20\}$. Déterminer
+$T$, puis dire lesquels des ensembles $\{a,b\}$, $\{a,b,c\}$, $\{a,c,d\}$ sont des
+supermajorités.
+
+\Q \textbf{(Lemme d'intersection.)} Soient $E_1$ et $E_2$ deux supermajorités. Démontrer
+que \[ w(E_1\cap E_2)\ \ge\ \frac{T}{3}. \] \emph{Indication~:} majorer $w(E_1\cup E_2)$
+par $T$ et utiliser $w(E_1\cup E_2)=w(E_1)+w(E_2)-w(E_1\cap E_2)$. Ce lemme est la clé de
+toute la partie IV~; on veillera à rédiger la démonstration complètement.
+
+\subsection*{I.3 --- La fuite d'inactivité}
+
+Lorsque plus d'un tiers des validateurs cessent de voter, plus aucun point de contrôle ne
+peut être finalisé. Casper prévoit alors une \textbf{fuite d'inactivité}~: à chaque époque,
+un validateur qui ne vote pas et dont le dépôt vaut $D$ perd la fraction $p\,D$, où
+$p\in\,]0,1[$ est un réel fixé. On note $D_k$ le dépôt d'un validateur inactif après $k$
+époques, avec $D_0=D>0$.
+
+\Q Exprimer $D_k$ en fonction de $D$, $p$ et $k$. En déduire la valeur de la somme
+$\displaystyle\sum_{k=0}^{+\infty} p\,D_k$ et interpréter ce résultat.
+
+\Q Soit $S$ un réel tel que $0<S<D$. Démontrer que l'ensemble des entiers $k$ tels que
+$D_k\le S$ est non vide et que son plus petit élément vaut
+\[ k^{\star} \;=\; \left\lceil \frac{\ln(S/D)}{\ln(1-p)} \right\rceil . \]
+
+\Q Écrire une fonction \code{nb_epoques(D, p, S)} qui renvoie $k^{\star}$ \textbf{sans
+utiliser de logarithme}, par une simple boucle. Exhiber un variant prouvant la terminaison,
+puis montrer que la complexité est un $O\!\left(\log(D/S)\right)$.
+
+\Q Application numérique~: calculer $k^{\star}$ pour $D=1000$, $p=0{,}05$ et $S=500$.
+
+%=======================================================================
+\section*{Partie II --- Arbre de points de contrôle et sérialisation des votes}
+%=======================================================================
+
+\subsection*{II.1 --- Ancêtres, conflits, plus proche ancêtre commun}
+
+\Q Écrire une fonction \code{est_ancetre(parent, a, b)} qui renvoie \code{True} si et
+seulement si \code{a} est un ancêtre de \code{b}. Exhiber un variant de boucle et donner la
+complexité en fonction de $h(b)$.
+
+\Q En déduire une fonction \code{conflit(parent, a, b)} qui teste si $a$ et $b$ sont en
+conflit. Sur l'arbre $A_0$ de la Figure~1, déterminer si les paires $(2,4)$, $(3,5)$ et
+$(1,3)$ sont en conflit.
+
+\Q Écrire une fonction \code{ancetre_commun(parent, a, b, h)}, où \code{h} est la liste des
+hauteurs, qui renvoie le \textbf{plus proche ancêtre commun} de $a$ et $b$, c'est-à-dire
+l'ancêtre commun de plus grande hauteur. L'algorithme devra procéder en deux temps~: égaliser
+les hauteurs, puis remonter simultanément. Donner sa complexité.
+
+\Q Démontrer la correction de \code{ancetre_commun} en énonçant l'invariant de la troisième
+boucle. On pourra admettre le résultat suivant, que l'on énoncera précisément~: si $x$ et
+$y$ ont même hauteur et sont tous deux ancêtres d'un même n\oe ud, alors $x=y$.
+
+\Q Démontrer l'équivalence~: $a$ et $b$ sont en conflit si et seulement si
+$\texttt{ancetre\_commun}(a,b)\notin\{a,b\}$.
+
+\Q Écrire une fonction \code{vote_valide(parent, depots, vote)} qui teste la validité d'un
+vote \code{(v, s, t)} au sens des notations.
+
+\subsection*{II.2 --- Sérialisation à longueur variable des hauteurs}
+
+Un vote $\langle \nu, s, t, h(s), h(t)\rangle$ est diffusé sur le réseau~; il faut donc le
+\emph{sérialiser}, c'est-à-dire le transformer en une suite d'octets. Comme les hauteurs
+sont le plus souvent petites, on n'utilise pas un codage sur un nombre fixe d'octets, mais
+le codage \emph{à longueur variable} suivant, dit codage en base $128$.
+
+\begin{defi}
+Soit $n\in\mathbb{N}$ et soit $n=\sum_{i=0}^{\ell-1} a_i\,128^{\,i}$ son écriture en base
+$128$, avec $0\le a_i\le 127$, $a_{\ell-1}\ne 0$ si $n\ge 1$, et $\ell=1$, $a_0=0$ si
+$n=0$. Le \textbf{codage} de $n$ est la liste d'octets
+\[ \texttt{encode}(n) \;=\; [\,a_0+128,\ a_1+128,\ \dots,\ a_{\ell-2}+128,\ a_{\ell-1}\,]. \]
+Autrement dit, chaque octet porte $7$ bits de poids faible de $n$, et son bit de poids fort
+vaut $1$ pour tous les octets sauf le dernier.
+\end{defi}
+
+\Q Écrire une fonction \code{encode(n)} conforme à cette définition. Donner
+\code{encode(0)}, \code{encode(127)}, \code{encode(128)} et \code{encode(300)}.
+
+\Q Montrer que le nombre de tours de la boucle de \code{encode} vaut $1$ si $n=0$ et
+$\lfloor \log_{128} n\rfloor + 1$ si $n\ge 1$. Exhiber un variant de boucle. En déduire que
+la longueur de \code{encode(n)} est un $O(\log n)$.
+
+\Q Écrire la fonction réciproque \code{decode(octets)}, de complexité linéaire en la
+longueur de la liste.
+
+\Q Démontrer, par récurrence sur $\ell$ (le nombre d'octets produits), que pour tout
+$n\in\mathbb{N}$ on a $\texttt{decode}(\texttt{encode}(n)) = n$. On distinguera soigneusement le
+cas $n<128$ du cas général.
+
+\Q Le sujet suppose des hauteurs pouvant aller jusqu'à $10^{9}$. Combien d'octets au
+maximum le codage d'une hauteur consomme-t-il~? Comparer à un codage sur $8$ octets et
+commenter l'intérêt du codage à longueur variable pour un protocole où des milliers de votes
+sont diffusés à chaque époque.
+
+%=======================================================================
+\section*{Partie III --- Justification et finalisation}
+%=======================================================================
+
+On rappelle les définitions du protocole.
+
+\begin{defi}[Casper]\leavevmode
+\begin{itemize}[leftmargin=1.4em,itemsep=1pt]
+\item Un couple ordonné $(s,t)$ de points de contrôle est un \textbf{lien de supermajorité},
+noté $s\to t$, lorsque l'ensemble des validateurs ayant publié un vote valide de source $s$
+et de cible $t$ forme une supermajorité. Un lien peut « sauter » des points de contrôle~:
+$h(t)>h(s)+1$ est autorisé.
+\item Un point de contrôle $c$ est \textbf{justifié} si $c=r$, ou s'il existe un point de
+contrôle justifié $c'$ tel que $c'\to c$.
+\item Un point de contrôle $c$ est \textbf{finalisé} si $c=r$, ou si $c$ est justifié et
+s'il existe un lien $c\to c'$ où $c'$ est un fils \emph{direct} de $c$ (donc
+$h(c')=h(c)+1$).
+\end{itemize}
+\end{defi}
+
+\Q Écrire une fonction \code{liens_supermajorite(votes, depots)} qui prend une liste de
+votes valides (éventuellement avec des doublons, un même validateur pouvant émettre
+plusieurs fois le même vote) et renvoie l'\textbf{ensemble} des couples $(s,t)$ formant un
+lien de supermajorité. On veillera à ne compter le dépôt d'un validateur qu'une seule fois
+par couple $(s,t)$. Donner la complexité en fonction du nombre $m$ de votes.
+
+\Q Écrire une fonction \code{enfants_de(parent)} qui renvoie la liste \code{E} telle que
+\code{E[c]} soit la liste des fils de $c$. Complexité~?
+
+\Q Écrire une fonction \textbf{récursive} \code{sous_arbre(E, c)} renvoyant la liste des
+descendants de $c$ (lui compris). Démontrer que le nombre total d'appels engendrés par
+\code{sous_arbre(E, 0)} vaut exactement $n$. Montrer ensuite, sur l'exemple d'un arbre réduit
+à un chemin, que le coût des concaténations peut être \textbf{quadratique} en $n$~; proposer
+alors une variante \code{sous_arbre_acc} utilisant un accumulateur, de complexité $O(n)$.
+
+\Q Écrire une fonction \code{justifies(parent, liens)} renvoyant l'ensemble des points de
+contrôle justifiés. On utilisera un parcours en profondeur itératif à partir de la racine
+dans le graphe orienté dont les arcs sont les liens de supermajorité. Donner la complexité
+en fonction de $n$ et du nombre $|L|$ de liens.
+
+\Q Démontrer la correction de \code{justifies}~: montrer par double inclusion que
+l'ensemble renvoyé est exactement l'ensemble des points de contrôle justifiés. Pour
+l'inclusion réciproque, on raisonnera par récurrence sur la longueur d'une chaîne de
+justification menant de $r$ à $c$.
+
+\Q Écrire une fonction \code{finalises(parent, liens, J, h)} renvoyant l'ensemble des
+points de contrôle finalisés, où \code{J} est l'ensemble des justifiés. Donner la
+complexité.
+
+\Q Démontrer que si $c$ est finalisé et $c\ne r$, alors le fils direct $c'$ intervenant
+dans la définition est lui-même justifié.
+
+\Q On considère l'arbre $A_0$ de la Figure~1, les dépôts de la question 6, et la liste de
+votes où chacun des validateurs $a$, $b$, $c$ émet les trois votes $(0,1)$, $(1,2)$ et
+$(2,3)$. Déterminer l'ensemble des liens de supermajorité, l'ensemble des justifiés, puis
+l'ensemble des finalisés. Justifier chaque appartenance.
+
+\subsection*{III.4 --- La règle de choix de fourche}
+
+La règle de choix de fourche de Casper s'énonce~: \emph{suivre la chaîne contenant le point
+de contrôle justifié de plus grande hauteur.}
+
+\Q Écrire une fonction \code{choix_fourche(J, h)} renvoyant le point de contrôle justifié de
+plus grande hauteur. Complexité~?
+
+\Q On admet la propriété (iv) démontrée en partie IV~: \emph{tant que moins d'un tiers des
+validateurs (en dépôt) n'enfreint aucun commandement, il existe au plus un point de contrôle
+justifié de hauteur donnée.}
+\begin{enumerate}[label=(\alph*),leftmargin=2em,itemsep=1pt]
+\item Démontrer que tout point de contrôle justifié $c$ est relié à la racine par une chaîne
+$r=b_0\to b_1\to\dots\to b_k=c$ de liens de supermajorité dont \emph{tous} les termes sont
+justifiés~; en déduire que chaque $b_i$ est un ancêtre de $b_{i+1}$ et que la suite
+$\big(h(b_i)\big)_{0\le i\le k}$ est strictement croissante.
+\item En déduire que le maximum calculé par \code{choix_fourche} est atteint en un
+\textbf{unique} n\oe ud, et que la règle de choix de fourche est donc bien définie.
+\end{enumerate}
+
+%=======================================================================
+\section*{Partie IV --- Détection des infractions et sûreté responsable}
+%=======================================================================
+
+\begin{defi}[Les deux commandements de Casper]
+Un validateur $\nu$ ne doit publier deux votes distincts $\langle\nu,s_1,t_1\rangle$ et
+$\langle\nu,s_2,t_2\rangle$ vérifiant l'une des deux conditions suivantes~:
+\begin{itemize}[leftmargin=2.2em,itemsep=1pt]
+\item[\textbf{(I)}] $h(t_1)=h(t_2)$ \quad (deux votes distincts pour une même hauteur de
+cible)~;
+\item[\textbf{(II)}] $h(s_1)<h(s_2)<h(t_2)<h(t_1)$ \quad (un vote strictement emboîté dans
+un autre).
+\end{itemize}
+Tout validateur enfreignant l'un de ces commandements perd la totalité de son dépôt.
+\end{defi}
+
+\subsection*{IV.1 --- Détection algorithmique}
+
+\Q Écrire une fonction \code{infraction_I(votes, h)} qui renvoie un témoin d'infraction au
+commandement (I) — c'est-à-dire un triplet $(\nu, t_1, t_2)$ avec $t_1\ne t_2$ et
+$h(t_1)=h(t_2)$ tous deux ciblés par $\nu$ — ou \code{None} s'il n'y en a pas. La complexité
+devra être en $O(m)$ en moyenne, où $m$ est le nombre de votes. Justifier.
+
+\Q Écrire une fonction \code{infraction_II_naif(votes, h)} détectant une infraction au
+commandement (II) par double boucle. Donner sa complexité.
+
+\Q On veut faire mieux. Soit un validateur $\nu$ et la liste $L$ de ses votes, triée par
+hauteur de source croissante. Démontrer l'équivalence suivante~: \emph{$\nu$ enfreint (II)
+si et seulement s'il existe un vote $(s_2,t_2)$ de $L$ tel que
+\[ \max\{\,h(t_1)\ :\ (s_1,t_1)\in L,\ h(s_1)<h(s_2)\,\}\ >\ h(t_2). \]}
+On prendra garde au fait que la condition $h(s_2)<h(t_2)$ est automatiquement vérifiée pour
+un vote valide.
+
+\Q En déduire une fonction \code{infraction_II(votes, h)} de complexité $O(m\log m)$,
+utilisant un tri puis un unique parcours maintenant le maximum courant des $h(t)$ déjà
+rencontrés. On prendra soin de traiter les votes de \emph{même} hauteur de source par
+groupes, afin de respecter l'inégalité \emph{stricte} $h(s_1)<h(s_2)$. Énoncer l'invariant
+de la boucle principale et justifier la complexité.
+
+\Q Sur l'arbre $A_0$, un validateur $\nu$ publie les deux votes $(0,3)$ et $(1,2)$. Quel
+commandement enfreint-il~? Même question pour les votes $(0,2)$ et $(0,4)$.
+
+\subsection*{IV.2 --- Sûreté responsable}
+
+On suppose désormais que \textbf{moins d'un tiers} des validateurs (en dépôt) enfreint un
+commandement.
+
+\Q Démontrer les propriétés suivantes.
+\begin{itemize}[leftmargin=2.2em,itemsep=1pt]
+\item[(i)] Si $s_1\to t_1$ et $s_2\to t_2$ sont deux liens de supermajorité distincts, alors
+$h(t_1)\ne h(t_2)$.
+\item[(ii)] Si $s_1\to t_1$ et $s_2\to t_2$ sont deux liens de supermajorité distincts, alors
+l'inégalité $h(s_1)<h(s_2)<h(t_2)<h(t_1)$ est impossible.
+\end{itemize}
+\emph{Indication~:} appliquer le lemme d'intersection de la question 7 aux deux ensembles de
+validateurs soutenant les deux liens.
+
+\Q En déduire~:
+\begin{itemize}[leftmargin=2.2em,itemsep=1pt]
+\item[(iii)] pour toute hauteur $n$, il existe au plus un lien de supermajorité $s\to t$ avec
+$h(t)=n$~;
+\item[(iv)] pour toute hauteur $n$, il existe au plus un point de contrôle justifié de
+hauteur $n$.
+\end{itemize}
+
+\Q \textbf{(Théorème de sûreté responsable.)} Soient $a_m$ et $b_n$ deux points de contrôle
+finalisés \emph{en conflit}, de fils directs justifiés respectifs $a_{m+1}$ et $b_{n+1}$.
+Quitte à échanger les rôles, on suppose $h(a_m)<h(b_n)$. En considérant la chaîne de
+justification $r\to b_{i_1}\to b_{i_2}\to\dots\to b_n$ et en introduisant le plus petit
+indice $j$ tel que $h(b_j)>h(a_{m+1})$, démontrer que l'on aboutit à une contradiction avec
+(ii) ou (I). Conclure~: \emph{deux points de contrôle en conflit ne peuvent pas être tous
+deux finalisés sans qu'au moins un tiers du dépôt total ne soit détruit.}
+
+\Q Pourquoi le cas $h(a_m)=h(b_n)$ se traite-t-il immédiatement~? Quel commandement est
+alors enfreint~?
+
+\subsection*{IV.3 --- Recherche probabiliste d'un validateur fautif}
+
+Un client léger ne peut pas vérifier tous les validateurs. Il tire donc au hasard,
+\textbf{avec remise et de façon indépendante}, des validateurs uniformément parmi les $N$
+validateurs, et vérifie pour chacun s'il est fautif. On suppose qu'une proportion
+$q\in\,]0,1[$ des validateurs est fautive. On note $X$ le rang du premier tirage amenant un
+validateur fautif.
+
+\Q Justifier que $X$ suit une loi géométrique de paramètre $q$. Donner $P(X=k)$ pour
+$k\ge 1$, puis $P(X>k)$, et enfin $\mathbb{E}[X]$.
+
+\Q En déduire que l'algorithme de recherche s'arrête \textbf{presque sûrement}, c'est-à-dire
+que $P(X=+\infty)=0$.
+
+\Q Écrire une fonction \code{recherche_fautif(validateurs, est_fautif)} qui implémente cette
+recherche à l'aide de \code{random.randrange}, où \code{est_fautif} est une fonction
+booléenne. Que vaut l'espérance du nombre d'appels à \code{est_fautif} lorsque exactement un
+tiers des validateurs est fautif~? Pourquoi ne peut-on pas majorer le nombre de tours dans
+le pire des cas~?
+
+%=======================================================================
+\section*{Partie V --- Coût minimal d'une attaque (programmation dynamique)}
+%=======================================================================
+
+D'après la question 7, une attaque réussie contre la sûreté de Casper coûte à l'attaquant au
+moins $T/3$. Un attaquant rationnel cherche donc à \textbf{minimiser} le dépôt qu'il met en
+jeu tout en réunissant une supermajorité. Cela conduit au problème d'optimisation suivant.
+
+\begin{defi}[\textsc{Coût-Attaque}]
+\emph{Donnée~:} une liste $d=[d_0,\dots,d_{n-1}]$ d'entiers strictement positifs (les
+dépôts) et un entier $C\ge 0$ (le seuil, en pratique $C=\lceil 2T/3\rceil$).\\
+\emph{Question~:} déterminer
+$\displaystyle \mu(d,C)=\min\Big\{\textstyle\sum_{i\in S} d_i \ :\ S\subseteq
+\{0,\dots,n-1\},\ \sum_{i\in S} d_i\ \ge\ C\Big\}$, avec $\mu=+\infty$ si aucun $S$ ne
+convient.
+\end{defi}
+
+\Q Justifier que $C=\lceil 2T/3\rceil$ est bien le plus petit entier $C$ tel que
+$w(E)\ge C \iff E$ est une supermajorité. Écrire l'expression Python de $C$ à partir de
+\code{T} en n'utilisant que des divisions entières.
+
+\Q Le problème de \textbf{décision} associé est~: « existe-t-il $S$ avec
+$\sum_{i\in S} d_i = C$~? » (problème \textsc{Somme-de-Sous-Ensemble}). Démontrer que ce
+problème appartient à la classe \textbf{NP} en explicitant un certificat et un vérificateur
+polynomial. On rappelle (et on admettra) que \textsc{Somme-de-Sous-Ensemble} est
+NP-complet~; que peut-on en déduire quant à l'existence d'un algorithme polynomial pour
+\textsc{Coût-Attaque}, sous l'hypothèse $\mathrm{P}\ne\mathrm{NP}$~?
+
+\Q On pose, pour $0\le i\le n$ et $0\le j\le C$~:
+\[ m_i(j) \;=\; \min\Big\{\textstyle\sum_{k\in S} d_k \ :\ S\subseteq\{0,\dots,i-1\},\
+\min\big(C,\textstyle\sum_{k\in S} d_k\big) = j \Big\}\ \in\ \mathbb{N}\cup\{+\infty\}. \]
+Autrement dit, $m_i(j)$ est la plus petite somme réalisable avec les $i$ premiers dépôts
+dont la valeur \emph{écrêtée à $C$} vaut exactement $j$. Donner $m_0$, puis établir la
+relation de récurrence exprimant $m_{i+1}$ en fonction de $m_i$. Expliquer pourquoi
+l'écrêtage $\min(C,\cdot)$ est nécessaire pour borner la taille du tableau, et pourquoi il
+ne fait perdre aucune solution optimale.
+
+\Q Exprimer $\mu(d,C)$ à l'aide de $m_n$.
+
+\Q Écrire une fonction \code{cout_min_attaque(d, C)} implémentant cette récurrence avec un
+\textbf{unique} tableau de taille $C+1$ mis à jour en place. Justifier précisément le
+\textbf{sens de parcours} de l'indice $j$ et montrer sur un exemple ce qui se produirait si
+l'on parcourait dans l'autre sens.
+
+\Q Démontrer la correction de l'algorithme en énonçant et en prouvant, par récurrence sur
+le nombre $i$ de dépôts déjà traités, l'\textbf{invariant} vérifié par le tableau à la fin
+de la $i$-ème itération de la boucle externe. Justifier également la terminaison.
+
+\Q Donner la complexité en temps et en espace de \code{cout_min_attaque}. Expliquer
+pourquoi cet algorithme est dit \textbf{pseudo-polynomial} et pourquoi cela ne contredit pas
+la question 46 (NP-complétude). Que devient la complexité si les dépôts sont exprimés en
+\emph{wei}, la plus petite unité de l'ether, soit $10^{18}$ wei par ether~?
+
+\Q Application numérique~: on prend $d=[12,\,7,\,20,\,5,\,16]$. Calculer $T$, puis $C$, puis
+$\mu(d,C)$ en explicitant un sous-ensemble optimal et en détaillant le contenu du tableau à
+la fin de chaque itération pour la version réduite $d=[3,5,7]$, $C=8$.
+
+\Q Comparer $\mu(d,C)$ au seuil $C$ sur cet exemple. Un attaquant peut-il toujours
+mobiliser \emph{exactement} $C$~? Proposer un jeu de dépôts pour lequel $\mu(d,C)>C$
+strictement, et le justifier. Rapprocher enfin ce résultat de la question 7~: quelle part du
+dépôt mobilisé est effectivement \emph{détruite} lors d'une violation de la sûreté~?
+
+\Q \textbf{Question de synthèse (à traiter en quelques lignes).} Casper garantit la
+\emph{sûreté responsable} mais pas la \emph{vivacité} en toutes circonstances. À la lumière
+des parties III, IV et V, expliquer en quoi le mécanisme de fuite d'inactivité de la partie I
+restaure la vivacité, et pourquoi il fragilise en retour la garantie de sûreté démontrée à
+la question 49.
+
+\vfill
+\begin{center}\small\textsc{Fin de l'épreuve}\end{center}
+\end{document}

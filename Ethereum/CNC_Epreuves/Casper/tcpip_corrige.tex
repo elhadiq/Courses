@@ -1,0 +1,1398 @@
+\documentclass[11pt,a4paper]{article}
+\input{tcpip_preambule}
+\rhead{\small TCP/IP et HTTP/HTTPS --- Corrigé}
+\renewcommand{\Q}{\medskip\par\stepcounter{qcnt}\noindent\textbf{\color{cnc}Question~\theqcnt.}~}
+\lstdefinestyle{sql}{language=SQL, morekeywords={SUBSTR,ROUND,GROUP,ORDER,LIMIT,HAVING,CASE,WHEN,THEN,ELSE,END,EXISTS,DISTINCT}}
+\begin{document}
+\begin{center}
+{\large\bfseries Préparation au Concours National Commun --- Informatique MP}\\[8pt]
+\rule{0.9\linewidth}{0.5pt}\\[6pt]
+{\Large\bfseries Corrigé détaillé}\\[4pt]
+{\bfseries Filière MP --- Durée : 4 heures}\\[6pt]
+{\itshape Voyage d'un paquet : de l'adresse IP au cadenas du navigateur}\\[4pt]
+{\itshape Les protocoles TCP/IP et HTTP/HTTPS}\\[6pt]
+\rule{0.9\linewidth}{0.5pt}\\[8pt]
+{\small Auteur~: \href{https://orcid.org/0000-0002-6108-7176}{\textbf{Pr Agrégé El Hadiq Zouhair}}}\\[3pt]
+{\small \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}} \quad---\quad Tous droits réservés \textcopyright\ cpgeacademy.org}
+\end{center}
+\medskip
+\begin{center}
+\fcolorbox{gray}{gray!5}{\begin{minipage}{0.93\linewidth}\small
+\textbf{Avis important.} Ce document est une \textbf{initiative personnelle} du professeur,
+à but strictement pédagogique. Il ne s'agit \textbf{pas} d'un sujet officiel du Concours
+National Commun.
+\smallskip
+
+\textbf{Note de vérification.} L'intégralité du code Python de ce corrigé a été exécutée~;
+les fonctions ont été confrontées à des implantations naïves de référence sur plusieurs
+milliers de jeux d'essai aléatoires (arbre de préfixes, fusion d'intervalles, cache LRU,
+programmation dynamique), et les requêtes SQL ont été exécutées sur une base réelle. Les
+exemples numériques des questions 16 et 17 sont ceux des \rfc{1624} et \rfc{1071}.
+\smallskip
+
+\textbf{Pour aller plus loin.} \href{https://cpgeacademy.org}{\textbf{cpgeacademy.org}}.
+\end{minipage}}
+\end{center}
+\medskip
+
+%=======================================================================
+\section*{Partie I --- Adressage IPv4 et agrégation CIDR}
+%=======================================================================
+
+\Q Il s'agit d'une écriture en base $256$ sur exactement quatre chiffres.
+\begin{lstlisting}
+def ip_vers_entier(s):
+    x = 0
+    for c in s.split('.'):
+        x = x * 256 + int(c)
+    return x
+
+def entier_vers_ip(x):
+    o = []
+    for _ in range(4):
+        o.append(str(x % 256))
+        x = x // 256
+    return '.'.join(reversed(o))
+\end{lstlisting}
+Les deux boucles font exactement quatre tours~: la complexité est $\Theta(1)$.
+(\code{ip_vers_entier} applique le schéma de Horner en base $256$~;
+\code{entier_vers_ip} extrait les chiffres du poids faible vers le poids fort, d'où le
+\code{reversed}.)
+
+\Q
+\begin{lstlisting}
+def masque(n):
+    if n == 0:
+        return 0
+    return ((1 << n) - 1) << (32 - n)
+\end{lstlisting}
+\textbf{Démonstration.} Pour $n\ge 1$, $2^{n}-1$ est l'entier dont les $n$ bits de poids
+faible valent $1$. Le décaler de $32-n$ positions vers la gauche revient à le multiplier par
+$2^{32-n}$~: on obtient $(2^{n}-1)\,2^{32-n}=2^{32}-2^{32-n}$, entier dont les $n$ bits de
+poids fort valent $1$ et les $32-n$ autres $0$. Le cas $n=0$ est traité à part car
+$\texttt{1 << 0} - 1 = 0$ conviendrait, mais un décalage de $32$ n'est pas défini sur un mot
+de $32$ bits dans la plupart des langages~; on garde donc le test pour la portabilité.
+\hfill$\square$
+
+\Q
+\begin{lstlisting}
+def adresse_reseau(a, n):
+    return a & masque(n)
+
+def diffusion(a, n):
+    return a | (0xFFFFFFFF ^ masque(n))
+\end{lstlisting}
+\textbf{Démonstration.} Notons $r=\texttt{adresse\_reseau}(a,n)$. Par définition du et bit à
+bit, $r$ a les mêmes $n$ bits de poids fort que $a$ et ses $32-n$ bits de poids faible nuls.
+De même, $\texttt{diffusion}(a,n)$ a les mêmes $n$ bits de poids fort que $a$ et ses $32-n$
+bits de poids faible tous égaux à $1$, c'est-à-dire vaut $2^{32-n}-1$ sur cette partie. Comme
+$r$ vaut $0$ sur ces mêmes bits et que les deux nombres coïncident ailleurs,
+\[ \texttt{diffusion}(a,n)-r \;=\; 2^{32-n}-1 . \]
+Ce sont bien le minimum et le maximum de $\mathcal{A}(p/n)$~: écrire $a=r+u$ avec
+$0\le u\le 2^{32-n}-1$ établit que $\mathcal{A}(p/n)=[\![r,\ r+2^{32-n}-1]\!]$, ensemble de
+cardinal $2^{32-n}$. \hfill$\square$
+
+\Q Le préfixe contient $2^{32-n}$ adresses~; deux sont réservées (réseau et diffusion), d'où
+\[ \#\{\text{adresses attribuables}\} \;=\; 2^{32-n}-2 \qquad (n\le 30). \]
+Pour $n=31$ la formule donnerait $0$~: un tel préfixe ne contient que deux adresses, toutes
+deux « réservées ». Cette situation est traitée à part (\rfc{3021})~: sur une liaison
+point-à-point il n'y a pas besoin d'adresse de diffusion, et les deux adresses sont
+attribuées aux deux extrémités. Pour $n=32$ le préfixe se réduit à une adresse unique~: c'est
+une \emph{route d'hôte}. Ces deux cas montrent que la formule $2^{32-n}-2$ est une convention
+d'ingénierie et non un théorème.
+
+\Q
+\begin{lstlisting}
+def dans_prefixe(a, p, n):
+    if n == 0:
+        return True
+    return (a ^ p) >> (32 - n) == 0
+\end{lstlisting}
+\textbf{Démonstration.} Notons $a_{31},\dots,a_0$ et $p_{31},\dots,p_0$ les bits de $a$ et
+$p$. Le ou exclusif est bit à bit~: le bit de rang $i$ de $a\oplus p$ vaut $0$ si et
+seulement si $a_i=p_i$. Le décalage $\texttt{>>}(32-n)$ ne conserve que les bits de rang
+$\ge 32-n$, c'est-à-dire les $n$ bits de poids fort. Donc
+\[ (a\oplus p)\,\texttt{>>}\,(32-n)=0 \iff \forall i\ge 32-n,\ a_i=p_i \iff
+a\in\mathcal{A}(p/n). \]
+\hfill$\square$ Complexité $\Theta(1)$~; on n'a besoin ni de calculer le masque ni de faire
+deux et logiques.
+
+\Q \textbf{(Agrégation.)}
+
+$(\Leftarrow)$ Supposons que $p$ et $q$ ne diffèrent que par le bit de rang $32-n$~; quitte à
+les échanger, $p<q$ et $q=p+2^{32-n}$. D'après la question 3,
+$\mathcal{A}(p/n)=[\![p,\,p+2^{32-n}-1]\!]$ et $\mathcal{A}(q/n)=[\![p+2^{32-n},\,
+p+2^{32-n+1}-1]\!]$. Ces deux intervalles sont contigus, leur réunion est
+$[\![p,\,p+2^{33-n}-1]\!]$. Or $p$ a ses $32-n$ bits de poids faible nuls \emph{et} son bit
+de rang $32-n$ nul (puisque $q=p+2^{32-n}$ n'a pas provoqué de retenue), donc $p$ a ses
+$33-n$ bits de poids faible nuls~: $p/(n-1)$ est un préfixe valide et
+$\mathcal{A}(p/(n-1))=[\![p,\,p+2^{33-n}-1]\!]$. On prend $r=p$.
+
+$(\Rightarrow)$ Réciproquement, supposons $\mathcal{A}(r/(n-1))=\mathcal{A}(p/n)\cup
+\mathcal{A}(q/n)$. Le membre de gauche a pour cardinal $2^{33-n}$ et le membre de droite au
+plus $2\cdot 2^{32-n}=2^{33-n}$, avec égalité si et seulement si les deux préfixes sont
+disjoints. Ils le sont donc, et leur réunion est un intervalle~: ils sont contigus, donc
+$q=p+2^{32-n}$ (à échange près), ce qui signifie exactement que $p$ et $q$ ne diffèrent que
+par le bit de rang $32-n$. \hfill$\square$
+
+\textbf{Intérêt.} Un opérateur qui possède deux préfixes adjacents n'en annonce qu'un seul,
+deux fois plus grand~: c'est l'agrégation CIDR, sans laquelle la table de routage globale
+d'Internet, aujourd'hui de l'ordre de $10^{6}$ entrées, en compterait plusieurs dizaines de
+millions.
+
+\Q \textbf{(Famille laminaire.)} Supposons $n\le m$ (sinon on échange les rôles) et
+$\mathcal{A}(p/n)\cap\mathcal{A}(q/m)\ne\varnothing$~; soit $a$ dans l'intersection. Alors
+$a$ coïncide avec $p$ sur ses $n$ bits de poids fort, et avec $q$ sur ses $m\ge n$ bits de
+poids fort. Donc $p$ et $q$ coïncident sur leurs $n$ bits de poids fort. Soit alors
+$b\in\mathcal{A}(q/m)$~: $b$ coïncide avec $q$ sur $m\ge n$ bits, donc avec $q$ — donc avec
+$p$ — sur $n$ bits, c'est-à-dire $b\in\mathcal{A}(p/n)$. Ainsi
+$\mathcal{A}(q/m)\subseteq\mathcal{A}(p/n)$.
+
+Les trois cas sont donc exhaustifs~; ils sont mutuellement exclusifs dès que les deux
+préfixes sont distincts, puisque les ensembles sont non vides. \hfill$\square$
+
+\emph{Autrement dit, l'ensemble des préfixes CIDR ordonné par inclusion est une forêt~: c'est
+exactement ce qui permet la structure d'arbre de la question 20.}
+
+\Q
+\begin{enumerate}[label=(\alph*),leftmargin=2em,itemsep=2pt]
+\item $\texttt{masque}(12)=2^{32}-2^{20}$. En base $256$~: les $12$ premiers bits sont à $1$,
+soit $\texttt{11111111.1111}0000.0.0$, c'est-à-dire
+$\boxed{\texttt{255.240.0.0}}$ (car $\texttt{11110000}_2=240$).
+\item $\texttt{172.16.35.7}$ et le masque $\texttt{255.240.0.0}$~: $172\ \&\ 255=172$,
+$16\ \&\ 240 = 16$ (car $16=\texttt{00010000}_2$), $35\ \&\ 0=0$, $7\ \&\ 0=0$. L'adresse de
+réseau est $\boxed{\texttt{172.16.0.0}}$.
+\item $\texttt{masque}(26)=\texttt{255.255.255.192}$ (car $192=\texttt{11000000}_2$). Or
+$130=\texttt{10000010}_2$, donc $130\ \&\ 192 = 128$~: le réseau est
+$\boxed{\texttt{192.168.1.128}}$. La diffusion s'obtient en mettant à $1$ les $6$ bits de
+poids faible~: $128+63=191$, soit $\boxed{\texttt{192.168.1.191}}$. Le nombre d'adresses
+utilisables est $2^{6}-2=\boxed{62}$.
+\end{enumerate}
+
+%=======================================================================
+\section*{Partie II --- La somme de contrôle Internet}
+%=======================================================================
+
+\Q
+\begin{lstlisting}
+def add16(a, b):
+    s = a + b
+    return (s & 0xFFFF) + (s >> 16)
+\end{lstlisting}
+\textbf{Démonstration.} Soient $a,b\in[\![0,N-1]\!]$ avec $N=2^{16}$. Alors
+$s=a+b\le 2N-2$, donc $\lfloor s/N\rfloor\in\{0,1\}$~; l'expression \code{(s >> 16)} vaut
+donc $0$ ou $1$, et le résultat est $(s\bmod N)+\lfloor s/N\rfloor$.
+
+\emph{Cas $s<N$~:} le résultat vaut $s\le N-1$.
+\emph{Cas $s\ge N$~:} le résultat vaut $s-N+1$, et $N\le s\le 2N-2$ donne
+$1\le s-N+1\le N-1$.
+
+Dans les deux cas le résultat est dans $[\![0,N-1]\!]$~: \textbf{la réinjection de la retenue
+ne peut jamais provoquer une seconde retenue}. En effet, elle ne pourrait le faire que si
+$s\bmod N=N-1$ et $\lfloor s/N\rfloor=1$, c'est-à-dire $s=2N-1$, impossible puisque
+$s\le 2N-2$. \hfill$\square$
+
+\Q Reprenons les deux cas. Si $s<N$, le résultat est $s=a+b$. Si $s\ge N$, le résultat est
+$s-(N-1)$. Dans les deux cas
+\[ a\oplus' b \;\equiv\; a+b \pmod{N-1}. \]
+La commutativité est immédiate ($a+b=b+a$). Pour l'associativité, remarquons que
+$(a\oplus' b)\oplus' c$ et $a\oplus'(b\oplus' c)$ sont deux éléments de $[\![0,N-1]\!]$
+congrus à $a+b+c$ modulo $N-1$~; deux tels éléments diffèrent d'un multiple de $N-1$, donc
+sont égaux \emph{ou} valent $\{0,N-1\}$. Un examen des cas montre que $\oplus'$ ne produit
+$0$ que si les deux opérandes sont nuls~: si $s\ge N$ le résultat est $\ge 1$, et si $s<N$ le
+résultat est $s$, nul seulement si $a=b=0$. Comme $a\oplus'0=a$, les deux parenthésages
+donnent $0$ exactement dans le même cas ($a=b=c=0$), et sont donc toujours égaux.
+\hfill$\square$
+
+$0$ est neutre~: $a\oplus'0=a$. Enfin $x\oplus'\overline{x}=x+(N-1-x)=N-1=\texttt{0xFFFF}$.
+
+\textbf{Les deux zéros.} $\texttt{0x0000}$ et $\texttt{0xFFFF}$ sont tous deux congrus à $0$
+modulo $N-1$~: ce sont les deux représentations de zéro, notées $+0$ et $-0$. L'opération
+$\oplus'$ ne produit jamais $+0$ à partir d'opérandes non tous nuls~: elle « préfère »
+$-0$. Cette dissymétrie est \emph{exactement} la source du bogue de la \rfc{1141} étudié à la
+question 16.
+
+\Q \textbf{(a) Découpage en mots.}
+\begin{lstlisting}
+def mots16(octets):
+    o = list(octets)                     # copie : on ne modifie pas l'argument
+    if len(o) % 2 == 1:
+        o.append(0)                      # bourrage a droite
+    return [o[i]*256 + o[i+1] for i in range(0, len(o), 2)]
+\end{lstlisting}
+L'octet d'indice pair est celui de poids fort~: c'est la convention « gros-boutienne » de
+l'ordre réseau. Sur l'exemple demandé,
+$\texttt{mots16([0x45, 0x00, 0x00, 0x73])} = [\texttt{0x4500},\ \texttt{0x0073}]$.
+
+\emph{On prendra garde à recopier la liste~: sans le \code{list(octets)}, le bourrage
+modifierait la liste de l'appelant, effet de bord d'autant plus pernicieux qu'il ne se
+manifeste que pour les paquets de longueur impaire.}
+
+\textbf{(b) Somme.}
+\begin{lstlisting}
+def somme_un(mots):
+    s = 0
+    for m in mots:
+        s = add16(s, m)
+    return s
+\end{lstlisting}
+L'accumulateur est initialisé à $0$, élément neutre de $\oplus'$ (question 10).
+
+\textbf{(c) Complément.}
+\begin{lstlisting}
+def checksum(octets):
+    return somme_un(mots16(octets)) ^ 0xFFFF
+\end{lstlisting}
+Sur l'exemple~: $\texttt{0x4500}\oplus'\texttt{0x0073}=\texttt{0x4573}$ (aucune retenue),
+d'où $\texttt{checksum}=\overline{\texttt{0x4573}}=\texttt{0xFFFF}-\texttt{0x4573}
+=\boxed{\texttt{0xBA8C}}$.
+
+\textbf{Complexités.} Notons $k$ le nombre d'octets et $\ell=\lceil k/2\rceil$ le nombre de
+mots.
+\begin{center}\small
+\begin{tabular}{l|c|c}
+ & temps & espace auxiliaire\\\hline
+\code{mots16} & $\Theta(k)$ & $\Theta(k)$ (la copie et la liste de mots)\\
+\code{somme_un} & $\Theta(\ell)=\Theta(k)$ & $\Theta(1)$ (un accumulateur)\\
+\code{checksum} & $\Theta(k)$ & $\Theta(k)$ (héritée de \code{mots16})
+\end{tabular}
+\end{center}
+
+\textbf{Version en espace constant.} La liste intermédiaire des mots ne sert à rien~: on peut
+les former et les accumuler dans la même boucle.
+\begin{lstlisting}
+def checksum_direct(octets):
+    s = 0
+    k = len(octets)
+    i = 0
+    while i + 1 < k:                     # paires completes
+        s = add16(s, octets[i]*256 + octets[i+1])
+        i = i + 2
+    if i < k:                            # dernier octet isole
+        s = add16(s, octets[i]*256)      # bourrage implicite par un octet nul
+    return s ^ 0xFFFF
+\end{lstlisting}
+On obtient $\Theta(k)$ en temps et $\boxed{\Theta(1)}$ en espace auxiliaire, sans modifier
+l'argument. C'est exactement la boucle donnée en annexe du \rfc{1071}~; sur un paquet de
+$1500$ octets, l'économie de la liste intermédiaire est loin d'être négligeable lorsqu'on
+traite des millions de paquets par seconde.
+
+\Q Notons $S$ la somme en complément à un de tous les mots, le champ de contrôle étant à
+zéro. La valeur inscrite est $\overline{S}$. Le récepteur calcule la somme du paquet complet,
+c'est-à-dire, par associativité et commutativité (question 10)~:
+\[ S\oplus'\overline{S} \;=\; N-1 \;=\; \texttt{0xFFFF}. \]
+(On a utilisé $x\oplus'\overline{x}=\texttt{0xFFFF}$, établi à la question 10.)
+\hfill$\square$
+\begin{lstlisting}
+def verifie(octets):
+    return somme_un(mots16(octets)) == 0xFFFF
+\end{lstlisting}
+On notera l'élégance du procédé~: le récepteur n'a \emph{pas} à extraire le champ de
+contrôle ni à le remettre à zéro. Il fait la même boucle que l'émetteur et compare à une
+constante.
+
+\Q \textbf{(Indépendance de l'ordre des octets.)} Écrivons $x=256u+v$ avec
+$u,v\in[\![0,255]\!]$~; alors $\sigma(x)=256v+u$.
+
+Il suffit de traiter le cas de deux mots, le cas général s'en déduisant par récurrence
+immédiate grâce à l'associativité. Soient $x=256u+v$ et $y=256u'+v'$.
+
+\emph{Cas 1~: $v+v'\le 255$ et $u+u'\le 255$.} Aucune retenue nulle part~:
+$x\oplus' y=256(u+u')+(v+v')$ et $\sigma(x)\oplus'\sigma(y)=256(v+v')+(u+u')$, qui est bien
+son échangé.
+
+\emph{Cas 2~: retenue de l'octet de poids faible vers celui de poids fort.} Dans le calcul
+échangé, cette même retenue passe de l'octet de poids fort vers l'octet de poids faible
+\emph{par la réinjection circulaire}. Le point clé, souligné par la \rfc{1071}, est que
+l'addition en complément à un sur $16$ bits est \emph{circulaire}~: les retenues vont du bit
+$7$ au bit $8$ et du bit $15$ au bit $0$. Échanger systématiquement les octets revient à
+tourner les bits de $8$ positions dans ce cycle, ce qui ne modifie pas leur ordre relatif~:
+la somme obtenue est la somme échangée. \hfill$\square$
+
+\textbf{Conséquence pratique.} Une machine « petit-boutienne » qui lit en mémoire, mot par
+mot, des données stockées en ordre réseau (« gros-boutien ») obtient automatiquement la somme
+échangée~; en réécrivant le résultat en mémoire, il est de nouveau échangé, donc correct. La
+somme de contrôle se calcule ainsi avec \emph{exactement le même code} quelle que soit
+l'architecture — argument décisif en 1988.
+
+\Q Supposons que le paquet reçu diffère du paquet émis par un seul bit, de rang
+$r\in[\![0,15]\!]$ dans le mot d'indice $i$. La somme reçue $S'$ vérifie
+$S'\equiv S\pm 2^{r}\pmod{N-1}$, où $S=\texttt{0xFFFF}\equiv 0$. Or $1\le 2^{r}\le 2^{15}$,
+donc $2^{r}\not\equiv 0 \pmod{N-1}$ (car $0<2^r<N-1$), et de même $-2^r\not\equiv 0$. Donc
+$S'\not\equiv 0$, c'est-à-dire $S'\ne\texttt{0xFFFF}$ et $S'\ne\texttt{0x0000}$~: le test de
+la question 12 échoue. \hfill$\square$
+
+\emph{Vérification expérimentale~: sur $3\,000$ paquets aléatoires de $20$ octets et une
+inversion de bit tirée au hasard, l'erreur a été détectée dans $3\,000$ cas sur $3\,000$.}
+
+\Q L'addition $\oplus'$ étant \textbf{commutative}, permuter deux mots de $16$ bits ne change
+pas la somme~: une telle altération n'est \emph{jamais} détectée. Par exemple, le paquet
+commençant par $\texttt{12 34 AB CD}$ et celui commençant par $\texttt{AB CD 12 34}$, tout le
+reste étant identique, ont la même somme de contrôle.
+
+De même, une erreur de deux bits qui \emph{se compense} passe inaperçue~: ajouter $1$ à un
+mot et retrancher $1$ à un autre laisse la somme inchangée. Ainsi $\texttt{12 35 AB CC}$ a la
+même somme que $\texttt{12 34 AB CD}$.
+
+\textbf{Comparaison avec un CRC.} Un code polynomial interprète le message comme un polynôme
+sur $\mathbb{F}_2$ et en calcule le reste modulo un polynôme générateur~: le résultat dépend
+de la \emph{position} de chaque bit, ce qui détruit la symétrie ci-dessus. Un CRC-32 bien
+choisi détecte toutes les erreurs de $1$, $2$ ou $3$ bits, toutes les rafales de longueur
+$\le 32$ et toutes les erreurs de poids impair. Il est en revanche plus coûteux à calculer et
+ne se met pas à jour incrémentalement (question 16). Le choix de la somme en complément à un
+pour la couche transport est donc un compromis assumé~: la détection fine est confiée au
+CRC de la couche liaison, la somme de contrôle Internet n'assurant qu'un contrôle
+\emph{de bout en bout} bon marché.
+
+\Q \textbf{(Mise à jour incrémentale.)}
+\begin{lstlisting}
+def maj_1141(HC, m, mp):          # HC' = HC +' m +' ~m'      (RFC 1141)
+    return add16(add16(HC, m), mp ^ 0xFFFF)
+
+def maj_1624(HC, m, mp):          # HC' = ~( ~HC +' ~m +' m' ) (RFC 1624)
+    return add16(add16(HC ^ 0xFFFF, m ^ 0xFFFF), mp) ^ 0xFFFF
+\end{lstlisting}
+\textbf{(c) Application numérique.} On a $C_{\text{autres}}=\texttt{0xCD7A}$,
+$m=\texttt{0x5555}$, $m'=\texttt{0x3285}$. On note d'abord les deux sommes utiles~:
+\[ \texttt{0xCD7A}+\texttt{0x5555}=\texttt{0x122CF}\ \longrightarrow\ \texttt{0x22D0}
+   \quad\text{(repli)},\qquad
+   \texttt{0xCD7A}+\texttt{0x3285}=\texttt{0xFFFF}. \]
+On en déduit~:
+\[
+\begin{array}{r@{\ }c@{\ }l}
+HC &=& \overline{\texttt{0x22D0}} \;=\; \texttt{0xDD2F},\\[4pt]
+HC'\ \text{(recalcul complet)} &=& \overline{\texttt{0xFFFF}} \;=\;
+   \boxed{\texttt{0x0000}},\\[4pt]
+HC'\ \text{par la \rfc{1141}} &=& \texttt{0xDD2F}\oplus'\texttt{0x5555}\oplus'
+   \overline{\texttt{0x3285}} \;=\; \texttt{0xFFFF} \qquad\textbf{faux},\\[4pt]
+HC'\ \text{par la \rfc{1624}} &=& \overline{\ \texttt{0x22D0}\oplus'
+   \overline{\texttt{0x5555}}\oplus'\texttt{0x3285}\ } \;=\; \texttt{0x0000}
+   \qquad\textbf{correct}.
+\end{array}
+\]
+
+\textbf{(d) Explication.} La formule de la \rfc{1141} suppose que la complémentation est
+\emph{distributive} sur $\oplus'$, c'est-à-dire $\overline{x\oplus' y}=\overline{x}\oplus'
+\overline{y}\oplus'\dots$~; or cette propriété tombe en défaut lorsque le résultat est nul,
+précisément à cause des deux représentations de zéro (question 10). L'addition $\oplus'$ ne
+produit jamais $+0$ à partir d'opérandes non tous nuls~: elle produit $-0=\texttt{0xFFFF}$.
+Comme l'en-tête contient toujours au moins un champ non nul, le champ de contrôle ne peut
+jamais valoir $\overline{+0}=\texttt{0xFFFF}$~; il peut en revanche valoir
+$\overline{-0}=\texttt{0x0000}$. La \rfc{1141} produit donc $\texttt{0xFFFF}$, une valeur
+qu'un calcul complet ne peut jamais donner. La \rfc{1624} évite le problème en n'utilisant la
+complémentation qu'une seule fois, tout à la fin.
+
+\emph{Remarque.} Le \rfc{1624} note que si le récepteur vérifie comme à la question 12 (somme
+du paquet complet $=\texttt{0xFFFF}$), les deux valeurs $\texttt{0x0000}$ et
+$\texttt{0xFFFF}$ passent le test~: le bogue n'a d'effet que sur les implantations qui
+recalculent la somme et la comparent au champ. C'est un bel exemple de bogue qui ne se
+manifeste qu'à l'interopérabilité.
+
+\Q On regroupe les $20$ octets en dix mots de $16$ bits~:
+\[ \texttt{4500},\ \texttt{0073},\ \texttt{0000},\ \texttt{4000},\ \texttt{4011},\
+   \texttt{0000},\ \texttt{c0a8},\ \texttt{0001},\ \texttt{c0a8},\ \texttt{00c7}. \]
+La question 10 autorise à sommer d'abord \emph{sans} se soucier des retenues, puis à les
+replier à la fin (c'est la technique dite des « retenues différées » du \rfc{1071}). La somme
+entière vaut
+\[ 17664+115+0+16384+16401+0+49320+1+49320+199 \;=\; 149\,404 \;=\; \texttt{0x2479C}. \]
+On replie la retenue de poids fort~: $\texttt{0x479C}+\texttt{0x2}=\texttt{0x479E}$, valeur
+qui tient sur $16$ bits — aucun second repli n'est nécessaire. D'où
+\[ \boxed{\texttt{checksum} \;=\; \overline{\texttt{0x479E}} \;=\; \texttt{0xFFFF}-
+\texttt{0x479E} \;=\; \texttt{0xB861}} \]
+que l'on inscrit dans les octets d'indices $10$ et $11$~: \texttt{b8 61}.
+
+\textbf{Vérification.} En recalculant la somme sur le paquet complet, on ajoute
+$\texttt{0xB861}$ à $\texttt{0x479E}$, ce qui donne exactement $\texttt{0xFFFF}$~: le test de
+la question 12 est satisfait. (C'est l'exemple classique du \rfc{1071}~; le calcul a été
+vérifié en machine.)
+
+%=======================================================================
+\section*{Partie III --- Routage : plus long préfixe et plus courts chemins}
+%=======================================================================
+
+\Q
+\begin{lstlisting}
+def plus_long_prefixe(table, a):
+    best, bl = None, -1
+    for (p, n, saut) in table:
+        if dans_prefixe(a, p, n) and n > bl:
+            bl, best = n, saut
+    return best
+\end{lstlisting}
+Chaque entrée est examinée une fois, en $O(1)$ (question 5)~: la complexité est
+$\Theta(k)$.
+
+\Q Soit $\mathcal{P}$ l'ensemble des préfixes de la table contenant $a$. Il est non vide (il
+contient la route par défaut). D'après la question 7, deux éléments de $\mathcal{P}$ sont
+comparables pour l'inclusion, puisque leur intersection contient $a$ donc est non vide~:
+$\mathcal{P}$ est \textbf{totalement ordonné} par inclusion. Comme
+$\mathcal{A}(p/n)\subseteq\mathcal{A}(q/m)\Rightarrow n\ge m$, l'ordre par inclusion coïncide
+avec l'ordre inverse des longueurs~: il existe donc un unique élément de longueur maximale,
+qui est aussi le plus petit pour l'inclusion. \hfill$\square$
+
+\emph{C'est ce résultat qui donne son sens à la règle « plus long préfixe »~: elle sélectionne
+la route la plus spécifique, et cette route est unique.}
+
+\Q On représente un n\oe ud par une liste \code{[fils0, fils1, saut]}.
+\begin{lstlisting}
+class Trie:
+    def __init__(self):
+        self.racine = [None, None, None]
+
+    def inserer(self, p, n, saut):
+        noeud = self.racine
+        for i in range(n):
+            b = (p >> (31 - i)) & 1          # i-eme bit en partant du poids fort
+            if noeud[b] is None:
+                noeud[b] = [None, None, None]
+            noeud = noeud[b]
+        noeud[2] = saut
+\end{lstlisting}
+\textbf{Complexités.} Une insertion effectue exactement $n\le 32$ tours en $O(1)$~: elle
+coûte $O(n)=O(32)=O(1)$ si l'on considère $32$ comme une constante. En espace, chaque
+insertion crée au plus $32$ n\oe uds~: la structure occupe $O(32k)=O(k)$ pour $k$ entrées.
+Le facteur $32$ est le prix de la structure, mais il se réduit fortement en pratique par
+compression des chaînes de n\oe uds à un seul fils (arbres \emph{Patricia}).
+
+\Q
+\begin{lstlisting}
+    def chercher(self, a):
+        noeud = self.racine
+        res = self.racine[2]                 # eventuelle route par defaut (/0)
+        for i in range(32):
+            b = (a >> (31 - i)) & 1
+            if noeud[b] is None:
+                break
+            noeud = noeud[b]
+            if noeud[2] is not None:
+                res = noeud[2]
+        return res
+\end{lstlisting}
+\textbf{Invariant.}
+\begin{quote}\itshape
+Au début de l'itération $i$, \code{noeud} est le n\oe ud de profondeur $i$ correspondant aux
+$i$ premiers bits de $a$ (ce n\oe ud existe), et \code{res} est le saut associé au plus long
+préfixe de longueur $\le i$ de la table qui contienne $a$ ($\texttt{None}$ s'il n'y en a pas).
+\end{quote}
+\emph{Initialisation.} Pour $i=0$, \code{noeud} est la racine, qui représente la suite vide,
+et \code{res} est le saut du préfixe $/0$ s'il existe.
+
+\emph{Hérédité.} Supposons l'invariant vrai au début de l'itération $i$. Soit $b$ le bit de
+rang $31-i$ de $a$. Si $\texttt{noeud[b]}$ est \code{None}, aucun préfixe de la table de
+longueur $>i$ ne peut contenir $a$ (par construction de \code{inserer}, un tel préfixe aurait
+créé ce fils)~: la boucle s'arrête et \code{res} est déjà la bonne valeur. Sinon on descend~;
+le nouveau n\oe ud représente les $i+1$ premiers bits de $a$. S'il porte un saut, c'est que
+la table contient le préfixe correspondant, de longueur $i+1$, qui contient $a$ et qui est
+plus long que tous les précédents~: on met à jour \code{res}. L'invariant est rétabli pour
+$i+1$.
+
+\emph{Conclusion.} À la sortie, \code{res} est le saut du plus long préfixe de la table
+contenant $a$, qui est unique d'après la question 19. \hfill$\square$
+
+\emph{Vérification expérimentale~: sur $300$ tables aléatoires et $200$ adresses par table,
+soit $60\,000$ recherches, l'arbre et la version exhaustive de la question 18 ont toujours
+donné le même résultat.}
+
+\Q La boucle fait au plus $32$ tours en $O(1)$~: la complexité est $\boxed{O(32)=O(1)}$,
+\textbf{indépendante du nombre $k$ d'entrées}, contre $\Theta(k)$ pour la question 18.
+
+\textbf{Commentaire.} Un routeur de c\oe ur de réseau porte aujourd'hui une table d'environ
+$10^{6}$ préfixes et doit décider du sort de plusieurs dizaines de millions de paquets par
+seconde. Le parcours exhaustif demanderait $10^{6}$ tests par paquet — impossible. La
+recherche dans l'arbre en demande $32$ au plus, soit un gain de plus de quatre ordres de
+grandeur. C'est exactement l'écart entre un algorithme linéaire et un algorithme
+logarithmique en la taille de l'espace d'adressage. En pratique les routeurs vont plus loin
+encore (arbres multi-bits, mémoires associatives), mais le principe reste celui-ci.
+
+\Q
+\begin{lstlisting}
+import heapq
+
+def dijkstra(V, adj, s):
+    INF = float('inf')
+    d = [INF] * V
+    d[s] = 0
+    vus = [False] * V
+    tas = [(0, s)]
+    while tas:
+        du, u = heapq.heappop(tas)
+        if vus[u]:
+            continue                          # entree perimee
+        vus[u] = True
+        for (v, w) in adj[u]:
+            if d[u] + w < d[v]:
+                d[v] = d[u] + w
+                heapq.heappush(tas, (d[v], v))
+    return d
+\end{lstlisting}
+\textbf{Complexité.} Chaque arête provoque au plus un ajout dans le tas, qui contient donc au
+plus $E$ éléments~; chaque opération de tas coûte $O(\log E)=O(\log V)$ (car $E\le V^2$).
+D'où $\boxed{O\big((V+E)\log V\big)}$.
+
+\emph{Le test \code{if vus[u]: continue} est indispensable~: on n'enlève pas les entrées
+périmées du tas, on les ignore lorsqu'on les extrait. C'est la version « paresseuse »,
+la plus simple à écrire correctement.}
+
+\Q \textbf{Invariant de Dijkstra.}
+\begin{quote}\itshape
+Au moment où un sommet $u$ est marqué (\code{vus[u] = True}), $\texttt{d[u]}$ est la distance
+de $s$ à $u$~; de plus, pour tout sommet $v$ non encore marqué, $\texttt{d[v]}$ est le poids du
+plus court chemin de $s$ à $v$ \textbf{dont tous les sommets intermédiaires sont marqués}.
+\end{quote}
+\emph{Démonstration de la première partie, par l'absurde.} Supposons que $u$ soit le premier
+sommet marqué pour lequel $\texttt{d[u]}>\delta(s,u)$, où $\delta$ désigne la vraie distance.
+Soit $\gamma$ un plus court chemin de $s$ à $u$, et soit $y$ le premier sommet de $\gamma$
+non encore marqué au moment où l'on marque $u$ (il en existe, car $u$ l'est), et $x$ son
+prédécesseur sur $\gamma$ ($x$ est marqué, et $x$ existe car $s$ est marqué en premier). Par
+minimalité de $u$, $\texttt{d[x]}=\delta(s,x)$~; comme l'arête $(x,y)$ a été relâchée lors du
+marquage de $x$, on a $\texttt{d[y]}\le\delta(s,x)+w(x,y)=\delta(s,y)$. Or $y$ est sur un plus
+court chemin vers $u$ et \textbf{les poids sont positifs}, donc
+$\delta(s,y)\le\delta(s,u)$. On obtient
+\[ \texttt{d[y]}\ \le\ \delta(s,y)\ \le\ \delta(s,u)\ <\ \texttt{d[u]}, \]
+ce qui contredit le fait que l'algorithme a extrait $u$ — de clé minimale — avant $y$.
+\hfill$\square$
+
+\textbf{Où sert la positivité~?} Exactement à l'inégalité $\delta(s,y)\le\delta(s,u)$~: un
+préfixe d'un plus court chemin n'est plus court que le chemin entier que si les poids sont
+$\ge 0$. Avec une arête de poids négatif, Dijkstra peut marquer définitivement un sommet à
+une valeur trop grande et ne jamais se corriger.
+
+\Q
+\begin{lstlisting}
+def bellman_ford(V, aretes, s):
+    INF = float('inf')
+    d = [INF] * V
+    d[s] = 0
+    for _ in range(V - 1):
+        change = False
+        for (u, v, w) in aretes:
+            if d[u] + w < d[v]:
+                d[v] = d[u] + w
+                change = True
+        if not change:
+            break                              # arret anticipe
+    for (u, v, w) in aretes:
+        if d[u] + w < d[v]:
+            return None                        # circuit de poids negatif
+    return d
+\end{lstlisting}
+\textbf{Complexité.} $\Theta(V\!E)$ dans le pire des cas, $\Theta(E)$ en espace. C'est plus
+coûteux que Dijkstra, mais l'algorithme tolère les poids négatifs et — surtout — il est
+\emph{réparti}~: chaque sommet peut effectuer sa relaxation en ne connaissant que ses
+voisins. C'est ce qui en fait le c\oe ur des protocoles à vecteur de distance.
+
+\Q \textbf{Invariant.} \emph{Après $i$ tours de la boucle externe, pour tout sommet $v$,
+$\texttt{d[v]}\le \delta_i(s,v)$, où $\delta_i(s,v)$ est le poids minimal d'un chemin de $s$ à
+$v$ utilisant au plus $i$ arêtes ($+\infty$ s'il n'en existe pas).}
+
+\emph{Initialisation.} Pour $i=0$~: $\delta_0(s,s)=0=\texttt{d[s]}$ et $\delta_0(s,v)=+\infty$
+pour $v\ne s$.
+
+\emph{Hérédité.} Soit $\gamma$ un chemin de $s$ à $v$ à au plus $i+1$ arêtes de poids
+$\delta_{i+1}(s,v)$. Si $\gamma$ a au plus $i$ arêtes, la conclusion découle de l'hypothèse
+de récurrence et du fait que $\texttt{d[v]}$ ne fait que décroître. Sinon, notons $u$
+l'avant-dernier sommet de $\gamma$~: le préfixe de $\gamma$ jusqu'à $u$ a au plus $i$ arêtes
+et est optimal parmi ceux-là, donc à la fin du tour $i$ on a $\texttt{d[u]}\le\delta_i(s,u)$.
+Lors du tour $i+1$, l'arc $(u,v,w)$ est relâché, d'où
+$\texttt{d[v]}\le\texttt{d[u]}+w\le\delta_i(s,u)+w=\delta_{i+1}(s,v)$. \hfill$\square$
+
+\textbf{Correction et nombre de tours.} En l'absence de circuit de poids négatif, un plus
+court chemin est \emph{élémentaire}, donc comporte au plus $V-1$ arêtes~: après $V-1$ tours,
+$\texttt{d[v]}\le\delta_{V-1}(s,v)=\delta(s,v)$. L'inégalité inverse est immédiate puisque
+toute valeur de $\texttt{d[v]}$ est le poids d'un chemin réel. D'où l'égalité. Enfin, si un
+tour supplémentaire produit encore une amélioration, c'est qu'il existe un chemin à $V$
+arêtes strictement meilleur que tout chemin à $V-1$ arêtes~: un tel chemin contient un
+circuit, nécessairement de poids strictement négatif.
+
+\Q \textbf{(Comptage à l'infini.)} Sur la ligne $A - B - C$, à l'équilibre $B$ annonce
+$d(C)=1$ et $A$ annonce $d(C)=2$. Le lien $B-C$ tombe~: $B$ passe $d(C)$ à $+\infty$, mais il
+reçoit alors de $A$ l'annonce « je sais atteindre $C$ en $2$ ». $B$ en déduit $d(C)=3$ (via
+$A$) et l'annonce. $A$ recalcule alors $d(C)=4$ (via $B$), etc.
+
+Le mécanisme est clair~: $A$ a appris sa route \emph{par $B$} mais l'annonce à $B$ sans
+préciser cette provenance. Chaque routeur croit qu'un chemin subsiste chez l'autre~; les
+distances croissent d'un pas à chaque échange, indéfiniment. C'est le \textbf{comptage à
+l'infini}, défaut structurel des algorithmes à vecteur de distance — Bellman--Ford réparti
+converge, mais lentement, et transite par des états incohérents.
+
+\textbf{Contre-mesures.} RIP en emploie deux.
+\begin{itemize}[leftmargin=1.4em,itemsep=1pt]
+\item Le \emph{split horizon}~: un routeur n'annonce pas à un voisin une route apprise de ce
+voisin (variante \emph{poison reverse}~: il l'annonce à distance infinie). Cela règle le cas
+à deux routeurs, mais pas les boucles plus longues.
+\item Un plafond~: la distance $16$ est déclarée infinie. Le comptage s'arrête donc en au
+plus $16$ échanges — au prix d'une limitation drastique du diamètre du réseau, ce qui
+cantonne RIP aux petits domaines.
+\end{itemize}
+C'est précisément pour éviter ces pathologies qu'OSPF a adopté l'approche à \emph{état de
+liens}~: chaque routeur diffuse la topologie complète et exécute Dijkstra localement, au prix
+d'un coût mémoire et d'un trafic de diffusion supérieurs.
+
+\Q On applique Dijkstra depuis le sommet $0$. On note entre crochets le tableau
+$\texttt{d}$ (avec $\infty$ pour l'infini) et l'on souligne le sommet extrait.
+
+\begin{center}\small
+\begin{tabular}{c|c|l}
+Étape & Sommet extrait & Tableau $d=[d_0,\dots,d_5]$ après relaxation\\\hline
+0 & --- & $[0,\infty,\infty,\infty,\infty,\infty]$\\
+1 & $0$ & $[0,7,9,\infty,\infty,14]$\\
+2 & $1$ ($d=7$) & $[0,7,9,22,\infty,14]$\\
+3 & $2$ ($d=9$) & $[0,7,9,20,\infty,11]$\\
+4 & $5$ ($d=11$) & $[0,7,9,20,20,11]$\\
+5 & $3$ ($d=20$) & $[0,7,9,20,20,11]$\\
+6 & $4$ ($d=20$) & $[0,7,9,20,20,11]$
+\end{tabular}
+\end{center}
+D'où $\boxed{d=[0,7,9,20,20,11]}$.
+
+Un plus court chemin de $0$ à $4$ se lit en remontant les prédécesseurs~: $4$ a été atteint
+depuis $5$ ($11+9=20$), $5$ depuis $2$ ($9+2=11$), $2$ depuis $0$ ($9$). D'où
+\[ \boxed{0 \to 2 \to 5 \to 4}\qquad\text{de poids } 9+2+9=20. \]
+On notera que le chemin direct $0\to 5$ coûte $14$ alors que le détour $0\to2\to5$ ne coûte
+que $11$~: l'arête la plus « courte » n'est pas toujours la bonne, ce qui justifie
+l'algorithme. Bellman--Ford donne évidemment le même tableau.
+
+%=======================================================================
+\section*{Partie IV --- TCP : fiabilité, temporisateur et congestion}
+%=======================================================================
+
+\Q
+\begin{lstlisting}
+M = 1 << 32
+
+def avant(a, b):
+    return ((b - a) % M) < (1 << 31) and a != b
+\end{lstlisting}
+\textbf{Démonstration.} Supposons que tous les numéros en circulation appartiennent à
+$\{c,c+1,\dots,c+W-1\}$ modulo $M$, avec $W<2^{31}$. Soient $a=c+i$ et $b=c+j$ deux d'entre
+eux, $0\le i,j\le W-1$, $i\ne j$. Alors $(b-a)\bmod M = (j-i)\bmod M$ avec
+$-(W-1)\le j-i\le W-1$.
+\begin{itemize}[leftmargin=1.4em,itemsep=1pt]
+\item Si $j>i$ (c'est-à-dire $a$ précède $b$), alors $0<j-i\le W-1<2^{31}$ et
+$(b-a)\bmod M=j-i<2^{31}$~: la fonction renvoie \code{True}.
+\item Si $j<i$, alors $(b-a)\bmod M=M+(j-i)\ge M-(W-1)>M-2^{31}=2^{31}$~: la fonction
+renvoie \code{False}.
+\end{itemize}
+Le verdict est donc correct. \hfill$\square$
+
+\textbf{Ambiguïté pour $W=2^{31}$.} Prenons $a=0$ et $b=2^{31}$. Alors
+$(b-a)\bmod M=2^{31}\not<2^{31}$~: la fonction déclare que $a$ ne précède pas $b$. Mais
+$(a-b)\bmod M=2^{31}$ également~: elle déclare aussi que $b$ ne précède pas $a$. Les deux
+numéros sont à distance égale dans les deux sens sur le cercle~: la question « lequel vient
+avant~? » n'a tout simplement pas de réponse. C'est pourquoi TCP impose une fenêtre
+strictement inférieure à $2^{31}$ octets.
+
+\Q
+\begin{lstlisting}
+def fusionner(segments):
+    L = sorted(segments)                       # tri lexicographique : par debut
+    res = []
+    for (d, f) in L:
+        if res and d <= res[-1][1]:            # chevauchement ou contiguite
+            res[-1] = (res[-1][0], max(res[-1][1], f))
+        else:
+            res.append((d, f))
+    return res
+\end{lstlisting}
+\textbf{Complexité.} $\Theta(k\log k)$ pour le tri, puis $\Theta(k)$ pour le balayage~: total
+$\Theta(k\log k)$. C'est optimal dans le modèle des comparaisons, puisque le problème permet
+de trier ($k$ intervalles disjoints en entrée ressortent triés).
+
+\Q \textbf{Invariant.}
+\begin{quote}\itshape
+Avant le traitement de $L[i]$, la liste \code{res} contient les intervalles maximaux de la
+réunion $\bigcup_{j<i}L[j]$, triés par début croissant, deux à deux disjoints et non
+adjacents~; de plus, le début de $L[i]$ est supérieur ou égal au début du dernier élément de
+\code{res}.
+\end{quote}
+\emph{Initialisation.} Pour $i=0$, \code{res} est vide~: trivial.
+
+\emph{Hérédité.} Soit $(d,f)=L[i]$ et $(d_0,f_0)$ le dernier élément de \code{res}. Comme $L$
+est trié par début croissant, $d\ge d_0$, et tout intervalle de \code{res} autre que le
+dernier se termine avant $d_0\le d$~: seul le dernier peut rencontrer $(d,f)$. Deux cas.
+\begin{itemize}[leftmargin=1.4em,itemsep=1pt]
+\item Si $d\le f_0$, les deux intervalles se rencontrent ou sont contigus~; comme
+$d_0\le d$, leur réunion est exactement $[\,d_0,\max(f_0,f)\,[$, ce qu'affecte l'algorithme.
+Le nombre d'intervalles ne change pas, l'invariant est préservé.
+\item Si $d>f_0$, l'intervalle $(d,f)$ est disjoint de tous les précédents \emph{et} non
+adjacent au dernier~; on l'ajoute en queue, ce qui préserve le tri et la disjonction.
+\end{itemize}
+\hfill$\square$
+
+\emph{Conclusion.} À la fin, \code{res} est la décomposition en intervalles maximaux de la
+réunion de tous les segments. Cette décomposition est \textbf{unique}~: c'est la partition
+en composantes connexes de la réunion, vue comme partie de $\mathbb{Z}$.
+
+\emph{Vérification expérimentale~: sur $2\,000$ jeux de segments aléatoires, la réunion des
+intervalles renvoyés a toujours coïncidé, ensemble d'entiers par ensemble d'entiers, avec la
+réunion des segments fournis, et la sortie était toujours strictement croissante.}
+
+\Q
+\begin{lstlisting}
+def rto_initial(R, G=0.001):
+    SRTT = R
+    RTTVAR = R / 2
+    return SRTT, RTTVAR, max(1.0, SRTT + max(G, 4 * RTTVAR))
+
+def rto_suivant(SRTT, RTTVAR, R, alpha=1/8, beta=1/4, G=0.001):
+    RTTVAR = (1 - beta) * RTTVAR + beta * abs(SRTT - R)   # D'ABORD la variance
+    SRTT   = (1 - alpha) * SRTT + alpha * R               # ENSUITE la moyenne
+    return SRTT, RTTVAR, max(1.0, SRTT + max(G, 4 * RTTVAR))
+\end{lstlisting}
+\textbf{Pourquoi cet ordre~?} La mise à jour de $\mathrm{RTTVAR}$ utilise l'écart
+$|\mathrm{SRTT}-R'|$ entre l'\emph{ancienne} estimation et la nouvelle mesure. Si l'on
+mettait d'abord $\mathrm{SRTT}$ à jour, cet écart serait calculé avec une moyenne \emph{déjà
+attirée} vers $R'$, donc systématiquement sous-évalué~: l'estimateur de dispersion serait
+biaisé vers le bas, le $\mathrm{RTO}$ trop court, et les retransmissions inutiles se
+multiplieraient. Le \rfc{6298} écrit d'ailleurs explicitement que l'ordre \emph{doit} être
+respecté.
+
+\Q \textbf{Démonstration par récurrence sur $n$.} La relation est
+$S_n=(1-\alpha)S_{n-1}+\alpha R_n$ pour $n\ge 1$, avec $S_0=R_0$.
+
+\emph{Initialisation ($n=0$).} La formule donne $(1-\alpha)^0R_0=R_0=S_0$, la somme étant
+vide.
+
+\emph{Hérédité.} Supposons la formule vraie au rang $n$. Alors
+\[
+S_{n+1}=(1-\alpha)S_n+\alpha R_{n+1}
+=(1-\alpha)\Big[(1-\alpha)^nR_0+\alpha\sum_{i=1}^{n}(1-\alpha)^{n-i}R_i\Big]+\alpha R_{n+1}
+\]
+\[
+=(1-\alpha)^{n+1}R_0+\alpha\sum_{i=1}^{n}(1-\alpha)^{n+1-i}R_i+\alpha(1-\alpha)^{0}R_{n+1}
+=(1-\alpha)^{n+1}R_0+\alpha\sum_{i=1}^{n+1}(1-\alpha)^{n+1-i}R_i .
+\]
+\hfill$\square$
+
+\textbf{Somme des coefficients.} En posant $j=n-i$, la somme géométrique donne
+\[ (1-\alpha)^n+\alpha\sum_{i=1}^{n}(1-\alpha)^{n-i}
+ = (1-\alpha)^n+\alpha\sum_{j=0}^{n-1}(1-\alpha)^{j}
+ = (1-\alpha)^n+\alpha\cdot\frac{1-(1-\alpha)^n}{\alpha}
+ = 1 . \]
+$S_n$ est donc bien une \textbf{moyenne pondérée} des mesures, les poids décroissant
+géométriquement vers le passé~: c'est une moyenne mobile exponentielle. Cela garantit en
+particulier $\min_i R_i\le S_n\le\max_i R_i$.
+
+\emph{Vérification~: sur $500$ suites aléatoires, la forme close et l'itération coïncident à
+$10^{-12}$ près.}
+
+\Q Les poids de la question 33, lus du plus récent au plus ancien, sont
+$\alpha,\ \alpha(1-\alpha),\ \alpha(1-\alpha)^2,\dots$ On calcule, pour $|1-\alpha|<1$,
+\[ \mu=\sum_{j\ge 0}(j+1)\,\alpha(1-\alpha)^{j}
+     =\alpha\sum_{j\ge 0}(j+1)x^{j}\Big|_{x=1-\alpha}
+     =\frac{\alpha}{(1-x)^2}\Big|_{x=1-\alpha}
+     =\frac{\alpha}{\alpha^2}=\boxed{\frac{1}{\alpha}} \]
+(en dérivant terme à terme la série géométrique $\sum x^{j}=\frac{1}{1-x}$, licite sur
+$]-1,1[$). Pour $\alpha=1/8$~: $\mu=\boxed{8}$ échantillons.
+
+Pour le second point, on cherche le plus petit $j$ tel que
+$\alpha(1-\alpha)^{j}<\tfrac{1}{10}\alpha$, soit $(7/8)^{j}<1/10$, c'est-à-dire
+$j>\ln 10/\ln(8/7)\approx 2{,}3026/0{,}1335\approx 17{,}24$. D'où $\boxed{j=18}$.
+
+\textbf{Interprétation.} L'estimateur « se souvient » d'environ $8$ mesures et a
+pratiquement oublié tout ce qui date de plus de $18$ aller-retours. C'est un compromis
+assumé~: assez de mémoire pour lisser le bruit, assez peu pour suivre un changement de route
+ou de charge en quelques secondes.
+
+\Q \textbf{Algorithme de Karn.} Un segment retransmis donne lieu à \emph{deux} émissions et
+à un seul accusé de réception, sans que l'on sache à laquelle il répond. Si l'on mesure $R$
+depuis la \emph{seconde} émission alors que l'accusé répondait à la première, on obtient une
+valeur beaucoup trop \textbf{petite}. L'estimateur diminue, le $\mathrm{RTO}$ diminue, donc
+davantage de segments expirent et sont retransmis — d'où de nouvelles sous-estimations~: le
+biais s'auto-entretient et peut provoquer un effondrement par congestion. Karn et Partridge
+(1987) imposent donc de ne jamais échantillonner sur un segment retransmis, sauf si
+l'estampille temporelle lève l'ambiguïté.
+
+\textbf{Repli exponentiel.} Après $n$ expirations, les attentes successives valent
+$T_0,2T_0,\dots,2^{n-1}T_0$, d'où le temps cumulé
+\[ \sum_{i=0}^{n-1}2^{i}T_0 \;=\; T_0\,(2^{n}-1). \]
+Pour $T_0=1$~s et $n=5$~: $\boxed{31\ \text{secondes}}$. Ce doublement est la réponse
+canonique à une congestion~: en cas de doute, l'émetteur se retire exponentiellement du
+réseau plutôt que d'insister.
+
+\Q Les transmissions étant indépendantes et chacune réussissant avec probabilité $1-p$,
+$N$ est le rang du premier succès dans une suite d'épreuves de Bernoulli~: $N$ suit une
+\textbf{loi géométrique} de paramètre $1-p$, à valeurs dans $\mathbb{N}^{*}$~:
+\[ \mathbb{P}(N=k)=p^{\,k-1}(1-p),\qquad \mathbb{P}(N>k)=p^{\,k},\qquad
+   \mathbb{E}[N]=\frac{1}{1-p}. \]
+($\mathbb{P}(N>k)$ s'obtient directement~: les $k$ premières transmissions échouent, ce qui a
+probabilité $p^{k}$ par indépendance.)
+
+\textbf{Terminaison presque sûre.} L'événement « ne jamais aboutir » est l'intersection
+décroissante des $\{N>k\}$, donc par continuité décroissante
+\[ \mathbb{P}(N=+\infty)=\lim_{k\to+\infty}p^{k}=0 \qquad\text{car } 0<p<1. \]
+\hfill$\square$
+
+Pour $p=0{,}1$~: $\mathbb{E}[N]=1/0{,}9\approx\boxed{1{,}11}$ transmission, et
+$\mathbb{P}(N>3)=10^{-3}$. Le pire des cas n'est en revanche pas borné~: c'est un algorithme
+de type Las Vegas, dont on ne peut analyser que le comportement moyen.
+
+\Q Pendant un cycle, la fenêtre prend successivement les valeurs
+$\frac{W_{\max}}{2},\ \frac{W_{\max}}{2}+1,\ \dots,\ W_{\max}-1$, à raison d'un
+aller-retour par valeur~; le cycle dure donc $W_{\max}/2$ aller-retours. En posant
+$W=W_{\max}$, le nombre de segments émis est
+\[ N_{\text{cycle}}=\sum_{i=W/2}^{W-1} i
+ =\sum_{i=0}^{W-1}i-\sum_{i=0}^{W/2-1}i
+ =\frac{(W-1)W}{2}-\frac{(W/2-1)(W/2)}{2}, \]
+soit, en développant,
+\[ N_{\text{cycle}}=\frac{W^2-W}{2}-\frac{W^2/4-W/2}{2}
+ =\boxed{\frac{3W^{2}}{8}-\frac{W}{4}} . \]
+La fenêtre moyenne est le quotient par le nombre d'aller-retours~:
+\[ \overline{W}=\frac{N_{\text{cycle}}}{W/2}
+ =\frac{2}{W}\Big(\frac{3W^2}{8}-\frac{W}{4}\Big)=\frac{3W}{4}-\frac{1}{2}
+ =\boxed{\frac{3W-2}{4}} . \]
+\hfill$\square$
+
+\emph{Vérification~: pour $W=8,\,16,\,64,\,100$ on obtient respectivement
+$N_{\text{cycle}}=22,\ 92,\ 1520,\ 3725$ et $\overline{W}=5{,}5\ ;\ 11{,}5\ ;\ 47{,}5\ ;\
+74{,}5$, en accord exact avec les formules.}
+
+\Q Une perte par cycle et une probabilité de perte $p$ par segment donnent
+$p=1/N_{\text{cycle}}$, soit
+\[ \frac{1}{p}=\frac{3W^{2}}{8}-\frac{W}{4}\ \sim\ \frac{3W^{2}}{8}
+   \qquad\text{quand } W\to+\infty, \]
+d'où $W\approx\sqrt{\dfrac{8}{3p}}$. Le débit est le nombre d'octets émis par unité de temps,
+c'est-à-dire $\overline{W}\cdot\mathrm{MSS}/\mathrm{RTT}$ avec
+$\overline{W}\sim\frac{3}{4}W$~:
+\[ \text{débit}\ \approx\ \frac{3}{4}\sqrt{\frac{8}{3p}}\cdot
+   \frac{\mathrm{MSS}}{\mathrm{RTT}}
+  =\frac{\mathrm{MSS}}{\mathrm{RTT}}\sqrt{\frac{9}{16}\cdot\frac{8}{3p}}
+  =\frac{\mathrm{MSS}}{\mathrm{RTT}}\sqrt{\frac{3}{2p}}
+  \approx\frac{1{,}2247\ \mathrm{MSS}}{\mathrm{RTT}\sqrt{p}} . \]
+\hfill$\square$
+
+C'est la \textbf{formule de Mathis} (1997), l'un des résultats les plus cités de la
+littérature réseau~: elle donne, à partir de trois paramètres seulement, le débit d'une
+connexion TCP en régime établi.
+
+\Q Avec $\mathrm{MSS}=1460$ octets et $\mathrm{RTT}=0{,}100$~s~:
+\begin{center}
+\begin{tabular}{c|c|c|c}
+$p$ & $W_{\max}\approx\sqrt{8/(3p)}$ & débit (octets/s) & débit (Mbit/s)\\\hline
+$10^{-2}$ & $16{,}3$ & $1{,}79\times 10^{5}$ & $1{,}43$\\
+$10^{-4}$ & $163{,}3$ & $1{,}79\times 10^{6}$ & $14{,}3$
+\end{tabular}
+\end{center}
+
+\Q \textbf{(a)} Le débit varie comme $p^{-1/2}$~: diviser le taux de perte par $4$ ne
+multiplie le débit que par $2$. Les rendements sont donc \emph{décroissants}~; améliorer la
+qualité d'un lien déjà bon rapporte peu. C'est un argument classique en faveur des
+mécanismes de retransmission locale sur les liens sans fil.
+
+\textbf{(b)} Le débit varie comme $1/\mathrm{RTT}$~: à taux de perte égal, une connexion de
+$\mathrm{RTT}$ deux fois plus court obtient un débit deux fois plus grand. Deux connexions
+partageant le même goulet d'étranglement ne se partagent donc \textbf{pas} équitablement la
+bande passante~: la plus proche écrase la plus lointaine. C'est le fameux biais de TCP contre
+les connexions à long délai, l'une des principales motivations des algorithmes de congestion
+modernes (CUBIC, dont la croissance ne dépend plus du $\mathrm{RTT}$~; BBR, qui estime
+directement le débit et le délai plutôt que d'inférer la congestion des pertes).
+
+%=======================================================================
+\section*{Partie V --- HTTP, cache et HTTPS}
+%=======================================================================
+
+\Q
+\begin{lstlisting}
+def analyser_requete(texte):
+    i = texte.find('\r\n\r\n')
+    if i < 0:
+        return None                          # en-tete incomplet
+    lignes = texte[:i].split('\r\n')
+    methode, cible, version = lignes[0].split(' ')
+    entetes = {}
+    for ligne in lignes[1:]:
+        j = ligne.index(':')
+        entetes[ligne[:j].lower()] = ligne[j+1:].strip()
+    return (methode, cible, version, entetes, texte[i+4:])
+\end{lstlisting}
+Complexité $\Theta(n)$ où $n$ est la longueur du texte~: la recherche, la découpe et le
+parcours des lignes sont linéaires. La mise en minuscules des noms est imposée par le
+\rfc{9110}~: les noms d'en-têtes sont insensibles à la casse.
+
+\emph{Sur l'exemple du sujet, on obtient}
+\begin{lstlisting}
+('GET', '/index.html?p=1', 'HTTP/1.1',
+ {'host': 'cpgeacademy.org', 'content-length': '5'}, 'HELLO')
+\end{lstlisting}
+
+\Q On cherche la première occurrence du mot $u=\texttt{CRLFCRLF}$ de longueur $4$. L'automate
+a pour états $\{0,1,2,3\}$, l'état $q$ signifiant « les $q$ derniers caractères lus forment
+le préfixe de longueur $q$ de $u$ » ($4$ est l'état d'acceptation, où l'on s'arrête).
+
+\begin{center}\small
+\begin{tabular}{c|c|c|c|l}
+état & \texttt{'\textbackslash r'} & \texttt{'\textbackslash n'} & autre &
+ signification\\\hline
+$0$ & $1$ & $0$ & $0$ & rien de reconnu\\
+$1$ & $1$ & $2$ & $0$ & \texttt{CR} lu\\
+$2$ & $3$ & $0$ & $0$ & \texttt{CRLF} lu\\
+$3$ & $1$ & \textbf{accepter} & $0$ & \texttt{CRLFCR} lu
+\end{tabular}
+\end{center}
+La seule subtilité est la transition $1\xrightarrow{\texttt{CR}}1$ et
+$3\xrightarrow{\texttt{CR}}1$~: après un \texttt{CR} inattendu, ce \texttt{CR} peut lui-même
+amorcer une nouvelle occurrence, il ne faut donc pas retomber en $0$.
+\begin{lstlisting}
+def fin_entete(flux):
+    etat = 0
+    for k, c in enumerate(flux):
+        if   etat == 0: etat = 1 if c == '\r' else 0
+        elif etat == 1: etat = 2 if c == '\n' else (1 if c == '\r' else 0)
+        elif etat == 2: etat = 3 if c == '\r' else 0
+        elif etat == 3:
+            if c == '\n':
+                return k + 1
+            etat = 1 if c == '\r' else 0
+    return -1
+\end{lstlisting}
+
+\Q \textbf{Invariant.}
+\begin{quote}\itshape
+Après la lecture des $k$ premiers caractères sans acceptation, \code{etat} est la longueur du
+plus long suffixe du préfixe lu qui soit un préfixe strict de $u=\texttt{CRLFCRLF}$.
+\end{quote}
+\emph{Initialisation.} Avant toute lecture, le seul suffixe est le mot vide~: $\texttt{etat}=0$.
+
+\emph{Hérédité.} Soit $q$ l'état courant et $c$ le caractère lu. Le plus long suffixe du
+nouveau texte qui soit préfixe de $u$ est nécessairement de longueur $\le q+1$. S'il est de
+longueur $q+1$, c'est que $u_{q}=c$~: c'est exactement la transition « avancer ». Sinon, il
+faut prendre le plus long \emph{bord} de $u_{0..q-1}$ suivi de $c$. Ici $u=\texttt{CRLFCRLF}$
+et $u_{0..2}=\texttt{CRLF}$ n'a pour bords que le mot vide, sauf $u_{0..0}=\texttt{CR}$ dont
+le seul bord est vide~: en pratique, si $c=\texttt{CR}$ on retombe en $1$, sinon en $0$. Ce
+sont précisément les transitions écrites. \hfill$\square$
+
+\emph{Conséquences.} Chaque caractère est lu \textbf{une seule fois} et traité en $O(1)$~:
+l'analyse est en $\Theta(n)$, sans retour en arrière ni mémoire tampon. C'est essentiel pour
+un serveur qui traite un flux au fil de l'eau, sans pouvoir revenir sur les octets déjà
+consommés.
+
+\textbf{Vérification sur} \code{"\\r\\n\\r\\r\\n\\r\\n"} (longueur $7$)~:
+\begin{center}\small
+\begin{tabular}{c|cccccccc}
+$k$ & \multicolumn{1}{c}{début} & $0$ & $1$ & $2$ & $3$ & $4$ & $5$ & $6$\\
+caractère & --- & \texttt{CR} & \texttt{LF} & \texttt{CR} & \texttt{CR} & \texttt{LF} &
+ \texttt{CR} & \texttt{LF}\\\hline
+état après & $0$ & $1$ & $2$ & $3$ & $1$ & $2$ & $3$ & \textbf{accept.}
+\end{tabular}
+\end{center}
+La fonction renvoie $7$. On vérifie l'invariant au rang $k=3$~: le texte lu est
+\texttt{CRLFCR}, dont le plus long suffixe préfixe de $u$ après lecture du second \texttt{CR}
+est \texttt{CR}, de longueur $1$ — c'est bien l'état obtenu. Une implantation naïve qui
+serait retombée en $0$ aurait manqué l'occurrence.
+
+\Q
+\begin{lstlisting}
+def decoder_chunked(s):
+    res = []
+    i = 0
+    while True:
+        j = s.index('\r\n', i)               # fin de la ligne de taille
+        n = int(s[i:j], 16)                  # taille en hexadecimal
+        if n == 0:
+            return ''.join(res)
+        res.append(s[j+2 : j+2+n])
+        i = j + 2 + n + 2                    # on saute le bloc et son CRLF
+\end{lstlisting}
+\textbf{Variant.} Posons $V=\texttt{len(s)} - i$. À chaque tour, $i$ augmente d'au moins
+$\texttt{len(hex)}+2+n+2\ge 5>0$~: $V$ est un entier strictement décroissant, minoré par $0$
+tant que la chaîne est bien formée. La boucle se termine donc, au plus tard en épuisant la
+chaîne (ce qui lèverait alors une exception, comportement attendu sur une entrée malformée).
+
+\textbf{Complexité.} $\Theta(n)$~: chaque caractère est examiné au plus deux fois (une par
+\code{index}, une par la copie), et la concaténation finale par \code{join} est linéaire.
+On évitera soigneusement \code{res = res + bloc} dans la boucle, qui donnerait $\Theta(n^2)$.
+
+\emph{Exemple~:} le corps \code{"4\\r\\nWiki\\r\\n5\\r\\npedia\\r\\nE\\r\\n in\\r\\n\\r\\nchunks.\\r\\n0\\r\\n\\r\\n"}
+se décode en \code{"Wikipedia in\\r\\n\\r\\nchunks."} — noter que le troisième bloc, de
+taille $\texttt{E}_{16}=14$, contient lui-même des \texttt{CRLF}~: c'est tout l'intérêt du
+préfixe de longueur.
+
+\Q La difficulté est d'obtenir $O(1)$ \emph{à la fois} pour la recherche et pour la mise à
+jour de l'ordre d'ancienneté. On combine donc~:
+\begin{itemize}[leftmargin=1.4em,itemsep=1pt]
+\item un \textbf{dictionnaire} clé $\mapsto$ n\oe ud, pour la recherche en $O(1)$ moyen~;
+\item une \textbf{liste doublement chaînée} des clés, de la plus récemment utilisée (en tête)
+à la plus ancienne (en queue), avec deux n\oe uds sentinelles pour éviter les cas
+particuliers.
+\end{itemize}
+Un n\oe ud est une liste \code{[cle, precedent, suivant]}.
+\begin{lstlisting}
+class LRU:
+    def __init__(self, cap):
+        self.cap = cap
+        self.d = {}
+        self.tete  = ['GARDE', None, None]         # sentinelles
+        self.queue = ['GARDE', self.tete, None]
+        self.tete[2] = self.queue
+
+    def _retirer(self, x):
+        x[1][2] = x[2]
+        x[2][1] = x[1]
+
+    def _en_tete(self, x):
+        x[1] = self.tete
+        x[2] = self.tete[2]
+        self.tete[2][1] = x
+        self.tete[2] = x
+
+    def acceder(self, cle):
+        if cle in self.d:                          # succes
+            x = self.d[cle]
+            self._retirer(x)
+            self._en_tete(x)
+            return True
+        if len(self.d) == self.cap:                # eviction du plus ancien
+            v = self.queue[1]
+            self._retirer(v)
+            del self.d[v[0]]
+        x = [cle, None, None]
+        self._en_tete(x)
+        self.d[cle] = x
+        return False
+\end{lstlisting}
+\textbf{Invariant.}
+\begin{quote}\itshape
+À tout instant, la liste chaînée contient exactement les clés du dictionnaire, dans l'ordre
+décroissant de la date de leur dernier accès~; le dictionnaire associe à chaque clé le n\oe ud
+qui la porte~; et le nombre de clés n'excède jamais \code{cap}.
+\end{quote}
+Chaque opération de \code{acceder} — test d'appartenance, retrait, insertion en tête,
+suppression dans le dictionnaire — se fait en $O(1)$ moyen, le retrait en $O(1)$ exact grâce
+au \emph{double} chaînage (sans lui, retirer un n\oe ud demanderait de retrouver son
+prédécesseur, en $O(C)$). D'où un accès en $\boxed{O(1)}$ en moyenne, et un espace $O(C)$.
+
+\emph{Vérification expérimentale~: sur $3\,000$ suites d'accès aléatoires et des capacités de
+$1$ à $5$, cette classe et une implantation naïve de référence (liste Python réordonnée à
+chaque accès) ont toujours donné le même nombre de succès.}
+
+\Q
+\begin{center}\small
+\begin{tabular}{c|c|l|c}
+Accès & Résultat & Cache après (du plus récent au plus ancien) & Éviction\\\hline
+$a$ & échec & $[a]$ & ---\\
+$b$ & échec & $[b,a]$ & ---\\
+$c$ & échec & $[c,b,a]$ & ---\\
+$a$ & \textbf{succès} & $[a,c,b]$ & ---\\
+$d$ & échec & $[d,a,c]$ & $b$\\
+$b$ & échec & $[b,d,a]$ & $c$\\
+$a$ & \textbf{succès} & $[a,b,d]$ & ---\\
+$c$ & échec & $[c,a,b]$ & $d$\\
+$d$ & échec & $[d,c,a]$ & $b$\\
+$a$ & \textbf{succès} & $[a,d,c]$ & ---
+\end{tabular}
+\end{center}
+On compte $\boxed{3\ \text{succès sur }10}$, soit un taux de succès de $30\,\%$.
+
+\emph{Commentaire.} L'objet $a$, régulièrement redemandé, est toujours conservé~: c'est le
+comportement attendu. En revanche $b$, $c$ et $d$ s'évincent mutuellement en boucle. La
+politique optimale hors ligne (algorithme de Belady, qui évince l'objet dont la prochaine
+demande est la plus lointaine) ferait mieux~; mais elle suppose de connaître l'avenir, ce qui
+est exclu en ligne.
+
+\Q \textbf{Initialisation.} $m_0(j)=0$ pour tout $j$~: sans objet, on ne sert rien.
+
+\textbf{Récurrence.} Un sous-ensemble optimal de $\{0,\dots,i\}$ de taille $\le j$ contient
+ou non l'objet $i$~:
+\[ m_{i+1}(j) \;=\;
+\begin{cases}
+m_i(j) & \text{si } j<t_i,\\[3pt]
+\max\big(\,m_i(j),\ m_i(j-t_i)+f_i\,\big) & \text{si } j\ge t_i .
+\end{cases} \]
+Dans le second cas, le premier terme correspond au choix « ne pas prendre $i$ », le second à
+« prendre $i$ », ce qui laisse une capacité $j-t_i$ pour les objets $0,\dots,i-1$. C'est bien
+une partition des solutions, d'où le maximum.
+
+\Q
+\begin{lstlisting}
+def cache_optimal(t, f, C):
+    m = [0] * (C + 1)
+    for i in range(len(t)):
+        for j in range(C, t[i] - 1, -1):        # parcours DECROISSANT
+            if m[j - t[i]] + f[i] > m[j]:
+                m[j] = m[j - t[i]] + f[i]
+    return m[C]
+\end{lstlisting}
+\textbf{Sens de parcours.} La case $j$ est calculée à partir de la case $j-t_i<j$. En
+parcourant $j$ de $C$ vers $t_i$, la case $j-t_i$ n'a pas encore été modifiée au cours de
+cette itération~: elle contient donc $m_i(j-t_i)$, valeur qui \emph{n'utilise pas} l'objet
+$i$. L'objet est ainsi pris au plus une fois.
+
+\textbf{Contre-exemple en parcours croissant.} Prenons un seul objet, $t=[3]$, $f=[10]$, et
+$C=9$. En croissant~: $j=3$ donne $m[3]=10$~; puis $j=6$ lit $m[3]=10$ et donne $m[6]=20$~;
+puis $j=9$ lit $m[6]$ et donne $m[9]=30$. L'algorithme renverrait $30$ en plaçant
+\emph{trois fois} le même objet dans le cache, alors que la réponse correcte est $10$. (Le
+parcours croissant résout en fait le sac à dos \emph{avec répétition}, un autre problème.)
+
+\Q \textbf{Invariant.}
+\begin{quote}\itshape
+À la fin de la $i$-ième itération de la boucle externe, pour tout $j\in[\![0,C]\!]$,
+$\texttt{m[j]}=m_i(j)$, c'est-à-dire le nombre maximal de requêtes servies par un sous-ensemble
+de $\{0,\dots,i-1\}$ de taille totale au plus $j$.
+\end{quote}
+\emph{Initialisation.} Avant la première itération, $\texttt{m}$ est nul, c'est $m_0$.
+
+\emph{Hérédité.} Supposons $\texttt{m}=m_i$ au début de l'itération traitant l'objet $i$.
+Notons $\texttt{m}^{\text{fin}}$ le tableau à la fin de cette itération.
+
+$(\le)$ Toute valeur écrite dans $\texttt{m}^{\text{fin}}[j]$ vaut $m_i(j-t_i)+f_i$, donc est
+réalisée par un sous-ensemble de $\{0,\dots,i-1\}$ de taille $\le j-t_i$ auquel on ajoute
+$i$~: c'est un sous-ensemble de $\{0,\dots,i\}$ de taille $\le j$. Les valeurs conservées
+sont les $m_i(j)$, également réalisables. Donc
+$\texttt{m}^{\text{fin}}[j]\le m_{i+1}(j)$.
+
+$(\ge)$ Soit $S\subseteq\{0,\dots,i\}$ de taille $\le j$ réalisant $m_{i+1}(j)$. Si
+$i\notin S$ alors $\sum_{k\in S}f_k\le m_i(j)\le\texttt{m}^{\text{fin}}[j]$, puisque le tableau
+n'est jamais diminué. Si $i\in S$, alors $S\setminus\{i\}$ est de taille $\le j-t_i$, donc
+$\sum_{k\in S}f_k\le m_i(j-t_i)+f_i$~; or, grâce au parcours décroissant, la case $j-t_i$
+contenait bien $m_i(j-t_i)$ au moment de la lecture, et la mise à jour a porté la case $j$ à
+au moins cette valeur. Donc $\texttt{m}^{\text{fin}}[j]\ge m_{i+1}(j)$.
+
+D'où l'égalité, et l'invariant. \hfill$\square$
+
+\emph{Terminaison.} Les deux boucles sont des boucles \code{for} sur des intervalles finis~:
+la terminaison est immédiate, le nombre total d'itérations étant au plus $n(C+1)$.
+
+\emph{Conclusion.} À la fin, $\texttt{m[C]}=m_n(C)=\mu(t,f,C)$.
+
+\Q \textbf{Complexité.} Temps $\Theta(nC)$~; espace $\Theta(C)$ auxiliaire, contre
+$\Theta(nC)$ si l'on conservait tous les $m_i$.
+
+\textbf{Appartenance à NP.} Un certificat de l'instance « existe-t-il $S$ avec
+$\sum_{i\in S}t_i\le C$ et $\sum_{i\in S}f_i\ge F$~? » est la liste des indices de $S$, de
+taille $O(n\log n)$ bits donc polynomiale. Le vérificateur calcule les deux sommes ($2n$
+additions d'entiers de taille au plus celle de l'entrée) et effectue deux comparaisons~: il
+est polynomial. Donc le problème est dans \textbf{NP}. \hfill$\square$
+
+\textbf{Pourquoi il n'y a pas contradiction.} La taille de l'\emph{entrée} n'est pas $C$ mais
+le nombre de bits nécessaires pour l'écrire, soit $\Theta(\log C)$. La complexité
+$\Theta(nC)=\Theta\big(n\,2^{\log_2 C}\big)$ est donc \emph{exponentielle} en la taille de
+l'entrée. On dit l'algorithme \textbf{pseudo-polynomial}~: polynomial en la \emph{valeur} des
+données, non en leur \emph{taille}.
+
+\textbf{Tailles en octets, $C=10$~Go.} On aurait $C\approx 10^{10}$~: le tableau à lui seul
+occuperait des dizaines de gigaoctets et le calcul demanderait $n\cdot 10^{10}$ opérations —
+irréalisable. On change donc d'unité (par exemple le mégaoctet, ou le PGCD des tailles), ce
+qui divise $C$ par autant, ou l'on renonce à l'optimum exact au profit de l'heuristique
+gloutonne consistant à trier les objets par densité $f_i/t_i$ décroissante — laquelle donne,
+en version fractionnaire, une $2$-approximation.
+
+\Q Avec $t=[3,4,5,9,4]$, $f=[60,50,70,90,30]$, $C=10$~:
+\[ \boxed{\mu=130},\qquad\text{atteint par } S^{\star}=\{0,2\}\ \ (\text{tailles } 3+5=8\le
+10,\ \text{fréquences } 60+70=130). \]
+C'est le \emph{seul} sous-ensemble optimal. On remarquera que l'objet $3$, de fréquence
+maximale $90$, n'est pas retenu~: sa taille $9$ mobiliserait presque tout le cache pour un
+gain moindre. C'est exactement ce que le glouton par fréquence décroissante manquerait
+($90$ puis plus rien, soit $90<130$)~; le glouton par densité $f_i/t_i$, lui, donne
+$70/5=14$, $60/3=20$, $50/4=12{,}5$, $30/4=7{,}5$, $90/9=10$, soit l'ordre $0,2,\dots$ et
+retrouve ici l'optimum — mais ce n'est pas garanti en général.
+
+\textbf{Déroulé pour $t=[3,4,5]$, $f=[60,50,70]$, $C=8$}~:
+\[
+\begin{array}{l|ccccccccc}
+j & 0&1&2&3&4&5&6&7&8\\\hline
+\text{initialisation} & 0&0&0&0&0&0&0&0&0\\
+\text{après } (t_0,f_0)=(3,60) & 0&0&0&60&60&60&60&60&60\\
+\text{après } (t_1,f_1)=(4,50) & 0&0&0&60&60&60&60&110&110\\
+\text{après } (t_2,f_2)=(5,70) & 0&0&0&60&60&70&70&110&\mathbf{130}
+\end{array}
+\]
+D'où $\mu([3,4,5],[60,50,70],8)=\boxed{130}$, réalisé par $\{0,2\}$ (taille $8$).
+
+\subsection*{Requêtes SQL}
+
+\Q
+\begin{lstlisting}[style=sql]
+SELECT methode, COUNT(*) AS nb, SUM(octets) AS total_octets
+FROM journal
+GROUP BY methode
+ORDER BY nb DESC;
+\end{lstlisting}
+
+\Q
+\begin{lstlisting}[style=sql]
+SELECT chemin, COUNT(*) AS nb
+FROM journal
+GROUP BY chemin
+ORDER BY nb DESC, chemin ASC
+LIMIT 3;
+\end{lstlisting}
+Le second critère de tri (\code{chemin ASC}) rend le résultat déterministe en cas d'égalité~:
+sans lui, deux exécutions pourraient renvoyer des lignes différentes.
+
+\Q
+\begin{lstlisting}[style=sql]
+SELECT SUBSTR(horodatage, 12, 2) AS heure,
+       COUNT(*) AS total,
+       SUM(CASE WHEN statut BETWEEN 500 AND 599 THEN 1 ELSE 0 END) AS erreurs,
+       ROUND(100.0 * SUM(CASE WHEN statut BETWEEN 500 AND 599 THEN 1 ELSE 0 END)
+             / COUNT(*), 1) AS taux
+FROM journal
+GROUP BY heure
+ORDER BY heure;
+\end{lstlisting}
+Deux points méritent attention~: la position $12$ isole les deux caractères de l'heure dans
+\code{'AAAA-MM-JJ HH:MM:SS'} (les positions sont comptées à partir de $1$)~; et le facteur
+\code{100.0} force une division \emph{flottante} — avec \code{100}, la division entière
+renverrait $0$ pour tout taux inférieur à $100\,\%$.
+
+\Q
+\begin{lstlisting}[style=sql]
+SELECT ip, COUNT(*) AS nb4xx
+FROM journal
+WHERE statut BETWEEN 400 AND 499
+GROUP BY ip
+HAVING COUNT(*) >= 3
+ORDER BY nb4xx DESC;
+\end{lstlisting}
+On notera la différence de rôle entre \code{WHERE}, qui filtre les \emph{lignes} avant le
+regroupement, et \code{HAVING}, qui filtre les \emph{groupes} après.
+
+\Q Volume par pays~:
+\begin{lstlisting}[style=sql]
+SELECT c.pays, COUNT(*) AS nb, SUM(j.octets) AS octets
+FROM journal j
+JOIN client c ON j.ip = c.ip
+GROUP BY c.pays
+ORDER BY octets DESC;
+\end{lstlisting}
+Chemins jamais servis avec le statut $200$~:
+\begin{lstlisting}[style=sql]
+SELECT DISTINCT chemin
+FROM journal j1
+WHERE NOT EXISTS (SELECT 1 FROM journal j2
+                  WHERE j2.chemin = j1.chemin AND j2.statut = 200)
+ORDER BY chemin;
+\end{lstlisting}
+La sous-requête corrélée exprime directement la quantification universelle « pour toute ligne
+de ce chemin, le statut n'est pas $200$ ». Une écriture équivalente et souvent plus efficace
+utilise l'agrégation~:
+\begin{lstlisting}[style=sql]
+SELECT chemin FROM journal
+GROUP BY chemin
+HAVING SUM(CASE WHEN statut = 200 THEN 1 ELSE 0 END) = 0;
+\end{lstlisting}
+
+\subsection*{HTTPS}
+
+\Q
+\begin{lstlisting}
+def puissance_mod(a, e, n):
+    r = 1
+    a = a % n
+    while e > 0:
+        if e % 2 == 1:
+            r = (r * a) % n
+        a = (a * a) % n
+        e = e // 2
+    return r
+\end{lstlisting}
+\textbf{Terminaison.} Le variant est $e$~: c'est un entier naturel, et tant que la boucle
+continue on a $e\ge 1$, donc $\lfloor e/2\rfloor<e$. Il décroît strictement~: la boucle
+s'arrête. \hfill$\square$
+
+\textbf{Invariant.} Notons $a_0$ et $e_0$ les valeurs initiales.
+\begin{quote}\itshape
+Au début de chaque tour, $r\cdot a^{\,e}\equiv a_0^{\,e_0} \pmod n$.
+\end{quote}
+\emph{Initialisation.} $r=1$, $a\equiv a_0$, $e=e_0$~: l'égalité est immédiate.
+
+\emph{Hérédité.} Notons $r',a',e'$ les valeurs après un tour. Si $e$ est pair, $r'=r$,
+$a'\equiv a^2$, $e'=e/2$, d'où $r'a'^{e'}\equiv r\,(a^2)^{e/2}=r\,a^{e}$. Si $e$ est impair,
+$r'\equiv ra$, $a'\equiv a^{2}$, $e'=(e-1)/2$, d'où
+$r'a'^{e'}\equiv ra\cdot a^{e-1}=r\,a^{e}$. Dans les deux cas la quantité est conservée.
+
+\emph{Conclusion.} À la sortie $e=0$, donc $r\equiv r\cdot a^{0}\equiv a_0^{\,e_0}$.
+\hfill$\square$
+
+\textbf{Nombre de multiplications.} Le nombre de tours est le nombre de bits de $e$, soit
+$\lfloor\log_2 e\rfloor+1$. Chaque tour effectue un carré et, au plus, une multiplication~:
+d'où au plus $2(\lfloor\log_2 e\rfloor+1)=2\lfloor\log_2 e\rfloor+2$ multiplications
+modulaires. Le calcul naïf en demanderait $e-1$~: pour $e$ de $2048$ bits, on passe de
+$2^{2048}$ à moins de $4100$ multiplications.
+
+\emph{Vérification~: $300$ tirages aléatoires avec $n=2^{61}-1$ et des exposants jusqu'à
+$2^{40}$ redonnent exactement \code{pow(a, e, n)}.}
+
+\Q Le client calcule $K_C=B^{x}\bmod p$ et le serveur $K_S=A^{y}\bmod p$.
+\begin{lstlisting}
+K_client  = puissance_mod(B, x, p)
+K_serveur = puissance_mod(A, y, p)
+\end{lstlisting}
+\textbf{Démonstration.} Par associativité de l'exponentiation dans le groupe
+$(\mathbb{Z}/p\mathbb{Z})^{*}$~:
+\[ K_C \equiv B^{x} \equiv (g^{y})^{x} \equiv g^{xy} \equiv (g^{x})^{y} \equiv A^{y}
+\equiv K_S \pmod p . \]
+\hfill$\square$ Le secret $g^{xy}$ n'a jamais transité sur le réseau, bien qu'aucun des deux
+participants n'ait eu besoin de connaître l'exposant de l'autre.
+
+\textbf{Application numérique} ($p=23$, $g=5$, $x=6$, $y=15$)~:
+\[ A=5^{6}\bmod 23 = 15\,625 \bmod 23 = \boxed{8},\qquad
+   B=5^{15}\bmod 23 = \boxed{19}, \]
+\[ K = B^{x}\bmod 23 = 19^{6}\bmod 23 = \boxed{2}
+    \qquad\text{et}\qquad A^{y}\bmod 23 = 8^{15}\bmod 23 = 2 . \]
+(Détail pour $A$~: $5^2=25\equiv 2$, $5^4\equiv 4$, $5^6=5^4\cdot 5^2\equiv 4\cdot 2=8$.)
+
+\Q \textbf{Algorithme naïf.} On énumère $k=0,1,2,\dots$ en calculant $g^{k}$ de proche en
+proche ($g^{k+1}=g\cdot g^{k}$) jusqu'à trouver $A$. Comme l'ordre de $g$ divise $p-1$, on
+s'arrête au plus tard après $p-1$ essais~: complexité $O(p)$ en temps, $O(1)$ en espace.
+
+\textbf{Pas de bébé, pas de géant.} Posons $m=\lceil\sqrt{p-1}\,\rceil$ et écrivons
+$x=im+j$ avec $0\le i,j<m$ (possible car $x<p-1\le m^2$). Alors
+\[ g^{x}=A \iff g^{j}= A\,(g^{-m})^{i}. \]
+\emph{Pas de bébé~:} on tabule les $m$ valeurs $g^{j}\bmod p$, $0\le j<m$, dans un
+dictionnaire. \emph{Pas de géant~:} on calcule $u=g^{-m}\bmod p$ (par le petit théorème de
+Fermat, $g^{-m}\equiv g^{\,p-1-m}$), puis les valeurs $A u^{i}$ pour $i=0,1,\dots$ jusqu'à en
+trouver une dans la table~; on lit alors $j$ et l'on renvoie $x=im+j$. Coût~:
+$O(\sqrt{p})$ opérations et $O(\sqrt{p})$ en espace.
+
+\textbf{Ordres de grandeur pour $p$ de $2048$ bits.} Une machine à $10^{9}$ opérations par
+seconde effectue environ $3{,}15\times10^{16}$ opérations par an.
+\[ \text{naïf}~: p\approx 2^{2048}\approx 10^{616}\ \text{opérations},\qquad
+   \text{BSGS}~: \sqrt{p}\approx 2^{1024}\approx 10^{308}\ \text{opérations}. \]
+Même la variante en $\sqrt{p}$ demanderait de l'ordre de $10^{291}$ années — à comparer aux
+$1{,}4\times 10^{10}$ années de l'âge de l'Univers. Et $O(\sqrt{p})$ en \emph{espace}, soit
+$10^{308}$ entrées, est de toute façon physiquement impossible.
+
+\textbf{Conclusion.} Le passage de $O(p)$ à $O(\sqrt{p})$ divise l'exposant par deux~: c'est
+considérable en théorie, sans aucun effet pratique ici. C'est précisément la raison pour
+laquelle la taille des clés est choisie de sorte que \emph{même} le meilleur algorithme connu
+— le crible de corps de nombres, en complexité sous-exponentielle — reste hors de portée.
+C'est aussi pourquoi on préfère aujourd'hui les courbes elliptiques~: aucun analogue du
+crible n'y est connu, si bien qu'une clé de $256$ bits y offre le même niveau de sécurité
+qu'une clé de $3072$ bits modulo $p$, pour un coût de calcul bien moindre.
+
+\Q \textbf{Synthèse.}
+
+\emph{Confidentialité persistante.} Si les exposants $x$ et $y$ sont éphémères et effacés
+après usage, le secret $g^{xy}$ d'une session passée n'est reconstituable par personne~:
+il ne subsiste nulle part, et la clé privée à long terme du serveur ne sert qu'à
+\emph{signer} l'échange, jamais à le \emph{chiffrer}. Un attaquant qui aurait enregistré tout
+le trafic puis obtiendrait la clé privée du serveur — par vol, contrainte légale ou faille —
+ne pourrait toujours pas déchiffrer les sessions passées~; il pourrait seulement usurper
+l'identité du serveur pour les sessions \emph{futures}. C'est la \emph{confidentialité
+persistante} (\emph{forward secrecy}), rendue obligatoire par TLS~1.3.
+
+Dans l'ancien mécanisme, au contraire, le client tirait la clé de session et l'envoyait
+chiffrée avec la clé publique du serveur~: cette clé de session était donc, pour toujours,
+récupérable par quiconque obtenait la clé privée. Une seule compromission ouvrait
+rétroactivement des années d'archives — d'où sa suppression pure et simple.
+
+\emph{Deux menaces de nature différente.} La partie~II traite de l'\textbf{intégrité} face à
+un adversaire \emph{aveugle et non malveillant}~: le bruit, une mémoire défectueuse, un
+routeur mal programmé. La somme de contrôle Internet est conçue contre les erreurs
+\emph{aléatoires}, et l'on a vu qu'elle est très facile à contourner intentionnellement
+(question 15~: il suffit de permuter deux mots). La partie~V traite de la
+\textbf{confidentialité} et de l'\textbf{authenticité} face à un adversaire
+\emph{intelligent}, qui choisit ses altérations pour ne pas être détecté.
+
+Un mécanisme de la première catégorie ne protège en rien contre la seconde menace~: c'est
+pourquoi TLS n'ajoute pas une somme de contrôle mais un \emph{code d'authentification de
+message} muni d'une clé secrète, dont la sécurité repose sur une hypothèse calculatoire et
+non sur une propriété combinatoire. Les deux couches coexistent parce qu'elles répondent à
+des questions distinctes~: « ce paquet a-t-il été abîmé~? » et « ce paquet vient-il bien de
+mon interlocuteur, et lui seul peut-il le lire~? ».
+
+\vfill
+\begin{center}\small\textsc{Fin du corrigé} \quad---\quad
+\href{https://cpgeacademy.org}{cpgeacademy.org}\end{center}
+\end{document}
